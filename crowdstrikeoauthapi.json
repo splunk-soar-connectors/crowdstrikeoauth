@@ -24,6 +24,7 @@
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
     "min_phantom_version": "4.10.0.40961",
+    "fips_compliant": "true",
     "python_version": "3",
     "app_wizard_version": "1.0.0",
     "configuration": {

@@ -322,3 +322,18 @@ def process_list_view(provides, all_app_runs, context):
 
     # print context
     return 'crowdstrike_process_list_view.html'
+
+
+def command_view(provides, all_app_runs, context):
+
+    context['results'] = results = []
+    for summary, action_results in all_app_runs:
+        for result in action_results:
+
+            ctx_result = get_ctx_result_ps(result)
+            if (not ctx_result):
+                continue
+            results.append(ctx_result)
+
+    # print context
+    return 'crowdstrike_command_output.html'

@@ -2516,7 +2516,7 @@
                 },
                 "data": {
                     "data_type": "string",
-                    "description": "Data to include with command",
+                    "description": "Data/Arguments for the command",
                     "order": 3
                 }
             },
@@ -2592,9 +2592,7 @@
                     "data_type": "string",
                     "example_values": [
                         "ls"
-                    ],
-                    "column_name": "Command",
-                    "column_order": 1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.complete",
@@ -2616,18 +2614,14 @@
                     "data_type": "string",
                     "example_values": [
                         "Check your filename. Couldn't find 'some_file.txt'"
-                    ],
-                    "column_name": "Stderr",
-                    "column_order": 3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.stdout",
                     "data_type": "string",
                     "example_values": [
                         "Directory listing for C:\\ -\n\nName"
-                    ],
-                    "column_name": "Stdout",
-                    "column_order": 2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.task_id",
@@ -2645,9 +2639,7 @@
                     ],
                     "contains": [
                         "crowdstrike cloud request id"
-                    ],
-                    "column_name": "Cloud Request ID",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2674,9 +2666,8 @@
             "versions": "EQ(*)",
             "render": {
                 "title": "Run Command",
-                "type": "table",
-                "height": 5,
-                "width": 12
+                "type": "custom",
+                "view": "crowdstrike_view.command_view"
             }
         },
         {
@@ -2750,7 +2741,7 @@
                 },
                 "data": {
                     "data_type": "string",
-                    "description": "Data to include with command",
+                    "description": "Data/Arguments for the command",
                     "order": 3
                 }
             },
@@ -2826,9 +2817,7 @@
                     "data_type": "string",
                     "example_values": [
                         "ls"
-                    ],
-                    "column_name": "Command",
-                    "column_order": 1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.complete",
@@ -2850,18 +2839,14 @@
                     "data_type": "string",
                     "example_values": [
                         "Check your filename. Couldn't find 'some_file.txt'"
-                    ],
-                    "column_name": "Stderr",
-                    "column_order": 3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.stdout",
                     "data_type": "string",
                     "example_values": [
                         "Directory listing for C:\\ -\n\nName"
-                    ],
-                    "column_name": "Stdout",
-                    "column_order": 2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.task_id",
@@ -2879,9 +2864,7 @@
                     ],
                     "contains": [
                         "crowdstrike cloud request id"
-                    ],
-                    "column_name": "Cloud Request ID",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2908,9 +2891,8 @@
             "versions": "EQ(*)",
             "render": {
                 "title": "Run Admin Command",
-                "type": "table",
-                "height": 5,
-                "width": 12
+                "type": "custom",
+                "view": "crowdstrike_view.command_view"
             }
         },
         {

@@ -12,14 +12,14 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
-from datetime import datetime
-from phantom import utils as ph_utils
-from bs4 import UnicodeDammit
-
 import hashlib
 import json
-import time
 import sys
+import time
+from datetime import datetime
+
+from bs4 import UnicodeDammit
+from phantom import utils as ph_utils
 
 _container_common = {
     "description": "Container added by Phantom",
@@ -157,8 +157,9 @@ def _collate_results(detection_events):
             ingest_event['container'] = container
             container.update(_container_common)
             if sys.version_info[0] == 2:
-                container['name'] = "{0} {1}".format(UnicodeDammit(detection_name).unicode_markup.encode('utf-8'), 'at {0}'.format(creation_time) if (not machine_name)
-                    else 'on {0} at {1}'.format(UnicodeDammit(machine_name).unicode_markup.encode('utf-8'), creation_time))
+                container['name'] = "{0} {1}".format(UnicodeDammit(detection_name).unicode_markup.encode('utf-8'),
+                    'at {0}'.format(creation_time) if (not machine_name) else 'on {0} at {1}'.format(
+                    UnicodeDammit(machine_name).unicode_markup.encode('utf-8'), creation_time))
             else:
                 container['name'] = "{0} {1}".format(detection_name, 'at {0}'.format(creation_time) if (not machine_name)
                     else 'on {0} at {1}'.format(machine_name, creation_time))
@@ -409,7 +410,8 @@ def parse_events(events, base_connector, collate):
         container.update(_container_common)
         if sys.version_info[0] == 2:
             container['name'] = "{0} on {1} at {2}".format(
-                                    UnicodeDammit(detection_name).unicode_markup.encode('utf-8'), UnicodeDammit(hostname).unicode_markup.encode('utf-8'), creation_time)
+                UnicodeDammit(detection_name).unicode_markup.encode('utf-8'),
+                UnicodeDammit(hostname).unicode_markup.encode('utf-8'), creation_time)
         else:
             container['name'] = "{0} on {1} at {2}".format(detection_name, hostname, creation_time)
         container['severity'] = _severity_map.get(str(event_details.get('Severity', 3)), 'medium')

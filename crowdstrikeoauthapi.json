@@ -23,8 +23,9 @@
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "5.0.0",
     "python_version": "3",
+    "fips_compliant": true,
     "app_wizard_version": "1.0.0",
     "configuration": {
         "url": {
@@ -9159,11 +9160,11 @@
                     "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
                     "contains": [
-                        "ipv6",
                         "sha256",
                         "md5",
                         "domain",
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "example_values": [
                         "8.8.8.8"

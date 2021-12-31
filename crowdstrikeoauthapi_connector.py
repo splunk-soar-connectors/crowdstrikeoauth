@@ -176,7 +176,7 @@ class CrowdstrikeConnector(BaseConnector):
             self.get_phantom_base_url(), self.get_asset_id(), common_str, gt_date.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
         try:
-            r = requests.get(request_str, verify=False)    # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+            r = requests.get(request_str, verify=False)    # nosemgrep
         except Exception as e:
             self.debug_print("Error making local rest call: {0}".format(self._get_error_message_from_exception(e)))
             self.debug_print('DB QUERY: {}'.format(request_str))

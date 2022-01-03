@@ -1,5 +1,5 @@
 [comment]: # " File: readme.md"
-[comment]: # "  Copyright (c) 2019-2021 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
@@ -272,3 +272,10 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
     valid \[device_id\] and \[session_id\] parameters should be provided by the user. The user 
     should select "cd" from the \[command\] dropdown parameter and provide "C:\some_directory" 
     input in the \[data\] parameter.
+
+## Port Information
+The app uses HTTP/HTTPS protocol for communicating with the Crowdstrike Server. Below are the default ports used by Splunk SOAR.
+SERVICE NAME | TRANSPORT PROTOCOL | PORT
+------------ | ------------------ | ----
+**http** | tcp | 80
+**https** | tcp | 443

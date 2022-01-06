@@ -276,7 +276,7 @@ def _create_dict_hash(input_dict):
     if sys.version_info[0] == 3:
         input_dict_str = UnicodeDammit(input_dict_str).unicode_markup.encode('utf-8')
 
-    return hashlib.md5(input_dict_str).hexdigest()
+    return hashlib.sha256(input_dict_str).hexdigest()
 
 
 def _parse_sub_events(artifacts_list, input_dict, key_name, parent_artifact):

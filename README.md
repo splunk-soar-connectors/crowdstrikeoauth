@@ -205,13 +205,91 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
 
 <!-- -->
 
--   **Action -** Run Command, Run Admin Command, List Session Files, Get Session File
+-   **Action -** List Session Files, Get Session File
 
 <!-- -->
 
 -   To add \[session id\] to the action parameters of these actions, a session with the Create
     Session action needs to be created. Also, the user can delete the session using the Delete
     Session action.
+
+-   **Action -** Run Command
+
+<!-- -->
+
+-   This action can run the below-mentioned RTR commands on the host:
+    * cat
+    * cd
+    * env
+    * eventlog
+    * filehash
+    * getsid
+    * ipconfig
+    * ls
+    * mount
+    * netstat
+    * ps
+    * reg query
+-   To add \[session id\] to the action parameters of these actions, a session with the Create
+    Session action needs to be created. Also, the user can delete the session using the Delete
+    Session action.
+-   Example action run: If "cd C:\some_directory" command needs to be run using this action, 
+    valid \[device_id\] and \[session_id\] parameters should be provided by the user. The user 
+    should select "cd" from the \[command\] dropdown parameter and provide "C:\some_directory" 
+    input in the \[data\] parameter.
+
+-   **Action -** Run Admin Command
+
+<!-- -->
+
+-   This action can run the below-mentioned RTR administrator commands on the host:
+    * cat
+    * cd
+    * cp
+    * encrypt
+    * env
+    * eventlog
+    * filehash
+    * get
+    * getsid
+    * ipconfig
+    * kill
+    * ls
+    * map
+    * memdump
+    * mkdir
+    * mount
+    * mv
+    * netstat
+    * ps
+    * put
+    * reg query
+    * reg set
+    * reg delete
+    * reg load
+    * reg unload
+    * restart
+    * rm
+    * run
+    * runscript
+    * shutdown
+    * unmap
+    * xmemdump
+    * zip
+-   To add \[session id\] to the action parameters of these actions, a session with the Create
+    Session action needs to be created. Also, the user can delete the session using the Delete
+    Session action.
+-   Example action run: If "cd C:\some_directory" command needs to be run using this action, 
+    valid \[device_id\] and \[session_id\] parameters should be provided by the user. The user 
+    should select "cd" from the \[command\] dropdown parameter and provide "C:\some_directory" 
+    input in the \[data\] parameter.
+
+## Port Information
+The app uses HTTP/HTTPS protocol for communicating with the Crowdstrike Server. Below are the default ports used by Splunk SOAR.
+SERVICE NAME | TRANSPORT PROTOCOL | PORT
+------------ | ------------------ | ----
+**http** | tcp | 80
+**https** | tcp | 443
 
 
 ### Configuration Variables

@@ -1515,7 +1515,7 @@ class CrowdstrikeConnector(BaseConnector):
             summary['session_id'] = resp_json['resources'][0]['session_id']
         except:
             return action_result.set_status(phantom.APP_SUCCESS,
-                "Session created successfully but, unable to find session_id from the response. Unexpected response retrieved")
+                "Session created successfully, but unable to find session_id from the response. Unexpected response retrieved")
 
         return action_result.set_status(phantom.APP_SUCCESS, "Session created successfully")
 

@@ -14,17 +14,18 @@
             "name": "Harrison Smith"
         }
     ],
-    "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.4.3",
+    "license": "Copyright (c) 2019-2022 Splunk Inc.",
+    "app_version": "3.5.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, October 14 2021, API version: v1, v2"
+        "Cloud, API api.crowdstrike.com, January 8 2022, API version: v1, v2"
     ],
     "utctime_updated": "2022-01-07T20:05:58.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "5.0.0",
     "python_version": "3",
+    "fips_compliant": true,
     "app_wizard_version": "1.0.0",
     "configuration": {
         "url": {
@@ -2516,7 +2517,7 @@
                 },
                 "data": {
                     "data_type": "string",
-                    "description": "Data to include with command",
+                    "description": "Data/Arguments for the command",
                     "order": 3
                 }
             },
@@ -2592,9 +2593,7 @@
                     "data_type": "string",
                     "example_values": [
                         "ls"
-                    ],
-                    "column_name": "Command",
-                    "column_order": 1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.complete",
@@ -2616,18 +2615,14 @@
                     "data_type": "string",
                     "example_values": [
                         "Check your filename. Couldn't find 'some_file.txt'"
-                    ],
-                    "column_name": "Stderr",
-                    "column_order": 3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.stdout",
                     "data_type": "string",
                     "example_values": [
                         "Directory listing for C:\\ -\n\nName"
-                    ],
-                    "column_name": "Stdout",
-                    "column_order": 2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.task_id",
@@ -2645,9 +2640,7 @@
                     ],
                     "contains": [
                         "crowdstrike cloud request id"
-                    ],
-                    "column_name": "Cloud Request ID",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2674,9 +2667,8 @@
             "versions": "EQ(*)",
             "render": {
                 "title": "Run Command",
-                "type": "table",
-                "height": 5,
-                "width": 12
+                "type": "custom",
+                "view": "crowdstrike_view.command_view"
             }
         },
         {
@@ -2750,7 +2742,7 @@
                 },
                 "data": {
                     "data_type": "string",
-                    "description": "Data to include with command",
+                    "description": "Data/Arguments for the command",
                     "order": 3
                 }
             },
@@ -2826,9 +2818,7 @@
                     "data_type": "string",
                     "example_values": [
                         "ls"
-                    ],
-                    "column_name": "Command",
-                    "column_order": 1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.complete",
@@ -2850,18 +2840,14 @@
                     "data_type": "string",
                     "example_values": [
                         "Check your filename. Couldn't find 'some_file.txt'"
-                    ],
-                    "column_name": "Stderr",
-                    "column_order": 3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.stdout",
                     "data_type": "string",
                     "example_values": [
                         "Directory listing for C:\\ -\n\nName"
-                    ],
-                    "column_name": "Stdout",
-                    "column_order": 2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resources.*.task_id",
@@ -2879,9 +2865,7 @@
                     ],
                     "contains": [
                         "crowdstrike cloud request id"
-                    ],
-                    "column_name": "Cloud Request ID",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2908,9 +2892,8 @@
             "versions": "EQ(*)",
             "render": {
                 "title": "Run Admin Command",
-                "type": "table",
-                "height": 5,
-                "width": 12
+                "type": "custom",
+                "view": "crowdstrike_view.command_view"
             }
         },
         {
@@ -9177,11 +9160,11 @@
                     "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
                     "contains": [
-                        "ipv6",
                         "sha256",
                         "md5",
                         "domain",
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "example_values": [
                         "8.8.8.8"

@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_consts.py
 #
-# Copyright (c) 2019-2021 Splunk Inc.
+# Copyright (c) 2019-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -103,7 +103,8 @@ CROWDSTRIKE_COMPLETED = "Completed {0:.0%}"
 CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in the {key} parameter"
 CROWDSTRIKE_ERROR_CODE_MESSAGE = "Error code unavailable"
 CROWDSTRIKE_ERROR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or action parameters."
-CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the Crowdstrike server. Please check the asset configuration and|or the action parameters."
+CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the Crowdstrike server. "\
+    "Please check the asset configuration and|or the action parameters."
 CROWDSTRIKE_CODE_MESSAGE = "Error code: 404"
 CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
 CROWDSTRIKE_NO_DATA_MESSAGE = "No data found"
@@ -194,5 +195,5 @@ CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not
 CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Indicator not found'
 CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE_DELETE_IOC = 'Please provide at least one of the parameter'
 CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE = "Please enter valid value in '{}' parameter"
-CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc", "last_modified.asc",
-"indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]
+CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc",
+"last_modified.asc", "indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]

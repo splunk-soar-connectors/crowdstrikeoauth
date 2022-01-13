@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2019-2021 Splunk Inc.
+  Copyright (c) 2019-2022 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -189,9 +189,104 @@ The user can add a script file in the configuration parameter [<b>Script with fu
           If an incorrect value is provided in both the device_id and hostname parameters each, then, the action will fail with an appropriate error message.
         </li>
       </ul>
-  <li><b>Action -</b> Run Command, Run Admin Command, List Session Files, Get Session File</li>
+  <li><b>Action -</b> List Session Files, Get Session File</li>
       <ul>
         <li>
           To add [session id] to the action parameters of these actions, a session with the Create Session action needs to be created. Also, the user can delete the session using the Delete Session action.
         </li>
       </ul>
+      <br>
+  <li><b>Action -</b> Run Command</li>
+      <ul>
+        <li>
+          This action can run the below-mentioned RTR commands on the host:
+          <ul>
+            <li>cat</li>
+            <li>cd</li>
+            <li>env</li>
+            <li>eventlog</li>
+            <li>filehash</li>
+            <li>getsid</li>
+            <li>ipconfig</li>
+            <li>ls</li>
+            <li>mount</li>
+            <li>netstat</li>
+            <li>ps</li>
+            <li>reg query</li>
+          </ul>
+        </li>
+        <li>
+          To add [session id] to the action parameters of these actions, a session with the Create Session action needs to be created. Also, the user can delete the session using the Delete Session action.
+        </li>
+        <li>
+          Example action run: If "cd C:\some_directory" command needs to be run using this action, valid [device_id] and [session_id] parameters should be provided by the user. The user should select "cd" from the [command] dropdown parameter and provide "C:\some_directory" input in the [data] parameter.
+        </li>
+      </ul>
+  <li><b>Action -</b> Run Admin Command</li>
+      <ul>
+        <li>
+          This action can run the below-mentioned RTR administrator commands on the host:
+          <ul>
+            <li>cat</li>
+            <li>cd</li>
+            <li>cp</li>
+            <li>encrypt</li>
+            <li>env</li>
+            <li>eventlog</li>
+            <li>filehash</li>
+            <li>get</li>
+            <li>getsid</li>
+            <li>ipconfig</li>
+            <li>kill</li>
+            <li>ls</li>
+            <li>map</li>
+            <li>memdump</li>
+            <li>mkdir</li>
+            <li>mount</li>
+            <li>mv</li>
+            <li>netstat</li>
+            <li>ps</li>
+            <li>put</li>
+            <li>reg query</li>
+            <li>reg set</li>
+            <li>reg delete</li>
+            <li>reg load</li>
+            <li>reg unload</li>
+            <li>restart</li>
+            <li>rm</li>
+            <li>run</li>
+            <li>runscript</li>
+            <li>shutdown</li>
+            <li>unmap</li>
+            <li>xmemdump</li>
+            <li>zip</li>
+          </ul>
+        </li>
+        <li>
+          To add [session id] to the action parameters of these actions, a session with the Create Session action needs to be created. Also, the user can delete the session using the Delete Session action.
+        </li>
+        <li>
+          Example action run: If "cd C:\some_directory" command needs to be run using this action, valid [device_id] and [session_id] parameters should be provided by the user. The user should select "cd" from the [command] dropdown parameter and provide "C:\some_directory" input in the [data] parameter.
+        </li>
+      </ul>
+<h2>Port Information</h2>
+  <p>
+    The app uses HTTP/HTTPS protocol for communicating with the Crowdstrike Server. Below are the default ports used by Splunk SOAR.
+    <table>
+      <tr class=plain>
+        <th>Service Name</th>
+        <th>Transport Protocol</th>
+        <th>Port</th>
+      </tr>
+      <tr>
+        <td>http</td>
+        <td>tcp</td>
+        <td>80</td>
+      </tr>
+      <tr>
+        <td>https</td>
+        <td>tcp</td>
+        <td>443</td>
+      </tr>
+    </table>
+  </p>

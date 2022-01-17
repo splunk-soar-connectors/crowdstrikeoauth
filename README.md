@@ -2,16 +2,16 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 3\.4\.2  
+Connector Version: 3\.5\.1  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.10\.0\.40961  
+Minimum Product Version: 5\.0\.0  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2021 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
@@ -213,83 +213,90 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
     Session action needs to be created. Also, the user can delete the session using the Delete
     Session action.
 
+  
+
 -   **Action -** Run Command
 
 <!-- -->
 
 -   This action can run the below-mentioned RTR commands on the host:
-    * cat
-    * cd
-    * env
-    * eventlog
-    * filehash
-    * getsid
-    * ipconfig
-    * ls
-    * mount
-    * netstat
-    * ps
-    * reg query
+    -   cat
+    -   cd
+    -   env
+    -   eventlog
+    -   filehash
+    -   getsid
+    -   ipconfig
+    -   ls
+    -   mount
+    -   netstat
+    -   ps
+    -   reg query
 -   To add \[session id\] to the action parameters of these actions, a session with the Create
     Session action needs to be created. Also, the user can delete the session using the Delete
     Session action.
--   Example action run: If "cd C:\some_directory" command needs to be run using this action, 
-    valid \[device_id\] and \[session_id\] parameters should be provided by the user. The user 
-    should select "cd" from the \[command\] dropdown parameter and provide "C:\some_directory" 
-    input in the \[data\] parameter.
+-   Example action run: If "cd C:\\some_directory" command needs to be run using this action, valid
+    \[device_id\] and \[session_id\] parameters should be provided by the user. The user should
+    select "cd" from the \[command\] dropdown parameter and provide "C:\\some_directory" input in
+    the \[data\] parameter.
+
+<!-- -->
 
 -   **Action -** Run Admin Command
 
 <!-- -->
 
 -   This action can run the below-mentioned RTR administrator commands on the host:
-    * cat
-    * cd
-    * cp
-    * encrypt
-    * env
-    * eventlog
-    * filehash
-    * get
-    * getsid
-    * ipconfig
-    * kill
-    * ls
-    * map
-    * memdump
-    * mkdir
-    * mount
-    * mv
-    * netstat
-    * ps
-    * put
-    * reg query
-    * reg set
-    * reg delete
-    * reg load
-    * reg unload
-    * restart
-    * rm
-    * run
-    * runscript
-    * shutdown
-    * unmap
-    * xmemdump
-    * zip
+    -   cat
+    -   cd
+    -   cp
+    -   encrypt
+    -   env
+    -   eventlog
+    -   filehash
+    -   get
+    -   getsid
+    -   ipconfig
+    -   kill
+    -   ls
+    -   map
+    -   memdump
+    -   mkdir
+    -   mount
+    -   mv
+    -   netstat
+    -   ps
+    -   put
+    -   reg query
+    -   reg set
+    -   reg delete
+    -   reg load
+    -   reg unload
+    -   restart
+    -   rm
+    -   run
+    -   runscript
+    -   shutdown
+    -   unmap
+    -   xmemdump
+    -   zip
 -   To add \[session id\] to the action parameters of these actions, a session with the Create
     Session action needs to be created. Also, the user can delete the session using the Delete
     Session action.
--   Example action run: If "cd C:\some_directory" command needs to be run using this action, 
-    valid \[device_id\] and \[session_id\] parameters should be provided by the user. The user 
-    should select "cd" from the \[command\] dropdown parameter and provide "C:\some_directory" 
-    input in the \[data\] parameter.
+-   Example action run: If "cd C:\\some_directory" command needs to be run using this action, valid
+    \[device_id\] and \[session_id\] parameters should be provided by the user. The user should
+    select "cd" from the \[command\] dropdown parameter and provide "C:\\some_directory" input in
+    the \[data\] parameter.
 
 ## Port Information
-The app uses HTTP/HTTPS protocol for communicating with the Crowdstrike Server. Below are the default ports used by Splunk SOAR.
-SERVICE NAME | TRANSPORT PROTOCOL | PORT
------------- | ------------------ | ----
-**http** | tcp | 80
-**https** | tcp | 443
+
+The app uses HTTP/HTTPS protocol for communicating with the Crowdstrike Server. Below are the
+default ports used by Splunk SOAR.
+
+| Service Name | Transport Protocol | Port |
+|--------------|--------------------|------|
+| http         | tcp                | 80   |
+| https        | tcp                | 443  |
 
 
 ### Configuration Variables
@@ -801,7 +808,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **device\_id** |  required  | Device ID | string |  `crowdstrike device id` 
 **session\_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
 **command** |  required  | RTR command to execute on host | string | 
-**data** |  optional  | Data to include with command | string | 
+**data** |  optional  | Data/Arguments for the command | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -839,7 +846,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **device\_id** |  required  | Device ID | string |  `crowdstrike device id` 
 **session\_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
 **command** |  required  | RTR Admin command to execute on host | string | 
-**data** |  optional  | Data to include with command | string | 
+**data** |  optional  | Data/Arguments for the command | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -1968,7 +1975,7 @@ action\_result\.parameter\.description | string |
 action\_result\.parameter\.expiration | numeric | 
 action\_result\.parameter\.filename | string | 
 action\_result\.parameter\.host\_groups | string |  `crowdstrike host group id` 
-action\_result\.parameter\.ioc | string |  `ipv6`  `sha256`  `md5`  `domain`  `ip` 
+action\_result\.parameter\.ioc | string |  `sha256`  `md5`  `domain`  `ip`  `ipv6` 
 action\_result\.parameter\.platforms | string |  `crowdstrike indicator platforms` 
 action\_result\.parameter\.severity | string |  `severity` 
 action\_result\.parameter\.source | string | 

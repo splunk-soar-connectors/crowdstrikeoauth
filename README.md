@@ -2,7 +2,7 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 3\.5\.2  
+Connector Version: 3\.5\.3  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): "\.\*"  

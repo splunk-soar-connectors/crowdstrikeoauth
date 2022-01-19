@@ -3229,6 +3229,19 @@ class CrowdstrikeConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
+    def _get_fips_enabled(self):
+        try:
+            from phantom_common.install_info import is_fips_enabled
+        except ImportError:
+            return False
+
+        fips_enabled = is_fips_enabled()
+        if fips_enabled:
+            self.debug_print('FIPS is enabled')
+        else:
+            self.debug_print('FIPS is not enabled')
+        return fips_enabled
+
     def handle_action(self, param):
 
         # Get the action that we are supposed to execute for this App Run

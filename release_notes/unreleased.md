@@ -1,1 +1,4 @@
 **Unreleased**
+* Added documentation to clarify differences in commands between 'run command' and 'run admin command' actions [PAPP-19490]
+* Added custom view for 'run command' and 'run admin command' actions to format the output [PAPP-13361]
+* Changed the hashing algorithm to SHA256 when running in FIPS mode [PAPP-21043]

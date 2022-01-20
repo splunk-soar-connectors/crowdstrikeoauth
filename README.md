@@ -2,7 +2,7 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 3\.5\.3  
+Connector Version: 3\.5\.4  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): "\.\*"  
@@ -123,9 +123,9 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
 <!-- -->
 
 -   This action will download the resource report based on the provided artifact ID. Currently we
-    support the following Strict IOC CSV, Strict IOC JSON, Strict IOC STIX2.1, Strict IOC
-    MAEC5.0, Broad IOC CSV, Broad IOC JSON, Broad IOC STIX2.1, Broad IOC MAEC5.0, Memory Strings,
-    Icon, Screenshot artifact IDs.
+    support the following Strict IOC CSV, Strict IOC JSON, Strict IOC STIX2.1, Strict IOC MAEC5.0,
+    Broad IOC CSV, Broad IOC JSON, Broad IOC STIX2.1, Broad IOC MAEC5.0, Memory Strings, Icon,
+    Screenshot artifact IDs.
 
 <!-- -->
 

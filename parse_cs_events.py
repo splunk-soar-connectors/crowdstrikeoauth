@@ -1,16 +1,25 @@
 # File: parse_cs_events.py
-# Copyright (c) 2019-2021 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-
-from datetime import datetime
-from phantom import utils as ph_utils
-from bs4 import UnicodeDammit
-
+# Copyright (c) 2019-2022 Splunk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
 import hashlib
 import json
-import time
 import sys
+import time
+from datetime import datetime
+
+from bs4 import UnicodeDammit
+from phantom import utils as ph_utils
 
 _container_common = {
     "description": "Container added by Phantom",
@@ -109,7 +118,7 @@ def _get_event_types(events):
     return event_types
 
 
-def _collate_results(detection_events):
+def _collate_results(base_connector, detection_events):
 
     results = []
 
@@ -148,18 +157,19 @@ def _collate_results(detection_events):
             ingest_event['container'] = container
             container.update(_container_common)
             if sys.version_info[0] == 2:
-                container['name'] = "{0} {1}".format(UnicodeDammit(detection_name).unicode_markup.encode('utf-8'), 'at {0}'.format(creation_time) if (not machine_name)
-                    else 'on {0} at {1}'.format(UnicodeDammit(machine_name).unicode_markup.encode('utf-8'), creation_time))
+                container['name'] = "{0} {1}".format(UnicodeDammit(detection_name).unicode_markup.encode('utf-8'),
+                    'at {0}'.format(creation_time) if (not machine_name) else 'on {0} at {1}'.format(
+                    UnicodeDammit(machine_name).unicode_markup.encode('utf-8'), creation_time))
             else:
                 container['name'] = "{0} {1}".format(detection_name, 'at {0}'.format(creation_time) if (not machine_name)
                     else 'on {0} at {1}'.format(machine_name, creation_time))
-            container['source_data_identifier'] = _create_dict_hash(container)
+            container['source_data_identifier'] = _create_dict_hash(base_connector, container)
 
             # now the artifacts
             ingest_event['artifacts'] = artifacts = []
             for j, detection_event in enumerate(per_detection_machine_events):
 
-                artifacts_ret = _create_artifacts_from_event(detection_event)
+                artifacts_ret = _create_artifacts_from_event(base_connector, detection_event)
 
                 if artifacts_ret:
                     artifacts.extend(artifacts_ret)
@@ -251,7 +261,7 @@ def _get_artifact_name(key_name):
     return artifact_name
 
 
-def _create_dict_hash(input_dict):
+def _create_dict_hash(base_connector, input_dict):
 
     input_dict_str = None
 
@@ -266,10 +276,16 @@ def _create_dict_hash(input_dict):
     if sys.version_info[0] == 3:
         input_dict_str = UnicodeDammit(input_dict_str).unicode_markup.encode('utf-8')
 
-    return hashlib.md5(input_dict_str).hexdigest()
+    fips_enabled = base_connector._get_fips_enabled()
+    # if fips is not enabled, we should continue with our existing md5 usage for generating SDIs
+    # to not impact existing customers
+    if not fips_enabled:
+        return hashlib.md5(input_dict_str).hexdigest()
+
+    return hashlib.sha256(input_dict_str).hexdigest()
 
 
-def _parse_sub_events(artifacts_list, input_dict, key_name, parent_artifact):
+def _parse_sub_events(base_connector, artifacts_list, input_dict, key_name, parent_artifact):
 
     """ A generic parser function
     """
@@ -302,13 +318,13 @@ def _parse_sub_events(artifacts_list, input_dict, key_name, parent_artifact):
         cef['parentSdi'] = parent_sdi
         artifact['severity'] = parent_artifact['severity']
         artifacts_list.append(artifact)
-        artifact['source_data_identifier'] = _create_dict_hash(artifact)
+        artifact['source_data_identifier'] = _create_dict_hash(base_connector, artifact)
         _set_cef_types(artifact, cef)
 
     return (len(artifacts_list) - artifacts_len)
 
 
-def _create_artifacts_from_event(event):
+def _create_artifacts_from_event(base_connector, event):
 
     # Make a copy, since the dictionary will be modified
     event_details = dict(event['event'])
@@ -342,12 +358,12 @@ def _create_artifacts_from_event(event):
     artifacts = list()
     artifacts.append(artifact)
 
-    _parse_sub_events(artifacts, cef, 'networkAccesses', artifact)
-    _parse_sub_events(artifacts, cef, 'documentsAccessed', artifact)
-    _parse_sub_events(artifacts, cef, 'scanResults', artifact)
-    _parse_sub_events(artifacts, cef, 'executablesWritten', artifact)
-    _parse_sub_events(artifacts, cef, 'quarantineFiles', artifact)
-    _parse_sub_events(artifacts, cef, 'dnsRequests', artifact)
+    _parse_sub_events(base_connector, artifacts, cef, 'networkAccesses', artifact)
+    _parse_sub_events(base_connector, artifacts, cef, 'documentsAccessed', artifact)
+    _parse_sub_events(base_connector, artifacts, cef, 'scanResults', artifact)
+    _parse_sub_events(base_connector, artifacts, cef, 'executablesWritten', artifact)
+    _parse_sub_events(base_connector, artifacts, cef, 'quarantineFiles', artifact)
+    _parse_sub_events(base_connector, artifacts, cef, 'dnsRequests', artifact)
 
     return artifacts
 
@@ -377,11 +393,11 @@ def parse_events(events, base_connector, collate):
     base_connector.save_progress("Got {0} events of type DetectionSummaryEvent".format(len(detection_events)))
 
     if collate:
-        return _collate_results(detection_events)
+        return _collate_results(base_connector, detection_events)
 
     for i, curr_event in enumerate(detection_events):
 
-        artifacts_ret = _create_artifacts_from_event(curr_event)
+        artifacts_ret = _create_artifacts_from_event(base_connector, curr_event)
 
         event_details = curr_event['event']
         detection_name = event_details.get('DetectName', 'Unknown Detection')
@@ -400,11 +416,12 @@ def parse_events(events, base_connector, collate):
         container.update(_container_common)
         if sys.version_info[0] == 2:
             container['name'] = "{0} on {1} at {2}".format(
-                                    UnicodeDammit(detection_name).unicode_markup.encode('utf-8'), UnicodeDammit(hostname).unicode_markup.encode('utf-8'), creation_time)
+                UnicodeDammit(detection_name).unicode_markup.encode('utf-8'),
+                UnicodeDammit(hostname).unicode_markup.encode('utf-8'), creation_time)
         else:
             container['name'] = "{0} on {1} at {2}".format(detection_name, hostname, creation_time)
         container['severity'] = _severity_map.get(str(event_details.get('Severity', 3)), 'medium')
-        container['source_data_identifier'] = _create_dict_hash(container)
+        container['source_data_identifier'] = _create_dict_hash(base_connector, container)
 
         # now the artifacts, will just be one
         ingest_event['artifacts'] = artifacts = []

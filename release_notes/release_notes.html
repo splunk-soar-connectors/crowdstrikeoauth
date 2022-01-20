@@ -1,0 +1,86 @@
+<b>CrowdStrike OAuth API Release Notes - Published by Splunk January 20, 2022</b>
+<br><br>
+<b>Version 3.5.4 - Released January 20, 2022</b>
+<ul>
+<li>Added documentation to clarify differences in commands between 'run command' and 'run admin command' actions [PAPP-19490]</li>
+<li>Added custom view for 'run command' and 'run admin command' actions to format the output [PAPP-13361]</li>
+<li>Changed the hashing algorithm to SHA256 when running in FIPS mode [PAPP-21043]</li>
+</ul>
+<b>Version 3.4.1 - Released October 27, 2021</b>
+<ul>
+	<li>Updated the API for the following actions [PAPP-19967, PAPP-20354, PAPP-19283]</li>
+	<ul>
+		<li>upload indicator</li>
+		<li>update indicator</li>
+		<li>delete indicator</li>
+		<li>get indicator</li>
+		<li>list custom indicators</li>
+	</ul>
+	<li>Added the 'get device scroll' action [PAPP-11357]</li>
+</ul>
+
+<b>Version 3.3.0 - Released August 10, 2021</b>
+<ul>
+<li>Fixed the manual polling issue [PAPP-19046]</li>
+</ul>
+<b>Version 3.2.0 - Released July 28, 2021</b>
+<ul>
+<li>Bug fix in 'on poll', 'download report' and 'get session file' actions [PAPP-17196] [PAPP-18786]</li>
+</ul>
+<b>Version 3.1.0 - Released June 28, 2021</b>
+<ul>
+	<li>Added below mentioned new actions:</li>
+		<ul>
+			<li> file reputation </li>
+			<li> url reputation </li>
+			<li> detonate file </li>
+			<li> detonate url </li>
+			<li> check status </li>
+			<li> download report </li>
+		</ul>
+	<li>Pass the 'get role', 'get session file', 'hunt domain', 'hunt file', 'get system info' and 'list processes' actions with 'No data found' when API returns empty response [PAPP-16914]</li>
+	<li>Fixed the automation triggering issue for 'on poll' [PAPP-17014]</li>
+	<li>Updated the vault deprecated method [PAPP-18131]</li>
+	<li>Maintained the action_result status while generating token [PAPP-12938]</li>
+	<li>Changed the code structure to resolve 'on poll' action complexity [PAPP-16668]</li>
+	<li>Updated the API and added the pagination for 'hunt file', 'hunt domain', and 'list processes' actions [PAPP-11616]</li>
+</ul>
+<b>Version 2.0.7 - Released June 04, 2021</b>
+<ul>
+<li>Fixed an infinite loop issue in the 'run admin command' action</li>
+</ul>
+<b>Version 2.0.6 - Released January 25, 2021</b>
+<ul>
+<li>Bug fixes in the 'query device' action</li>
+</ul>
+<b>Version 2.0.5 - Released October 28, 2020</b>
+<ul>
+<li>Added the last_offset_id in the state file</li>
+<li>Fixed the preprocess script issue in 'on poll' action</li>
+<li>Fixed the bearer token issue in the ingestion</li>
+</ul>
+<b>Version 2.0.4 - Released October 15, 2020</b>
+<ul>
+<li>Added 3 new actions</li>
+   <ul>
+	<li>update indicator</li>
+	<li>delete indicator</li>
+	<li>upload indicator</li>
+   </ul>
+<li>Bug fix in the 'test connectivity' action</li>
+<li>Fixed the custom output views for 'list tickets' action</li>
+<li>Added IPv6 validation</li>
+<li>Handled Unicode issues for input parameters</li>
+</ul>
+<b>Version 2.0.3 - Released September 11, 2020</b>
+<ul>
+<li>Compatibility changes for Python 3 support</li>
+<li>Added 29 new actions</li>
+<li>Added Real Time Response functionality</li>
+<li>Bug fixes in 'test connectivity' action</li>
+<li>Handled exceptions for Unicode character issues</li>
+</ul>
+<b>Version 1.0.3 - Released July 16, 2019</b>
+<ul>
+<li>Initial Release</li>
+</ul>

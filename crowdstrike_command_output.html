@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: crowdstrike_get_user_roles.html
+<!-- File: crowdstrike_command_output.html
   Copyright (c) 2019-2022 Splunk Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,14 @@
 
 <style>
 
+    .output {
+      font-family: Consolas,"courier new",monospace;
+      background-color: black;
+      color: beige;
+      margin: 10px;
+      padding: 10px;
+      overflow-y: scroll;
+    }
 
     .crowdstrike a:hover {
         text-decoration:underline;
@@ -89,8 +97,18 @@
         white-space:nowrap;
     }
 
+    tbody {
+		counter-reset: serial-number;  /* Set the serial number counter to 0 */
+	}
+
+    #tb2:before {
+		counter-increment: serial-number;  /* Increment the serial number counter */
+		content: counter(serial-number);  /* Display the counter */
+	}
+
 </style>
 <div class="crowdstrike" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+
     {% for result in results %} <!-- loop for each result -->
     <br>
 
@@ -99,21 +117,41 @@
         <h4 class="wf-h4-style">No data found</h4>
 
     {% else %}
-    <h3 class="wf-h3-style">Info</h3>
-    {% if result.check_param %}
-        <table class="wf-table-vertical">
-        {% if result.param.user_uuid %}
-            <tr>
-                <td>User UUID</td>
-                <td>{{ result.param.user_uuid }}</td>
-            </tr>
-        {% endif %}
-        </table>
-    {% else %}
-        <h4 class="wf-h4-style">No action parameters provided</h4>
+    <h3 class="wf-h3-style">Command Info</h3>
+    <table class="wf-table-vertical">
+    {% if result.param.device_id %}
+        <tr>
+            <td>Device ID</td>
+            <td>
+                <a href="javascript:;"
+                                    onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ result.param.device_id }}
+                                        &nbsp;
+                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                    </a>
+            </td>
+        </tr>
     {% endif %}
+    {% if result.param.session_id %}
+    <td>Session ID</td>
+    <td>
+        <a href="javascript:;"
+        onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ result.param.session_id }}' }], 0, {{ container.id }}, null, false);">
+            {{ result.param.session_id }}
+        &nbsp;
+        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+        </a> 
+    </td>
+    {% endif %}
+    {% if result.param.command %}
+        <tr>
+            <td>Command</td>
+            <td>{{ result.param.command }}</td>
+        </tr>
+    {% endif %}
+    </table>
 
-    <h3 class="wf-h3-style">Role Info</h3>
+    <h3 class="wf-h3-style">Run Info</h3>
     <div class="metadata_div">
         <!--Default View-->
         <div class="panel-group" id="server-information">
@@ -122,23 +160,43 @@
                     <table class="wf-table-horizontal datatable">
                         <thead>
                             <tr>
-                                <th>Roles</th>
+                                <th>Cloud Request ID</th>
+                                <th>Stdout</th>
+                                <th>Stderr</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in result.data %}
-                                {% for resource in item.resources %}
-                                    <tr>
-                                        <td>
-                                            <a href="javascript:;"
-                                            onclick="context_menu(this, [{'contains': ['crowdstrike user role id'], 'value': '{{ resource }}' }], 0, {{ container.id }}, null, false);">
-                                                {{ resource }}
-                                                &nbsp;
-                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
+                            {% for field in item.resources %}
+                                <tr>
+                                  <td>
+                                    {% if result.summary.cloud_request_id %}
+                                      <a href="javascript:;"
+                                      onclick="context_menu(this, [{'contains': ['crowdstrike cloud request id'], 'value': '{{ result.summary.cloud_request_id }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ result.summary.cloud_request_id }}
+                                      &nbsp;
+                                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                      </a> 
+                                    {% else %}
+                                        None
+                                    {% endif %}
+                                </td>  
+                                  <td>
+                                        {% if field.stdout %}
+                                            <pre class="output">{{ field.stdout }}</pre>
+                                        {% else %}
+                                            None
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if field.stderr %}
+                                            <pre class="output">{{ field.stderr }}</pre>
+                                        {% else %}
+                                            None
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>
@@ -156,6 +214,7 @@
     $.extend(true, $.fn.dataTable.defaults, {
         "searching": false,
         "bLengthChange": false,
+        "ordering": true,
         "language": {
             "paginate": {
                 "previous": "<i class='fa fa-angle-left fa-lg'></i>",
@@ -169,7 +228,11 @@
         }
     });
     $.fn.DataTable.ext.pager.numbers_length = 5;
-    $('.datatable').DataTable();
+    $('.datatable').DataTable({
+        order: []
+    });
 </script>
 {% endblock %} <!-- Main Start Block -->
+
+
 

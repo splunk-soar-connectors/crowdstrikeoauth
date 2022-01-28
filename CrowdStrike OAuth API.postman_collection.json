@@ -1,0 +1,2737 @@
+{
+	"info": {
+		"_postman_id": "7dbda965-a6d0-4c74-a300-dff0b57aa94e",
+		"name": "CrowdStrike OAuth API",
+		"description": "# Postman Collection of Endpoints for CrowdStrike OAuth API App on Splunk SOAR.\n\n- ### Prerequisite\n\nThe below mentioned are the required fields to use this collection. So, make sure that all these fields are set before running the request.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| client_id  | Client ID ( in environment variables) |\n| client_secret |Client Secret ( in environment variables) |\n| base_url | EWS URL ( in local variables) |",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var response = pm.response.json()",
+							"pm.collectionVariables.set(\"token\", response.access_token)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/oauth2/token",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"oauth2",
+						"token"
+					]
+				},
+				"description": "This rest call retrieve a token and needed to generate token when token expires"
+			},
+			"response": []
+		},
+		{
+			"name": "list processes",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/indicators/queries/processes/v1?type=sha256&value={{ioc}}&device_id={{device_id}}&limit={{limit}}&offset={{offset}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"indicators",
+						"queries",
+						"processes",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "sha256"
+						},
+						{
+							"key": "value",
+							"value": "{{ioc}}"
+						},
+						{
+							"key": "device_id",
+							"value": "{{device_id}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						},
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						}
+					]
+				},
+				"description": "This rest call is used to List processes that have recently used the IOC on a particular device\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| device_id | Crowdstrike Device ID to search on |\n| ioc | File Hash or Domain to use for searching |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "list put files",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/real-time-response/queries/put-files/v1?filter={{filter}}&offset={{offset}}&sort={{sort}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"queries",
+						"put-files",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						}
+					]
+				},
+				"description": "Queries for files uploaded to Crowdstrike for use with the RTR `put` command\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| filter | to filter value |\n| sort | Property to sort by |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "List custom indicators",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/iocs/combined/indicator/v1?limit={{limit}}&filter={{filter}}&after={{after}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"iocs",
+						"combined",
+						"indicator",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "after",
+							"value": "{{after}}"
+						}
+					]
+				},
+				"description": "Queries for custom indicators in your customer account\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| filter | to filter value |\n| limit | limit to set |\n| after | for pagination (if there are more page) |"
+			},
+			"response": []
+		},
+		{
+			"name": "get indicator",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/iocs/combined/indicator/v1?filter={{filter}}&ids={{resource_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"iocs",
+						"combined",
+						"indicator",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "ids",
+							"value": "{{resource_id}}"
+						}
+					]
+				},
+				"description": "Get the full definition of one or more indicators that are being watched\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| filter | to filter value |\n| resource_id | The resource id of the indicator |"
+			},
+			"response": []
+		},
+		{
+			"name": "Hunt Domain",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/indicators/queries/devices/v1?type=domain&value={{value}}&offset={{offset}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"indicators",
+						"queries",
+						"devices",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "domain"
+						},
+						{
+							"key": "value",
+							"value": "{{value}}"
+						},
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Get a list of device IDs on which the domain was matched\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| value | value of domain |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Hunt File",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/indicators/queries/devices/v1?type=sha256&value={{value}}&offset={{offset}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"indicators",
+						"queries",
+						"devices",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "sha256"
+						},
+						{
+							"key": "value",
+							"value": "{{value}}"
+						},
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Hunt for a file on the network by querying for the hash\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| value | value of domain |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Set status",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ids\": [\n        \"{{ids}}\"\n    ],\n    \"status\": \"{{status}}\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/detects/entities/detects/v2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"detects",
+						"entities",
+						"detects",
+						"v2"
+					]
+				},
+				"description": "Set the state of a detection in Crowdstrike Host\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | detection id |\n| status | status to set |"
+			},
+			"response": []
+		},
+		{
+			"name": "list incident",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/incidents/queries/incidents/v1?offset={{offset}}&sort={{sort}}&filter={{filter}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"incidents",
+						"queries",
+						"incidents",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Search for incidents by providing an FQL filter, sorting, and paging details\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "list incident behavior",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/incidents/queries/behaviors/v1?offset={{offset}}&sort={{sort}}&filter={{filter}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"incidents",
+						"queries",
+						"behaviors",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Search for behaviors by providing an FQL filter, sorting, and paging details\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "list crowdscores",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/incidents/combined/crowdscores/v1?offset={{offset}}&sort={{sort}}&filter={{filter}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"incidents",
+						"combined",
+						"crowdscores",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Query environment wide CrowdScore and return the entity data\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "list roles",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/user-roles/queries/user-role-ids-by-cid/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user-roles",
+						"queries",
+						"user-role-ids-by-cid",
+						"v1"
+					]
+				},
+				"description": "Get information about all user roles from your Customer ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Get roles",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/user-roles/entities/user-roles/v1?ids={{ids}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user-roles",
+						"entities",
+						"user-roles",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "{{ids}}"
+						}
+					]
+				},
+				"description": "Get information about all user roles from your Customer ID\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | Role ID to get information about |"
+			},
+			"response": []
+		},
+		{
+			"name": "List Users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/users/queries/user-uuids-by-cid/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"queries",
+						"user-uuids-by-cid",
+						"v1"
+					]
+				},
+				"description": "Get information about all users in your Customer ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Get user roles",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/user-roles/queries/user-role-ids-by-user-uuid/v1?user_uuid={{user_uuid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user-roles",
+						"queries",
+						"user-role-ids-by-user-uuid",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "user_uuid",
+							"value": "{{user_uuid}}"
+						}
+					]
+				},
+				"description": "Gets the roles that are assigned to the user\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| user_uuid | crowdstrike unique user id |"
+			},
+			"response": []
+		},
+		{
+			"name": "Query Device",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/queries/devices/v1?offset={{offset}}&sort={{sort}}&filter={{filter}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"queries",
+						"devices",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Fetch the device details based on the provided query\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Quarantine device",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/queries/devices/v1?offset={{offset}}&filter={{filter}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"queries",
+						"devices",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						}
+					]
+				},
+				"description": "Get id for **quarantine device final**\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| filter | to filter value |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Quarantine device final",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ids\": [\n        \"{{ids}}\"\n        ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/entities/devices-actions/v2?action_name=contain",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"entities",
+						"devices-actions",
+						"v2"
+					],
+					"query": [
+						{
+							"key": "action_name",
+							"value": "contain"
+						}
+					]
+				},
+				"description": "Block the device\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | id that we got |"
+			},
+			"response": []
+		},
+		{
+			"name": "List Groups",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/queries/host-groups/v1?offset={{offset}}&sort={{sort}}&filter={{filter}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"queries",
+						"host-groups",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Fetch the details of the host groups\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Assign Hosts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/queries/devices/v1?offset={{offset}}&filter={{filter}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"queries",
+						"devices",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						}
+					]
+				},
+				"description": "Assign one or more hosts to the static host group\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| filter | to filter value |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Create session",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"device_id\": \"{{device_id}}\",\n    \"origin\": \"{{origin}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/real-time-response/entities/sessions/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"entities",
+						"sessions",
+						"v1"
+					]
+				},
+				"description": "Initialize a new session with the Real Time Response cloud\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| device_id | id of device |\n| origin | origin ( Ex. phantom ) |"
+			},
+			"response": []
+		},
+		{
+			"name": "List sessions",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/real-time-response/queries/sessions/v1?offset={{offset}}&sort={{sort}}&filter={{filter}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"queries",
+						"sessions",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Lists Real Time Response sessions\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload indicator",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"indicators\": [\n        {\n            \"action\": \"{{action}}\",\n            \"platforms\": {{platforms}},\n            \"type\": \"{{type}}\",\n            \"value\": \"{{value}}\",\n            \"expiration\": \"{{expiration}}\",\n            \"severity\": \"{{severity}}\",\n            \"source\": \"{{source}}\",\n            \"description\": \"{{description}}\",\n            \"tags\": {{tags}},\n            \"host_groups\": {{host_groups}},\n            \"metadata\": {\n                \"filename\": \"{{filename}}\"\n            }\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/iocs/entities/indicators/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"iocs",
+						"entities",
+						"indicators",
+						"v1"
+					]
+				},
+				"description": "Upload indicator that you want CrowdStrike to watch\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| action | Action to take when a host observes the custom IOC |\n| platforms | list of platforms |\n| type | type ( Ex. ipv4 ) |\n| value | Input domain, ip, or hash ioc |\n| expiration | expiration time |\n| severity | severity level |\n| source | Indicator originating source |\n| description | Indicator description |\n| tags | List of tags |\n| host_groups | List of host group ids |\n| filename | metadata filename |"
+			},
+			"response": []
+		},
+		{
+			"name": "Detonate URL get id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/falconx/queries/reports/v1?offset={{offset}}&filter={{filter}}&sort={{sort}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"falconx",
+						"queries",
+						"reports",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Upload an url to CrowdStrike and retrieve the analysis results\n\nWe can get all ids and then use these ids to get report by **for report** and **for report detailed** api call\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Detonate file get id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/falconx/queries/submissions/v1?offset={{offset}}&filter={{filter}}&sort={{sort}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"falconx",
+						"queries",
+						"submissions",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Upload a file to CrowdStrike and retrieve the analysis results\n\nWe can get all ids and then use these ids to get report by **for report** and **for report detailed** api call\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Url reputation",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/falconx/queries/reports/v1?offset={{offset}}&filter={{filter}}&sort={{sort}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"falconx",
+						"queries",
+						"reports",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Queries CrowdStrike for the url info\n\nWe can get all ids and then use these ids to get report by **for report** and **for report detailed** api call\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "File reputation",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/falconx/queries/submissions/v1?offset={{offset}}&filter={{filter}}&sort={{sort}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"falconx",
+						"queries",
+						"submissions",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Queries CrowdStrike for the file info\n\nWe can get all ids and then use these ids to get report by **for report** and **for report detailed** api call\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "For report",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/falconx/entities/report-summaries/v1?ids={{ids}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"falconx",
+						"entities",
+						"report-summaries",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "{{ids}}"
+						}
+					]
+				},
+				"description": "We can get report for given **ids**\n\n**ids:** We can use this field to add multiple ids\n\nWe can add values like these separated by **&ids=** \n\n**EX.** 061c7d50bf5&ids=3061c7a3aca&ids=30619b4cb0ba2adc5dccd1f7ad&ids=3061cda1f553c7f5"
+			},
+			"response": []
+		},
+		{
+			"name": "for report detailed",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/falconx/entities/reports/v1?ids={{ids}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"falconx",
+						"entities",
+						"reports",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "{{ids}}"
+						}
+					]
+				},
+				"description": "We can get detailed report for given **ids**\n\n**ids:** We can use this field to add multiple ids\n\nWe can add values like these separated by **&ids=** \n\n**EX.** 061c7d50bf5&ids=3061c7a3aca&ids=30619b4cb0ba2adc5dccd1f7ad&ids=3061cda1f553c7f5"
+			},
+			"response": []
+		},
+		{
+			"name": "Get device scroll",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/queries/devices-scroll/v1?offset={{offset}}&filter={{filter}}&sort={{sort}}&limit={{limit}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"queries",
+						"devices-scroll",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						},
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "sort",
+							"value": "{{sort}}"
+						},
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| sort | Property to sort by |\n| filter | to filter value |\n| limit | limit to set |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Get process detail",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/processes/entities/processes/v1?ids={{ids}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"processes",
+						"entities",
+						"processes",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "{{ids}}"
+						}
+					]
+				},
+				"description": "Retrieve the details of a process that is running or that previously ran, given a process ID\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | Process ID from previous Falcon IOC search |"
+			},
+			"response": []
+		},
+		{
+			"name": "Update incident",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action_parameters\": [\n        {\n            \"name\": \"add_tag\",\n            \"value\": \"{{add_tag}}\"\n        },\n        {\n            \"name\": \"delete_tag\",\n            \"value\": \"{{delete_tag}}\"\n        },\n        {\n            \"name\": \"update_name\",\n            \"value\": \"{{update_name}}\"\n        },\n        {\n            \"name\": \"update_description\",\n            \"value\": \"{{description}}\"\n        },\n        {\n            \"name\": \"update_status\",\n            \"value\": \"{{update_status}}\"\n        },\n        {\n            \"name\": \"add_comment\",\n            \"value\": \"{{comment}}\"\n        }\n    ],\n    \"ids\": {{ids}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/incidents/entities/incident-actions/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"incidents",
+						"entities",
+						"incident-actions",
+						"v1"
+					]
+				},
+				"description": "Perform a set of actions on one or more incidents, such as adding tags or comments or updating the incident name or description\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | list of incident ids |\n| add_tag | tag to add |\n| delete_tag | tag to delete |\n| update_name | name to update |\n| update_status | status to update |\n| add_comment | comment to add |\n| update_description | description to update |"
+			},
+			"response": []
+		},
+		{
+			"name": "Get incident behaviors",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ids\": {{ids}}\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/incidents/entities/behaviors/GET/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"incidents",
+						"entities",
+						"behaviors",
+						"GET",
+						"v1"
+					]
+				},
+				"description": "Get details on behaviors by providing behavior IDs\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | List of incident ids |"
+			},
+			"response": []
+		},
+		{
+			"name": "Update indicator",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bulk_update\": {\n        \"filter\": \"{{filter}}'\",\n        \"action\": \"{{action}}\",\n        \"expiration\": \"{{expiration}}\",\n        \"source\": \"{{source}}\",\n        \"severity\": \"{{severity}}\",\n        \"platforms\": {{platforms}},\n        \"description\": \"{{description}}\",\n        \"tags\": {{tags}},\n        \"applied_globally\": true,\n        \"metadata\": {\n            \"filename\": \"{{filename}}\"\n        }\n    }\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/iocs/entities/indicators/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"iocs",
+						"entities",
+						"indicators",
+						"v1"
+					]
+				},
+				"description": "Update an indicator that has been uploaded\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| action | \"Action to take when a host observes the custom IOC |\n| platforms | list of platforms |\n| filter | to filter value |\n| expiration | expiration time |\n| severity | severity level |\n| source | Indicator originating source |\n| description | Indicator description |\n| tags | List of tags |\n| host_groups | List of host group ids |\n| filename | metadata filename |"
+			},
+			"response": []
+		},
+		{
+			"name": "Check status",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/falconx/entities/submissions/v1?ids={{resource_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"falconx",
+						"entities",
+						"submissions",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "{{resource_id}}"
+						}
+					]
+				},
+				"description": "To check detonation status of the provided resource id\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| resource_id | id of resource |"
+			},
+			"response": []
+		},
+		{
+			"name": "Upload put file",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "description",
+							"value": "{{description}}",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "{{filename}}",
+							"type": "text"
+						},
+						{
+							"key": "comments_for_audit_log",
+							"value": "{{comment}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/real-time-response/entities/put-files/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"entities",
+						"put-files",
+						"v1"
+					]
+				},
+				"description": "Upload a new put-file to use for the RTR `put` command\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| description | File description |\n| filename | name of file |\n| comment | comment for audit log |"
+			},
+			"response": []
+		},
+		{
+			"name": "Run command",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"device_id\": \"{{device_id}}\",\n    \"base_command\": \"{{base_command}}\",\n    \"command_string\": \"{{base_command}} {{command_string}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/real-time-response/entities/command/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"entities",
+						"command",
+						"v1"
+					]
+				},
+				"description": "Execute an active responder command on a single host\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| session_id | id of session |\n| device_id | id of device |\n| base_command | base command ( Ex. ls ) |\n| command_string | data to include with command |"
+			},
+			"response": []
+		},
+		{
+			"name": "Run admin command",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"session_id\": \"{{session_id}}\",\n    \"device_id\": \"{{device_id}}\",\n    \"base_command\": \"{{base_command}}\",\n    \"command_string\": \"{{base_command}} {{command_string}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/real-time-response/entities/admin-command/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"entities",
+						"admin-command",
+						"v1"
+					]
+				},
+				"description": "Execute an RTR Admin command on a single host\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| session_id | id of session |\n| device_id | id of device |\n| base_command | base command ( Ex. get ) |\n| command_string | data to include with command |"
+			},
+			"response": []
+		},
+		{
+			"name": "Get system info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/entities/devices/v1?ids={{ids}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"entities",
+						"devices",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "{{ids}}"
+						}
+					]
+				},
+				"description": "Get details of a device, given the device ID\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | device id |"
+			},
+			"response": []
+		},
+		{
+			"name": "Remove hosts get device id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/queries/devices/v1?filter={{filter}}&offset={{offset}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"queries",
+						"devices",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						}
+					]
+				},
+				"description": "to filter device id for **remove hosts final** if we don't have device id\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| filter | to filter value |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "Remove hosts Final",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"action_parameters\": [\n        {\n            \"name\": \"filter\", \n            \"value\": \"(device_id:['{{device_id}}'])\"\n        }\n        ], \n    \"ids\": {{ids}}\n        \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/entities/host-group-actions/v1?action_name=remove-hosts",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"entities",
+						"host-group-actions",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "action_name",
+							"value": "remove-hosts"
+						}
+					]
+				},
+				"description": "Remove one or more hosts from the static host group\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| device_id | id of device |\n| ids | static host group id |"
+			},
+			"response": []
+		},
+		{
+			"name": "Download report",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "application/gzip",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/falconx/entities/artifacts/v1?id={{id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"falconx",
+						"entities",
+						"artifacts",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{id}}"
+						}
+					]
+				},
+				"description": "To download the report of the provided artifact id\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| id | artifact id |"
+			},
+			"response": []
+		},
+		{
+			"name": "Get command details",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/real-time-response/entities/active-responder-command/v1?cloud_request_id={{cloud_request_id}}&sequence_id=0",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"entities",
+						"active-responder-command",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "cloud_request_id",
+							"value": "{{cloud_request_id}}"
+						},
+						{
+							"key": "sequence_id",
+							"value": "0"
+						}
+					]
+				},
+				"description": "Retrieve results of an active responder command executed on a single host\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| cloud_request_id | Cloud Request ID for Command |"
+			},
+			"response": []
+		},
+		{
+			"name": "Get incident details",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ids\": {{ids}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/incidents/entities/incidents/GET/v1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"incidents",
+						"entities",
+						"incidents",
+						"GET",
+						"v1"
+					]
+				},
+				"description": "Get details on incidents by providing incident IDs\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | List of incident IDs |"
+			},
+			"response": []
+		},
+		{
+			"name": "delete indicator get ids",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/iocs/queries/indicators/v1?filter={{filter}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"iocs",
+						"queries",
+						"indicators",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						}
+					]
+				},
+				"description": "to get ids to delete indicator which will be used in **delete indicator final** api call\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| filter | to filter value |"
+			},
+			"response": []
+		},
+		{
+			"name": "delete indicator final",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/iocs/entities/indicators/v1?ids={{ids}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"iocs",
+						"entities",
+						"indicators",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "ids",
+							"value": "{{ids}}"
+						}
+					]
+				},
+				"description": "Delete an indicator that is being watched\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | indicator id |"
+			},
+			"response": []
+		},
+		{
+			"name": "list session files",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/real-time-response/entities/file/v1?session_id={{session_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"entities",
+						"file",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "session_id",
+							"value": "{{session_id}}"
+						}
+					]
+				},
+				"description": "Get a list of files for the specified RTR session\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| session_id | id of session |"
+			},
+			"response": []
+		},
+		{
+			"name": "Get session file",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/real-time-response/entities/extracted-file-contents/v1?session_id={{session_id}}&sha256={{file_hash}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"entities",
+						"extracted-file-contents",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "session_id",
+							"value": "{{session_id}}"
+						},
+						{
+							"key": "sha256",
+							"value": "{{file_hash}}"
+						}
+					]
+				},
+				"description": "Get RTR extracted file contents for the specified session and sha256 and add it to the vault\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| session_id | id of session |\n| file_hash | hash to retrieve |"
+			},
+			"response": []
+		},
+		{
+			"name": "delete session",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/real-time-response/entities/sessions/v1?session_id={{session_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"real-time-response",
+						"entities",
+						"sessions",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "session_id",
+							"value": "{{session_id}}"
+						}
+					]
+				},
+				"description": "Deletes a Real Time Response session\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| session_id | id of session |"
+			},
+			"response": []
+		},
+		{
+			"name": "unquarantine device get id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/queries/devices/v1?filter={{filter}}&offset={{offset}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"queries",
+						"devices",
+						"v1"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "{{filter}}"
+						},
+						{
+							"key": "offset",
+							"value": "{{offset}}"
+						}
+					]
+				},
+				"description": "to get ids for **unquarantine device final**\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| filter | to filter value |\n| offset | Starting index of overall result set from which to return ids (defaults to 0) |"
+			},
+			"response": []
+		},
+		{
+			"name": "unquarantine device final",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ids\": [\n        \"{{ids}}\"\n        ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/devices/entities/devices-actions/v2?action_name=lift_containment",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"devices",
+						"entities",
+						"devices-actions",
+						"v2"
+					],
+					"query": [
+						{
+							"key": "action_name",
+							"value": "lift_containment"
+						}
+					]
+				},
+				"description": "Unblock the device\n\nThe variable and its Description for the action are mentioned below.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| ids | id that we got |"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "ioc",
+			"value": ""
+		},
+		{
+			"key": "id",
+			"value": ""
+		},
+		{
+			"key": "limit",
+			"value": ""
+		},
+		{
+			"key": "filter",
+			"value": ""
+		},
+		{
+			"key": "offset",
+			"value": ""
+		},
+		{
+			"key": "sort",
+			"value": ""
+		},
+		{
+			"key": "after",
+			"value": ""
+		},
+		{
+			"key": "ids",
+			"value": ""
+		},
+		{
+			"key": "value",
+			"value": ""
+		},
+		{
+			"key": "type",
+			"value": ""
+		},
+		{
+			"key": "status",
+			"value": ""
+		},
+		{
+			"key": "user_uuid",
+			"value": ""
+		},
+		{
+			"key": "origin",
+			"value": ""
+		},
+		{
+			"key": "device_id",
+			"value": ""
+		},
+		{
+			"key": "action",
+			"value": ""
+		},
+		{
+			"key": "severity",
+			"value": ""
+		},
+		{
+			"key": "host_groups",
+			"value": ""
+		},
+		{
+			"key": "tags",
+			"value": ""
+		},
+		{
+			"key": "description",
+			"value": ""
+		},
+		{
+			"key": "source",
+			"value": ""
+		},
+		{
+			"key": "expiration",
+			"value": ""
+		},
+		{
+			"key": "filename",
+			"value": ""
+		},
+		{
+			"key": "platforms",
+			"value": ""
+		},
+		{
+			"key": "comment",
+			"value": ""
+		},
+		{
+			"key": "update_status",
+			"value": ""
+		},
+		{
+			"key": "update_name",
+			"value": ""
+		},
+		{
+			"key": "delete_tag",
+			"value": ""
+		},
+		{
+			"key": "add_tag",
+			"value": ""
+		},
+		{
+			"key": "resource_id",
+			"value": ""
+		},
+		{
+			"key": "base_command",
+			"value": ""
+		},
+		{
+			"key": "session_id",
+			"value": ""
+		},
+		{
+			"key": "command_string",
+			"value": ""
+		},
+		{
+			"key": "cloud_request_id",
+			"value": ""
+		},
+		{
+			"key": "file_hash",
+			"value": ""
+		}
+	]
+}

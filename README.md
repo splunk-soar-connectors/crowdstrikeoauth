@@ -2,11 +2,11 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 3\.5\.7  
+Connector Version: 3\.5\.9  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.0\.0  
+Minimum Product Version: 5\.1\.0  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 

@@ -17,7 +17,7 @@
 # Json keys specific to the app's input parameters/config and the output result
 CROWDSTRIKE_JSON_URL_OAuth = "url"
 CROWDSTRIKE_CLIENT_ID = "client_id"
-CROWDSTRIKE_CLIENT_SECRET = "client_secret"
+CROWDSTRIKE_CLIENT_SECRET = "client_secret"  # pragma: allowlist secret
 CROWDSTRIKE_OAUTH_TOKEN_STRING = "oauth2_token"
 CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING = "access_token"
 CROWDSTRIKE_JSON_COUNT_ONLY = "count_only"
@@ -25,7 +25,7 @@ CROWDSTRIKE_GET_PROCESS_DETAIL_FALCON_PROCESS_ID = "falcon_process_id"
 CROWDSTRIKE_GET_DEVICE_DETAIL_DEVICE_ID = "id"
 CROWDSTRIKE_JSON_ID = "id"
 CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE = "state"
-PAYLOAD_SECURITY_API_KEY = 'api_key'
+PAYLOAD_SECURITY_API_KEY = 'api_key'  # pragma: allowlist secret
 CROWDSTRIKE_JSON_IOC = "ioc"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID = "id"
 CROWDSTRIKE_IOCS_EXPIRATION = "expiration"

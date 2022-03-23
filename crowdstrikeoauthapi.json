@@ -15,7 +15,7 @@
         }
     ],
     "license": "Copyright (c) 2019-2022 Splunk Inc.",
-    "app_version": "3.5.9",
+    "app_version": "3.6.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, January 8 2022, API version: v1, v2"
     ],
@@ -14855,7 +14855,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.8-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.9-py2.py3-none-any.whl"
             }
         ]
     },
@@ -14899,7 +14899,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.8-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.9-py2.py3-none-any.whl"
             }
         ]
     }

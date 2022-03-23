@@ -101,8 +101,7 @@ CROWDSTRIKE_MISSING_INDICATOR_VALUE_ERROR_MESSAGE = "Please provide indicator va
 CROWDSTRIKE_MISSING_INDICATOR_TYPE_ERROR_MESSAGE = "Please provide indicator type"
 CROWDSTRIKE_COMPLETED = "Completed {0:.0%}"
 CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in the {key} parameter"
-CROWDSTRIKE_ERROR_CODE_MESSAGE = "Error code unavailable"
-CROWDSTRIKE_ERROR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+CROWDSTRIKE_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the Crowdstrike server. "\
     "Please check the asset configuration and|or the action parameters."
 CROWDSTRIKE_CODE_MESSAGE = "Error code: 404"
@@ -122,6 +121,10 @@ CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
 CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "(type:'{}' + value:'{}') + (deleted:'true', deleted: 'false')"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID = "id:'{}' + (deleted:'true', deleted: 'false')"
+CROWDSTRIKE_STATE_FILE_CORRUPT_ERR = (
+    "Error occurred while loading the state file due to its unexpected format. "
+    "Resetting the state file with the default format. Please try again."
+)
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"

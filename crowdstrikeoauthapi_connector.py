@@ -62,6 +62,7 @@ class CrowdstrikeConnector(BaseConnector):
         self._oauth_access_token = None
         self._poll_interval = None
         self._required_detonation = False
+        self.stream_file_data = False
 
     def initialize(self):
         """ Automatically called by the BaseConnector before the calls to the handle_action function"""
@@ -90,6 +91,11 @@ class CrowdstrikeConnector(BaseConnector):
         self._parameters = {'appId': app_id.replace('-', '')}
 
         self._state = self.load_state()
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {"app_version": self.get_app_json().get("app_version")}
+            return self.set_status(phantom.APP_ERROR, CROWDSTRIKE_STATE_FILE_CORRUPT_ERR)
+
         self._oauth_access_token = self._state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING, {}).get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING)
 
         ret = self._handle_preprocess_scripts()
@@ -135,7 +141,7 @@ class CrowdstrikeConnector(BaseConnector):
 
             try:
                 self._preprocess_container = self._script_module.preprocess_container
-            except:
+            except Exception:
                 self.save_progress("Error loading custom script. Does not contain preprocess_container function")
                 return phantom.APP_ERROR
 
@@ -147,24 +153,25 @@ class CrowdstrikeConnector(BaseConnector):
         :return: error message
         """
 
-        error_msg = CROWDSTRIKE_ERROR_MESSAGE
-        error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
+        error_code = None
+        error_msg = CROWDSTRIKE_ERR_MSG_UNAVAILABLE
+
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
                     error_msg = e.args[0]
-            else:
-                error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
-                error_msg = CROWDSTRIKE_ERROR_MESSAGE
-        except:
-            error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
-            error_msg = CROWDSTRIKE_ERROR_MESSAGE
+        except Exception:
+            pass
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        if not error_code:
+            error_text = "Error Message: {}".format(error_msg)
+        else:
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+
+        return error_text
 
     def _check_for_existing_container(self, container, time_interval, collate):
         # Even if the collate parameter is selected, the time mentioned in the merge_time_interval
@@ -232,7 +239,7 @@ class CrowdstrikeConnector(BaseConnector):
             ipv6_type = ipaddress.IPv6Address(ip)
             if ipv6_type:
                 return (phantom.APP_SUCCESS, "ipv6")
-        except:
+        except Exception:
             pass
 
         if util.is_hash(ioc):
@@ -591,7 +598,7 @@ class CrowdstrikeConnector(BaseConnector):
         # successful request
         try:
             data = dict(response["resources"][0])
-        except:
+        except Exception:
             return action_result.set_status(
                 phantom.APP_ERROR, "Error occurred while parsing response of 'get_system_info' action. Unknown response retrieved")
 
@@ -600,7 +607,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         try:
             summary['hostname'] = response["resources"][0]['hostname']
-        except:
+        except Exception:
             pass
 
         return action_result.set_status(phantom.APP_SUCCESS, "Device details fetched successfully")
@@ -646,7 +653,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         try:
             data = dict(response["resources"][0])
-        except:
+        except Exception:
             return action_result.set_status(
                 phantom.APP_ERROR, "Error occurred while parsing response of 'get_process_detail' action. Unknown response retrieved")
 
@@ -1251,7 +1258,7 @@ class CrowdstrikeConnector(BaseConnector):
             try:
                 if test_details[id] not in put_file_sorted_list:
                     put_file_sorted_list.append(test_details[id])
-            except:
+            except Exception:
                 self.debug_print("Error occurred while sorting the 'put' file details")
                 pass
 
@@ -1513,7 +1520,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         try:
             summary['session_id'] = resp_json['resources'][0]['session_id']
-        except:
+        except Exception:
             return action_result.set_status(phantom.APP_SUCCESS,
                 "Session created successfully, but unable to find session_id from the response. Unexpected response retrieved")
 
@@ -1572,7 +1579,7 @@ class CrowdstrikeConnector(BaseConnector):
             try:
                 if test_details[id] not in sessions_sorted_list:
                     sessions_sorted_list.append(test_details[id])
-            except:
+            except Exception:
                 self.debug_print("Error occurred while sorting the session details")
                 pass
 
@@ -1602,7 +1609,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         try:
             cloud_request_id = resp_json['resources'][0]['cloud_request_id']
-        except:
+        except Exception:
             return action_result.set_status(
                 phantom.APP_ERROR, "Error occurred while fetching the cloud_request_id from the response. Unexpected response retrieved")
 
@@ -1631,7 +1638,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         try:
             cloud_request_id = resp_json['resources'][0]['cloud_request_id']
-        except:
+        except Exception:
             return action_result.set_status(
                 phantom.APP_ERROR, "Error occurred while fetching the cloud_request_id from the response. Unexpected response retrieved")
 
@@ -1754,7 +1761,7 @@ class CrowdstrikeConnector(BaseConnector):
             'session_id': param['session_id'],
             'sha256': param['file_hash']
         }
-
+        self.stream_file_data = True
         ret_val, vault_results = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT, params=params)
 
         if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_MESSAGE in action_result.get_message():
@@ -1918,7 +1925,7 @@ class CrowdstrikeConnector(BaseConnector):
                     return None
                 parameter = int(parameter)
 
-            except:
+            except Exception:
                 action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE.format(key=key))
                 return None
 
@@ -1947,7 +1954,7 @@ class CrowdstrikeConnector(BaseConnector):
                 max_events = self._validate_integers(action_result,
                                                      config.get('max_events_poll_now', DEFAULT_POLLNOW_EVENTS_COUNT),
                                                      "max_events_poll_now")
-            except:
+            except Exception:
                 self.debug_print("Error occurred while validating 'max_events_poll_now' asset configuration parameter")
                 max_events = DEFAULT_POLLNOW_EVENTS_COUNT
         else:
@@ -1956,7 +1963,7 @@ class CrowdstrikeConnector(BaseConnector):
                 self.debug_print("Validating 'max_events' asset configuration parameter")
                 max_events = self._validate_integers(action_result, config.get('max_events', DEFAULT_EVENTS_COUNT),
                                                      "max_events")
-            except:
+            except Exception:
                 max_events = DEFAULT_EVENTS_COUNT
 
         return max_crlf, merge_time_interval, max_events
@@ -1988,7 +1995,7 @@ class CrowdstrikeConnector(BaseConnector):
             try:
                 self.debug_print("Fetching last_offset_id from the state file")
                 lower_id = int(self._state.get('last_offset_id', 0))
-            except:
+            except Exception:
                 self.debug_print("Error occurred while fetching last_offset_id from the state file")
                 self.debug_print("Considering this run as first run")
                 lower_id = 0
@@ -2012,7 +2019,7 @@ class CrowdstrikeConnector(BaseConnector):
             resp_json = r.json()
             try:
                 err_message = resp_json['errors'][0]['message']
-            except:
+            except Exception:
                 err_message = 'None'
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_FROM_SERVER, status=r.status_code, message=err_message)
 
@@ -2891,7 +2898,7 @@ class CrowdstrikeConnector(BaseConnector):
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-        except:
+        except Exception:
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
@@ -2934,7 +2941,7 @@ class CrowdstrikeConnector(BaseConnector):
                         return RetVal(action_result.set_status(phantom.APP_ERROR,
                             "Error from server. Error code: {0} Data from server: {1}, {2}".format(
                                 resp_json["errors"][0]["code"], resp_json["errors"][0]["message"], resp_json["resources"][0]["message"])), None)
-        except:
+        except Exception:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while processing error response from server"), None)
 
         # Please specify the status codes here
@@ -2997,7 +3004,11 @@ class CrowdstrikeConnector(BaseConnector):
             try:
                 compressed_file_path = UnicodeDammit(compressed_file_path).unicode_markup
                 with open(compressed_file_path, 'wb') as f:
-                    f.write(response.content)
+                    if self.stream_file_data:
+                        for chunk in response.iter_content(chunk_size=10 * 1024 * 1024):
+                            f.write(chunk)
+                    else:
+                        f.write(response.content)
             except IOError as e:
                 error_message = self._get_error_message_from_exception(e)
                 if "File name too long" in error_message:
@@ -3006,7 +3017,11 @@ class CrowdstrikeConnector(BaseConnector):
                     self.debug_print('Original filename : {}'.format(filename))
                     self.debug_print('Modified filename : {}'.format(new_file_name))
                     with open(compressed_file_path, 'wb') as f:
-                        f.write(response.content)
+                        if self.stream_file_data:
+                            for chunk in response.iter_content(chunk_size=10 * 1024 * 1024):
+                                f.write(chunk)
+                        else:
+                            f.write(response.content)
                 else:
                     return RetVal(
                         action_result.set_status(phantom.APP_ERROR,
@@ -3063,12 +3078,14 @@ class CrowdstrikeConnector(BaseConnector):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, 'add_debug_data'):
             action_result.add_debug_data({'r_status_code': response.status_code})
-            action_result.add_debug_data({'r_text': response.text})
+            if not self.stream_file_data:
+                action_result.add_debug_data({'r_text': response.text})
             action_result.add_debug_data({'r_headers': response.headers})
 
         # Reset_password returns empty body
-        if not response.text and 200 <= response.status_code < 399:
-            return RetVal(phantom.APP_SUCCESS, {})
+        if not self.stream_file_data:
+            if not response.text and 200 <= response.status_code < 399:
+                return RetVal(phantom.APP_SUCCESS, {})
 
         if is_download:
             if 'csv' in response.headers.get('Content-Type', ''):
@@ -3134,7 +3151,10 @@ class CrowdstrikeConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
-            r = request_func(endpoint, json=json, data=data, headers=headers, params=params)
+            if self.stream_file_data:
+                r = request_func(endpoint, json=json, data=data, headers=headers, params=params, stream=True)
+            else:
+                r = request_func(endpoint, json=json, data=data, headers=headers, params=params)
         except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR, "Error connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json

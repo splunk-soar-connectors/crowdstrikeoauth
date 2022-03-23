@@ -2962,7 +2962,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_compressed_file_response(self, response, action_result, type, file_extension=None):
+    def _process_compressed_file_response(self, response, action_result, type, file_extension=None): # noqa
 
         guid = uuid.uuid4()
 

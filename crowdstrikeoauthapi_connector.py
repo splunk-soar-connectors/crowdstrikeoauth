@@ -554,6 +554,43 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Status set successfully")
 
+    def _paginate_get_endpoint(self, action_result, resource_id_list, endpoint, check_message=None, resource_data=None):
+        id_list = list()
+        id_list.extend(resource_id_list)
+        resource_details_list = list()
+        while id_list:
+            # Endpoint creation
+            ids = id_list[:min(100, len(id_list))]
+            endpoint_param = ''
+            for resource in ids:
+                endpoint_param += "ids={}&".format(resource)
+
+            endpoint_param = endpoint_param.strip("&")
+
+            endpoint = "{}?{}".format(endpoint, endpoint_param)
+
+            # Make REST call
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
+
+            if phantom.is_fail(ret_val) and check_message not in action_result.get_message():
+                self.debug_print('Error response returned from the API : {}'.format(endpoint))
+                return action_result.get_status()
+
+            if ret_val and response.get("resources"):
+                resource_details_list.extend(response.get("resources"))
+
+            del id_list[:min(100, len(id_list))]
+
+        if not resource_details_list:
+            return action_result.set_status(phantom.APP_SUCCESS, 'No data found')
+
+        resource_details_list = [i for n, i in enumerate(resource_details_list) if i not in resource_details_list[n + 1:]]
+
+        for item in resource_details_list:
+            action_result.add_data(item)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "{} fetched successfully".format(resource_data))
+
     def _handle_get_zta_data(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -562,39 +599,8 @@ class CrowdstrikeConnector(BaseConnector):
         agent_ids = param['agent_id']
         agent_ids = [x.strip() for x in agent_ids.split(',')]
         agent_ids = list(filter(None, agent_ids))
-
-        details_list = list()
-        while agent_ids:
-            # Endpoint creation
-            ids_list = agent_ids[:min(100, len(agent_ids))]
-            endpoint_param = ''
-            for agent in ids_list:
-                endpoint_param += "ids={}&".format(agent)
-
-            endpoint_param = endpoint_param.strip("&")
-            endpoint = CROWDSTRIKE_GET_ZERO_TRUST_ASSESSMENT_ENDPOINT
-
-            endpoint = "{}?{}".format(endpoint, endpoint_param)
-            # Make REST call
-            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
-
-            if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE not in action_result.get_message():
-                return action_result.get_status()
-
-            if ret_val and response.get("resources"):
-                details_list.extend(response.get("resources"))
-
-            del agent_ids[:min(100, len(agent_ids))]
-
-        if not details_list:
-            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
-
-        details_data_list = [i for n, i in enumerate(details_list) if i not in details_list[n + 1:]]
-
-        for agent in details_data_list:
-            action_result.add_data(agent)
-
-        return action_result.set_status(phantom.APP_SUCCESS, "Zero Trust Assessment data fetched successfully")
+        return self._paginate_get_endpoint(action_result, agent_ids, CROWDSTRIKE_GET_ZERO_TRUST_ASSESSMENT_ENDPOINT,
+            CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE, "Zero Trust Assessment data")
 
     def _handle_hunt_file(self, param):
 
@@ -973,39 +979,7 @@ class CrowdstrikeConnector(BaseConnector):
         list_ids = param.get("role_id")
         list_ids = [x.strip() for x in list_ids.split(',')]
         list_ids = list(filter(None, list_ids))
-
-        details_list = list()
-        while list_ids:
-            # Endpoint creation
-            role_ids = list_ids[:min(100, len(list_ids))]
-            endpoint_param = ''
-            for role in role_ids:
-                endpoint_param += "ids={}&".format(role)
-
-            endpoint_param = endpoint_param.strip("&")
-            endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
-
-            endpoint = "{}?{}".format(endpoint, endpoint_param)
-            # Make REST call
-            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
-
-            if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_MESSAGE not in action_result.get_message():
-                return action_result.get_status()
-
-            if ret_val and response.get("resources"):
-                details_list.extend(response.get("resources"))
-
-            del list_ids[:min(100, len(list_ids))]
-
-        if not details_list:
-            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
-
-        details_data_list = [i for n, i in enumerate(details_list) if i not in details_list[n + 1:]]
-
-        for role in details_data_list:
-            action_result.add_data(role)
-
-        return action_result.set_status(phantom.APP_SUCCESS, "Role fetched successfully")
+        return self._paginate_get_endpoint(action_result, list_ids, CROWDSTRIKE_GET_ROLE_ENDPOINT, CROWDSTRIKE_STATUS_CODE_MESSAGE, "Role")
 
     def _handle_list_roles(self, param):
 

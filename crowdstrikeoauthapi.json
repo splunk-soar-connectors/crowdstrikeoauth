@@ -17,7 +17,7 @@
     "license": "Copyright (c) 2019-2022 Splunk Inc.",
     "app_version": "3.6.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, January 8 2022, API version: v1, v2"
+        "Cloud, API api.crowdstrike.com, March 30 2022, API version: v1, v2"
     ],
     "utctime_updated": "2022-02-03T21:33:22.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
@@ -14812,6 +14812,230 @@
                 "title": "Device scrolls",
                 "type": "table",
                 "height": 5
+            }
+        },
+        {
+            "action": "get zta data",
+            "description": "Get Zero Trust Assessment data for one or more hosts by providing agent IDs (AID)",
+            "type": "investigate",
+            "identifier": "get_zta_data",
+            "read_only": true,
+            "parameters": {
+                "agent_id": {
+                    "data_type": "string",
+                    "description": "Agent ID to get zero trust assessment data about. Comma-separated list allowed",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "crowdstrike agent id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.agent_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike agent id"
+                    ],
+                    "example_values": [
+                        "95969e1abbea43bdaf6cc50c9b4aec2e,46592f3d661a469eb2503d72a29afd3a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aid",
+                    "data_type": "string",
+                    "example_values": [
+                        "95969e1abbea43bdaf6cc50c9b4aec2e"
+                    ],
+                    "column_name": "Agent ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment.os",
+                    "data_type": "numeric",
+                    "example_values": [
+                        38
+                    ],
+                    "column_name": "OS",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.assessment.overall",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "3.3.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment.sensor_config",
+                    "data_type": "numeric",
+                    "example_values": [
+                        29
+                    ],
+                    "column_name": "Sensor Config",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.modified_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-03-21T23:07:13Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.event_platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Win"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.os_signals.*.criteria",
+                    "data_type": "string",
+                    "example_values": [
+                        "Kernel Mode Code Integrity: enabled"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "windows_os_build"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.os_signals.*.group_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows OS Build"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.os_signals.*.meets_criteria",
+                    "data_type": "string",
+                    "example_values": [
+                        "no"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.criteria",
+                    "data_type": "string",
+                    "example_values": [
+                        "Spotlight: enabled"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.signal_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "spotlight_enabled"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.group_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sensor"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.signal_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Spotlight"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.meets_criteria",
+                    "data_type": "string",
+                    "example_values": [
+                        "no"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.product_type_desc",
+                    "data_type": "string",
+                    "example_values": [
+                        "Server"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sensor_file_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "not deployed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.system_serial_number",
+                    "data_type": "string",
+                    "example_values": [
+                        "VMware-42 2a 23 c9 7f 05 df a5-23 51 df 2c 02 ce 36 fb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zero Trust Assessment data fetched successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
             }
         }
     ],

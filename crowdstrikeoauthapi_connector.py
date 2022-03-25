@@ -554,6 +554,48 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Status set successfully")
 
+    def _handle_get_zta_data(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        agent_ids = param['agent_id']
+        agent_ids = [x.strip() for x in agent_ids.split(',')]
+        agent_ids = list(filter(None, agent_ids))
+
+        details_list = list()
+        while agent_ids:
+            # Endpoint creation
+            ids_list = agent_ids[:min(100, len(agent_ids))]
+            endpoint_param = ''
+            for agent in ids_list:
+                endpoint_param += "ids={}&".format(agent)
+
+            endpoint_param = endpoint_param.strip("&")
+            endpoint = CROWDSTRIKE_GET_ZERO_TRUST_ASSESSMENT_ENDPOINT
+
+            endpoint = "{}?{}".format(endpoint, endpoint_param)
+            # Make REST call
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
+
+            if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE not in action_result.get_message():
+                return action_result.get_status()
+
+            if ret_val and response.get("resources"):
+                details_list.extend(response.get("resources"))
+
+            del agent_ids[:min(100, len(agent_ids))]
+
+        if not details_list:
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
+
+        details_data_list = [i for n, i in enumerate(details_list) if i not in details_list[n + 1:]]
+
+        for agent in details_data_list:
+            action_result.add_data(agent)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Zero Trust Assessment data fetched successfully")
+
     def _handle_hunt_file(self, param):
 
         file_hash = param[phantom.APP_JSON_HASH]
@@ -2926,22 +2968,25 @@ class CrowdstrikeConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
                                                    format(err_msg)), None)
 
-        self.debug_print("Response JSON: {}".format(resp_json))
         try:
             if "resources" in list(resp_json.keys()):
                 if "errors" in list(resp_json.keys()):
                     if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and \
                             resp_json["errors"] and len(resp_json["errors"]) != 0:
-                        self.debug_print("Error from server. Error code: {0} Data from server: {1}".format(
-                            resp_json["errors"][0]["code"], resp_json["errors"][0]["message"]))
+                        error_msg = str()
+                        for error_data in resp_json["errors"]:
+                            error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
+                        self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
                         return RetVal(action_result.set_status(phantom.APP_ERROR,
-                            "Error from server. Error code: {0} Data from server: {1}".format(
-                                resp_json["errors"][0]["code"], resp_json["errors"][0]["message"])), None)
+                            "Error from server. Error details: {}".format(error_msg.strip(", "))), None)
                     if resp_json["resources"] and len(resp_json["resources"]) != 0 and resp_json["errors"] and len(resp_json["errors"]) != 0:
-                        return RetVal(action_result.set_status(phantom.APP_ERROR,
-                            "Error from server. Error code: {0} Data from server: {1}, {2}".format(
-                                resp_json["errors"][0]["code"], resp_json["errors"][0]["message"], resp_json["resources"][0]["message"])), None)
-        except Exception:
+                        error_msg = str()
+                        for error_data in resp_json["errors"]:
+                            error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
+                        self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
+                        return RetVal(action_result.set_status(phantom.APP_SUCCESS,
+                            "Error from server. Error details: {}".format(error_msg.strip(", "))), resp_json)
+        except:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while processing error response from server"), None)
 
         # Please specify the status codes here
@@ -3323,6 +3368,7 @@ class CrowdstrikeConnector(BaseConnector):
             'detonate_url': self._handle_detonate_url,
             'check_detonate_status': self._handle_check_detonate_status,
             'get_device_scroll': self._handle_get_device_scroll,
+            'get_zta_data': self._handle_get_zta_data
         }
 
         action = self.get_action_identifier()

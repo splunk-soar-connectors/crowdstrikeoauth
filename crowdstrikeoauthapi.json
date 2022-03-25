@@ -14848,15 +14848,16 @@
                     "data_type": "string",
                     "example_values": [
                         "95969e1abbea43bdaf6cc50c9b4aec2e"
-                    ],
-                    "column_name": "Agent ID",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.cid",
                     "data_type": "string",
                     "example_values": [
                         "3061c7ff3b634e22b38274d4b586558e"
+                    ],
+                    "contains": [
+                        "crowdstrike customer id"
                     ]
                 },
                 {
@@ -14864,9 +14865,7 @@
                     "data_type": "numeric",
                     "example_values": [
                         38
-                    ],
-                    "column_name": "OS",
-                    "column_order": 1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.assessment.overall",
@@ -14887,9 +14886,7 @@
                     "data_type": "numeric",
                     "example_values": [
                         29
-                    ],
-                    "column_name": "Sensor Config",
-                    "column_order": 2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.modified_time",
@@ -15035,7 +15032,9 @@
             ],
             "versions": "EQ(*)",
             "render": {
-                "type": "table"
+                "title": "Get ZTA Data",
+                "type": "custom",
+                "view": "crowdstrike_view.display_view"
             }
         }
     ],

@@ -445,7 +445,7 @@ class CrowdstrikeConnector(BaseConnector):
             if (not offset) and (not response.get('meta', {}).get("pagination", {}).get("next_page")):
                 return list_ids
 
-    def _test_connectivity_oauth2(self, param):
+    def _handle_test_connectivity(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -969,7 +969,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "User roles fetched successfully")
 
-    def _handle_get_roles(self, param):
+    def _handle_get_role(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -3297,7 +3297,7 @@ class CrowdstrikeConnector(BaseConnector):
             return result
 
         action_mapping = {
-            'test_asset_connectivity': self._test_connectivity_oauth2,
+            'test_asset_connectivity': self._handle_test_connectivity,
             'query_device': self._handle_query_device,
             'list_groups': self._handle_list_groups,
             'quarantine_device': self._handle_quarantine_device,
@@ -3330,7 +3330,7 @@ class CrowdstrikeConnector(BaseConnector):
             'list_users': self._handle_list_users,
             'get_user_roles': self._handle_get_user_roles,
             'list_roles': self._handle_list_roles,
-            'get_role': self._handle_get_roles,
+            'get_role': self._handle_get_role,
             'list_processes': self._handle_list_processes,
             'upload_iocs': self._handle_upload_iocs,
             'delete_iocs': self._handle_delete_iocs,

@@ -62,7 +62,7 @@ class CrowdstrikeConnector(BaseConnector):
         self._oauth_access_token = None
         self._poll_interval = None
         self._required_detonation = False
-        self.stream_file_data = False
+        self._stream_file_data = False
 
     def initialize(self):
         """ Automatically called by the BaseConnector before the calls to the handle_action function"""
@@ -445,7 +445,7 @@ class CrowdstrikeConnector(BaseConnector):
             if (not offset) and (not response.get('meta', {}).get("pagination", {}).get("next_page")):
                 return list_ids
 
-    def _test_connectivity_oauth2(self, param):
+    def _handle_test_connectivity(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -969,7 +969,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "User roles fetched successfully")
 
-    def _handle_get_roles(self, param):
+    def _handle_get_role(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -1777,7 +1777,7 @@ class CrowdstrikeConnector(BaseConnector):
             'session_id': param['session_id'],
             'sha256': param['file_hash']
         }
-        self.stream_file_data = True
+        self._stream_file_data = True
         ret_val, vault_results = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT, params=params)
 
         if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_MESSAGE in action_result.get_message():
@@ -3023,7 +3023,7 @@ class CrowdstrikeConnector(BaseConnector):
             try:
                 compressed_file_path = UnicodeDammit(compressed_file_path).unicode_markup
                 with open(compressed_file_path, 'wb') as f:
-                    if self.stream_file_data:
+                    if self._stream_file_data:
                         for chunk in response.iter_content(chunk_size=10 * 1024 * 1024):
                             f.write(chunk)
                     else:
@@ -3036,7 +3036,7 @@ class CrowdstrikeConnector(BaseConnector):
                     self.debug_print('Original filename : {}'.format(filename))
                     self.debug_print('Modified filename : {}'.format(new_file_name))
                     with open(compressed_file_path, 'wb') as f:
-                        if self.stream_file_data:
+                        if self._stream_file_data:
                             for chunk in response.iter_content(chunk_size=10 * 1024 * 1024):
                                 f.write(chunk)
                         else:
@@ -3097,14 +3097,13 @@ class CrowdstrikeConnector(BaseConnector):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, 'add_debug_data'):
             action_result.add_debug_data({'r_status_code': response.status_code})
-            if not self.stream_file_data:
+            if not self._stream_file_data:
                 action_result.add_debug_data({'r_text': response.text})
             action_result.add_debug_data({'r_headers': response.headers})
 
         # Reset_password returns empty body
-        if not self.stream_file_data:
-            if not response.text and 200 <= response.status_code < 399:
-                return RetVal(phantom.APP_SUCCESS, {})
+        if not self._stream_file_data and not response.text and 200 <= response.status_code < 399:
+            return RetVal(phantom.APP_SUCCESS, {})
 
         if is_download:
             if 'csv' in response.headers.get('Content-Type', ''):
@@ -3170,7 +3169,7 @@ class CrowdstrikeConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
-            if self.stream_file_data:
+            if self._stream_file_data:
                 r = request_func(endpoint, json=json, data=data, headers=headers, params=params, stream=True)
             else:
                 r = request_func(endpoint, json=json, data=data, headers=headers, params=params)
@@ -3297,7 +3296,7 @@ class CrowdstrikeConnector(BaseConnector):
             return result
 
         action_mapping = {
-            'test_asset_connectivity': self._test_connectivity_oauth2,
+            'test_asset_connectivity': self._handle_test_connectivity,
             'query_device': self._handle_query_device,
             'list_groups': self._handle_list_groups,
             'quarantine_device': self._handle_quarantine_device,
@@ -3330,7 +3329,7 @@ class CrowdstrikeConnector(BaseConnector):
             'list_users': self._handle_list_users,
             'get_user_roles': self._handle_get_user_roles,
             'list_roles': self._handle_list_roles,
-            'get_role': self._handle_get_roles,
+            'get_role': self._handle_get_role,
             'list_processes': self._handle_list_processes,
             'upload_iocs': self._handle_upload_iocs,
             'delete_iocs': self._handle_delete_iocs,

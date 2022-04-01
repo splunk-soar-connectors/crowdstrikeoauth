@@ -424,7 +424,7 @@ class CrowdstrikeConnector(BaseConnector):
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
             if phantom.is_fail(ret_val):
-                if CROWDSTRIKE_CODE_MESSAGE in action_result.get_message():
+                if CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE in action_result.get_message():
                     return []
                 return None
 
@@ -637,7 +637,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT, params=api_data)
 
-        if phantom.is_fail(ret_val) and CROWDSTRIKE_CODE_MESSAGE in action_result.get_message():
+        if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE in action_result.get_message():
             return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         if phantom.is_fail(ret_val):

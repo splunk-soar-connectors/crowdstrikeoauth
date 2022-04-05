@@ -2933,7 +2933,7 @@ class CrowdstrikeConnector(BaseConnector):
         :param action_result: object of Action Result
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
-
+        self.debug_print("IN PROCESS JSON RESPONSE......")
         # Try a json parse
         try:
             resp_json = response.json()
@@ -2958,15 +2958,20 @@ class CrowdstrikeConnector(BaseConnector):
                         for error_data in resp_json["errors"]:
                             error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
                         self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
-                        return RetVal(action_result.set_status(phantom.APP_SUCCESS,
-                            "Error from server. Error details: {}".format(error_msg.strip(", "))), resp_json)
+                        if resp_json["resources"][0].get('message'):
+                            return RetVal(action_result.set_status(phantom.APP_ERROR,
+                                "Error from server. Error details: {}, {}".format(
+                                    error_msg.strip(", "), resp_json["resources"][0]["message"])), None)
+                        else:
+                            return RetVal(action_result.set_status(phantom.APP_SUCCESS,
+                                "Error from server. Error details: {}".format(error_msg.strip(", "))), resp_json)
         except:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while processing error response from server"), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
-
+        self.debug_print("AFTERRETEREtER")
         error_message = response.text.replace('{', '{{').replace('}', '}}')
         message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
 
@@ -3180,6 +3185,9 @@ class CrowdstrikeConnector(BaseConnector):
         is_download = False
         if CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT in endpoint:
             is_download = True
+        self.debug_print("LKLKLKLKLKLK")
+        self.debug_print(r.status_code)
+        self.debug_print(r.text)
         return self._process_response(r, action_result, is_download)
 
     def _make_rest_call_helper_oauth2(self, action_result, endpoint, headers=None, params=None, data=None, json=None, method="get"):
@@ -3215,6 +3223,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json, method)
 
+        self.debug_print("1111111111")
+        self.debug_print(resp_json)
+        self.debug_print("2222222222")
         # If token is expired, generate a new token
         msg = action_result.get_message()
         if msg and 'token is invalid' in msg or 'token has expired' in msg or \

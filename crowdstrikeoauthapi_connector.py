@@ -2942,27 +2942,28 @@ class CrowdstrikeConnector(BaseConnector):
                                                    format(err_msg)), None)
 
         try:
-            if resp_json.get("resources") and resp_json.get("errors"):
-                if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and \
-                        resp_json["errors"] and len(resp_json["errors"]) != 0:
-                    error_msg = str()
-                    for error_data in resp_json["errors"]:
-                        error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
-                    self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
-                    return RetVal(action_result.set_status(phantom.APP_ERROR,
-                        "Error from server. Error details: {}".format(error_msg.strip(", "))), None)
-                if resp_json["resources"] and len(resp_json["resources"]) != 0 and resp_json["errors"] and len(resp_json["errors"]) != 0:
-                    error_msg = str()
-                    for error_data in resp_json["errors"]:
-                        error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
-                    self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
-                    if resp_json["resources"][0].get('message'):
+            if "resources" in list(resp_json.keys()):
+                if "errors" in list(resp_json.keys()):
+                    if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and \
+                            resp_json["errors"] and len(resp_json["errors"]) != 0:
+                        error_msg = str()
+                        for error_data in resp_json["errors"]:
+                            error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
+                        self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
                         return RetVal(action_result.set_status(phantom.APP_ERROR,
-                            "Error from server. Error details: {}, {}".format(
-                                error_msg.strip(", "), resp_json["resources"][0]["message"])), None)
-                    else:
-                        return RetVal(action_result.set_status(phantom.APP_SUCCESS,
-                            "Error from server. Error details: {}".format(error_msg.strip(", "))), resp_json)
+                            "Error from server. Error details: {}".format(error_msg.strip(", "))), None)
+                    if resp_json["resources"] and len(resp_json["resources"]) != 0 and resp_json["errors"] and len(resp_json["errors"]) != 0:
+                        error_msg = str()
+                        for error_data in resp_json["errors"]:
+                            error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
+                        self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
+                        if resp_json["resources"][0].get('message'):
+                            return RetVal(action_result.set_status(phantom.APP_ERROR,
+                                "Error from server. Error details: {}, {}".format(
+                                    error_msg.strip(", "), resp_json["resources"][0]["message"])), None)
+                        else:
+                            return RetVal(action_result.set_status(phantom.APP_SUCCESS,
+                                "Error from server. Error details: {}".format(error_msg.strip(", "))), resp_json)
         except:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while processing error response from server"), None)
 

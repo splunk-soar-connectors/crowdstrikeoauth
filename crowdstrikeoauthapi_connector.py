@@ -2933,7 +2933,6 @@ class CrowdstrikeConnector(BaseConnector):
         :param action_result: object of Action Result
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
-
         # Try a json parse
         try:
             resp_json = response.json()
@@ -2943,21 +2942,25 @@ class CrowdstrikeConnector(BaseConnector):
                                                    format(err_msg)), None)
 
         try:
-            if "resources" in list(resp_json.keys()):
-                if "errors" in list(resp_json.keys()):
-                    if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and \
-                            resp_json["errors"] and len(resp_json["errors"]) != 0:
-                        error_msg = str()
-                        for error_data in resp_json["errors"]:
-                            error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
-                        self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
+            if resp_json.get("resources") and resp_json.get("errors"):
+                if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and \
+                        resp_json["errors"] and len(resp_json["errors"]) != 0:
+                    error_msg = str()
+                    for error_data in resp_json["errors"]:
+                        error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
+                    self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
+                    return RetVal(action_result.set_status(phantom.APP_ERROR,
+                        "Error from server. Error details: {}".format(error_msg.strip(", "))), None)
+                if resp_json["resources"] and len(resp_json["resources"]) != 0 and resp_json["errors"] and len(resp_json["errors"]) != 0:
+                    error_msg = str()
+                    for error_data in resp_json["errors"]:
+                        error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
+                    self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
+                    if resp_json["resources"][0].get('message'):
                         return RetVal(action_result.set_status(phantom.APP_ERROR,
-                            "Error from server. Error details: {}".format(error_msg.strip(", "))), None)
-                    if resp_json["resources"] and len(resp_json["resources"]) != 0 and resp_json["errors"] and len(resp_json["errors"]) != 0:
-                        error_msg = str()
-                        for error_data in resp_json["errors"]:
-                            error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
-                        self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
+                            "Error from server. Error details: {}, {}".format(
+                                error_msg.strip(", "), resp_json["resources"][0]["message"])), None)
+                    else:
                         return RetVal(action_result.set_status(phantom.APP_SUCCESS,
                             "Error from server. Error details: {}".format(error_msg.strip(", "))), resp_json)
         except:
@@ -2966,7 +2969,6 @@ class CrowdstrikeConnector(BaseConnector):
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
-
         error_message = response.text.replace('{', '{{').replace('}', '}}')
         message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
 
@@ -2981,7 +2983,33 @@ class CrowdstrikeConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_compressed_file_response(self, response, action_result, type, file_extension=None): # noqa
+    def _get_file_name(self, action_params, type, file_extension):
+        """ This function is used to generate the file name from the provided parameter.
+
+        :param action_params: action parameters
+        :param type: file type
+        :param file extension: file extension
+        :return: filename
+        """
+
+        filename = ''
+        if type == 'compress':
+            filename = "{0}.7z".format(action_params.get('file_name', action_params['file_hash']))
+        elif type == 'csv':
+            filename = "{0}.csv".format(action_params.get('file_name', action_params['artifact_id']))
+        elif type == 'json':
+            filename = "{0}.json".format(action_params.get('file_name', action_params['artifact_id']))
+        elif type == 'plain':
+            if file_extension == 'pcap':
+                filename = "{0}.pcap".format(action_params.get('file_name', action_params['artifact_id']))
+            else:
+                filename = "{0}.zip".format(action_params.get('file_name', action_params['artifact_id']))
+        elif type == 'png':
+            filename = "{0}.png".format(action_params.get('file_name', action_params['artifact_id']))
+
+        return filename
+
+    def _process_compressed_file_response(self, response, action_result, type, file_extension=None):
 
         guid = uuid.uuid4()
 
@@ -3002,19 +3030,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_params = self.get_current_param()
 
-        if type == 'compress':
-            filename = "{0}.7z".format(action_params.get('file_name', action_params['file_hash']))
-        elif type == 'csv':
-            filename = "{0}.csv".format(action_params.get('file_name', action_params['artifact_id']))
-        elif type == 'json':
-            filename = "{0}.json".format(action_params.get('file_name', action_params['artifact_id']))
-        elif type == 'plain':
-            if file_extension == 'pcap':
-                filename = "{0}.pcap".format(action_params.get('file_name', action_params['artifact_id']))
-            else:
-                filename = "{0}.zip".format(action_params.get('file_name', action_params['artifact_id']))
-        elif type == 'png':
-            filename = "{0}.png".format(action_params.get('file_name', action_params['artifact_id']))
+        filename = self._get_file_name(action_params, type, file_extension)
 
         compressed_file_path = "{0}/{1}".format(local_dir, filename)
 
@@ -3169,10 +3185,7 @@ class CrowdstrikeConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
-            if self._stream_file_data:
-                r = request_func(endpoint, json=json, data=data, headers=headers, params=params, stream=True)
-            else:
-                r = request_func(endpoint, json=json, data=data, headers=headers, params=params)
+            r = request_func(endpoint, json=json, data=data, headers=headers, params=params, stream=self._stream_file_data)
         except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR, "Error connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json

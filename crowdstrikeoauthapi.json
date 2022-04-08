@@ -14,7 +14,7 @@
             "name": "Harrison Smith"
         }
     ],
-    "copyright": "Copyright (c) 2019-2022 Splunk Inc.",
+    "license": "Copyright (c) 2019-2022 Splunk Inc.",
     "app_version": "3.6.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, April 4 2022, API version: v1, v2"
@@ -23,7 +23,7 @@
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "5.1.0",
+    "min_phantom_version": "5.2.0",
     "python_version": "3",
     "fips_compliant": true,
     "app_wizard_version": "1.0.0",

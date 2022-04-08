@@ -122,7 +122,7 @@ CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "(type:'{}' + value:'{}') + (deleted:'true', deleted: 'false')"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID = "id:'{}' + (deleted:'true', deleted: 'false')"
 CROWDSTRIKE_STATE_FILE_CORRUPT_ERR = (
-    "Error occurred while loading the state file due to its unexpected format. "
+    "Error occurred while loading the state file due to it's unexpected format. "
     "Resetting the state file with the default format. Please try again."
 )
 # endpoint

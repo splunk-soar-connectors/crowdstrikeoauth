@@ -1,3 +1,1 @@
 **Unreleased**
-* Added the 'get zta data' action [PAPP-24871]
-* Updated the 'get session file' action to get the file in chunks [PAPP-24293]

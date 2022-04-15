@@ -2,11 +2,11 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 3\.5\.9  
+Connector Version: 3\.6\.0  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.1\.0  
+Minimum Product Version: 5\.2\.0  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
@@ -364,6 +364,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [detonate url](#action-detonate-url) - Upload an url to CrowdStrike and retrieve the analysis results  
 [check status](#action-check-status) - To check detonation status of the provided resource id  
 [get device scroll](#action-get-device-scroll) - Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability \(based on offset pointer which expires after 2 minutes with no maximum limit\)  
+[get zta data](#action-get-zta-data) - Get Zero Trust Assessment data for one or more hosts by providing agent IDs \(AID\)  
 
 ## action: 'test connectivity'
 Validate the asset configuration for connectivity\. This action logs into the site to check the connection and credentials
@@ -2811,4 +2812,46 @@ summary\.total\_objects\_successful | numeric |
 action\_result\.parameter\.filter | string | 
 action\_result\.parameter\.limit | numeric | 
 action\_result\.parameter\.sort | string | 
-action\_result\.parameter\.offset | string | 
+action\_result\.parameter\.offset | string |   
+
+## action: 'get zta data'
+Get Zero Trust Assessment data for one or more hosts by providing agent IDs \(AID\)
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**agent\_id** |  required  | Agent ID to get zero trust assessment data about\. Comma\-separated list allowed | string |  `crowdstrike device id` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.parameter\.agent\_id | string |  `crowdstrike device id` 
+action\_result\.data\.\*\.aid | string |  `crowdstrike device id` 
+action\_result\.data\.\*\.cid | string |  `crowdstrike customer id` 
+action\_result\.data\.\*\.assessment\.os | numeric | 
+action\_result\.data\.\*\.assessment\.overall | numeric | 
+action\_result\.data\.\*\.assessment\.version | string | 
+action\_result\.data\.\*\.assessment\.sensor\_config | numeric | 
+action\_result\.data\.\*\.modified\_time | string | 
+action\_result\.data\.\*\.event\_platform | string | 
+action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.criteria | string | 
+action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.signal\_id | string | 
+action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.group\_name | string | 
+action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.signal\_name | string | 
+action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.meets\_criteria | string | 
+action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.criteria | string | 
+action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.signal\_id | string | 
+action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.group\_name | string | 
+action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.signal\_name | string | 
+action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.meets\_criteria | string | 
+action\_result\.data\.\*\.product\_type\_desc | string | 
+action\_result\.data\.\*\.sensor\_file\_status | string | 
+action\_result\.data\.\*\.system\_serial\_number | string | 
+action\_result\.status | string | 
+action\_result\.message | string | 
+action\_result\.summary | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric | 

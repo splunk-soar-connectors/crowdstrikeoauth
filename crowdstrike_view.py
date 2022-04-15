@@ -259,6 +259,9 @@ def display_view(provides, all_app_runs, context):
     if provides == 'detonate url':
         return 'crowdstrike_detonate_url.html'
 
+    if provides == 'get zta data':
+        return 'crowdstrike_get_zta_data.html'
+
 
 def hunt_view(provides, all_app_runs, context):
 

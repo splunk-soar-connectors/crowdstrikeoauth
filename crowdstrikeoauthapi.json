@@ -14705,17 +14705,14 @@
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.resources",
                     "data_type": "string",
-                    "example_values": [
-                        "12e75112bdc44ac7a60b5ad1d2765303"
-                    ],
-                    "contains": [
-                        "crowdstrike device id"
-                    ]
+                    "example_values": []
                 },
                 {
                     "data_path": "action_result.data.*.errors.*.code",
@@ -14811,9 +14808,10 @@
             ],
             "versions": "EQ(*)",
             "render": {
-                "title": "Device scroll",
-                "type": "custom",
-                "view": "crowdstrike_view.display_view"
+                "width": 12,
+                "title": "Device scrolls",
+                "type": "table",
+                "height": 5
             }
         },
         {

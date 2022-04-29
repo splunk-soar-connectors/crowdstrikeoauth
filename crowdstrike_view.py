@@ -262,9 +262,6 @@ def display_view(provides, all_app_runs, context):
     if provides == 'get zta data':
         return 'crowdstrike_get_zta_data.html'
 
-    if provides == 'get device scroll':
-        return 'crowdstrike_get_device_scroll.html'
-
 
 def hunt_view(provides, all_app_runs, context):
 

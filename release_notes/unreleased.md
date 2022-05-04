@@ -1,1 +1,2 @@
 **Unreleased**
+Added a new custom widget for get device scroll action [PAPP-20822]

@@ -2,7 +2,7 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 3\.6\.0  
+Connector Version: 3\.6\.1  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): "\.\*"  
@@ -2797,7 +2797,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
-action\_result\.data\.\*\.resources | string | 
+action\_result\.data\.\*\.resources | string |  `crowdstrike device id` 
 action\_result\.data\.\*\.errors\.\*\.code | string | 
 action\_result\.data\.\*\.errors\.\*\.id | string | 
 action\_result\.data\.\*\.errors\.\*\.message | string | 

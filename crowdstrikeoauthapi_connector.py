@@ -2423,15 +2423,26 @@ class CrowdstrikeConnector(BaseConnector):
 
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
-        try:
-            file_id = param['vault_id']
-            _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
-            file_info = list(file_info)[0]
-            file_hash = file_info['metadata']['sha256']
-        except IndexError:
-            return action_result.set_status(phantom.APP_ERROR, 'Vault file could not be found with supplied Vault ID')
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, 'Vault ID not valid: {}'.format(self._get_error_message_from_exception(e)))
+        if param.get('vault_id'):
+            endpoint = CROWDSTRIKE_QUERY_FILE_ENDPOINT
+            try:
+                file_id = param['vault_id']
+                _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
+                file_info = list(file_info)[0]
+                file_hash = file_info['metadata']['sha256']
+            except IndexError:
+                return action_result.set_status(phantom.APP_ERROR, 'Vault file could not be found with supplied Vault ID')
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, 'Vault ID not valid: {}'.format(self._get_error_message_from_exception(e)))
+        elif param.get("sha256"):
+            endpoint = CROWDSTRIKE_QUERY_REPORT_ENDPOINT
+            if util.is_sha256(param["sha256"]):
+                file_hash = param["sha256"]
+            else:
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_UNSUPPORTED_HASH_TYPE)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, 'No Vault ID or SHA256 was provided')
+
 
         filter_query = "sandbox.sha256:'{}'".format(file_hash)
 
@@ -2462,7 +2473,7 @@ class CrowdstrikeConnector(BaseConnector):
             self.debug_print('Error occurred while checking the data')
             return action_result.get_status()
 
-        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_FILE_ENDPOINT, param_dict)
+        resource_id_list = self._get_ids(action_result, endpoint, param_dict)
 
         if resource_id_list is None:
             return action_result.get_status()

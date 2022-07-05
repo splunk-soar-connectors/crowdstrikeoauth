@@ -2443,7 +2443,6 @@ class CrowdstrikeConnector(BaseConnector):
         else:
             return action_result.set_status(phantom.APP_ERROR, 'No Vault ID or SHA256 was provided')
 
-
         filter_query = "sandbox.sha256:'{}'".format(file_hash)
 
         max_limit = CROWDSTRIKE_FALCONX_API_LIMIT

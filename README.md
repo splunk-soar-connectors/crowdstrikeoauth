@@ -2088,7 +2088,8 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**vault\_id** |  required  | Vault ID of file | string |  `vault id` 
+**vault\_id** |  optional  | Vault ID of a file | string |  `vault id` 
+**sha256** | optional | SHA256 hash of a file | string | `sha256`
 **limit** |  optional  | Maximum reports to be fetched | numeric | 
 **sort** |  optional  | Property to sort by | string | 
 **offset** |  optional  | Starting index of overall result set from which to return ids \(defaults to 0\) | numeric | 

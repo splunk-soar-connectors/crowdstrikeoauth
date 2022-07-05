@@ -12,6 +12,12 @@
     "contributors": [
         {
             "name": "Harrison Smith"
+        },
+        {
+            "name": "Caleb Riggs"
+        },
+        {
+            "name": "Katie Tanner"
         }
     ],
     "license": "Copyright (c) 2019-2022 Splunk Inc.",
@@ -9788,7 +9794,7 @@
         },
         {
             "action": "file reputation",
-            "description": "Queries CrowdStrike for the file info",
+            "description": "Queries CrowdStrike for the file info given a vault ID or a SHA256 hash",
             "type": "investigate",
             "identifier": "file_reputation",
             "read_only": true,
@@ -9796,11 +9802,17 @@
                 "vault_id": {
                     "data_type": "string",
                     "description": "Vault ID of file",
-                    "required": true,
-                    "primary": true,
                     "order": 0,
                     "contains": [
                         "vault id"
+                    ]
+                },
+                "sha256": {
+                    "data_type": "string",
+                    "description": "SHA256 hash of the file",
+                    "order": 0,
+                    "contains": [
+                        "fileHashSha256"
                     ]
                 },
                 "limit": {
@@ -9884,6 +9896,17 @@
                     ],
                     "contains": [
                         "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "3460eb8087523e19ac486f37fc68192c2dcd087814a2a9c9ad6b668fee3e0134",
+                        "813a0c3c8e05421428b2e4cc7513a7d29e3e02a2567375c178f77780cf3a56ed"
+                    ],
+                    "contains": [
+                        "fileHashSha256"
                     ]
                 },
                 {
@@ -15048,7 +15071,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -15076,7 +15099,7 @@
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.1-py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
@@ -15092,7 +15115,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -15120,7 +15143,7 @@
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.1-py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",

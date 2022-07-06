@@ -9810,7 +9810,7 @@
                 "sha256": {
                     "data_type": "string",
                     "description": "SHA256 hash of the file",
-                    "order": 0,
+                    "order": 1,
                     "contains": [
                         "fileHashSha256"
                     ]
@@ -9818,13 +9818,13 @@
                 "limit": {
                     "data_type": "numeric",
                     "description": "Maximum reports to be fetched",
-                    "order": 1,
+                    "order": 2,
                     "default": 50
                 },
                 "sort": {
                     "data_type": "string",
                     "description": "Property to sort by",
-                    "order": 2,
+                    "order": 3,
                     "value_list": [
                         "verdict.asc",
                         "verdict.desc",
@@ -9839,12 +9839,12 @@
                 "offset": {
                     "data_type": "numeric",
                     "description": "Starting index of overall result set from which to return ids (defaults to 0)",
-                    "order": 3,
+                    "order": 4,
                     "default": 0
                 },
                 "detail_report": {
                     "data_type": "boolean",
-                    "order": 4,
+                    "order": 5,
                     "description": "Get the detailed report",
                     "default": false
                 }

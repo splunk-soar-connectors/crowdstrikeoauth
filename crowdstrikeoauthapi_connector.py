@@ -2426,7 +2426,7 @@ class CrowdstrikeConnector(BaseConnector):
         if param.get('vault_id'):
             endpoint = CROWDSTRIKE_QUERY_FILE_ENDPOINT
             try:
-                file_id = param['vault_id']
+                file_id = param.get('vault_id')
                 _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
                 file_info = list(file_info)[0]
                 file_hash = file_info['metadata']['sha256']
@@ -2436,8 +2436,8 @@ class CrowdstrikeConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, 'Vault ID not valid: {}'.format(self._get_error_message_from_exception(e)))
         elif param.get("sha256"):
             endpoint = CROWDSTRIKE_QUERY_REPORT_ENDPOINT
-            if util.is_sha256(param["sha256"]):
-                file_hash = param["sha256"]
+            if util.is_sha256(param.get("sha256")):
+                file_hash = param.get("sha256")
             else:
                 return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_UNSUPPORTED_HASH_TYPE)
         else:
@@ -2447,7 +2447,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         max_limit = CROWDSTRIKE_FALCONX_API_LIMIT
 
-        sort_data = [ 'created_timestamp.asc', 'created_timestamp.desc', 'threat_score.asc', 'threat_score.desc']
+        sort_data = ['created_timestamp.asc', 'created_timestamp.desc', 'threat_score.asc', 'threat_score.desc']
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
 

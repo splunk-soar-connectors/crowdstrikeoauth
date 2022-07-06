@@ -9812,7 +9812,7 @@
                     "description": "SHA256 hash of the file",
                     "order": 1,
                     "contains": [
-                        "fileHashSha256"
+                        "sha256"
                     ]
                 },
                 "limit": {
@@ -9906,7 +9906,7 @@
                         "813a0c3c8e05421428b2e4cc7513a7d29e3e02a2567375c178f77780cf3a56ed"
                     ],
                     "contains": [
-                        "fileHashSha256"
+                        "sha256"
                     ]
                 },
                 {

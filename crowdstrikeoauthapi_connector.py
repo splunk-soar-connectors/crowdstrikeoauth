@@ -22,6 +22,7 @@ import traceback
 import uuid
 from datetime import datetime, timedelta
 
+import encryption_helper
 import phantom.app as phantom
 import phantom.rules as phantom_rules
 import phantom.utils as util
@@ -75,7 +76,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.set_validator('ipv6', self._is_ip)
         # Base URL
         self._client_id = config[CROWDSTRIKE_CLIENT_ID]
-        self._client_secret = config[CROWDSTRIKE_CLIENT_SECRET]
+        self._client_secret = config[CROWDSTRIKE_CLIENT_SECRET].rstrip('/')
         self._base_url_oauth = config[CROWDSTRIKE_JSON_URL_OAuth]
         self._required_detonation = False
         self._poll_interval = self._validate_integers(self, config.get(CROWDSTRIKE_POLL_INTERVAL, 15), CROWDSTRIKE_POLL_INTERVAL)
@@ -83,9 +84,6 @@ class CrowdstrikeConnector(BaseConnector):
             return self.get_status()
 
         self._base_url_oauth = self._base_url_oauth.replace('\\', '/')
-
-        if self._base_url_oauth[-1] == '/':
-            self._base_url_oauth = self._base_url_oauth[:-1]
 
         app_id = config.get('app_id', self.get_asset_id().replace('-', ''))
         self._parameters = {'appId': app_id.replace('-', '')}
@@ -95,8 +93,6 @@ class CrowdstrikeConnector(BaseConnector):
             self.debug_print("Resetting the state file with the default format")
             self._state = {"app_version": self.get_app_json().get("app_version")}
             return self.set_status(phantom.APP_ERROR, CROWDSTRIKE_STATE_FILE_CORRUPT_ERR)
-
-        self._oauth_access_token = self._state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING, {}).get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING)
 
         ret = self._handle_preprocess_scripts()
         if phantom.is_fail(ret):
@@ -141,8 +137,8 @@ class CrowdstrikeConnector(BaseConnector):
 
             try:
                 self._preprocess_container = self._script_module.preprocess_container
-            except Exception:
-                self.save_progress("Error loading custom script. Does not contain preprocess_container function")
+            except Exception as ex:
+                self.save_progress("Error loading custom script. Does not contain preprocess_container function, Error:{}".format(str(ex)))
                 return phantom.APP_ERROR
 
         return phantom.APP_SUCCESS
@@ -163,8 +159,8 @@ class CrowdstrikeConnector(BaseConnector):
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
-        except Exception:
-            pass
+        except Exception as ex:
+            self.debug_print("Error occurred while retrieving exception information: {}".format(str(ex)))
 
         if not error_code:
             error_text = "Error Message: {}".format(error_msg)
@@ -449,12 +445,6 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # initially set the token for first time
-        ret_val = self._get_token(action_result)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
         if not param:
             param = {}
 
@@ -646,17 +636,18 @@ class CrowdstrikeConnector(BaseConnector):
         # successful request
         try:
             data = dict(response["resources"][0])
-        except Exception:
+        except Exception as ex:
             return action_result.set_status(
-                phantom.APP_ERROR, "Error occurred while parsing response of 'get_system_info' action. Unknown response retrieved")
+                phantom.APP_ERROR, "Error occurred while parsing response of 'get_system_info' action."
+                                   " Unknown response retrieved Error:{}".format(str(ex)))
 
         action_result.add_data(data)
 
         summary = action_result.update_summary({})
         try:
             summary['hostname'] = response["resources"][0]['hostname']
-        except Exception:
-            pass
+        except Exception as ex:
+            self.debug_print("Error occured while getting hostname, Error:{}".format(str(ex)))
 
         return action_result.set_status(phantom.APP_SUCCESS, "Device details fetched successfully")
 
@@ -1276,7 +1267,6 @@ class CrowdstrikeConnector(BaseConnector):
                     put_file_sorted_list.append(test_details[id])
             except Exception:
                 self.debug_print("Error occurred while sorting the 'put' file details")
-                pass
 
         for put_file in put_file_sorted_list:
             action_result.add_data(put_file)
@@ -1595,9 +1585,8 @@ class CrowdstrikeConnector(BaseConnector):
             try:
                 if test_details[id] not in sessions_sorted_list:
                     sessions_sorted_list.append(test_details[id])
-            except Exception:
-                self.debug_print("Error occurred while sorting the session details")
-                pass
+            except Exception as ex:
+                self.debug_print("Error occurred while sorting the session details, Error: {}".format(str(ex)))
 
         for session in sessions_sorted_list:
             action_result.add_data(session)
@@ -1979,7 +1968,8 @@ class CrowdstrikeConnector(BaseConnector):
                 self.debug_print("Validating 'max_events' asset configuration parameter")
                 max_events = self._validate_integers(action_result, config.get('max_events', DEFAULT_EVENTS_COUNT),
                                                      "max_events")
-            except Exception:
+            except Exception as ex:
+                self.debug_print("Error:{}".format(str(ex)))
                 max_events = DEFAULT_EVENTS_COUNT
 
         return max_crlf, merge_time_interval, max_events
@@ -2011,8 +2001,8 @@ class CrowdstrikeConnector(BaseConnector):
             try:
                 self.debug_print("Fetching last_offset_id from the state file")
                 lower_id = int(self._state.get('last_offset_id', 0))
-            except Exception:
-                self.debug_print("Error occurred while fetching last_offset_id from the state file")
+            except Exception as ex:
+                self.debug_print("Error occurred while fetching last_offset_id from the state file, Error:{}".format(str(ex)))
                 self.debug_print("Considering this run as first run")
                 lower_id = 0
 
@@ -2924,8 +2914,8 @@ class CrowdstrikeConnector(BaseConnector):
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-        except Exception:
-            error_text = "Cannot parse error details"
+        except Exception as ex:
+            error_text = "Cannot parse error details, Error: {}".format(str(ex))
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
@@ -3223,12 +3213,21 @@ class CrowdstrikeConnector(BaseConnector):
         if headers is None:
             headers = {}
 
-        token = self._state.get('oauth2_token', {})
-        if not token.get('access_token'):
+        # token check
+        if self._state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING, None):
+            if self._state.get("is_encrypted", False):
+                encrypted_state = self._state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING)
+                decrypted_state = json.loads(encryption_helper.decrypt(encrypted_state, self._asset_id))
+                self._oauth_access_token = decrypted_state[CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING]
+            else:
+                ret_val = self._get_token(action_result)
+                if phantom.is_fail(ret_val):
+                    return ret_val
+        else:
+            # initially set the token for first time
             ret_val = self._get_token(action_result)
-
             if phantom.is_fail(ret_val):
-                return action_result.get_status(), None
+                return ret_val
 
         headers.update({
             'Authorization': 'Bearer {0}'.format(self._oauth_access_token)
@@ -3285,9 +3284,10 @@ class CrowdstrikeConnector(BaseConnector):
             self._state.pop(CROWDSTRIKE_OAUTH_TOKEN_STRING, {})
             return action_result.get_status()
 
-        self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING] = resp_json
-        self._oauth_access_token = resp_json[CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING]
-        self.save_state(self._state)
+        encrypted_state = encryption_helper.encrypt(json.dumps(resp_json), self._asset_id)
+        self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING] = encrypted_state
+        self._state[CROWDSTRIKE_OAUTH_ACCESS_TOKEN_IS_ENCRYPTED] = True
+        self._oauth_access_token = resp_json.get(CROWDSTRIKE_OAUTH_TOKEN_STRING, {}).get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING)
 
         return phantom.APP_SUCCESS
 

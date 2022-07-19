@@ -607,6 +607,11 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.kernel_version",
+                    "data_type": "string",
+                    "example_value": "10.0.19044.1766"
+                },
+                {
                     "data_path": "action_result.data.*.last_seen",
                     "data_type": "string",
                     "example_values": [
@@ -667,6 +672,11 @@
                     "example_values": [
                         "2019-06-20T14:04:12Z"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.os_build",
+                    "data_type": "string",
+                    "example_value": "19044"
                 },
                 {
                     "data_path": "action_result.data.*.os_version",
@@ -3415,6 +3425,11 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.pattern_disposition_details.blocking_unsupported_or_disabled",
+                    "data_type": "boolean",
+                    "example_value": false
+                },
+                {
                     "data_path": "action_result.data.*.pattern_disposition_details.bootup_safeguard_enabled",
                     "data_type": "boolean",
                     "example_values": [
@@ -3469,6 +3484,11 @@
                         true,
                         false
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_action_failed",
+                    "data_type": "boolean",
+                    "example_value": false
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.kill_parent",
@@ -3557,6 +3577,16 @@
                         true,
                         false
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.suspend_parent",
+                    "data_type": "boolean",
+                    "example_value": false
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.suspend_process",
+                    "data_type": "boolean",
+                    "example_value": false
                 },
                 {
                     "data_path": "action_result.data.*.pattern_id",
@@ -3753,7 +3783,7 @@
                     "contains": [
                         "crowdstrike incident id"
                     ],
-                    "column_name": "IDs",
+                    "column_name": "Ids",
                     "column_order": 1
                 },
                 {
@@ -6147,6 +6177,11 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.kernel_version",
+                    "data_type": "string",
+                    "example_value": "10.0.19044.1766"
+                },
+                {
                     "data_path": "action_result.data.*.last_seen",
                     "data_type": "string",
                     "column_name": "Last Seen",
@@ -6207,6 +6242,11 @@
                     "example_values": [
                         "2018-03-10T15:40:09Z"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.os_build",
+                    "data_type": "string",
+                    "example_value": "19044"
                 },
                 {
                     "data_path": "action_result.data.*.os_version",
@@ -7182,11 +7222,41 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.metadata.company_name",
+                    "data_type": "string",
+                    "example_value": "Carbon Black, Inc"
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.file_description",
+                    "data_type": "string",
+                    "example_value": "CarbonBlack Sensor"
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.file_version",
+                    "data_type": "string",
+                    "example_value": "6.0.2.70329"
+                },
+                {
                     "data_path": "action_result.data.*.metadata.filename",
                     "data_type": "string",
                     "example_values": [
                         "test_file_name"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.original_filename",
+                    "data_type": "string",
+                    "example_value": "cb.exe"
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.product_name",
+                    "data_type": "string",
+                    "example_value": "CarbonBlack Sensor"
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.product_version",
+                    "data_type": "string",
+                    "example_value": "6.0.2.70329"
                 },
                 {
                     "data_path": "action_result.data.*.metadata.signed",
@@ -7195,6 +7265,11 @@
                         false,
                         true
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.mobile_action",
+                    "data_type": "string",
+                    "example_value": "no_action"
                 },
                 {
                     "data_path": "action_result.data.*.modified_by",
@@ -7430,6 +7505,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "detect"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.from_expiration",
                     "data_type": "string",
                     "example_values": [
@@ -7473,16 +7558,6 @@
                 {
                     "data_path": "action_result.parameter.ph",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "detect"
-                    ],
-                    "contains": [
-                        "crowdstrike indicator action"
-                    ]
                 },
                 {
                     "data_path": "action_result.parameter.sort",
@@ -7629,6 +7704,16 @@
                     "contains": [
                         "crowdstrike indicator id"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.metadata.filename",
+                    "data_type": "string",
+                    "example_value": "esxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegfesxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegf"
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.mobile_action",
+                    "data_type": "string",
+                    "example_value": "no_action"
                 },
                 {
                     "data_path": "action_result.data.*.domain.*.modified_by",
@@ -7834,6 +7919,11 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.ipv4.*.metadata.filename",
+                    "data_type": "string",
+                    "example_value": "test"
+                },
+                {
                     "data_path": "action_result.data.*.ipv4.*.modified_by",
                     "data_type": "string",
                     "example_values": [
@@ -8035,6 +8125,11 @@
                     "contains": [
                         "crowdstrike indicator id"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.metadata.filename",
+                    "data_type": "string",
+                    "example_value": "test_file_name"
                 },
                 {
                     "data_path": "action_result.data.*.ipv6.*.modified_by",
@@ -8262,6 +8357,11 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.md5.*.mobile_action",
+                    "data_type": "string",
+                    "example_value": "no_action"
+                },
+                {
                     "data_path": "action_result.data.*.md5.*.modified_by",
                     "data_type": "string",
                     "example_values": [
@@ -8472,11 +8572,41 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sha256.*.metadata.company_name",
+                    "data_type": "string",
+                    "example_value": "Microsoft Corporation"
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.file_description",
+                    "data_type": "string",
+                    "example_value": "Runtime Broker"
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.file_version",
+                    "data_type": "string",
+                    "example_value": "10.0.19041.746 (WinBuild.160101.0800)"
+                },
+                {
                     "data_path": "action_result.data.*.sha256.*.metadata.filename",
                     "data_type": "string",
                     "example_values": [
                         "test_file_name"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.original_filename",
+                    "data_type": "string",
+                    "example_value": "RuntimeBroker.exe"
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.product_name",
+                    "data_type": "string",
+                    "example_value": "Microsoft\u00ae Windows\u00ae Operating System"
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.product_version",
+                    "data_type": "string",
+                    "example_value": "10.0.19041.746"
                 },
                 {
                     "data_path": "action_result.data.*.sha256.*.metadata.signed",
@@ -8485,6 +8615,11 @@
                         false,
                         true
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.mobile_action",
+                    "data_type": "string",
+                    "example_value": "no_action"
                 },
                 {
                     "data_path": "action_result.data.*.sha256.*.modified_by",
@@ -8944,7 +9079,7 @@
                     "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
                     "column_order": 1,
-                    "column_name": "IOC Queried",
+                    "column_name": "Ioc Queried",
                     "contains": [
                         "hash",
                         "sha256",
@@ -9794,7 +9929,7 @@
         },
         {
             "action": "file reputation",
-            "description": "Queries CrowdStrike for the file info given a vault ID or a SHA256 hash",
+            "description": "Queries CrowdStrike for the file info given a vault ID or a SHA256 hash, vault ID has higher priority than SHA256 hash if both are provided",
             "type": "investigate",
             "identifier": "file_reputation",
             "read_only": true,
@@ -9802,6 +9937,7 @@
                 "vault_id": {
                     "data_type": "string",
                     "description": "Vault ID of file",
+                    "primary": true,
                     "order": 0,
                     "contains": [
                         "vault id"
@@ -9811,6 +9947,7 @@
                     "data_type": "string",
                     "description": "SHA256 hash of the file",
                     "order": 1,
+                    "primary": true,
                     "contains": [
                         "sha256"
                     ]
@@ -9881,6 +10018,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "3460eb8087523e19ac486f37fc68192c2dcd087814a2a9c9ad6b668fee3e0134"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.sort",
                     "data_type": "string",
                     "example_values": [
@@ -9891,22 +10038,10 @@
                     "data_path": "action_result.parameter.vault_id",
                     "data_type": "string",
                     "example_values": [
-                        "30c5e524e975816fbce1d958150e394efc219772",
-                        "3625d01958241505e11605ea7b89b81df54b7638"
+                        "30c5e524e975816fbce1d958150e394efc219772"
                     ],
                     "contains": [
                         "vault id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.sha256",
-                    "data_type": "string",
-                    "example_values": [
-                        "3460eb8087523e19ac486f37fc68192c2dcd087814a2a9c9ad6b668fee3e0134",
-                        "813a0c3c8e05421428b2e4cc7513a7d29e3e02a2567375c178f77780cf3a56ed"
-                    ],
-                    "contains": [
-                        "sha256"
                     ]
                 },
                 {
@@ -14701,8 +14836,7 @@
                 "offset": {
                     "data_type": "string",
                     "description": "The offset to page from, for the next result set",
-                    "order": 0,
-                    "value_list": []
+                    "order": 0
                 },
                 "limit": {
                     "data_type": "numeric",
@@ -14717,8 +14851,7 @@
                 "filter": {
                     "data_type": "string",
                     "description": "The offset to page from, for the next result set",
-                    "order": 3,
-                    "value_list": []
+                    "order": 3
                 }
             },
             "output": [
@@ -14731,29 +14864,57 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources",
+                    "data_path": "action_result.parameter.filter",
                     "data_type": "string",
                     "example_values": [
-                        "12e75112bdc44ac7a60b5ad1d2765303"
-                    ],
-                    "contains": [
-                        "crowdstrike device id"
+                        "platform_name:'windows'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        120,
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "status.desc"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.errors.*.code",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.errors.*.id",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.errors.*.message",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.expires_at",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1632462683095273200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.meta.pagination.total",
@@ -14763,20 +14924,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_path": "action_result.data.*.resources",
                     "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.limit",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.expires_at",
-                    "data_type": "numeric",
                     "example_values": [
-                        1632462683095273200
+                        "12e75112bdc44ac7a60b5ad1d2765303"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
                     ]
                 },
                 {
@@ -14803,33 +14957,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.filter",
-                    "data_type": "string",
-                    "example_values": [
-                        "platform_name:'windows'"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "example_values": [
-                        120,
-                        7
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.sort",
-                    "data_type": "string",
-                    "example_values": [
-                        "status.desc"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.offset",
-                    "data_type": "string",
-                    "example_values": []
                 }
             ],
             "versions": "EQ(*)",
@@ -14859,6 +14986,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
@@ -14879,16 +15014,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.cid",
-                    "data_type": "string",
-                    "example_values": [
-                        "3061c7ff3b634e22b38274d4b586558e"
-                    ],
-                    "contains": [
-                        "crowdstrike customer id"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.assessment.os",
                     "data_type": "numeric",
                     "example_values": [
@@ -14903,13 +15028,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assessment.version",
-                    "data_type": "string",
-                    "example_values": [
-                        "3.3.0"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.assessment.sensor_config",
                     "data_type": "numeric",
                     "example_values": [
@@ -14917,17 +15035,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.modified_time",
+                    "data_path": "action_result.data.*.assessment.version",
                     "data_type": "string",
                     "example_values": [
-                        "2022-03-21T23:07:13Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.event_platform",
-                    "data_type": "string",
-                    "example_values": [
-                        "Win"
+                        "3.3.0"
                     ]
                 },
                 {
@@ -14938,24 +15049,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "windows_os_build"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.assessment_items.os_signals.*.group_name",
                     "data_type": "string",
                     "example_values": [
                         "Windows 10"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Windows OS Build"
                     ]
                 },
                 {
@@ -14966,17 +15063,24 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "windows_os_build"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows OS Build"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.assessment_items.sensor_signals.*.criteria",
                     "data_type": "string",
                     "example_values": [
                         "Spotlight: enabled"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.signal_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "spotlight_enabled"
                     ]
                 },
                 {
@@ -14987,6 +15091,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.meets_criteria",
+                    "data_type": "string",
+                    "example_values": [
+                        "no"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.signal_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "spotlight_enabled"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.assessment_items.sensor_signals.*.signal_name",
                     "data_type": "string",
                     "example_values": [
@@ -14994,10 +15112,27 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.meets_criteria",
+                    "data_path": "action_result.data.*.cid",
                     "data_type": "string",
                     "example_values": [
-                        "no"
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ],
+                    "contains": [
+                        "crowdstrike customer id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.event_platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Win"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-03-21T23:07:13Z"
                     ]
                 },
                 {
@@ -15022,12 +15157,8 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -15035,10 +15166,6 @@
                     "example_values": [
                         "Zero Trust Assessment data fetched successfully"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",

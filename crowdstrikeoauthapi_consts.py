@@ -126,6 +126,9 @@ CROWDSTRIKE_STATE_FILE_CORRUPT_ERR = (
     "Error occurred while loading the state file due to it's unexpected format. "
     "Resetting the state file with the default format. Please try again."
 )
+CROWDSTRIKE_ENCRYPTION_ERR = "Error occurred while encrypting the state file"
+CROWDSTRIKE_DECRYPTION_ERR = "Error occurred while decrypting the state file"
+CROWDSTRIKEOAUTH_ERR_EMPTY_RESPONSE = "Status Code {code}. Empty response and no information in the header"
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"

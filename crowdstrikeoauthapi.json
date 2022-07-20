@@ -609,7 +609,9 @@
                 {
                     "data_path": "action_result.data.*.kernel_version",
                     "data_type": "string",
-                    "example_value": "10.0.19044.1766"
+                    "example_values": [
+                        "10.0.19044.1766"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.last_seen",
@@ -676,7 +678,9 @@
                 {
                     "data_path": "action_result.data.*.os_build",
                     "data_type": "string",
-                    "example_value": "19044"
+                    "example_values": [
+                        "19044"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.os_version",
@@ -3427,7 +3431,9 @@
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.blocking_unsupported_or_disabled",
                     "data_type": "boolean",
-                    "example_value": false
+                    "example_values": [
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.bootup_safeguard_enabled",
@@ -3488,7 +3494,9 @@
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.kill_action_failed",
                     "data_type": "boolean",
-                    "example_value": false
+                    "example_values": [
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.kill_parent",
@@ -3581,12 +3589,16 @@
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.suspend_parent",
                     "data_type": "boolean",
-                    "example_value": false
+                    "example_values": [
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_disposition_details.suspend_process",
                     "data_type": "boolean",
-                    "example_value": false
+                    "example_values": [
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.pattern_id",
@@ -3783,7 +3795,7 @@
                     "contains": [
                         "crowdstrike incident id"
                     ],
-                    "column_name": "Ids",
+                    "column_name": "IDs",
                     "column_order": 1
                 },
                 {
@@ -6179,7 +6191,9 @@
                 {
                     "data_path": "action_result.data.*.kernel_version",
                     "data_type": "string",
-                    "example_value": "10.0.19044.1766"
+                    "example_values": [
+                        "10.0.19044.1766"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.last_seen",
@@ -6246,7 +6260,9 @@
                 {
                     "data_path": "action_result.data.*.os_build",
                     "data_type": "string",
-                    "example_value": "19044"
+                    "example_values": [
+                        "19044"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.os_version",
@@ -7224,17 +7240,23 @@
                 {
                     "data_path": "action_result.data.*.metadata.company_name",
                     "data_type": "string",
-                    "example_value": "Carbon Black, Inc"
+                    "example_values": [
+                        "Carbon Black, Inc"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.file_description",
                     "data_type": "string",
-                    "example_value": "CarbonBlack Sensor"
+                    "example_values": [
+                        "CarbonBlack Sensor"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.file_version",
                     "data_type": "string",
-                    "example_value": "6.0.2.70329"
+                    "example_values": [
+                        "6.0.2.70329"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.filename",
@@ -7246,17 +7268,23 @@
                 {
                     "data_path": "action_result.data.*.metadata.original_filename",
                     "data_type": "string",
-                    "example_value": "cb.exe"
+                    "example_values": [
+                        "cb.exe"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.product_name",
                     "data_type": "string",
-                    "example_value": "CarbonBlack Sensor"
+                    "example_values": [
+                        "CarbonBlack Sensor"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.product_version",
                     "data_type": "string",
-                    "example_value": "6.0.2.70329"
+                    "example_values": [
+                        "6.0.2.70329"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.signed",
@@ -7269,7 +7297,9 @@
                 {
                     "data_path": "action_result.data.*.mobile_action",
                     "data_type": "string",
-                    "example_value": "no_action"
+                    "example_values": [
+                        "no_action"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.modified_by",
@@ -7708,12 +7738,16 @@
                 {
                     "data_path": "action_result.data.*.domain.*.metadata.filename",
                     "data_type": "string",
-                    "example_value": "esxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegfesxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegf"
+                    "example_values": [
+                        "esxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegfesxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegf"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.domain.*.mobile_action",
                     "data_type": "string",
-                    "example_value": "no_action"
+                    "example_values": [
+                        "no_action"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.domain.*.modified_by",
@@ -7921,7 +7955,9 @@
                 {
                     "data_path": "action_result.data.*.ipv4.*.metadata.filename",
                     "data_type": "string",
-                    "example_value": "test"
+                    "example_values": [
+                        "test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ipv4.*.modified_by",
@@ -8129,7 +8165,9 @@
                 {
                     "data_path": "action_result.data.*.ipv6.*.metadata.filename",
                     "data_type": "string",
-                    "example_value": "test_file_name"
+                    "example_values": [
+                        "test_file_name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ipv6.*.modified_by",
@@ -8359,7 +8397,9 @@
                 {
                     "data_path": "action_result.data.*.md5.*.mobile_action",
                     "data_type": "string",
-                    "example_value": "no_action"
+                    "example_values": [
+                        "no_action"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.md5.*.modified_by",
@@ -8574,17 +8614,23 @@
                 {
                     "data_path": "action_result.data.*.sha256.*.metadata.company_name",
                     "data_type": "string",
-                    "example_value": "Microsoft Corporation"
+                    "example_values": [
+                        "Microsoft Corporation"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sha256.*.metadata.file_description",
                     "data_type": "string",
-                    "example_value": "Runtime Broker"
+                    "example_values": [
+                        "Runtime Broker"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sha256.*.metadata.file_version",
                     "data_type": "string",
-                    "example_value": "10.0.19041.746 (WinBuild.160101.0800)"
+                    "example_values": [
+                        "10.0.19041.746 (WinBuild.160101.0800)"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sha256.*.metadata.filename",
@@ -8596,17 +8642,23 @@
                 {
                     "data_path": "action_result.data.*.sha256.*.metadata.original_filename",
                     "data_type": "string",
-                    "example_value": "RuntimeBroker.exe"
+                    "example_values": [
+                        "RuntimeBroker.exe"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sha256.*.metadata.product_name",
                     "data_type": "string",
-                    "example_value": "Microsoft\u00ae Windows\u00ae Operating System"
+                    "example_values": [
+                        "Microsoft\u00ae Windows\u00ae Operating System"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sha256.*.metadata.product_version",
                     "data_type": "string",
-                    "example_value": "10.0.19041.746"
+                    "example_values": [
+                        "10.0.19041.746"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sha256.*.metadata.signed",
@@ -8619,7 +8671,9 @@
                 {
                     "data_path": "action_result.data.*.sha256.*.mobile_action",
                     "data_type": "string",
-                    "example_value": "no_action"
+                    "example_values": [
+                        "no_action"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sha256.*.modified_by",
@@ -9079,7 +9133,7 @@
                     "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
                     "column_order": 1,
-                    "column_name": "Ioc Queried",
+                    "column_name": "IOC Queried",
                     "contains": [
                         "hash",
                         "sha256",

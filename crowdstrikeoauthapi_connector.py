@@ -14,7 +14,6 @@
 # and limitations under the License.
 #
 #
-# Phantom imports
 import ipaddress
 import json
 import os
@@ -29,7 +28,6 @@ import phantom.rules as phantom_rules
 import phantom.utils as util
 import pytz
 import requests
-# import simplejson as json
 from _collections import defaultdict
 from bs4 import BeautifulSoup, UnicodeDammit
 from phantom.action_result import ActionResult

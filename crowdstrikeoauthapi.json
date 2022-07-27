@@ -23,7 +23,7 @@
     "license": "Copyright (c) 2019-2022 Splunk Inc.",
     "app_version": "3.7.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, July 8 2022, API version: v1, v2"
+        "Cloud, API api.crowdstrike.com, July 8 2022, API versions: v1, v2"
     ],
     "utctime_updated": "2022-05-04T23:15:36.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
@@ -9253,7 +9253,7 @@
                     "description": "Indicator originating source",
                     "data_type": "string",
                     "order": 4,
-                    "default": "IOC uploaded via Splunk Phantom"
+                    "default": "IOC uploaded via Splunk SOAR"
                 },
                 "description": {
                     "description": "Indicator description",
@@ -9805,7 +9805,7 @@
                     "description": "Indicator originating source",
                     "data_type": "string",
                     "order": 4,
-                    "default": "IOC updated via Splunk Phantom"
+                    "default": "IOC updated via Splunk SOAR"
                 },
                 "description": {
                     "description": "Indicator description",
@@ -11024,7 +11024,7 @@
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "testuser@phantom.us"
+                        "testuser@soar.us"
                     ]
                 },
                 {
@@ -12097,7 +12097,7 @@
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "testuser@phantom.us"
+                        "testuser@soar.us"
                     ]
                 },
                 {
@@ -13466,7 +13466,7 @@
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "testuser@phantom.us"
+                        "testuser@soar.us"
                     ]
                 },
                 {

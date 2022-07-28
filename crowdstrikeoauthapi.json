@@ -12,12 +12,18 @@
     "contributors": [
         {
             "name": "Harrison Smith"
+        },
+        {
+            "name": "Caleb Riggs"
+        },
+        {
+            "name": "Katie Tanner"
         }
     ],
     "license": "Copyright (c) 2019-2022 Splunk Inc.",
-    "app_version": "3.6.1",
+    "app_version": "3.7.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, April 4 2022, API version: v1, v2"
+        "Cloud, API api.crowdstrike.com, July 8 2022, API versions: v1, v2"
     ],
     "utctime_updated": "2022-05-04T23:15:36.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
@@ -601,6 +607,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.kernel_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.19044.1766"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.last_seen",
                     "data_type": "string",
                     "example_values": [
@@ -660,6 +673,13 @@
                     "data_type": "string",
                     "example_values": [
                         "2019-06-20T14:04:12Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.os_build",
+                    "data_type": "string",
+                    "example_values": [
+                        "19044"
                     ]
                 },
                 {
@@ -3409,6 +3429,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.pattern_disposition_details.blocking_unsupported_or_disabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.pattern_disposition_details.bootup_safeguard_enabled",
                     "data_type": "boolean",
                     "example_values": [
@@ -3461,6 +3488,13 @@
                     "data_type": "boolean",
                     "example_values": [
                         true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_action_failed",
+                    "data_type": "boolean",
+                    "example_values": [
                         false
                     ]
                 },
@@ -3549,6 +3583,20 @@
                     "data_type": "boolean",
                     "example_values": [
                         true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.suspend_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.suspend_process",
+                    "data_type": "boolean",
+                    "example_values": [
                         false
                     ]
                 },
@@ -6141,6 +6189,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.kernel_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.19044.1766"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.last_seen",
                     "data_type": "string",
                     "column_name": "Last Seen",
@@ -6200,6 +6255,13 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-03-10T15:40:09Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.os_build",
+                    "data_type": "string",
+                    "example_values": [
+                        "19044"
                     ]
                 },
                 {
@@ -7176,10 +7238,52 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.metadata.company_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Carbon Black, Inc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.file_description",
+                    "data_type": "string",
+                    "example_values": [
+                        "CarbonBlack Sensor"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.file_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.0.2.70329"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.metadata.filename",
                     "data_type": "string",
                     "example_values": [
                         "test_file_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.original_filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "cb.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.product_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "CarbonBlack Sensor"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.product_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.0.2.70329"
                     ]
                 },
                 {
@@ -7188,6 +7292,13 @@
                     "example_values": [
                         false,
                         true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mobile_action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
                     ]
                 },
                 {
@@ -7424,6 +7535,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "detect"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.from_expiration",
                     "data_type": "string",
                     "example_values": [
@@ -7467,16 +7588,6 @@
                 {
                     "data_path": "action_result.parameter.ph",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "detect"
-                    ],
-                    "contains": [
-                        "crowdstrike indicator action"
-                    ]
                 },
                 {
                     "data_path": "action_result.parameter.sort",
@@ -7622,6 +7733,20 @@
                     ],
                     "contains": [
                         "crowdstrike indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.metadata.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "esxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegfesxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.mobile_action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
                     ]
                 },
                 {
@@ -7828,6 +7953,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.ipv4.*.metadata.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.ipv4.*.modified_by",
                     "data_type": "string",
                     "example_values": [
@@ -8028,6 +8160,13 @@
                     ],
                     "contains": [
                         "crowdstrike indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.metadata.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_file_name"
                     ]
                 },
                 {
@@ -8256,6 +8395,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.md5.*.mobile_action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.md5.*.modified_by",
                     "data_type": "string",
                     "example_values": [
@@ -8466,10 +8612,52 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sha256.*.metadata.company_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft Corporation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.file_description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Runtime Broker"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.file_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.19041.746 (WinBuild.160101.0800)"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sha256.*.metadata.filename",
                     "data_type": "string",
                     "example_values": [
                         "test_file_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.original_filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "RuntimeBroker.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.product_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft\u00ae Windows\u00ae Operating System"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.product_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.19041.746"
                     ]
                 },
                 {
@@ -8478,6 +8666,13 @@
                     "example_values": [
                         false,
                         true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.mobile_action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
                     ]
                 },
                 {
@@ -9058,7 +9253,7 @@
                     "description": "Indicator originating source",
                     "data_type": "string",
                     "order": 4,
-                    "default": "IOC uploaded via Splunk Phantom"
+                    "default": "IOC uploaded via Splunk SOAR"
                 },
                 "description": {
                     "description": "Indicator description",
@@ -9610,7 +9805,7 @@
                     "description": "Indicator originating source",
                     "data_type": "string",
                     "order": 4,
-                    "default": "IOC updated via Splunk Phantom"
+                    "default": "IOC updated via Splunk SOAR"
                 },
                 "description": {
                     "description": "Indicator description",
@@ -9788,7 +9983,7 @@
         },
         {
             "action": "file reputation",
-            "description": "Queries CrowdStrike for the file info",
+            "description": "Queries CrowdStrike for the file info given a vault ID or a SHA256 hash, vault ID has higher priority than SHA256 hash if both are provided",
             "type": "investigate",
             "identifier": "file_reputation",
             "read_only": true,
@@ -9796,23 +9991,31 @@
                 "vault_id": {
                     "data_type": "string",
                     "description": "Vault ID of file",
-                    "required": true,
                     "primary": true,
                     "order": 0,
                     "contains": [
                         "vault id"
                     ]
                 },
+                "sha256": {
+                    "data_type": "string",
+                    "description": "SHA256 hash of the file",
+                    "order": 1,
+                    "primary": true,
+                    "contains": [
+                        "sha256"
+                    ]
+                },
                 "limit": {
                     "data_type": "numeric",
                     "description": "Maximum reports to be fetched",
-                    "order": 1,
+                    "order": 2,
                     "default": 50
                 },
                 "sort": {
                     "data_type": "string",
                     "description": "Property to sort by",
-                    "order": 2,
+                    "order": 3,
                     "value_list": [
                         "verdict.asc",
                         "verdict.desc",
@@ -9827,12 +10030,12 @@
                 "offset": {
                     "data_type": "numeric",
                     "description": "Starting index of overall result set from which to return ids (defaults to 0)",
-                    "order": 3,
+                    "order": 4,
                     "default": 0
                 },
                 "detail_report": {
                     "data_type": "boolean",
-                    "order": 4,
+                    "order": 5,
                     "description": "Get the detailed report",
                     "default": false
                 }
@@ -9869,6 +10072,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "3460eb8087523e19ac486f37fc68192c2dcd087814a2a9c9ad6b668fee3e0134"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.sort",
                     "data_type": "string",
                     "example_values": [
@@ -9879,8 +10092,7 @@
                     "data_path": "action_result.parameter.vault_id",
                     "data_type": "string",
                     "example_values": [
-                        "30c5e524e975816fbce1d958150e394efc219772",
-                        "3625d01958241505e11605ea7b89b81df54b7638"
+                        "30c5e524e975816fbce1d958150e394efc219772"
                     ],
                     "contains": [
                         "vault id"
@@ -10812,7 +11024,7 @@
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "testuser@phantom.us"
+                        "testuser@soar.us"
                     ]
                 },
                 {
@@ -11885,7 +12097,7 @@
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "testuser@phantom.us"
+                        "testuser@soar.us"
                     ]
                 },
                 {
@@ -13254,7 +13466,7 @@
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "testuser@phantom.us"
+                        "testuser@soar.us"
                     ]
                 },
                 {
@@ -14678,8 +14890,7 @@
                 "offset": {
                     "data_type": "string",
                     "description": "The offset to page from, for the next result set",
-                    "order": 0,
-                    "value_list": []
+                    "order": 0
                 },
                 "limit": {
                     "data_type": "numeric",
@@ -14694,8 +14905,7 @@
                 "filter": {
                     "data_type": "string",
                     "description": "The offset to page from, for the next result set",
-                    "order": 3,
-                    "value_list": []
+                    "order": 3
                 }
             },
             "output": [
@@ -14708,29 +14918,57 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources",
+                    "data_path": "action_result.parameter.filter",
                     "data_type": "string",
                     "example_values": [
-                        "12e75112bdc44ac7a60b5ad1d2765303"
-                    ],
-                    "contains": [
-                        "crowdstrike device id"
+                        "platform_name:'windows'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        120,
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "status.desc"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.errors.*.code",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.errors.*.id",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.errors.*.message",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.expires_at",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1632462683095273200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.meta.pagination.total",
@@ -14740,20 +14978,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_path": "action_result.data.*.resources",
                     "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.limit",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.expires_at",
-                    "data_type": "numeric",
                     "example_values": [
-                        1632462683095273200
+                        "12e75112bdc44ac7a60b5ad1d2765303"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
                     ]
                 },
                 {
@@ -14780,33 +15011,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.filter",
-                    "data_type": "string",
-                    "example_values": [
-                        "platform_name:'windows'"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric",
-                    "example_values": [
-                        120,
-                        7
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.sort",
-                    "data_type": "string",
-                    "example_values": [
-                        "status.desc"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.offset",
-                    "data_type": "string",
-                    "example_values": []
                 }
             ],
             "versions": "EQ(*)",
@@ -14836,6 +15040,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
@@ -14856,16 +15068,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.cid",
-                    "data_type": "string",
-                    "example_values": [
-                        "3061c7ff3b634e22b38274d4b586558e"
-                    ],
-                    "contains": [
-                        "crowdstrike customer id"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.assessment.os",
                     "data_type": "numeric",
                     "example_values": [
@@ -14880,13 +15082,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assessment.version",
-                    "data_type": "string",
-                    "example_values": [
-                        "3.3.0"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.assessment.sensor_config",
                     "data_type": "numeric",
                     "example_values": [
@@ -14894,17 +15089,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.modified_time",
+                    "data_path": "action_result.data.*.assessment.version",
                     "data_type": "string",
                     "example_values": [
-                        "2022-03-21T23:07:13Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.event_platform",
-                    "data_type": "string",
-                    "example_values": [
-                        "Win"
+                        "3.3.0"
                     ]
                 },
                 {
@@ -14915,24 +15103,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "windows_os_build"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.assessment_items.os_signals.*.group_name",
                     "data_type": "string",
                     "example_values": [
                         "Windows 10"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Windows OS Build"
                     ]
                 },
                 {
@@ -14943,17 +15117,24 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "windows_os_build"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.os_signals.*.signal_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows OS Build"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.assessment_items.sensor_signals.*.criteria",
                     "data_type": "string",
                     "example_values": [
                         "Spotlight: enabled"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.signal_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "spotlight_enabled"
                     ]
                 },
                 {
@@ -14964,6 +15145,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.meets_criteria",
+                    "data_type": "string",
+                    "example_values": [
+                        "no"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.signal_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "spotlight_enabled"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.assessment_items.sensor_signals.*.signal_name",
                     "data_type": "string",
                     "example_values": [
@@ -14971,10 +15166,27 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assessment_items.sensor_signals.*.meets_criteria",
+                    "data_path": "action_result.data.*.cid",
                     "data_type": "string",
                     "example_values": [
-                        "no"
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ],
+                    "contains": [
+                        "crowdstrike customer id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.event_platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Win"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-03-21T23:07:13Z"
                     ]
                 },
                 {
@@ -14999,12 +15211,8 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -15012,10 +15220,6 @@
                     "example_values": [
                         "Zero Trust Assessment data fetched successfully"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -15048,7 +15252,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -15076,7 +15280,7 @@
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.1-py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
@@ -15092,7 +15296,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -15120,7 +15324,7 @@
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.1-py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",

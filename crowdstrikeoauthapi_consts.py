@@ -20,6 +20,7 @@ CROWDSTRIKE_CLIENT_ID = "client_id"
 CROWDSTRIKE_CLIENT_SECRET = "client_secret"  # pragma: allowlist secret
 CROWDSTRIKE_OAUTH_TOKEN_STRING = "oauth2_token"
 CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING = "access_token"
+CROWDSTRIKE_OAUTH_ACCESS_TOKEN_IS_ENCRYPTED = "is_encrypted"
 CROWDSTRIKE_JSON_COUNT_ONLY = "count_only"
 CROWDSTRIKE_GET_PROCESS_DETAIL_FALCON_PROCESS_ID = "falcon_process_id"
 CROWDSTRIKE_GET_DEVICE_DETAIL_DEVICE_ID = "id"
@@ -125,6 +126,9 @@ CROWDSTRIKE_STATE_FILE_CORRUPT_ERR = (
     "Error occurred while loading the state file due to it's unexpected format. "
     "Resetting the state file with the default format. Please try again."
 )
+CROWDSTRIKE_ENCRYPTION_ERR = "Error occurred while encrypting the state file"
+CROWDSTRIKE_DECRYPTION_ERR = "Error occurred while decrypting the state file"
+CROWDSTRIKEOAUTH_ERR_EMPTY_RESPONSE = "Status Code {code}. Empty response and no information in the header"
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"

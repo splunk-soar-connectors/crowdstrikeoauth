@@ -3205,12 +3205,13 @@ class CrowdstrikeConnector(BaseConnector):
         resp_json = None
 
         try:
-            request_func = getattr(requests, method)
-        except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
-
-        try:
-            r = request_func(endpoint, json=json, data=data, headers=headers, params=params, stream=self._stream_file_data)
+            kwargs = {
+                "json": json,
+                "data": data,
+                "headers": headers,
+                "params": params,
+            }
+            r = requests.request(method, endpoint, **kwargs)
         except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR, "Error connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json

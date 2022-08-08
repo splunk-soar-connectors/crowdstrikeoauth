@@ -3210,6 +3210,7 @@ class CrowdstrikeConnector(BaseConnector):
                 "data": data,
                 "headers": headers,
                 "params": params,
+                "stream": self._stream_file_data
             }
             r = requests.request(method, endpoint, **kwargs)
         except Exception as e:

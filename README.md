@@ -2,11 +2,11 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 3\.6\.1  
+Connector Version: 3\.7\.0  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.2\.0  
+Minimum Product Version: 5\.3\.0  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
@@ -357,7 +357,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [upload indicator](#action-upload-indicator) - Upload indicator that you want CrowdStrike to watch  
 [delete indicator](#action-delete-indicator) - Delete an indicator that is being watched  
 [update indicator](#action-update-indicator) - Update an indicator that has been uploaded  
-[file reputation](#action-file-reputation) - Queries CrowdStrike for the file info  
+[file reputation](#action-file-reputation) - Queries CrowdStrike for the file info given a vault ID or a SHA256 hash, vault ID has higher priority than SHA256 hash if both are provided  
 [url reputation](#action-url-reputation) - Queries CrowdStrike for the url info  
 [download report](#action-download-report) - To download the report of the provided artifact id  
 [detonate file](#action-detonate-file) - Upload a file to CrowdStrike and retrieve the analysis results  
@@ -454,6 +454,7 @@ action\_result\.data\.\*\.group\_hash | string |  `sha256`
 action\_result\.data\.\*\.groups | string |  `md5` 
 action\_result\.data\.\*\.hostname | string |  `host name` 
 action\_result\.data\.\*\.instance\_id | string | 
+action\_result\.data\.\*\.kernel\_version | string | 
 action\_result\.data\.\*\.last\_seen | string | 
 action\_result\.data\.\*\.local\_ip | string |  `ip` 
 action\_result\.data\.\*\.mac\_address | string | 
@@ -462,6 +463,7 @@ action\_result\.data\.\*\.major\_version | string |
 action\_result\.data\.\*\.meta\.version | string | 
 action\_result\.data\.\*\.minor\_version | string | 
 action\_result\.data\.\*\.modified\_timestamp | string | 
+action\_result\.data\.\*\.os\_build | string | 
 action\_result\.data\.\*\.os\_version | string | 
 action\_result\.data\.\*\.platform\_id | string | 
 action\_result\.data\.\*\.platform\_name | string | 
@@ -969,6 +971,7 @@ action\_result\.data\.\*\.meta\.query\_time | numeric |
 action\_result\.data\.\*\.meta\.trace\_id | string | 
 action\_result\.data\.\*\.objective | string | 
 action\_result\.data\.\*\.pattern\_disposition | numeric | 
+action\_result\.data\.\*\.pattern\_disposition\_details\.blocking\_unsupported\_or\_disabled | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.bootup\_safeguard\_enabled | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.critical\_process\_disabled | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.detect | boolean | 
@@ -976,6 +979,7 @@ action\_result\.data\.\*\.pattern\_disposition\_details\.fs\_operation\_blocked 
 action\_result\.data\.\*\.pattern\_disposition\_details\.handle\_operation\_downgraded | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.inddet\_mask | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.indicator | boolean | 
+action\_result\.data\.\*\.pattern\_disposition\_details\.kill\_action\_failed | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.kill\_parent | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.kill\_process | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.kill\_subprocess | boolean | 
@@ -987,6 +991,8 @@ action\_result\.data\.\*\.pattern\_disposition\_details\.quarantine\_machine | b
 action\_result\.data\.\*\.pattern\_disposition\_details\.registry\_operation\_blocked | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.rooting | boolean | 
 action\_result\.data\.\*\.pattern\_disposition\_details\.sensor\_only | boolean | 
+action\_result\.data\.\*\.pattern\_disposition\_details\.suspend\_parent | boolean | 
+action\_result\.data\.\*\.pattern\_disposition\_details\.suspend\_process | boolean | 
 action\_result\.data\.\*\.pattern\_id | numeric | 
 action\_result\.data\.\*\.sha256 | string | 
 action\_result\.data\.\*\.tactic | string | 
@@ -1481,6 +1487,7 @@ action\_result\.data\.\*\.group\_hash | string |  `sha256`
 action\_result\.data\.\*\.groups | string |  `md5` 
 action\_result\.data\.\*\.hostname | string |  `host name` 
 action\_result\.data\.\*\.instance\_id | string | 
+action\_result\.data\.\*\.kernel\_version | string | 
 action\_result\.data\.\*\.last\_seen | string | 
 action\_result\.data\.\*\.local\_ip | string | 
 action\_result\.data\.\*\.mac\_address | string | 
@@ -1489,6 +1496,7 @@ action\_result\.data\.\*\.major\_version | string |
 action\_result\.data\.\*\.meta\.version | string | 
 action\_result\.data\.\*\.minor\_version | string | 
 action\_result\.data\.\*\.modified\_timestamp | string | 
+action\_result\.data\.\*\.os\_build | string | 
 action\_result\.data\.\*\.os\_version | string | 
 action\_result\.data\.\*\.ou | string | 
 action\_result\.data\.\*\.platform\_id | string | 
@@ -1676,8 +1684,15 @@ action\_result\.data\.\*\.from\_parent | boolean |
 action\_result\.data\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
 action\_result\.data\.\*\.id | string |  `crowdstrike indicator id` 
 action\_result\.data\.\*\.metadata\.av\_hits | numeric | 
+action\_result\.data\.\*\.metadata\.company\_name | string | 
+action\_result\.data\.\*\.metadata\.file\_description | string | 
+action\_result\.data\.\*\.metadata\.file\_version | string | 
 action\_result\.data\.\*\.metadata\.filename | string | 
+action\_result\.data\.\*\.metadata\.original\_filename | string | 
+action\_result\.data\.\*\.metadata\.product\_name | string | 
+action\_result\.data\.\*\.metadata\.product\_version | string | 
 action\_result\.data\.\*\.metadata\.signed | boolean | 
+action\_result\.data\.\*\.mobile\_action | string | 
 action\_result\.data\.\*\.modified\_by | string | 
 action\_result\.data\.\*\.modified\_on | string | 
 action\_result\.data\.\*\.modified\_timestamp | string |  `date` 
@@ -1714,12 +1729,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
+action\_result\.parameter\.action | string |  `crowdstrike indicator action` 
 action\_result\.parameter\.from\_expiration | string |  `date` 
 action\_result\.parameter\.indicator\_type | string |  `crowdstrike indicator type` 
 action\_result\.parameter\.indicator\_value | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain` 
 action\_result\.parameter\.limit | numeric | 
 action\_result\.parameter\.ph | string | 
-action\_result\.parameter\.action | string |  `crowdstrike indicator action` 
 action\_result\.parameter\.sort | string | 
 action\_result\.parameter\.source | string | 
 action\_result\.parameter\.to\_expiration | string |  `date` 
@@ -1737,6 +1752,8 @@ action\_result\.data\.\*\.domain\.\*\.expired | boolean |
 action\_result\.data\.\*\.domain\.\*\.from\_parent | boolean | 
 action\_result\.data\.\*\.domain\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
 action\_result\.data\.\*\.domain\.\*\.id | string |  `crowdstrike indicator id` 
+action\_result\.data\.\*\.domain\.\*\.metadata\.filename | string | 
+action\_result\.data\.\*\.domain\.\*\.mobile\_action | string | 
 action\_result\.data\.\*\.domain\.\*\.modified\_by | string |  `md5` 
 action\_result\.data\.\*\.domain\.\*\.modified\_on | string | 
 action\_result\.data\.\*\.domain\.\*\.modified\_timestamp | string |  `date` 
@@ -1760,6 +1777,7 @@ action\_result\.data\.\*\.ipv4\.\*\.expired | boolean |
 action\_result\.data\.\*\.ipv4\.\*\.from\_parent | boolean | 
 action\_result\.data\.\*\.ipv4\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
 action\_result\.data\.\*\.ipv4\.\*\.id | string |  `crowdstrike indicator id` 
+action\_result\.data\.\*\.ipv4\.\*\.metadata\.filename | string | 
 action\_result\.data\.\*\.ipv4\.\*\.modified\_by | string |  `md5` 
 action\_result\.data\.\*\.ipv4\.\*\.modified\_on | string | 
 action\_result\.data\.\*\.ipv4\.\*\.modified\_timestamp | string |  `date` 
@@ -1783,6 +1801,7 @@ action\_result\.data\.\*\.ipv6\.\*\.expired | boolean |
 action\_result\.data\.\*\.ipv6\.\*\.from\_parent | boolean | 
 action\_result\.data\.\*\.ipv6\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
 action\_result\.data\.\*\.ipv6\.\*\.id | string |  `crowdstrike indicator id` 
+action\_result\.data\.\*\.ipv6\.\*\.metadata\.filename | string | 
 action\_result\.data\.\*\.ipv6\.\*\.modified\_by | string |  `md5` 
 action\_result\.data\.\*\.ipv6\.\*\.modified\_on | string | 
 action\_result\.data\.\*\.ipv6\.\*\.modified\_timestamp | string |  `date` 
@@ -1809,6 +1828,7 @@ action\_result\.data\.\*\.md5\.\*\.id | string |  `crowdstrike indicator id`
 action\_result\.data\.\*\.md5\.\*\.metadata\.av\_hits | numeric | 
 action\_result\.data\.\*\.md5\.\*\.metadata\.filename | string | 
 action\_result\.data\.\*\.md5\.\*\.metadata\.signed | boolean | 
+action\_result\.data\.\*\.md5\.\*\.mobile\_action | string | 
 action\_result\.data\.\*\.md5\.\*\.modified\_by | string |  `md5` 
 action\_result\.data\.\*\.md5\.\*\.modified\_on | string | 
 action\_result\.data\.\*\.md5\.\*\.modified\_timestamp | string |  `date` 
@@ -1833,8 +1853,15 @@ action\_result\.data\.\*\.sha256\.\*\.from\_parent | boolean |
 action\_result\.data\.\*\.sha256\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
 action\_result\.data\.\*\.sha256\.\*\.id | string |  `crowdstrike indicator id` 
 action\_result\.data\.\*\.sha256\.\*\.metadata\.av\_hits | numeric | 
+action\_result\.data\.\*\.sha256\.\*\.metadata\.company\_name | string | 
+action\_result\.data\.\*\.sha256\.\*\.metadata\.file\_description | string | 
+action\_result\.data\.\*\.sha256\.\*\.metadata\.file\_version | string | 
 action\_result\.data\.\*\.sha256\.\*\.metadata\.filename | string | 
+action\_result\.data\.\*\.sha256\.\*\.metadata\.original\_filename | string | 
+action\_result\.data\.\*\.sha256\.\*\.metadata\.product\_name | string | 
+action\_result\.data\.\*\.sha256\.\*\.metadata\.product\_version | string | 
 action\_result\.data\.\*\.sha256\.\*\.metadata\.signed | boolean | 
+action\_result\.data\.\*\.sha256\.\*\.mobile\_action | string | 
 action\_result\.data\.\*\.sha256\.\*\.modified\_by | string |  `md5` 
 action\_result\.data\.\*\.sha256\.\*\.modified\_on | string | 
 action\_result\.data\.\*\.sha256\.\*\.modified\_timestamp | string |  `date` 
@@ -2080,7 +2107,7 @@ summary\.total\_objects | numeric |
 summary\.total\_objects\_successful | numeric |   
 
 ## action: 'file reputation'
-Queries CrowdStrike for the file info
+Queries CrowdStrike for the file info given a vault ID or a SHA256 hash, vault ID has higher priority than SHA256 hash if both are provided
 
 Type: **investigate**  
 Read only: **True**
@@ -2088,7 +2115,8 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**vault\_id** |  required  | Vault ID of file | string |  `vault id` 
+**vault\_id** |  optional  | Vault ID of file | string |  `vault id` 
+**sha256** |  optional  | SHA256 hash of the file | string |  `sha256` 
 **limit** |  optional  | Maximum reports to be fetched | numeric | 
 **sort** |  optional  | Property to sort by | string | 
 **offset** |  optional  | Starting index of overall result set from which to return ids \(defaults to 0\) | numeric | 
@@ -2101,6 +2129,7 @@ action\_result\.status | string |
 action\_result\.parameter\.detail\_report | boolean | 
 action\_result\.parameter\.limit | numeric | 
 action\_result\.parameter\.offset | numeric | 
+action\_result\.parameter\.sha256 | string |  `sha256` 
 action\_result\.parameter\.sort | string | 
 action\_result\.parameter\.vault\_id | string |  `vault id` 
 action\_result\.data\.\*\.cid | string | 
@@ -2797,22 +2826,22 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
-action\_result\.data\.\*\.resources | string |  `crowdstrike device id` 
+action\_result\.parameter\.filter | string | 
+action\_result\.parameter\.limit | numeric | 
+action\_result\.parameter\.offset | string | 
+action\_result\.parameter\.sort | string | 
 action\_result\.data\.\*\.errors\.\*\.code | string | 
 action\_result\.data\.\*\.errors\.\*\.id | string | 
 action\_result\.data\.\*\.errors\.\*\.message | string | 
-action\_result\.data\.\*\.meta\.pagination\.total | numeric | 
-action\_result\.data\.\*\.meta\.pagination\.offset | string | 
-action\_result\.data\.\*\.meta\.pagination\.limit | string | 
 action\_result\.data\.\*\.meta\.pagination\.expires\_at | numeric | 
+action\_result\.data\.\*\.meta\.pagination\.limit | string | 
+action\_result\.data\.\*\.meta\.pagination\.offset | string | 
+action\_result\.data\.\*\.meta\.pagination\.total | numeric | 
+action\_result\.data\.\*\.resources | string |  `crowdstrike device id` 
 action\_result\.summary | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.parameter\.offset | string |   
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'get zta data'
 Get Zero Trust Assessment data for one or more hosts by providing agent IDs \(AID\)
@@ -2828,30 +2857,30 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.agent\_id | string |  `crowdstrike device id` 
 action\_result\.data\.\*\.aid | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.cid | string |  `crowdstrike customer id` 
 action\_result\.data\.\*\.assessment\.os | numeric | 
 action\_result\.data\.\*\.assessment\.overall | numeric | 
-action\_result\.data\.\*\.assessment\.version | string | 
 action\_result\.data\.\*\.assessment\.sensor\_config | numeric | 
-action\_result\.data\.\*\.modified\_time | string | 
-action\_result\.data\.\*\.event\_platform | string | 
+action\_result\.data\.\*\.assessment\.version | string | 
 action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.criteria | string | 
-action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.signal\_id | string | 
 action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.group\_name | string | 
-action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.signal\_name | string | 
 action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.meets\_criteria | string | 
+action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.signal\_id | string | 
+action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.signal\_name | string | 
 action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.criteria | string | 
-action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.signal\_id | string | 
 action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.group\_name | string | 
-action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.signal\_name | string | 
 action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.meets\_criteria | string | 
+action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.signal\_id | string | 
+action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.signal\_name | string | 
+action\_result\.data\.\*\.cid | string |  `crowdstrike customer id` 
+action\_result\.data\.\*\.event\_platform | string | 
+action\_result\.data\.\*\.modified\_time | string | 
 action\_result\.data\.\*\.product\_type\_desc | string | 
 action\_result\.data\.\*\.sensor\_file\_status | string | 
 action\_result\.data\.\*\.system\_serial\_number | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric | 

@@ -1912,7 +1912,8 @@ class CrowdstrikeConnector(BaseConnector):
 
     @tenacity.retry(retry=tenacity.retry_if_exception_type(EmptyResourcesException),
                     stop=tenacity.stop_after_attempt(5),
-                    wait=tenacity.wait_random_exponential(multiplier=1, max=60))
+                    wait=tenacity.wait_random(min=20, max=60),
+                    reraise=True)
     def _get_stream(self, action_result):
 
         # Progress
@@ -2009,6 +2010,82 @@ class CrowdstrikeConnector(BaseConnector):
 
         return max_crlf, merge_time_interval, max_events
 
+    def _process_data_feed_stream(self, action_result, datafeed_request, max_crlf, merge_time_interval, max_events):
+        # Handle any errors
+        if datafeed_request.status_code != requests.codes.ok:  # pylint: disable=E1101
+            resp_json = datafeed_request.json()
+            try:
+                err_message = resp_json['errors'][0]['message']
+            except Exception as ex:
+                err_message = "{}: {}".format('None', self._get_error_message_from_exception(ex))
+            return action_result.set_status(phantom.APP_ERROR,
+                                            CROWDSTRIKE_ERR_FROM_SERVER,
+                                            status=datafeed_request.status_code,
+                                            message=err_message)
+
+        # Parse the events
+        counter = 0   # counter for continuous blank lines
+        total_blank_lines_count = 0    # counter for total number of blank lines
+
+        try:
+            for stream_data in datafeed_request.iter_lines(chunk_size=None):
+                # chunk = UnicodeDammit(chunk).unicode_markup
+
+                if stream_data is None:
+                    # Done with all the event data for now
+                    self.debug_print(CROWDSTRIKE_NO_DATA_MSG)
+                    self.save_progress(CROWDSTRIKE_NO_DATA_MSG)
+                    break
+
+                if not stream_data.strip():
+                    # increment counter for counting of the continuous as well as total blank lines
+                    counter += 1
+                    total_blank_lines_count += 1
+
+                    if counter > max_crlf:
+                        self.debug_print(CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG.format(counter))
+                        self.save_progress(CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG.format(counter))
+                        break
+
+                    self.debug_print(CROWDSTRIKE_RECEIVED_CR_LF_MSG.format(counter))
+                    self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MSG.format(counter))
+                    continue
+
+                ret_val, stream_data = self._parse_resp_data(stream_data)
+
+                if phantom.is_fail(ret_val):
+                    self.save_progress("Failed to parse the stream_data. Find stream_data details in logs. Error Message: {}".format(
+                        action_result.get_status_message()))
+                    self.save_progress("Continuing with next event.")
+                    self.debug_print("Failed to parse the stream_data: {}".format(stream_data))
+                    continue
+
+                if stream_data and stream_data.get('metadata', {}).get('eventType') == 'DetectionSummaryEvent':
+                    self._events.append(stream_data)
+                    counter = 0   # reset the continuous blank lines counter as we received a valid data in between
+
+                # Calculate length of DetectionSummaryEvents until now
+                len_events = len(self._events)
+
+                if max_events and len_events >= max_events:
+                    self._events = self._events[:max_events]
+                    break
+
+                self.send_progress(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
+                self.debug_print(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
+
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
+                                        CROWDSTRIKE_ERR_EVENTS_FETCH, err_msg))
+
+        self.send_progress(" ")
+
+        self.debug_print(CROWDSTRIKE_BLANK_LINES_COUNT_MSG.format(total_blank_lines_count))
+        self.save_progress(CROWDSTRIKE_BLANK_LINES_COUNT_MSG.format(total_blank_lines_count))
+        self.debug_print(CROWDSTRIKE_GOT_EVENTS_MSG.format(len(self._events)))   # total events count
+        self.save_progress(CROWDSTRIKE_GOT_EVENTS_MSG.format(len(self._events)))
+
     def _on_poll(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -2057,87 +2134,28 @@ class CrowdstrikeConnector(BaseConnector):
         self._data_feed_url += f'&offset={lower_id}&eventType=DetectionSummaryEvent'
         self.debug_print(f'Connecting to stream at: {self._data_feed_url}.')
         try:
-            r = requests.get(self._data_feed_url,    # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                headers={'Authorization': 'Token {0}'.format(self._token), 'Connection': 'Keep-Alive'}, stream=True)
+            datafeed_request_headers = {
+                'Authorization': f'Token {self._token}',
+                'Connection': 'Keep-Alive',
+            }
+            with requests.get(self._data_feed_url,
+                              headers=datafeed_request_headers,
+                              timeout=300,
+                              stream=True) as datafeed_request:
+                self.debug_print(f'Successfully connected to stream at: {self._data_feed_url}!')
+                failure_result = self._process_data_feed_stream(action_result=action_result,
+                                                                datafeed_request=datafeed_request,
+                                                                max_crlf=max_crlf,
+                                                                merge_time_interval=merge_time_interval,
+                                                                max_events=max_events)
+                # Result will be None if there were no failures
+                if failure_result:
+                    return failure_result
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_CONNECTING, self._get_error_message_from_exception(e))
 
-        # Handle any errors
-        if r.status_code != requests.codes.ok:  # pylint: disable=E1101
-            resp_json = r.json()
-            try:
-                err_message = resp_json['errors'][0]['message']
-            except Exception as ex:
-                err_message = "{}: {}".format('None', self._get_error_message_from_exception(ex))
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_FROM_SERVER, status=r.status_code, message=err_message)
-
-        self.debug_print(f'Successfully connected to stream at: {self._data_feed_url}!')
-
-        # Parse the events
-        counter = 0   # counter for continuous blank lines
-        total_blank_lines_count = 0    # counter for total number of blank lines
-
-        try:
-            for stream_data in r.iter_lines(chunk_size=None):
-                # chunk = UnicodeDammit(chunk).unicode_markup
-
-                if stream_data is None:
-                    # Done with all the event data for now
-                    self.debug_print(CROWDSTRIKE_NO_DATA_MSG)
-                    self.save_progress(CROWDSTRIKE_NO_DATA_MSG)
-                    break
-
-                if not stream_data.strip():
-                    # increment counter for counting of the continuous as well as total blank lines
-                    counter += 1
-                    total_blank_lines_count += 1
-
-                    if counter > max_crlf:
-                        self.debug_print(CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG.format(counter))
-                        self.save_progress(CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG.format(counter))
-                        break
-                    else:
-                        self.debug_print(CROWDSTRIKE_RECEIVED_CR_LF_MSG.format(counter))
-                        self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MSG.format(counter))
-                        continue
-
-                ret_val, stream_data = self._parse_resp_data(stream_data)
-
-                if phantom.is_fail(ret_val):
-                    self.save_progress("Failed to parse the stream_data. Find stream_data details in logs. Error Message: {}".format(
-                        action_result.get_status_message()))
-                    self.save_progress("Continuing with next event.")
-                    self.debug_print("Failed to parse the stream_data: {}".format(stream_data))
-                    continue
-
-                if stream_data and stream_data.get('metadata', {}).get('eventType') == 'DetectionSummaryEvent':
-                    self._events.append(stream_data)
-                    counter = 0   # reset the continuous blank lines counter as we received a valid data in between
-
-                # Calculate length of DetectionSummaryEvents until now
-                len_events = len(self._events)
-
-                if max_events and len_events >= max_events:
-                    self._events = self._events[:max_events]
-                    break
-
-                self.send_progress(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
-                self.debug_print(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
-
-        except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
-                                        CROWDSTRIKE_ERR_EVENTS_FETCH, err_msg))
-
         # Check if to collate the data or not
         collate = config.get('collate', True)
-
-        self.send_progress(" ")
-
-        self.debug_print(CROWDSTRIKE_BLANK_LINES_COUNT_MSG.format(total_blank_lines_count))
-        self.save_progress(CROWDSTRIKE_BLANK_LINES_COUNT_MSG.format(total_blank_lines_count))
-        self.debug_print(CROWDSTRIKE_GOT_EVENTS_MSG.format(len(self._events)))   # total events count
-        self.save_progress(CROWDSTRIKE_GOT_EVENTS_MSG.format(len(self._events)))
 
         if self._events:
             self.send_progress("Parsing the fetched DetectionSummaryEvents...")

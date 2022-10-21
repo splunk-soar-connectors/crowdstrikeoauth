@@ -2132,44 +2132,52 @@ class CrowdstrikeConnector(BaseConnector):
 
         # Query for the events
         self._data_feed_url += f'&offset={lower_id}&eventType=DetectionSummaryEvent'
+
         self.debug_print(f'Connecting to stream at: {self._data_feed_url}.')
+
+        datafeed_request_headers = {
+            'Authorization': f'Token {self._token}',
+            'Connection': 'Keep-Alive',
+        }
         try:
-            datafeed_request_headers = {
-                'Authorization': f'Token {self._token}',
-                'Connection': 'Keep-Alive',
-            }
-            with requests.get(self._data_feed_url,
-                              headers=datafeed_request_headers,
-                              timeout=300,
-                              stream=True) as datafeed_request:
-                self.debug_print(f'Successfully connected to stream at: {self._data_feed_url}!')
-                failure_result = self._process_data_feed_stream(action_result=action_result,
-                                                                datafeed_request=datafeed_request,
-                                                                max_crlf=max_crlf,
-                                                                merge_time_interval=merge_time_interval,
-                                                                max_events=max_events)
-                # Result will be None if there were no failures
-                if failure_result:
-                    return failure_result
+            datafeed_request = requests.get(self._data_feed_url,
+                                            headers=datafeed_request_headers,
+                                            timeout=300,
+                                            stream=True)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_CONNECTING, self._get_error_message_from_exception(e))
 
-        # Check if to collate the data or not
-        collate = config.get('collate', True)
+        self.debug_print(f'Successfully connected to stream at: {self._data_feed_url}!')
 
-        if self._events:
-            self.send_progress("Parsing the fetched DetectionSummaryEvents...")
-            results = events_parser.parse_events(self._events, self, collate)
-            self.save_progress("Created {0} relevant results from the fetched DetectionSummaryEvents".format(len(results)))
-            if results:
-                self.save_progress("Adding {0} event artifact{1}. Empty containers will be skipped.".format(
-                    len(results), 's' if len(results) > 1 else ''))
-                self._save_results(results, param)
-                self.send_progress("Done")
-            if not self.is_poll_now():
-                last_event = self._events[-1]
-                last_offset_id = last_event['metadata']['offset']
-                self._state['last_offset_id'] = last_offset_id + 1
+        # Explicitly close the stream once done by using a with statement
+        with datafeed_request:
+            failure_result = self._process_data_feed_stream(action_result=action_result,
+                                                            datafeed_request=datafeed_request,
+                                                            max_crlf=max_crlf,
+                                                            merge_time_interval=merge_time_interval,
+                                                            max_events=max_events)
+            # Result will be None if there were no failures
+            if failure_result:
+                return failure_result
+
+            # Check if to collate the data or not
+            collate = config.get('collate', True)
+
+            # Handle parsing while the connection is open to ensure we set the offset before
+            # any new connection attempts.
+            if self._events:
+                self.send_progress("Parsing the fetched DetectionSummaryEvents...")
+                results = events_parser.parse_events(self._events, self, collate)
+                self.save_progress("Created {0} relevant results from the fetched DetectionSummaryEvents".format(len(results)))
+                if results:
+                    self.save_progress("Adding {0} event artifact{1}. Empty containers will be skipped.".format(
+                        len(results), 's' if len(results) > 1 else ''))
+                    self._save_results(results, param)
+                    self.send_progress("Done")
+                if not self.is_poll_now():
+                    last_event = self._events[-1]
+                    last_offset_id = last_event['metadata']['offset']
+                    self._state['last_offset_id'] = last_offset_id + 1
 
         return action_result.set_status(phantom.APP_SUCCESS)
 

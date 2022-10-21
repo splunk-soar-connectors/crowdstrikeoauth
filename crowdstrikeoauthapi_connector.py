@@ -28,6 +28,7 @@ import phantom.rules as phantom_rules
 import phantom.utils as util
 import pytz
 import requests
+import tenacity
 from _collections import defaultdict
 from bs4 import BeautifulSoup, UnicodeDammit
 from phantom.action_result import ActionResult
@@ -45,6 +46,10 @@ class RetVal(tuple):
     def __new__(cls, val1, val2):
 
         return tuple.__new__(RetVal, (val1, val2))
+
+
+class EmptyResourcesException(Exception):
+    pass
 
 
 class CrowdstrikeConnector(BaseConnector):
@@ -173,6 +178,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         error_code = None
         error_msg = CROWDSTRIKE_ERR_MSG_UNAVAILABLE
+        self.error_print("Error Occurred:", e)
 
         try:
             if hasattr(e, "args"):
@@ -1904,6 +1910,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         return (phantom.APP_SUCCESS, event)
 
+    @tenacity.retry(retry=tenacity.retry_if_exception_type(EmptyResourcesException),
+                    stop=tenacity.stop_after_attempt(5),
+                    wait=tenacity.wait_random_exponential(multiplier=1, max=60))
     def _get_stream(self, action_result):
 
         # Progress
@@ -1927,7 +1936,8 @@ class CrowdstrikeConnector(BaseConnector):
         # Extract values that we require for other calls
         resources = resp.get('resources')
         if not resources:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY)
+            self.debug_print(CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY)
+            raise EmptyResourcesException(CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY)
 
         self._data_feed_url = resources[0].get('dataFeedURL')
         if not self._data_feed_url:
@@ -2005,7 +2015,12 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Connect to the server
-        if phantom.is_fail(self._get_stream(action_result)):
+        try:
+            get_stream_result = self._get_stream(action_result)
+        except EmptyResourcesException:
+            get_stream_result = action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY)
+
+        if phantom.is_fail(get_stream_result):
             return action_result.get_status()
 
         if self._data_feed_url is None:
@@ -2039,8 +2054,9 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress(CROWDSTRIKE_MSG_GETTING_EVENTS.format(lower_id=lower_id, max_events=max_events))
 
         # Query for the events
+        self._data_feed_url += f'&offset={lower_id}&eventType=DetectionSummaryEvent'
+        self.debug_print(f'Connecting to stream at: {self._data_feed_url}.')
         try:
-            self._data_feed_url = self._data_feed_url + '&offset={0}&eventType=DetectionSummaryEvent'.format(lower_id)
             r = requests.get(self._data_feed_url,    # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
                 headers={'Authorization': 'Token {0}'.format(self._token), 'Connection': 'Keep-Alive'}, stream=True)
         except Exception as e:
@@ -2054,6 +2070,8 @@ class CrowdstrikeConnector(BaseConnector):
             except Exception as ex:
                 err_message = "{}: {}".format('None', self._get_error_message_from_exception(ex))
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_FROM_SERVER, status=r.status_code, message=err_message)
+
+        self.debug_print(f'Successfully connected to stream at: {self._data_feed_url}!')
 
         # Parse the events
         counter = 0   # counter for continuous blank lines

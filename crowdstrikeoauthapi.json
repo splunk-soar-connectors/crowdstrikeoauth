@@ -21,7 +21,7 @@
         }
     ],
     "license": "Copyright (c) 2019-2022 Splunk Inc.",
-    "app_version": "3.7.0",
+    "app_version": "3.8.0-fdse.1",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, July 8 2022, API versions: v1, v2"
     ],
@@ -2189,6 +2189,224 @@
             "versions": "EQ(*)",
             "render": {
                 "title": "Delete Session",
+                "type": "table",
+                "height": 5,
+                "width": 12
+            }
+        },
+        {
+            "action": "list alerts",
+            "description": "Lists Alerts",
+            "verbose": "This action supports filtering in order to retrieve a particular set of alerts.",
+            "type": "investigate",
+            "identifier": "list_alerts",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Maximum alerts to be fetched (maximum 10000)",
+                    "order": 0,
+                    "default": 100
+                },
+                "filter": {
+                    "data_type": "string",
+                    "description": "Filter expression used to limit the fetched alerts (FQL Syntax)",
+                    "order": 1
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Property to sort by",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "modified_timestamp:<='2019-06-14T10:22:02.02236652Z'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        120,
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "created_timestamp.asc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-24T20:52:08Z"
+                    ],
+                    "column_name": "Timestamp",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-24T20:54:04Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updated_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-24T20:54:04Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updated_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.agent_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assigned_to_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assigned_to_uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assigned_to_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.composite_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.display_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.email_sent",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.external",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.objective",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.scenario",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tactic",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tactic_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technique_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technique_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*",
+                    "data_type": "string"  
+                },
+                {
+                    "data_path": "action_result.summary.total_alerts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total alerts: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "title": "List Alerts",
                 "type": "table",
                 "height": 5,
                 "width": 12

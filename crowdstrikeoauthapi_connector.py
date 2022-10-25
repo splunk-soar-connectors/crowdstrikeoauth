@@ -1618,6 +1618,50 @@ class CrowdstrikeConnector(BaseConnector):
         summary['total_alerts'] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
+    
+    def _handle_list_detections(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        resp = self._check_data(action_result, param)
+
+        if phantom.is_fail(resp):
+            return action_result.get_status()
+
+        detection_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT, param)
+        if detection_id_list is None:
+            return action_result.get_status()
+
+        detection_id_data = list()
+        detection_id_data.extend(detection_id_list)
+        param.update({"ids": detection_id_list})
+
+        detection_details_list = self._get_details(action_result, CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT, param, method='post')
+
+        if detection_details_list is None:
+            return action_result.get_status()
+
+        detection_sorted_list = list()
+        test_details = dict()
+
+        for data in detection_details_list:
+            test_details.update({data['detection_id']: data})
+
+        for detection_id in detection_id_data:
+            try:
+                if test_details[detection_id] not in detection_sorted_list:
+                    detection_sorted_list.append(test_details[detection_id])
+            except Exception as ex:
+                self.debug_print("Error occurred while sorting the alert details, Error: "
+                                 "{}".format(self._get_error_message_from_exception(ex)))
+
+        for detection in detection_sorted_list:
+            action_result.add_data(detection)
+
+        summary = action_result.update_summary({})
+        summary['total_detections'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_sessions(self, param):
 
@@ -3387,6 +3431,7 @@ class CrowdstrikeConnector(BaseConnector):
             'create_session': self._handle_create_session,
             'delete_session': self._handle_delete_session,
             "list_alerts": self._handle_list_alerts,
+            "list_detections": self._handle_list_detections,
             'list_sessions': self._handle_list_sessions,
             'run_command': self._handle_run_command,
             'run_admin_command': self._handle_run_admin_command,

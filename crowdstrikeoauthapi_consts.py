@@ -151,6 +151,9 @@ CROWDSTRIKE_RUN_COMMAND_ENDPOINT = "/real-time-response/entities/command/v1"
 CROWDSTRIKE_LIST_ALERTS_ENDPOINT = "/alerts/queries/alerts/v1"
 CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v1"
 
+CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT = "/detects/queries/detects/v1"
+CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT = "/detects/entities/summaries/GET/v1"
+
 CROWDSTRIKE_GET_RTR_FILES_ENDPOINT = "/real-time-response/entities/file/v1"
 CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT = "/real-time-response/entities/extracted-file-contents/v1"
 CROWDSTRIKE_GET_INDICATOR_ENDPOINT = "/iocs/entities/indicators/v1"

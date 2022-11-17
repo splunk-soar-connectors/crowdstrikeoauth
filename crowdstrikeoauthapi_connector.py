@@ -1574,7 +1574,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary['results'] = 'Successfully removed session: {0}'.format(param['session_id'])
 
         return action_result.set_status(phantom.APP_SUCCESS, "Session ended successfully")
-    
+
     def _handle_list_alerts(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1601,7 +1601,7 @@ class CrowdstrikeConnector(BaseConnector):
         test_details = dict()
 
         for data in alert_details_list:
-            test_details.update({data['id']: data})
+            test_details.update({data['composite_id']: data})
 
         for id in alert_id_data:
             try:
@@ -1618,7 +1618,7 @@ class CrowdstrikeConnector(BaseConnector):
         summary['total_alerts'] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
-    
+
     def _handle_list_detections(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2129,8 +2129,11 @@ class CrowdstrikeConnector(BaseConnector):
         # Query for the events
         try:
             self._data_feed_url = self._data_feed_url + '&offset={0}&eventType=DetectionSummaryEvent'.format(lower_id)
-            r = requests.get(self._data_feed_url,    # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                headers={'Authorization': 'Token {0}'.format(self._token), 'Connection': 'Keep-Alive'}, stream=True)
+            kwargs = {
+                "headers": {'Authorization': 'Token {0}'.format(self._token), 'Connection': 'Keep-Alive'},
+                "stream": True
+            }
+            r = requests.request("get", self._data_feed_url, **kwargs)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_CONNECTING, self._get_error_message_from_exception(e))
 

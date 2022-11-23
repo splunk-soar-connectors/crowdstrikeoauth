@@ -115,14 +115,14 @@ class CrowdstrikeConnector(BaseConnector):
                     return encryption_helper.decrypt(self._state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING)
                                                      .get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING), self._asset_id)
                 except Exception as ex:
-                    self.debug_print("{}: {}".format(CROWDSTRIKE_DECRYPTION_ERR, self._get_error_message_from_exception(ex)))
+                    self.debug_print("{}: {}".format(CROWDSTRIKE_DECRYPTION_ERROR, self._get_error_message_from_exception(ex)))
         return None
 
     def encrypt_state(self):
         try:
             return encryption_helper.encrypt(self._oauth_access_token, self._asset_id)
         except Exception as ex:
-            self.debug_print("{}: {}".format(CROWDSTRIKE_ENCRYPTION_ERR, self._get_error_message_from_exception(ex)))
+            self.debug_print("{}: {}".format(CROWDSTRIKE_ENCRYPTION_ERROR, self._get_error_message_from_exception(ex)))
         return None
 
     def _is_ip(self, input_ip_address):
@@ -172,22 +172,22 @@ class CrowdstrikeConnector(BaseConnector):
         """
 
         error_code = None
-        error_msg = CROWDSTRIKE_UNAVAILABLE_MSG_ERR
+        error_message = CROWDSTRIKE_UNAVAILABLE_MESSAGE_ERROR
 
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
-                    error_msg = e.args[1]
+                    error_message = e.args[1]
                 elif len(e.args) == 1:
-                    error_msg = e.args[0]
+                    error_message = e.args[0]
         except Exception as ex:
             self.debug_print("Error occurred while retrieving exception information: {}".format(self._get_error_message_from_exception(ex)))
 
         if not error_code:
-            error_text = "Error Message: {}".format(error_msg)
+            error_text = "Error Message: {}".format(error_message)
         else:
-            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_message)
 
         return error_text
 
@@ -244,7 +244,7 @@ class CrowdstrikeConnector(BaseConnector):
         if util.is_sha256(hash_value):
             return (phantom.APP_SUCCESS, "sha256")
 
-        return (action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_UNSUPPORTED_HASH_TYPE_ERR), None)
+        return (action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_UNSUPPORTED_HASH_TYPE_ERROR), None)
 
     def _get_ioc_type(self, ioc, action_result):
 
@@ -474,7 +474,7 @@ class CrowdstrikeConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params=param)
 
         if phantom.is_fail(ret_val):
-            self.save_progress(CROWDSTRIKE_CONNECTIVITY_TEST_ERR)
+            self.save_progress(CROWDSTRIKE_CONNECTIVITY_TEST_ERROR)
             return phantom.APP_ERROR
 
         self.save_progress("Test connectivity passed")
@@ -1995,7 +1995,7 @@ class CrowdstrikeConnector(BaseConnector):
     def _get_stream(self, action_result):
 
         # Progress
-        self.save_progress(CROWDSTRIKE_USING_BASE_URL_ERR, base_url=self._base_url_oauth)
+        self.save_progress(CROWDSTRIKE_USING_BASE_URL_ERROR, base_url=self._base_url_oauth)
 
         # Connectivity
         self.save_progress(phantom.APP_PROG_CONNECTIVITY_TO_ELLIPSES, self._base_url_oauth)
@@ -2010,20 +2010,20 @@ class CrowdstrikeConnector(BaseConnector):
 
         meta = resp.get('meta')
         if not meta:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_META_KEY_EMPTY_ERR)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_META_KEY_EMPTY_ERROR)
 
         # Extract values that we require for other calls
         resources = resp.get('resources')
         if not resources:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_RESOURCES_KEY_EMPTY_ERR)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_RESOURCES_KEY_EMPTY_ERROR)
 
         self._data_feed_url = resources[0].get('dataFeedURL')
         if not self._data_feed_url:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_DATAFEED_EMPTY_ERR)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_DATAFEED_EMPTY_ERROR)
 
         session_token = resources[0].get('sessionToken')
         if not session_token:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERR)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR)
 
         self._token = session_token['token']
 
@@ -2124,7 +2124,7 @@ class CrowdstrikeConnector(BaseConnector):
         if lower_id < 0:
             lower_id = 0
 
-        self.save_progress(CROWDSTRIKE_GETTING_EVENTS_MSG.format(lower_id=lower_id, max_events=max_events))
+        self.save_progress(CROWDSTRIKE_GETTING_EVENTS_MESSAGE.format(lower_id=lower_id, max_events=max_events))
 
         # Query for the events
         try:
@@ -2135,7 +2135,7 @@ class CrowdstrikeConnector(BaseConnector):
             }
             r = requests.request("get", self._data_feed_url, **kwargs)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_CONNECTIVITY_ERR, self._get_error_message_from_exception(e))
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_CONNECTIVITY_ERROR, self._get_error_message_from_exception(e))
 
         # Handle any errors
         if r.status_code != requests.codes.ok:  # pylint: disable=E1101
@@ -2144,7 +2144,7 @@ class CrowdstrikeConnector(BaseConnector):
                 err_message = resp_json['errors'][0]['message']
             except Exception as ex:
                 err_message = "{}: {}".format('None', self._get_error_message_from_exception(ex))
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_FROM_SERVER_ERR, status=r.status_code, message=err_message)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_FROM_SERVER_ERROR, status=r.status_code, message=err_message)
 
         # Parse the events
         counter = 0   # counter for continuous blank lines
@@ -2156,8 +2156,8 @@ class CrowdstrikeConnector(BaseConnector):
 
                 if stream_data is None:
                     # Done with all the event data for now
-                    self.debug_print(CROWDSTRIKE_NO_DATA_MSG)
-                    self.save_progress(CROWDSTRIKE_NO_DATA_MSG)
+                    self.debug_print(CROWDSTRIKE_NO_DATA_MESSAGE)
+                    self.save_progress(CROWDSTRIKE_NO_DATA_MESSAGE)
                     break
 
                 if not stream_data.strip():
@@ -2166,12 +2166,12 @@ class CrowdstrikeConnector(BaseConnector):
                     total_blank_lines_count += 1
 
                     if counter > max_crlf:
-                        self.debug_print(CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG.format(counter))
-                        self.save_progress(CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG.format(counter))
+                        self.debug_print(CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter))
+                        self.save_progress(CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter))
                         break
                     else:
-                        self.debug_print(CROWDSTRIKE_RECEIVED_CR_LF_MSG.format(counter))
-                        self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MSG.format(counter))
+                        self.debug_print(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
+                        self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
                         continue
 
                 ret_val, stream_data = self._parse_resp_data(stream_data)
@@ -2194,23 +2194,23 @@ class CrowdstrikeConnector(BaseConnector):
                     self._events = self._events[:max_events]
                     break
 
-                self.send_progress(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
-                self.debug_print(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
+                self.send_progress(CROWDSTRIKE_PULLED_EVENTS_MESSAGE.format(len(self._events)))
+                self.debug_print(CROWDSTRIKE_PULLED_EVENTS_MESSAGE.format(len(self._events)))
 
         except Exception as e:
             err_message = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
-                                        CROWDSTRIKE_EVENTS_FETCH_ERR, err_message))
+                                        CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message))
 
         # Check if to collate the data or not
         collate = config.get('collate', True)
 
         self.send_progress(" ")
 
-        self.debug_print(CROWDSTRIKE_BLANK_LINES_COUNT_MSG.format(total_blank_lines_count))
-        self.save_progress(CROWDSTRIKE_BLANK_LINES_COUNT_MSG.format(total_blank_lines_count))
-        self.debug_print(CROWDSTRIKE_GOT_EVENTS_MSG.format(len(self._events)))   # total events count
-        self.save_progress(CROWDSTRIKE_GOT_EVENTS_MSG.format(len(self._events)))
+        self.debug_print(CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE.format(total_blank_lines_count))
+        self.save_progress(CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE.format(total_blank_lines_count))
+        self.debug_print(CROWDSTRIKE_GOT_EVENTS_MESSAGE.format(len(self._events)))   # total events count
+        self.save_progress(CROWDSTRIKE_GOT_EVENTS_MESSAGE.format(len(self._events)))
 
         if self._events:
             self.send_progress("Parsing the fetched DetectionSummaryEvents...")
@@ -3005,7 +3005,7 @@ class CrowdstrikeConnector(BaseConnector):
         if response.status_code == 200 or response.status_code == 202:
             return RetVal(phantom.APP_SUCCESS, "Status code: {}".format(response.status_code))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERR.format(code=response.status_code)), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR.format(code=response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
         """ This function is used to process html response.

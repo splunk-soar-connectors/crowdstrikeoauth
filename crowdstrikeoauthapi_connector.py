@@ -172,7 +172,7 @@ class CrowdstrikeConnector(BaseConnector):
         """
 
         error_code = None
-        error_msg = CROWDSTRIKE_ERR_MSG_UNAVAILABLE
+        error_msg = CROWDSTRIKE_UNAVAILABLE_MSG_ERR
 
         try:
             if hasattr(e, "args"):
@@ -244,7 +244,7 @@ class CrowdstrikeConnector(BaseConnector):
         if util.is_sha256(hash_value):
             return (phantom.APP_SUCCESS, "sha256")
 
-        return (action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_UNSUPPORTED_HASH_TYPE), None)
+        return (action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_UNSUPPORTED_HASH_TYPE_ERR), None)
 
     def _get_ioc_type(self, ioc, action_result):
 
@@ -474,7 +474,7 @@ class CrowdstrikeConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params=param)
 
         if phantom.is_fail(ret_val):
-            self.save_progress(CROWDSTRIKE_ERR_CONNECTIVITY_TEST)
+            self.save_progress(CROWDSTRIKE_CONNECTIVITY_TEST_ERR)
             return phantom.APP_ERROR
 
         self.save_progress("Test connectivity passed")
@@ -1175,15 +1175,15 @@ class CrowdstrikeConnector(BaseConnector):
         if indicator_sort_criteria:
             indicator_sort_criteria = indicator_sort_criteria.lower()
             if indicator_sort_criteria not in CROWDSTRIKE_SORT_CRITERIA_LIST:
-                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_IOCS_SORT))
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR.format(CROWDSTRIKE_IOCS_SORT))
         if CROWDSTRIKE_IOCS_ACTION in param:
             ioc_action = param.get(CROWDSTRIKE_IOCS_ACTION).lower()
             if ioc_action not in ["no_action", "allow", "prevent_no_ui", "prevent", "detect"]:
-                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_IOCS_ACTION))
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR.format(CROWDSTRIKE_IOCS_ACTION))
         if CROWDSTRIKE_SEARCH_IOCS_TYPE in param:
             search_ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE).lower()
             if search_ioc_type not in ["all", "hash", "ipv4", "ipv6", "md5", "sha256", "domain"]:
-                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_SEARCH_IOCS_TYPE))
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR.format(CROWDSTRIKE_SEARCH_IOCS_TYPE))
         api_data = {
             "limit": 2000  # 2000 is the max, this could be tuned
         }
@@ -1942,18 +1942,18 @@ class CrowdstrikeConnector(BaseConnector):
         if ioc_type:
             ioc_type = ioc_type.lower()
             if ioc_type not in ["sha256", "md5", "domain", "ipv4", "ipv6"]:
-                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_SEARCH_IOCS_TYPE))
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR.format(CROWDSTRIKE_SEARCH_IOCS_TYPE))
         ioc = param.get(CROWDSTRIKE_JSON_LIST_IOC)
         resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
 
         if not ioc_type and not ioc and not resource_id:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_PARAMETER_MESSAGE_ERROR)
 
         if ioc_type and not ioc and not resource_id:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_INDICATOR_VALUE_ERROR_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_INDICATOR_VALUE_MESSAGE_ERROR)
 
         if ioc and not ioc_type and not resource_id:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_INDICATOR_TYPE_ERROR_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_INDICATOR_TYPE_MESSAGE_ERROR)
 
         params = {}
         if resource_id:
@@ -1995,10 +1995,10 @@ class CrowdstrikeConnector(BaseConnector):
     def _get_stream(self, action_result):
 
         # Progress
-        self.save_progress(CROWDSTRIKE_USING_BASE_URL, base_url=self._base_url_oauth)
+        self.save_progress(CROWDSTRIKE_USING_BASE_URL_ERR, base_url=self._base_url_oauth)
 
         # Connectivity
-        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._base_url_oauth)
+        self.save_progress(phantom.APP_PROG_CONNECTIVITY_TO_ELLIPSES, self._base_url_oauth)
 
         self._token = None
         self._data_feed_url = None
@@ -2010,20 +2010,20 @@ class CrowdstrikeConnector(BaseConnector):
 
         meta = resp.get('meta')
         if not meta:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_META_KEY_EMPTY)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_META_KEY_EMPTY_ERR)
 
         # Extract values that we require for other calls
         resources = resp.get('resources')
         if not resources:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_RESOURCES_KEY_EMPTY_ERR)
 
         self._data_feed_url = resources[0].get('dataFeedURL')
         if not self._data_feed_url:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_DATAFEED_EMPTY)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_DATAFEED_EMPTY_ERR)
 
         session_token = resources[0].get('sessionToken')
         if not session_token:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_SESSION_TOKEN_NOT_FOUND)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERR)
 
         self._token = session_token['token']
 
@@ -2124,7 +2124,7 @@ class CrowdstrikeConnector(BaseConnector):
         if lower_id < 0:
             lower_id = 0
 
-        self.save_progress(CROWDSTRIKE_MSG_GETTING_EVENTS.format(lower_id=lower_id, max_events=max_events))
+        self.save_progress(CROWDSTRIKE_GETTING_EVENTS_MSG.format(lower_id=lower_id, max_events=max_events))
 
         # Query for the events
         try:
@@ -2135,7 +2135,7 @@ class CrowdstrikeConnector(BaseConnector):
             }
             r = requests.request("get", self._data_feed_url, **kwargs)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_CONNECTING, self._get_error_message_from_exception(e))
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_CONNECTIVITY_ERR, self._get_error_message_from_exception(e))
 
         # Handle any errors
         if r.status_code != requests.codes.ok:  # pylint: disable=E1101
@@ -2144,7 +2144,7 @@ class CrowdstrikeConnector(BaseConnector):
                 err_message = resp_json['errors'][0]['message']
             except Exception as ex:
                 err_message = "{}: {}".format('None', self._get_error_message_from_exception(ex))
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_FROM_SERVER, status=r.status_code, message=err_message)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_FROM_SERVER_ERR, status=r.status_code, message=err_message)
 
         # Parse the events
         counter = 0   # counter for continuous blank lines
@@ -2198,9 +2198,9 @@ class CrowdstrikeConnector(BaseConnector):
                 self.debug_print(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
 
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
+            err_message = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
-                                        CROWDSTRIKE_ERR_EVENTS_FETCH, err_msg))
+                                        CROWDSTRIKE_EVENTS_FETCH_ERR, err_message))
 
         # Check if to collate the data or not
         collate = config.get('collate', True)
@@ -2419,7 +2419,7 @@ class CrowdstrikeConnector(BaseConnector):
         resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
 
         if not ioc and not resource_id:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE_DELETE_IOC)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_PARAMETER_MESSAGE_DELETE_IOC_ERROR)
 
         if resource_id:
             api_data = {'ids': resource_id}
@@ -2511,9 +2511,9 @@ class CrowdstrikeConnector(BaseConnector):
                 if sort_criteria == 'threat_score.desc':
                     resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0].get('threat_score', 0), reverse=True)
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            self.debug_print('Error occurred while sorting the response : {}'.format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while sorting the response : {}'.format(err_msg))
+            err_message = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while sorting the response : {}'.format(err_message))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while sorting the response : {}'.format(err_message))
 
         for report in resource_details_list:
             action_result.add_data(report)
@@ -2701,9 +2701,9 @@ class CrowdstrikeConnector(BaseConnector):
 
             action_result.add_data(resp_json['resources'][0])
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            self.debug_print('Error occurred while parsing the response : {}'.format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while parsing the response : {}'.format(err_msg))
+            err_message = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while parsing the response : {}'.format(err_message))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while parsing the response : {}'.format(err_message))
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_detonate_url(self, param):
@@ -2863,8 +2863,8 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             sha256 = json_resp['resources'][0]['sha256']
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            self.debug_print("Error while fetching sha256. Error: {}".format(err_msg))
+            err_message = self._get_error_message_from_exception(e)
+            self.debug_print("Error while fetching sha256. Error: {}".format(err_message))
             return action_result.set_status(phantom.APP_ERROR, 'Error occurred while fetching sha256 for the file')
 
         return self._submit_resource_for_detonation(action_result, param, sha256=sha256)
@@ -2924,9 +2924,9 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             resource_id = json_resp['resources'][0]['id']
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            self.debug_print('Error occurred while fetching the resource id : {}'.format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while fetching the resource id : {}'.format(err_msg))
+            err_message = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while fetching the resource id : {}'.format(err_message))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while fetching the resource id : {}'.format(err_message))
         return self._poll_for_detonate_results(action_result, param, resource_id)
 
     def _poll_for_detonate_results(self, action_result, param, resource_id):
@@ -2960,9 +2960,10 @@ class CrowdstrikeConnector(BaseConnector):
             if prev_resp and prev_resp['resources']:
                 action_result.add_data(prev_resp['resources'][0])
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            self.debug_print('Error occurred while adding the response to action result : {}'.format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while adding the response to action result : {}'.format(err_msg))
+            err_message = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while adding the response to action result : {}'.format(err_message))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while adding the response to action result : {}'.format(
+                err_message))
 
         return action_result.set_status(phantom.APP_SUCCESS, 'Timed out while waiting for the result. To know the status of submitted \
             sample please run the check status action with {} resource id.'.format(resource_id))
@@ -2987,9 +2988,9 @@ class CrowdstrikeConnector(BaseConnector):
             summary_data['total_reports'] = len(json_resp['resources'])
             action_result.add_data(json_resp['resources'][0])
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            self.debug_print('Error occurred while parsing the response : {}'.format(err_msg))
-            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while parsing the response : {}'.format(err_msg))
+            err_message = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while parsing the response : {}'.format(err_message))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while parsing the response : {}'.format(err_message))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -3004,7 +3005,7 @@ class CrowdstrikeConnector(BaseConnector):
         if response.status_code == 200 or response.status_code == 202:
             return RetVal(phantom.APP_SUCCESS, "Status code: {}".format(response.status_code))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, CROWDSTRIKEOAUTH_ERR_EMPTY_RESPONSE.format(code=response.status_code)), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERR.format(code=response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
         """ This function is used to process html response.
@@ -3052,9 +3053,9 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             resp_json = response.json()
         except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
+            err_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
-                                                   format(err_msg)), None)
+                                                   format(err_message)), None)
 
         try:
             if "resources" in list(resp_json.keys()):

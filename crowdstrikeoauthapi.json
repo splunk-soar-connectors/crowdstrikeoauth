@@ -3302,7 +3302,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Total alerts: 4"
+                        "Total alerts: 50"
                     ]
                 },
                 {

@@ -1998,7 +1998,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress(CROWDSTRIKE_USING_BASE_URL_ERROR, base_url=self._base_url_oauth)
 
         # Connectivity
-        self.save_progress(phantom.APP_PROG_CONNECTIVITY_TO_ELLIPSES, self._base_url_oauth)
+        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._base_url_oauth)
 
         self._token = None
         self._data_feed_url = None

@@ -1,1 +1,3 @@
 **Unreleased**
+Add two new actions: list alerts and list detections [PAPP-28119]
+Ingestion bug fix [PAPP-28185]

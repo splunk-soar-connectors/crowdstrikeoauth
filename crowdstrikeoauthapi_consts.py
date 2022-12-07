@@ -62,10 +62,9 @@ DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT = 50
 
 # Status messages for the app
 CROWDSTRIKE_SUCC_CONNECTIVITY_TEST = "Test connectivity passed"
-CROWDSTRIKE_ERR_CONNECTIVITY_TEST = "Test connectivity failed"
-CROWDSTRIKE_ERR_CONNECTING = "Error connecting to server"
-CROWDSTRIKE_ERR_FROM_SERVER = "Error from Server, Status Code: {status}, Message: {message}"
-CROWDSTRIKE_ERR_END_TIME_LT_START_TIME = "End time less than start time"
+CROWDSTRIKE_CONNECTIVITY_TEST_ERROR = "Test connectivity failed"
+CROWDSTRIKE_FROM_SERVER_ERROR = "Error from Server, Status Code: {status}, Message: {message}"
+CROWDSTRIKE_END_TIME_LT_START_TIME_ERROR = "End time less than start time"
 CROWDSTRIKE_INVALID_LIMIT = 'Please provide non-zero positive integer in limit parameter'
 CROWDSTRIKE_HTML_ERROR = 'Bad Request - Invalid URL HTTP Error 400. The request URL is invalid'
 CROWDSTRIKE_NO_PARAMETER_ERROR = "One of the parameters (device_id or hostname) must be provided"
@@ -73,47 +72,47 @@ CROWDSTRIKE_INVALID_INPUT_ERROR = "Please provide valid inputs"
 CROWDSTRIKE_INVALID_DEVICE_ID_AND_HOSTNAME_ERROR = "Please provide valid device_id and hostname parameters"
 CROWDSTRIKE_INVALID_DEVICE_ID_ERROR = "Please provide valid device_id parameter"
 CROWDSTRIKE_INVALID_HOSTNAME_ERROR = "Please provide valid hostname parameter"
-CROWDSTRIKE_ERR_UNSUPPORTED_HASH_TYPE = "Unsupported hash type"
-CROWDSTRIKE_ERR_API_UNSUPPORTED_METHOD = "Unsupported method"
-CROWDSTRIKE_ERR_SERVER_CONNECTION = "Connection failed"
-CROWDSTRIKE_ERR_JSON_PARSE = "Unable to parse reply as a Json, raw string reply: '{raw_text}'"
-CROWDSTRIKE_ERR_FROM_SERVER = "API failed, Status code: {status}, Detail: {detail}"
-CROWDSTRIKE_SUCC_SET_STATUS = "Successfully set status"
+CROWDSTRIKE_UNSUPPORTED_HASH_TYPE_ERROR = "Unsupported hash type"
+CROWDSTRIKE_API_UNSUPPORTED_METHOD_ERROR = "Unsupported method"
+CROWDSTRIKE_SERVER_CONNECTIVITY_ERROR = "Connection failed"
+CROWDSTRIKE_JSON_PARSE_ERROR = "Unable to parse reply as a Json, raw string reply: '{raw_text}'"
+CROWDSTRIKE_FROM_SERVER_ERROR = "API failed, Status code: {status}, Detail: {detail}"
+CROWDSTRIKE_SUCC_SET_STATUS_ERROR = "Successfully set status"
 CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE = "No more feeds available"
-CROWDSTRIKE_MSG_GETTING_EVENTS = "Getting maximum {max_events} events from id {lower_id} onwards (ids might not be contiguous)"
-CROWDSTRIKE_ERR_CONNECTING = "Error connecting to server"
-CROWDSTRIKE_ERR_FROM_SERVER = "Error from Server, Status Code: {status}, Message: {message}"
-CROWDSTRIKE_USING_BASE_URL = "Using base url: {base_url}"
-CROWDSTRIKE_ERR_META_KEY_EMPTY = "Meta key empty or not present"
-CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY = "Resources key empty or not present. Please try after sometime"
-CROWDSTRIKE_ERR_DATAFEED_EMPTY = "Datafeed key empty or not present"
-CROWDSTRIKE_ERR_SESSION_TOKEN_NOT_FOUND = "Session token, not found"
-PAYLOAD_SECURITY_MSG_SUBMITTING_FILE = 'Submitting file/url to Falcon Sandbox'
-CROWDSTRIKE_ERR_UNSUPPORTED_HASH_TYPE = "Unsupported hash type"
-CROWDSTRIKE_ERR_EVENTS_FETCH = "Error occurred while fetching the DetectionSummaryEvents from the CrowdStrike server datafeed URL stream"
-CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MSG = "Please provide zero or a valid positive integer value in the {parameter} parameter"
-CROWDSTRIKE_LIMIT_VALIDATION_MSG = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
+CROWDSTRIKE_GETTING_EVENTS_MESSAGE = "Getting maximum {max_events} events from id {lower_id} onwards (ids might not be contiguous)"
+CROWDSTRIKE_CONNECTIVITY_ERROR = "Error connecting to server"
+CROWDSTRIKE_FROM_SERVER_ERROR = "Error from Server, Status Code: {status}, Message: {message}"
+CROWDSTRIKE_USING_BASE_URL_ERROR = "Using base url: {base_url}"
+CROWDSTRIKE_META_KEY_EMPTY_ERROR = "Meta key empty or not present"
+CROWDSTRIKE_RESOURCES_KEY_EMPTY_ERROR = "Resources key empty or not present. Please try after sometime"
+CROWDSTRIKE_DATAFEED_EMPTY_ERROR = "Datafeed key empty or not present"
+CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR = "Session token, not found"
+PAYLOAD_SECURITY_SUBMITTING_FILE_MESSAGE = 'Submitting file/url to Falcon Sandbox'
+CROWDSTRIKE_UNSUPPORTED_HASH_TYPE_ERROR = "Unsupported hash type"
+CROWDSTRIKE_EVENTS_FETCH_ERROR = "Error occurred while fetching the DetectionSummaryEvents from the CrowdStrike server datafeed URL stream"
+CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE = "Please provide zero or a valid positive integer value in the {parameter} parameter"
+CROWDSTRIKE_LIMIT_VALIDATION_MESSAGE = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
 CROWDSTRIKE_SUCC_GET_ALERT = "Indicator fetched successfully"
 CROWDSTRIKE_SUCC_POST_ALERT = "Indicator uploaded successfully"
 CROWDSTRIKE_SUCC_DELETE_ALERT = "Indicator deleted successfully"
 CROWDSTRIKE_SUCC_UPDATE_ALERT = "Indicator updated successfully"
-CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE = "Please either provide 'resource id' or 'indicator type' and 'indicator value'"
-CROWDSTRIKE_MISSING_INDICATOR_VALUE_ERROR_MESSAGE = "Please provide indicator value"
-CROWDSTRIKE_MISSING_INDICATOR_TYPE_ERROR_MESSAGE = "Please provide indicator type"
+CROWDSTRIKE_MISSING_PARAMETER_MESSAGE_ERROR = "Please either provide 'resource id' or 'indicator type' and 'indicator value'"
+CROWDSTRIKE_MISSING_INDICATOR_VALUE_MESSAGE_ERROR = "Please provide indicator value"
+CROWDSTRIKE_MISSING_INDICATOR_TYPE_MESSAGE_ERROR = "Please provide indicator type"
 CROWDSTRIKE_COMPLETED = "Completed {0:.0%}"
 CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in the {key} parameter"
-CROWDSTRIKE_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
-CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the Crowdstrike server. "\
+CROWDSTRIKE_UNAVAILABLE_MESSAGE_ERROR = "Error message unavailable. Please check the asset configuration and|or action parameters"
+CROWDSTRIKE_UNICODE_DAMMIT_TYPE_MESSAGE_ERROR = "Error occurred while connecting to the Crowdstrike server. "\
     "Please check the asset configuration and|or the action parameters."
 CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
 CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE = "Error details: 404"
 CROWDSTRIKE_NO_DATA_MESSAGE = "No data found"
-CROWDSTRIKE_PULLED_EVENTS_MSG = "Pulled {0} events of type 'DetectionSummaryEvent'"
-CROWDSTRIKE_NO_DATA_MSG = "No data, terminating loop"
-CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG = "CR/LF received on iteration: {} - terminating loop"
-CROWDSTRIKE_RECEIVED_CR_LF_MSG = "CR/LF received on iteration {} - continuing"
-CROWDSTRIKE_BLANK_LINES_COUNT_MSG = "Total blank lines count: {}"
-CROWDSTRIKE_GOT_EVENTS_MSG = "Got {0} events of type 'DetectionSummaryEvent'"
+CROWDSTRIKE_PULLED_EVENTS_MESSAGE = "Pulled {0} events of type 'DetectionSummaryEvent'"
+CROWDSTRIKE_NO_DATA_MESSAGE = "No data, terminating loop"
+CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE = "CR/LF received on iteration: {} - terminating loop"
+CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE = "CR/LF received on iteration {} - continuing"
+CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE = "Total blank lines count: {}"
+CROWDSTRIKE_GOT_EVENTS_MESSAGE = "Got {0} events of type 'DetectionSummaryEvent'"
 
 CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_asset={1}'\
@@ -122,13 +121,13 @@ CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
 CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "(type:'{}' + value:'{}') + (deleted:'true', deleted: 'false')"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID = "id:'{}' + (deleted:'true', deleted: 'false')"
-CROWDSTRIKE_STATE_FILE_CORRUPT_ERR = (
+CROWDSTRIKE_STATE_FILE_CORRUPT_ERROR = (
     "Error occurred while loading the state file due to it's unexpected format. "
     "Resetting the state file with the default format. Please try again."
 )
-CROWDSTRIKE_ENCRYPTION_ERR = "Error occurred while encrypting the state file"
-CROWDSTRIKE_DECRYPTION_ERR = "Error occurred while decrypting the state file"
-CROWDSTRIKEOAUTH_ERR_EMPTY_RESPONSE = "Status Code {code}. Empty response and no information in the header"
+CROWDSTRIKE_ENCRYPTION_ERROR = "Error occurred while encrypting the state file"
+CROWDSTRIKE_DECRYPTION_ERROR = "Error occurred while decrypting the state file"
+CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR = "Status Code {code}. Empty response and no information in the header"
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"
@@ -147,6 +146,12 @@ CROWDSTRIKE_RTR_ADMIN_GET_PUT_FILES = "/real-time-response/queries/put-files/v1"
 CROWDSTRIKE_RTR_ADMIN_PUT_FILES = "/real-time-response/entities/put-files/v1"
 CROWDSTRIKE_ADMIN_COMMAND_ENDPOINT = "/real-time-response/entities/admin-command/v1"
 CROWDSTRIKE_RUN_COMMAND_ENDPOINT = "/real-time-response/entities/command/v1"
+
+CROWDSTRIKE_LIST_ALERTS_ENDPOINT = "/alerts/queries/alerts/v1"
+CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v1"
+
+CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT = "/detects/queries/detects/v1"
+CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT = "/detects/entities/summaries/GET/v1"
 
 CROWDSTRIKE_GET_RTR_FILES_ENDPOINT = "/real-time-response/entities/file/v1"
 CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT = "/real-time-response/entities/extracted-file-contents/v1"
@@ -201,7 +206,7 @@ CROWDSTRIKE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
 
 CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not found'
 CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Indicator not found'
-CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE_DELETE_IOC = 'Please provide at least one of the parameter'
-CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE = "Please enter valid value in '{}' parameter"
+CROWDSTRIKE_MISSING_PARAMETER_MESSAGE_DELETE_IOC_ERROR = 'Please provide at least one of the parameter'
+CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR = "Please enter valid value in '{}' parameter"
 CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc",
 "last_modified.asc", "indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]

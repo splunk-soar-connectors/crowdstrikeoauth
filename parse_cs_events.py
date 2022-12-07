@@ -280,7 +280,7 @@ def _create_dict_hash(base_connector, input_dict):
     # if fips is not enabled, we should continue with our existing md5 usage for generating SDIs
     # to not impact existing customers
     if not fips_enabled:
-        return hashlib.md5(input_dict_str).hexdigest()
+        return hashlib.md5(input_dict_str).hexdigest()  # nosemgrep
 
     return hashlib.sha256(input_dict_str).hexdigest()
 

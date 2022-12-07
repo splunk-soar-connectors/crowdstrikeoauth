@@ -50,7 +50,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
      <li>Scheduled | Interval Polling
          <ul>
              <li>
-                 During scheduled | interval polling, the app starts from the first event that it can query up to the value configured in the configuration parameter [Maximum events to get while scheduled and interval polling] and creates artifacts for all the fetched DetectionSummaryEvents. Then, it remembers the last event's offset ID and stores in the state file against the key [last_offset_id]. In the next scheduled poll run, it will start from the stored offset ID in the state file and will fetch the maximum events as configured in the [Maximum events to get while scheduled and interval polling] parameter.
+                 During scheduled | interval polling, the app starts from the first event that it can query up to the value configured in the configuration parameter [Maximum events to get while scheduled and interval polling] and creates artifacts for all the fetched DetectionSummaryEvents. Then, it remembers the last event's offset ID and stores it in the state file against the key [last_offset_id]. In the next scheduled poll run, it will start from the stored offset ID in the state file and will fetch the maximum events as configured in the [Maximum events to get while scheduled and interval polling] parameter.
              </li>
          </ul>
      </li>
@@ -111,7 +111,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
      <li>DNS Requests</li>
  </ul>
 
-<p>Each of the sub-events has a CEF key called <b>parentSdi</b> that stands for Parent Source Data Identifier. This is the value of the SDI of the main event that the sub-events were generated from.</p>
+<p>Each of the sub-events has a CEF key called <b>parentSdi</b> which stands for Parent Source Data Identifier. This is the value of the SDI of the main event that the sub-events were generated from.</p>
 
 
 <h2>Falcon X Sandbox Actions</h2>
@@ -126,7 +126,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
       <li><b>Action -</b> Download Report </li>
       <ul>
         <li>
-          This action will download the resource report based on the provided artifact ID. Currently we support the following Strict IOC CSV, Strict IOC JSON, Strict IOC STIX2.1, Strict IOC MAEC5.0, Broad IOC CSV, Broad IOC JSON, Broad IOC STIX2.1, Broad IOC MAEC5.0, Memory Strings, Icon, Screenshot artifact IDs.
+          This action will download the resource report based on the provided artifact ID. Currently, we support the following Strict IOC CSV, Strict IOC JSON, Strict IOC STIX2.1, Strict IOC MAEC5.0, Broad IOC CSV, Broad IOC JSON, Broad IOC STIX2.1, Broad IOC MAEC5.0, Memory Strings, Icon, Screenshot artifact IDs.
         </li>
       </ul>
 
@@ -139,7 +139,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
           If the analysis is in progress and reaches the time entered in the detonate_timeout parameter, then this action will return the resource_id of the submitted file using which the submission status can be checked.
         </li>
         <li>
-          If the submitted file will be analyzed within the entered time in the detonate_timeout parameter, its report will be fetched. Currently these file types are supported .exe, .scr, .pif, .dll, .com, .cpl, etc., .doc, .docx, .ppt, .pps, .pptx, .ppsx, .xls, .xlsx, .rtf, .pub, .pdf, Executable JAR, .sct, .lnk, .chm, .hta, .wsf, .js, .vbs, .vbe, .swf, pl, .ps1, .psd1, .psm1, .svg, .py, Linux ELF executables, .eml, .msg.
+          If the submitted file will be analyzed within the entered time in the detonate_timeout parameter, its report will be fetched. Currently, these file types are supported .exe, .scr, .pif, .dll, .com, .cpl, etc., .doc, .docx, .ppt, .pps, .pptx, .ppsx, .xls, .xlsx, .rtf, .pub, .pdf, Executable JAR, .sct, .lnk, .chm, .hta, .wsf, .js, .vbs, .vbe, .swf, pl, .ps1, .psd1, .psm1, .svg, .py, Linux ELF executables, .eml, .msg.
         </li>
       </ul>
 
@@ -152,7 +152,7 @@ The user can add a script file in the configuration parameter [<b>Script with fu
           If the analysis is in progress and it reaches the time entered in the detonate_timeout parameter, then this action will return the resource_id of the submitted URL using which the status of the submission can be checked. If the analysis status is running then do not re-run the detonate URL action, otherwise, the URL will be again submitted for the analysis.
         </li>
         <li>
-          If the submitted URL will be analyzed within the entered time in the detonate_timeout parameter, its report will be fetched. Currently 3 domains of URL are supported http, https, and ftp.
+          If the submitted URL will be analyzed within the entered time in the detonate_timeout parameter, its report will be fetched. Currently, 3 domains of URL are supported http, https, and ftp.
         </li>
       </ul>
       <li><b>Action -</b> Check Status </li>

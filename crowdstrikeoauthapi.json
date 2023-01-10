@@ -5200,6 +5200,65 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "b6330292-28e6-4198-994d-96f327c5b5bd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.role_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "custom_ioas_manager"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.role_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Custom IOAs Manager"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.grant_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "direct"
+                    ]
                 }
             ],
             "versions": "EQ(*)",

@@ -947,11 +947,11 @@ class CrowdstrikeConnector(BaseConnector):
         if not response.get('resources', []):
             return action_result.set_status(phantom.APP_SUCCESS, "No data found for user resources")
 
-        params = {'ids': response.get('resources', [])}
+        data = {'ids': response.get('resources', [])}
 
         endpoint = CROWDSTRIKE_GET_USER_INFO_ENDPOINT
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, json_data=data, method="post")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()

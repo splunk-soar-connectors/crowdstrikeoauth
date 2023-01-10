@@ -20,7 +20,7 @@
             "name": "Katie Tanner"
         }
     ],
-    "license": "Copyright (c) 2019-2022 Splunk Inc.",
+    "license": "Copyright (c) 2019-2023 Splunk Inc.",
     "app_version": "3.8.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, November 23 2022, API versions: v1, v2"

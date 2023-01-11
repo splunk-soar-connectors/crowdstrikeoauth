@@ -23,13 +23,13 @@
     "license": "Copyright (c) 2019-2023 Splunk Inc.",
     "app_version": "3.8.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, November 23 2022, API versions: v1, v2"
+        "Cloud, API api.crowdstrike.com, January 20 2023, API versions: v1, v2"
     ],
     "utctime_updated": "2022-05-04T23:15:36.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "5.3.5",
+    "min_phantom_version": "5.3.3",
     "python_version": "3",
     "fips_compliant": true,
     "app_wizard_version": "1.0.0",
@@ -2131,7 +2131,7 @@
                         "crowdstrike rtr session id"
                     ],
                     "column_name": "Session ID",
-                    "column_order": "0",
+                    "column_order": 0,
                     "example_values": [
                         "cdc3b485-6d71-4417-b091-939336154e83"
                     ]
@@ -2753,7 +2753,7 @@
                         "md5",
                         "crowdstrike device id"
                     ],
-                    "column_name": "Device id",
+                    "column_name": "Device ID",
                     "column_order": 0
                 },
                 {
@@ -5144,6 +5144,27 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.meta.powered_by",
                     "data_type": "string",
                     "example_values": [
@@ -5177,6 +5198,44 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.resources.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.grant_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "direct"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.role_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "custom_ioas_manager"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.role_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Custom IOAs Manager"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "b6330292-28e6-4198-994d-96f327c5b5bd"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -5199,65 +5258,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.limit",
-                    "data_type": "numeric",
-                    "example_values": [
-                        100
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.total",
-                    "data_type": "numeric",
-                    "example_values": [
-                        14
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.offset",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.cid",
-                    "data_type": "string",
-                    "example_values": [
-                        "3061c7ff3b634e22b38274d4b586558e"
-                    ],
-                    "contains": [
-                        "md5"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.uuid",
-                    "data_type": "string",
-                    "example_values": [
-                        "b6330292-28e6-4198-994d-96f327c5b5bd"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.role_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "custom_ioas_manager"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.role_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Custom IOAs Manager"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.grant_type",
-                    "data_type": "string",
-                    "example_values": [
-                        "direct"
                     ]
                 }
             ],
@@ -10299,7 +10299,7 @@
                     "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
                     "column_order": 1,
-                    "column_name": "Ioc Queried",
+                    "column_name": "IOC Queried",
                     "contains": [
                         "hash",
                         "sha256",
@@ -16410,7 +16410,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.9.24-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.12.7-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -16442,7 +16442,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.13-py2.py3-none-any.whl"
             }
         ]
     },
@@ -16454,7 +16454,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.9.24-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.12.7-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -16486,7 +16486,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.13-py2.py3-none-any.whl"
             }
         ]
     }

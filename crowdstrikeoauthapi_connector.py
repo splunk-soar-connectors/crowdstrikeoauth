@@ -85,7 +85,7 @@ class CrowdstrikeConnector(BaseConnector):
         self._base_url_oauth = self._base_url_oauth.replace('\\', '/')
         self._asset_id = self.get_asset_id()
 
-        app_id = config.get('app_id', self.get_asset_id().replace('-', ''))
+        app_id = config.get('app_id', self.get_app_id())
         self._parameters = {'appId': app_id.replace('-', '')}
 
         self._state = self.load_state()
@@ -174,6 +174,8 @@ class CrowdstrikeConnector(BaseConnector):
         error_code = None
         error_message = CROWDSTRIKE_UNAVAILABLE_MESSAGE_ERROR
 
+        self.error_print("Error occurred.", e)
+
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
@@ -181,8 +183,8 @@ class CrowdstrikeConnector(BaseConnector):
                     error_message = e.args[1]
                 elif len(e.args) == 1:
                     error_message = e.args[0]
-        except Exception as ex:
-            self.debug_print("Error occurred while retrieving exception information: {}".format(self._get_error_message_from_exception(ex)))
+        except Exception as e:
+            self.error_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         if not error_code:
             error_text = "Error Message: {}".format(error_message)
@@ -3002,7 +3004,7 @@ class CrowdstrikeConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
-        if response.status_code == 200 or response.status_code == 202:
+        if response.status_code in (200, 202, 204):
             return RetVal(phantom.APP_SUCCESS, "Status code: {}".format(response.status_code))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR.format(code=response.status_code)), None)
@@ -3080,7 +3082,7 @@ class CrowdstrikeConnector(BaseConnector):
                         else:
                             return RetVal(action_result.set_status(phantom.APP_SUCCESS,
                                 "Error from server. Error details: {}".format(error_msg.strip(", "))), resp_json)
-        except:
+        except Exception:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while processing error response from server"), None)
 
         # Please specify the status codes here

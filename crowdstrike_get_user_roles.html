@@ -127,18 +127,16 @@
                         </thead>
                         <tbody>
                             {% for item in result.data %}
-                                {% for resource in item.resources %}
-                                    <tr>
-                                        <td>
-                                            <a href="javascript:;"
-                                            onclick="context_menu(this, [{'contains': ['crowdstrike user role id'], 'value': '{{ resource.role_name }}' }], 0, {{ container.id }}, null, false);">
-                                                {{ resource.role_name }}
-                                                &nbsp;
-                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
+                                <tr>
+                                    <td>
+                                        <a href="javascript:;"
+                                        onclick="context_menu(this, [{'contains': ['crowdstrike user role id'], 'value': '{{ item.role_name }}' }], 0, {{ container.id }}, null, false);">
+                                            {{ item.role_name }}
+                                            &nbsp;
+                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                        </a>
+                                    </td>
+                                </tr>
                             {% endfor %}
                         </tbody>
                     </table>

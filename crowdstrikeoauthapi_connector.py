@@ -371,7 +371,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return containers_processed
 
-    def _paginator(self, action_result, endpoint, param):
+    def _paginator(self, action_result, endpoint, param=dict()):
         """
         This action is used to create an iterator that will paginate through responses from called methods.
 
@@ -942,14 +942,12 @@ class CrowdstrikeConnector(BaseConnector):
         # Get all the UIDS from your Customer ID
         endpoint = CROWDSTRIKE_LIST_USERS_UIDS_ENDPOINT
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
-        if phantom.is_fail(ret_val):
+        ids = self._paginator(action_result, endpoint)
+
+        if ids is None:
             return action_result.get_status()
 
-        if not response.get('resources', []):
-            return action_result.set_status(phantom.APP_SUCCESS, "No data found for user resources")
-
-        data = {'ids': response.get('resources', [])}
+        data = {'ids': ids}
 
         endpoint = CROWDSTRIKE_GET_USER_INFO_ENDPOINT
 
@@ -974,13 +972,14 @@ class CrowdstrikeConnector(BaseConnector):
 
         endpoint = CROWDSTRIKE_GET_USER_ROLES_ENDPOINT
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+        user_role_list = self._paginator(action_result, endpoint, params)
 
-        if phantom.is_fail(ret_val):
+        if user_role_list is None:
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        for data in user_role_list:
+            action_result.add_data(data)
 
         return action_result.set_status(phantom.APP_SUCCESS, "User roles fetched successfully")
 

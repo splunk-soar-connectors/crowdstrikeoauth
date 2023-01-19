@@ -3007,7 +3007,7 @@ class CrowdstrikeConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
-        if response.status_code in CROWDSTRIKE_API_SUCCESS_CODES:
+        if response.status_code in CROWDSTRIKE_API_SUCC_CODES:
             return RetVal(phantom.APP_SUCCESS, "Status code: {}".format(response.status_code))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR.format(code=response.status_code)), None)

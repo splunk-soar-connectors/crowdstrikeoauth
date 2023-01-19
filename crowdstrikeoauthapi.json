@@ -21,7 +21,7 @@
         }
     ],
     "license": "Copyright (c) 2019-2023 Splunk Inc.",
-    "app_version": "3.9.0",
+    "app_version": "4.0.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, January 20 2023, API versions: v1, v2"
     ],

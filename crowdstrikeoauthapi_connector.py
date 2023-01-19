@@ -371,7 +371,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return containers_processed
 
-    def _paginator(self, action_result, endpoint, param=dict()):
+    def _paginator(self, action_result, endpoint, param=None):
         """
         This action is used to create an iterator that will paginate through responses from called methods.
 
@@ -379,7 +379,8 @@ class CrowdstrikeConnector(BaseConnector):
         :param action_result: Object of ActionResult class
         :param **kwargs: Dictionary of Input parameters
         """
-
+        if param is None:
+            param = dict()
         list_ids = list()
 
         limit = None
@@ -946,6 +947,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         if ids is None:
             return action_result.get_status()
+
+        if not ids:
+            return action_result.set_status(phantom.APP_SUCCESS, "No data found for user resources")
 
         data = {'ids': ids}
 
@@ -3003,7 +3007,7 @@ class CrowdstrikeConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
-        if response.status_code in (200, 202, 204):
+        if response.status_code in CROWDSTRIKE_API_SUCCESS_CODES:
             return RetVal(phantom.APP_SUCCESS, "Status code: {}".format(response.status_code))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR.format(code=response.status_code)), None)

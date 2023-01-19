@@ -210,3 +210,4 @@ CROWDSTRIKE_MISSING_PARAMETER_MESSAGE_DELETE_IOC_ERROR = 'Please provide at leas
 CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR = "Please enter valid value in '{}' parameter"
 CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc",
 "last_modified.asc", "indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]
+CROWDSTRIKE_API_SUCCESS_CODES = [200, 202, 204]

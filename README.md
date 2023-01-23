@@ -2,11 +2,11 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 3\.8\.0  
+Connector Version: 4\.0\.0  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.3\.5  
+Minimum Product Version: 5\.4\.0  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
@@ -298,6 +298,22 @@ default ports used by Splunk SOAR.
 | http         | tcp                | 80   |
 | https        | tcp                | 443  |
 
+## Playbook Backward Compatibility
+
+-   The output data-paths have been updated in the below-existing action. Hence, it is requested to
+    update existing playbooks created in the earlier versions of the app by re-inserting \|
+    modifying \| deleting the corresponding action blocks.
+
+      
+
+    -   list users - Below output data-paths have been updated.
+
+          
+
+        -   Updated name from 'customer' to 'cid'
+        -   Updated name from 'firstName' to 'first_name'
+        -   Updated name from 'lastName' to 'last_name'
+
 
 ### Configuration Variables
 The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a CrowdStrike asset in SOAR.
@@ -412,7 +428,10 @@ action\_result\.data\.\*\.cid | string |  `md5`
 action\_result\.data\.\*\.config\_id\_base | string | 
 action\_result\.data\.\*\.config\_id\_build | string | 
 action\_result\.data\.\*\.config\_id\_platform | string | 
+action\_result\.data\.\*\.connection\_ip | string |  `ip` 
+action\_result\.data\.\*\.connection\_mac\_address | string | 
 action\_result\.data\.\*\.cpu\_signature | string | 
+action\_result\.data\.\*\.default\_gateway\_ip | string |  `ip` 
 action\_result\.data\.\*\.device\_id | string |  `crowdstrike device id` 
 action\_result\.data\.\*\.device\_policies\.device\_control\.applied | boolean | 
 action\_result\.data\.\*\.device\_policies\.device\_control\.applied\_date | string | 
@@ -431,6 +450,12 @@ action\_result\.data\.\*\.device\_policies\.global\_config\.assigned\_date | str
 action\_result\.data\.\*\.device\_policies\.global\_config\.policy\_id | string |  `md5` 
 action\_result\.data\.\*\.device\_policies\.global\_config\.policy\_type | string | 
 action\_result\.data\.\*\.device\_policies\.global\_config\.settings\_hash | string | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.applied | numeric | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.applied\_date | string | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.assigned\_date | string | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.policy\_id | string |  `md5` 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.policy\_type | string | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.settings\_hash | string |  `sha256` 
 action\_result\.data\.\*\.device\_policies\.prevention\.applied | boolean | 
 action\_result\.data\.\*\.device\_policies\.prevention\.applied\_date | string | 
 action\_result\.data\.\*\.device\_policies\.prevention\.assigned\_date | string | 
@@ -467,6 +492,7 @@ action\_result\.data\.\*\.minor\_version | string |
 action\_result\.data\.\*\.modified\_timestamp | string | 
 action\_result\.data\.\*\.os\_build | string | 
 action\_result\.data\.\*\.os\_version | string | 
+action\_result\.data\.\*\.ou | string | 
 action\_result\.data\.\*\.platform\_id | string | 
 action\_result\.data\.\*\.platform\_name | string | 
 action\_result\.data\.\*\.pointer\_size | string | 
@@ -858,6 +884,7 @@ action\_result\.data\.\*\.device\.system\_manufacturer | string |
 action\_result\.data\.\*\.device\.system\_product\_name | string | 
 action\_result\.data\.\*\.email\_sent | boolean | 
 action\_result\.data\.\*\.first\_behavior | string | 
+action\_result\.data\.\*\.hostinfo\.domain | string | 
 action\_result\.data\.\*\.last\_behavior | string | 
 action\_result\.data\.\*\.max\_confidence | numeric | 
 action\_result\.data\.\*\.max\_severity | numeric | 
@@ -1247,9 +1274,9 @@ action\_result\.status | string |
 action\_result\.data\.\*\.meta\.powered\_by | string | 
 action\_result\.data\.\*\.meta\.query\_time | numeric | 
 action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.customer | string |  `crowdstrike customer id` 
-action\_result\.data\.\*\.resources\.\*\.firstName | string | 
-action\_result\.data\.\*\.resources\.\*\.lastName | string | 
+action\_result\.data\.\*\.resources\.\*\.cid | string |  `crowdstrike customer id` 
+action\_result\.data\.\*\.resources\.\*\.first\_name | string | 
+action\_result\.data\.\*\.resources\.\*\.last\_name | string | 
 action\_result\.data\.\*\.resources\.\*\.uid | string |  `crowdstrike user id` 
 action\_result\.data\.\*\.resources\.\*\.uuid | string |  `crowdstrike unique user id` 
 action\_result\.summary | string | 
@@ -1273,10 +1300,11 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.user\_uuid | string |  `crowdstrike unique user id` 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources | string |  `crowdstrike user role id` 
+action\_result\.data\.\*\.cid | string | 
+action\_result\.data\.\*\.grant\_type | string | 
+action\_result\.data\.\*\.role\_id | string | 
+action\_result\.data\.\*\.role\_name | string | 
+action\_result\.data\.\*\.uuid | string | 
 action\_result\.summary | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
@@ -1301,6 +1329,7 @@ action\_result\.data\.\*\.meta\.trace\_id | string |
 action\_result\.data\.\*\.resources\.\*\.description | string | 
 action\_result\.data\.\*\.resources\.\*\.display\_name | string | 
 action\_result\.data\.\*\.resources\.\*\.id | string |  `crowdstrike user role id` 
+action\_result\.data\.\*\.resources\.\*\.is\_global | boolean | 
 action\_result\.summary | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
@@ -1327,6 +1356,7 @@ action\_result\.data\.\*\.display\_name | string |
 action\_result\.data\.\*\.errors\.\*\.code | numeric | 
 action\_result\.data\.\*\.errors\.\*\.message | string | 
 action\_result\.data\.\*\.id | string |  `crowdstrike user role id` 
+action\_result\.data\.\*\.is\_global | boolean | 
 action\_result\.data\.\*\.meta\.powered\_by | string | 
 action\_result\.data\.\*\.meta\.query\_time | numeric | 
 action\_result\.data\.\*\.meta\.trace\_id | string | 
@@ -1631,7 +1661,10 @@ action\_result\.data\.\*\.cid | string |  `md5`
 action\_result\.data\.\*\.config\_id\_base | string | 
 action\_result\.data\.\*\.config\_id\_build | string | 
 action\_result\.data\.\*\.config\_id\_platform | string | 
+action\_result\.data\.\*\.connection\_ip | string |  `ip` 
+action\_result\.data\.\*\.connection\_mac\_address | string | 
 action\_result\.data\.\*\.cpu\_signature | string | 
+action\_result\.data\.\*\.default\_gateway\_ip | string |  `ip` 
 action\_result\.data\.\*\.device\_id | string |  `crowdstrike device id` 
 action\_result\.data\.\*\.device\_policies\.device\_control\.applied | boolean | 
 action\_result\.data\.\*\.device\_policies\.device\_control\.applied\_date | string | 
@@ -1650,6 +1683,12 @@ action\_result\.data\.\*\.device\_policies\.global\_config\.assigned\_date | str
 action\_result\.data\.\*\.device\_policies\.global\_config\.policy\_id | string | 
 action\_result\.data\.\*\.device\_policies\.global\_config\.policy\_type | string | 
 action\_result\.data\.\*\.device\_policies\.global\_config\.settings\_hash | string | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.applied | numeric | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.applied\_date | string | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.assigned\_date | string | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.policy\_id | string |  `md5` 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.policy\_type | string | 
+action\_result\.data\.\*\.device\_policies\.jumpcloud\.settings\_hash | string |  `sha256` 
 action\_result\.data\.\*\.device\_policies\.prevention\.applied | boolean | 
 action\_result\.data\.\*\.device\_policies\.prevention\.applied\_date | string | 
 action\_result\.data\.\*\.device\_policies\.prevention\.assigned\_date | string | 
@@ -1677,7 +1716,7 @@ action\_result\.data\.\*\.hostname | string |  `host name`
 action\_result\.data\.\*\.instance\_id | string | 
 action\_result\.data\.\*\.kernel\_version | string | 
 action\_result\.data\.\*\.last\_seen | string | 
-action\_result\.data\.\*\.local\_ip | string | 
+action\_result\.data\.\*\.local\_ip | string |  `ip` 
 action\_result\.data\.\*\.mac\_address | string | 
 action\_result\.data\.\*\.machine\_domain | string |  `domain` 
 action\_result\.data\.\*\.major\_version | string | 
@@ -1966,6 +2005,7 @@ action\_result\.data\.\*\.ipv4\.\*\.from\_parent | boolean |
 action\_result\.data\.\*\.ipv4\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
 action\_result\.data\.\*\.ipv4\.\*\.id | string |  `crowdstrike indicator id` 
 action\_result\.data\.\*\.ipv4\.\*\.metadata\.filename | string | 
+action\_result\.data\.\*\.ipv4\.\*\.mobile\_action | string | 
 action\_result\.data\.\*\.ipv4\.\*\.modified\_by | string |  `md5` 
 action\_result\.data\.\*\.ipv4\.\*\.modified\_on | string | 
 action\_result\.data\.\*\.ipv4\.\*\.modified\_timestamp | string |  `date` 
@@ -2362,6 +2402,7 @@ action\_result\.data\.\*\.sandbox\.\*\.environment\_id | numeric |
 action\_result\.data\.\*\.sandbox\.\*\.error\_message | string | 
 action\_result\.data\.\*\.sandbox\.\*\.error\_origin | string | 
 action\_result\.data\.\*\.sandbox\.\*\.error\_type | string | 
+action\_result\.data\.\*\.sandbox\.\*\.exact\_deep\_hash | string | 
 action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.description | string | 
 action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_path | string | 
 action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_size | numeric | 
@@ -2388,6 +2429,9 @@ action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.url | string |
 action\_result\.data\.\*\.sandbox\.\*\.incidents\.\*\.name | string | 
 action\_result\.data\.\*\.sandbox\.\*\.memory\_strings\_artifact\_id | string |  `crowdstrike artifact id` 
 action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.attack\_id | string | 
+action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.parent\.attack\_id | string | 
+action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.parent\.attack\_id\_wiki | string | 
+action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.parent\.technique | string | 
 action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.tactic | string | 
 action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.technique | string | 
 action\_result\.data\.\*\.sandbox\.\*\.network\_settings | string | 
@@ -2409,8 +2453,14 @@ action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.process\_flags\.\*\.name |
 action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.key | string | 
 action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.operation | string | 
 action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.path | string | 
+action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.status | string | 
+action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.status\_human\_readable | string | 
 action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.value | string | 
 action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.sha256 | string |  `sha256` 
+action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.streams\.\*\.file\_name | string | 
+action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.streams\.\*\.human\_keywords | string | 
+action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.streams\.\*\.instructions\_artifact\_id | string | 
+action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.streams\.\*\.uid | string | 
 action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.uid | string | 
 action\_result\.data\.\*\.sandbox\.\*\.sha256 | string |  `sha256` 
 action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.attack\_id | string | 
@@ -3025,6 +3075,9 @@ action\_result\.data\.\*\.meta\.pagination\.expires\_at | numeric |
 action\_result\.data\.\*\.meta\.pagination\.limit | string | 
 action\_result\.data\.\*\.meta\.pagination\.offset | string | 
 action\_result\.data\.\*\.meta\.pagination\.total | numeric | 
+action\_result\.data\.\*\.meta\.powered\_by | string | 
+action\_result\.data\.\*\.meta\.query\_time | numeric | 
+action\_result\.data\.\*\.meta\.trace\_id | string | 
 action\_result\.data\.\*\.resources | string |  `crowdstrike device id` 
 action\_result\.summary | string | 
 action\_result\.message | string | 

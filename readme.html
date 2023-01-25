@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2019-2022 Splunk Inc.
+  Copyright (c) 2019-2023 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -290,3 +290,17 @@ The user can add a script file in the configuration parameter [<b>Script with fu
       </tr>
     </table>
   </p>
+<h2>Playbook Backward Compatibility</h2>
+	<p>
+		<ul>
+			<li>The output data-paths have been updated in the below-existing action. Hence, it is requested to update existing playbooks created in the earlier versions of the app by re-inserting | modifying | deleting the corresponding action blocks.</li>
+			<ul>
+				<li>list users - Below output data-paths have been updated.</li>
+				<ul>
+					<li>Updated name from 'customer' to 'cid'</li>
+          <li>Updated name from 'firstName' to 'first_name'</li>
+          <li>Updated name from 'lastName' to 'last_name'</li>
+				</ul>
+			</ul>
+		</ul>
+	</p>

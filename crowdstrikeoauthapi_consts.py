@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_consts.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR = "Status Code {code}. Empty response and 
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"
-CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT = "/devices/entities/devices/v1"
+CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT = "/devices/entities/devices/v2"
 CROWDSTRIKE_GET_DEVICE_SCROLL_ENDPOINT = "/devices/queries/devices-scroll/v1"
 CROWDSTRIKE_GET_HOST_GROUP_ID_ENDPOINT = "/devices/queries/host-groups/v1"
 CROWDSTRIKE_GET_HOST_GROUP_DETAILS_ENDPOINT = "/devices/entities/host-groups/v1"
@@ -169,11 +169,11 @@ CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT = "/incidents/entities/incidents/GE
 CROWDSTRIKE_GET_INCIDENT_BEHAVIORS_ID_ENDPOINT = "/incidents/entities/behaviors/GET/v1"
 CROWDSTRIKE_LIST_CROWDSCORES_ENDPOINT = "/incidents/combined/crowdscores/v1"
 CROWDSTRIKE_UPDATE_INCIDENT_ENDPOINT = "/incidents/entities/incident-actions/v1"
-CROWDSTRIKE_LIST_USERS_UIDS_ENDPOINT = "/users/queries/user-uuids-by-cid/v1"
-CROWDSTRIKE_GET_USER_INFO_ENDPOINT = "/users/entities/users/v1"
-CROWDSTRIKE_GET_USER_ROLES_ENDPOINT = "/user-roles/queries/user-role-ids-by-user-uuid/v1"
-CROWDSTRIKE_GET_ROLE_ENDPOINT = "/user-roles/entities/user-roles/v1"
-CROWDSTRIKE_LIST_USER_ROLES_ENDPOINT = "/user-roles/queries/user-role-ids-by-cid/v1"
+CROWDSTRIKE_LIST_USERS_UIDS_ENDPOINT = "/user-management/queries/users/v1"
+CROWDSTRIKE_GET_USER_INFO_ENDPOINT = "/user-management/entities/users/GET/v1"
+CROWDSTRIKE_GET_USER_ROLES_ENDPOINT = "/user-management/combined/user-roles/v1"
+CROWDSTRIKE_GET_ROLE_ENDPOINT = "/user-management/entities/roles/v1"
+CROWDSTRIKE_LIST_USER_ROLES_ENDPOINT = "/user-management/queries/roles/v1"
 CROWDSTRIKE_QUERY_REPORT_ENDPOINT = "/falconx/queries/reports/v1"
 CROWDSTRIKE_QUERY_FILE_ENDPOINT = "/falconx/queries/submissions/v1"
 CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT = "/falconx/entities/report-summaries/v1"
@@ -210,3 +210,4 @@ CROWDSTRIKE_MISSING_PARAMETER_MESSAGE_DELETE_IOC_ERROR = 'Please provide at leas
 CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR = "Please enter valid value in '{}' parameter"
 CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc",
 "last_modified.asc", "indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]
+CROWDSTRIKE_API_SUCC_CODES = [200, 202, 204]

@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_connector.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ class CrowdstrikeConnector(BaseConnector):
         self._base_url_oauth = self._base_url_oauth.replace('\\', '/')
         self._asset_id = self.get_asset_id()
 
-        app_id = config.get('app_id', self.get_asset_id().replace('-', ''))
+        app_id = config.get('app_id', self.get_app_id())
         self._parameters = {'appId': app_id.replace('-', '')}
 
         self._state = self.load_state()
@@ -174,6 +174,8 @@ class CrowdstrikeConnector(BaseConnector):
         error_code = None
         error_message = CROWDSTRIKE_UNAVAILABLE_MESSAGE_ERROR
 
+        self.error_print("Error occurred.", e)
+
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
@@ -181,8 +183,8 @@ class CrowdstrikeConnector(BaseConnector):
                     error_message = e.args[1]
                 elif len(e.args) == 1:
                     error_message = e.args[0]
-        except Exception as ex:
-            self.debug_print("Error occurred while retrieving exception information: {}".format(self._get_error_message_from_exception(ex)))
+        except Exception as e:
+            self.error_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         if not error_code:
             error_text = "Error Message: {}".format(error_message)
@@ -369,7 +371,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return containers_processed
 
-    def _paginator(self, action_result, endpoint, param):
+    def _paginator(self, action_result, endpoint, param=None):
         """
         This action is used to create an iterator that will paginate through responses from called methods.
 
@@ -377,7 +379,8 @@ class CrowdstrikeConnector(BaseConnector):
         :param action_result: Object of ActionResult class
         :param **kwargs: Dictionary of Input parameters
         """
-
+        if param is None:
+            param = dict()
         list_ids = list()
 
         limit = None
@@ -940,18 +943,19 @@ class CrowdstrikeConnector(BaseConnector):
         # Get all the UIDS from your Customer ID
         endpoint = CROWDSTRIKE_LIST_USERS_UIDS_ENDPOINT
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
-        if phantom.is_fail(ret_val):
+        ids = self._paginator(action_result, endpoint)
+
+        if ids is None:
             return action_result.get_status()
 
-        if not response.get('resources', []):
+        if not ids:
             return action_result.set_status(phantom.APP_SUCCESS, "No data found for user resources")
 
-        params = {'ids': response.get('resources', [])}
+        data = {'ids': ids}
 
         endpoint = CROWDSTRIKE_GET_USER_INFO_ENDPOINT
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, json_data=data, method="post")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -972,13 +976,14 @@ class CrowdstrikeConnector(BaseConnector):
 
         endpoint = CROWDSTRIKE_GET_USER_ROLES_ENDPOINT
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+        user_role_list = self._paginator(action_result, endpoint, params)
 
-        if phantom.is_fail(ret_val):
+        if user_role_list is None:
             return action_result.get_status()
 
         # Add the response into the data section
-        action_result.add_data(response)
+        for data in user_role_list:
+            action_result.add_data(data)
 
         return action_result.set_status(phantom.APP_SUCCESS, "User roles fetched successfully")
 
@@ -3002,7 +3007,7 @@ class CrowdstrikeConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
-        if response.status_code == 200 or response.status_code == 202:
+        if response.status_code in CROWDSTRIKE_API_SUCC_CODES:
             return RetVal(phantom.APP_SUCCESS, "Status code: {}".format(response.status_code))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR.format(code=response.status_code)), None)
@@ -3080,7 +3085,7 @@ class CrowdstrikeConnector(BaseConnector):
                         else:
                             return RetVal(action_result.set_status(phantom.APP_SUCCESS,
                                 "Error from server. Error details: {}".format(error_msg.strip(", "))), resp_json)
-        except:
+        except Exception:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred while processing error response from server"), None)
 
         # Please specify the status codes here

@@ -1691,7 +1691,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, f"Detections fetched: {len(detection_details_list)}")
 
-    def _handle_update_detection(self, param):
+    def _handle_update_detections(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3496,7 +3496,7 @@ class CrowdstrikeConnector(BaseConnector):
             "list_alerts": self._handle_list_alerts,
             "list_detections": self._handle_list_detections,
             'get_detections_details': self._handle_get_detections_details,
-            'update_detection': self._handle_update_detection,
+            'update_detections': self._handle_update_detections,
             'list_sessions': self._handle_list_sessions,
             'run_command': self._handle_run_command,
             'run_admin_command': self._handle_run_admin_command,

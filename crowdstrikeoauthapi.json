@@ -3885,15 +3885,15 @@
             }
         },
         {
-            "action": "update detection",
-            "description": "Update detection in Crowdstrike Host",
+            "action": "update detections",
+            "description": "Update detections in Crowdstrike Host",
             "type": "generic",
-            "identifier": "update_detection",
+            "identifier": "update_detections",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
                 "ids": {
-                    "description": "List of Detection IDs to update",
+                    "description": "List of Detection IDs to update. Comma separated list allowed",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike detection id"

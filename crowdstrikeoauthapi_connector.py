@@ -1668,6 +1668,60 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_get_detections_details(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ids = param.get("ids")
+        ids = [x.strip() for x in ids.split(',')]
+        ids = list(filter(None, ids))
+
+        data = {"ids": ids}
+
+        detection_details_list = self._get_details(action_result, CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT, data, method='post')
+
+        if detection_details_list is None:
+            return action_result.get_status()
+
+        for detection in detection_details_list:
+            action_result.add_data(detection)
+
+        summary = action_result.update_summary({})
+        summary['total_detections'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS, f"Detections fetched: {len(detection_details_list)}")
+
+    def _handle_update_detection(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ids = param.get("ids")
+        ids = [x.strip() for x in ids.split(',')]
+        ids = list(filter(None, ids))
+
+        data = {"ids": ids}
+
+        if param.get('assigned_to_uuid'):
+            data.update({'assigned_to_uuid': param.get('assigned_to_uuid')})
+        
+        if param.get('comment'):
+            data.update({'comment': param.get('comment')})
+        
+        if param.get('show_in_ui'):
+            data.update({'show_in_ui': param.get('show_in_ui')})
+
+        if param.get('status'):
+            data.update({'status': param.get('status')})
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RESOLVE_DETECTION_APIPATH, json_data=data, method="patch")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        
+        action_result.add_data(response)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Detections update successfully")
+
     def _handle_list_sessions(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -3441,6 +3495,8 @@ class CrowdstrikeConnector(BaseConnector):
             'delete_session': self._handle_delete_session,
             "list_alerts": self._handle_list_alerts,
             "list_detections": self._handle_list_detections,
+            'get_detections_details': self._handle_get_detections_details,
+            'update_detection': self._handle_update_detection,
             'list_sessions': self._handle_list_sessions,
             'run_command': self._handle_run_command,
             'run_admin_command': self._handle_run_admin_command,

@@ -1039,7 +1039,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
-action\_result\.parameter\.ids | string | `crowdstrike incident id` 
+action\_result\.parameter\.ids | string | `crowdstrike detection id` 
 action\_result\.parameter\.comment| string | 
 action\_result\.parameter\.show\_in\_ui | boolean | 
 action\_result\.parameter\.assigned\_to\_uuid" | string |  

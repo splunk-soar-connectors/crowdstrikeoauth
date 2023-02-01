@@ -909,7 +909,7 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ids** |  required  | List of detection IDs. Comma separated list allowed | string | `crowdstrike detection id` 
+**ids** |  required  | List of detection IDs. Comma separated list allowed | string |  `crowdstrike detection id` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -1029,7 +1029,7 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ids** |  required  | List of detection IDs. Comma separated list allowed | string | `crowdstrike detection id` 
+**ids** |  required  | List of detection IDs. Comma separated list allowed | string |  `crowdstrike detection id` 
 **comment** |  required  | Comment to add to the detection | string | 
 **assigned_to_uuid** |  optional  | User ID | string | 
 **show_in_ui** |  optional  | This detection is displayed or not in Falcon | boolean | 

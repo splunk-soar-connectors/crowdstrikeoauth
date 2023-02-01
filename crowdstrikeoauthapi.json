@@ -3916,11 +3916,11 @@
                     "order": 2
                 },
                 "show_in_ui": {
-                    "description": "Status to set",
-                    "data_type": "string",
+                    "description": "This detection is displayed or not in Falcon",
+                    "data_type": "boolean",
                     "value_list": [
-                        "true",
-                        "false"
+                        true,
+                        false
                     ],
                     "required": false,
                     "order": 3
@@ -3966,7 +3966,6 @@
                         "values"
                     ]
                 },
-
                 {
                     "data_path": "action_result.parameter.show_in_ui",
                     "data_type": "boolean",
@@ -3974,6 +3973,10 @@
                         true,
                         false
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.assigned_to_uuid",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.status",

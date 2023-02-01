@@ -343,7 +343,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [remove hosts](#action-remove-hosts) - Remove one or more hosts from the static host group  
 [create session](#action-create-session) - Initialize a new session with the Real Time Response cloud  
 [delete session](#action-delete-session) - Deletes a Real Time Response session  
-[list detections](#action-list-detections) - Get a list of detections  
+[list detections](#action-list-detections) - Get a list of detections
+[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection ID's
+[update detections](#action-update-details) - Update detections in Crowdstrike Host
 [list alerts](#action-list-alerts) - Get a list of alerts  
 [list sessions](#action-list-sessions) - Lists Real Time Response sessions  
 [run command](#action-run-command) - Execute an active responder command on a single host  
@@ -894,6 +896,158 @@ action\_result\.data\.\*\.seconds\_to\_triaged | numeric |
 action\_result\.data\.\*\.show\_in\_ui | boolean | 
 action\_result\.data\.\*\.status | string | 
 action\_result\.summary\.total\_detections | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
+
+## action: 'get detections details'
+Get a list of detections details by providing detection ID's
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**ids** |  required  | List of detection IDs. Comma separated list allowed | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.status | string |  
+action\_result\.data | string | 
+action\_result\.data\.\*\.behaviors\.\*\.alleged\_filetype | string | 
+action\_result\.data\.\*\.behaviors\.\*\.behavior\_id | string | 
+action\_result\.data\.\*\.behaviors\.\*\.cmdline | string | 
+action\_result\.data\.\*\.behaviors\.\*\.confidence | numeric | 
+action\_result\.data\.\*\.behaviors\.\*\.control\_graph\_id | string | 
+action\_result\.data\.\*\.behaviors\.\*\.description | string | 
+action\_result\.data\.\*\.behaviors\.\*\.device\_id | string |  `md5`  `crowdstrike device id` 
+action\_result\.data\.\*\.behaviors\.\*\.display\_name | string | 
+action\_result\.data\.\*\.behaviors\.\*\.filename | string | 
+action\_result\.data\.\*\.behaviors\.\*\.filepath | string | 
+action\_result\.data\.\*\.behaviors\.\*\.ioc\_description | string | 
+action\_result\.data\.\*\.behaviors\.\*\.ioc\_source | string | 
+action\_result\.data\.\*\.behaviors\.\*\.ioc\_type | string | 
+action\_result\.data\.\*\.behaviors\.\*\.ioc\_value | string | 
+action\_result\.data\.\*\.behaviors\.\*\.md5 | string | 
+action\_result\.data\.\*\.behaviors\.\*\.objective | string | 
+action\_result\.data\.\*\.behaviors\.\*\.parent\_details\.parent\_cmdline | string | 
+action\_result\.data\.\*\.behaviors\.\*\.parent\_details\.parent\_md5 | string | 
+action\_result\.data\.\*\.behaviors\.\*\.parent\_details\.parent\_process\_graph\_id | string | 
+action\_result\.data\.\*\.behaviors\.\*\.parent\_details\.parent\_sha256 | string | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition | numeric | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.blocking\_unsupported\_or\_disabled | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.bootup\_safeguard\_enabled | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.critical\_process\_disabled | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.detect | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.fs\_operation\_blocked | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.handle\_operation\_downgraded | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.inddet\_mask | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.indicator | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.kill\_action\_failed | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.kill\_parent | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.kill\_process | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.kill\_subprocess | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.operation\_blocked | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.policy\_disabled | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.process\_blocked | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.quarantine\_file | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.quarantine\_machine | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.registry\_operation\_blocked | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.rooting | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.sensor\_only | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.suspend\_parent | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.suspend\_process | boolean | 
+action\_result\.data\.\*\.behaviors\.\*\.scenario | string | 
+action\_result\.data\.\*\.behaviors\.\*\.severity | numeric | 
+action\_result\.data\.\*\.behaviors\.\*\.sha256 | string | 
+action\_result\.data\.\*\.behaviors\.\*\.tactic | string | 
+action\_result\.data\.\*\.behaviors\.\*\.tactic\_id | string | 
+action\_result\.data\.\*\.behaviors\.\*\.technique | string | 
+action\_result\.data\.\*\.behaviors\.\*\.technique\_id | string | 
+action\_result\.data\.\*\.behaviors\.\*\.template\_instance\_id | string | 
+action\_result\.data\.\*\.behaviors\.\*\.timestamp | string | 
+action\_result\.data\.\*\.behaviors\.\*\.triggering\_process\_graph\_id | string | 
+action\_result\.data\.\*\.behaviors\.\*\.user\_id | string | 
+action\_result\.data\.\*\.behaviors\.\*\.user\_name | string | 
+action\_result\.data\.\*\.cid | string |  `md5` 
+action\_result\.data\.\*\.created\_timestamp | string | 
+action\_result\.data\.\*\.date\_updated | string | 
+action\_result\.data\.\*\.detection\_id | string | 
+action\_result\.data\.\*\.device\.agent\_load\_flags | string | 
+action\_result\.data\.\*\.device\.agent\_local\_time | string | 
+action\_result\.data\.\*\.device\.agent\_version | string | 
+action\_result\.data\.\*\.device\.bios\_manufacturer | string | 
+action\_result\.data\.\*\.device\.bios\_version | string | 
+action\_result\.data\.\*\.device\.cid | string | 
+action\_result\.data\.\*\.device\.config\_id\_base | string | 
+action\_result\.data\.\*\.device\.config\_id\_build | string | 
+action\_result\.data\.\*\.device\.config\_id\_platform | string | 
+action\_result\.data\.\*\.device\.device\_id | string |  `md5`  `crowdstrike device id` 
+action\_result\.data\.\*\.device\.external\_ip | string | 
+action\_result\.data\.\*\.device\.first\_seen | string | 
+action\_result\.data\.\*\.device\.hostname | string | 
+action\_result\.data\.\*\.device\.last\_seen | string | 
+action\_result\.data\.\*\.device\.local\_ip | string | 
+action\_result\.data\.\*\.device\.mac\_address | string | 
+action\_result\.data\.\*\.device\.machine\_domain | string | 
+action\_result\.data\.\*\.device\.major\_version | string | 
+action\_result\.data\.\*\.device\.minor\_version | string | 
+action\_result\.data\.\*\.device\.modified\_timestamp | string | 
+action\_result\.data\.\*\.device\.os\_version | string | 
+action\_result\.data\.\*\.device\.platform\_id | string | 
+action\_result\.data\.\*\.device\.platform\_name | string | 
+action\_result\.data\.\*\.device\.product\_type | string | 
+action\_result\.data\.\*\.device\.product\_type\_desc | string | 
+action\_result\.data\.\*\.device\.site\_name | string | 
+action\_result\.data\.\*\.device\.status | string | 
+action\_result\.data\.\*\.device\.system\_manufacturer | string | 
+action\_result\.data\.\*\.device\.system\_product\_name | string | 
+action\_result\.data\.\*\.email\_sent | boolean | 
+action\_result\.data\.\*\.first\_behavior | string | 
+action\_result\.data\.\*\.hostinfo\.domain | string | 
+action\_result\.data\.\*\.last\_behavior | string | 
+action\_result\.data\.\*\.max\_confidence | numeric | 
+action\_result\.data\.\*\.max\_severity | numeric | 
+action\_result\.data\.\*\.max\_severity\_displayname | string | 
+action\_result\.data\.\*\.seconds\_to\_resolved | numeric | 
+action\_result\.data\.\*\.seconds\_to\_triaged | numeric | 
+action\_result\.data\.\*\.show\_in\_ui | boolean | 
+action\_result\.data\.\*\.status | string | 
+action\_result\.summary\.total\_detections | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
+
+## action: 'update detections'
+Update detections in Crowdstrike Host
+
+Type: **generic**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**ids** |  required  | List of detection IDs. Comma separated list allowed | string | 
+**comment** |  required  | Comment to add to the detection | string | 
+**assigned_to_uuid** |  optional  | User ID | string | 
+**show_in_ui** |  optional  | This detection is displayed or not in Falcon | boolean | 
+**status** |  optional  | Status to set | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.parameter\.ids | string | `crowdstrike incident id` 
+action\_result\.parameter\.comment| string | 
+action\_result\.parameter\.show\_in\_ui | boolean | 
+action\_result\.parameter\.assigned\_to\_uuid" | string |  
+action\_result\.parameter\.status | string | 
+action\_result\.data\.\*\.meta\.query\_time | numeric | 
+action\_result\.data\.\*\.meta\.trace\_id | string |
+action\_result\.data\.\*\.meta\.writes\.resources\_affected| numeric | 
+action\_result\.summary | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   

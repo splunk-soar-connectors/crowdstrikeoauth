@@ -343,9 +343,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [remove hosts](#action-remove-hosts) - Remove one or more hosts from the static host group  
 [create session](#action-create-session) - Initialize a new session with the Real Time Response cloud  
 [delete session](#action-delete-session) - Deletes a Real Time Response session  
-[list detections](#action-list-detections) - Get a list of detections
-[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection ID's
-[update detections](#action-update-details) - Update detections in Crowdstrike Host
+[list detections](#action-list-detections) - Get a list of detections  
+[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection ID's  
+[update detections](#action-update-details) - Update detections in Crowdstrike Host  
 [list alerts](#action-list-alerts) - Get a list of alerts  
 [list sessions](#action-list-sessions) - Lists Real Time Response sessions  
 [run command](#action-run-command) - Execute an active responder command on a single host  
@@ -909,7 +909,7 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ids** |  required  | List of detection IDs. Comma separated list allowed | string | 
+**ids** |  required  | List of detection IDs. Comma separated list allowed | string | crowdstrike detection id 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -1029,7 +1029,7 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ids** |  required  | List of detection IDs. Comma separated list allowed | string | 
+**ids** |  required  | List of detection IDs. Comma separated list allowed | string | crowdstrike detection id 
 **comment** |  required  | Comment to add to the detection | string | 
 **assigned_to_uuid** |  optional  | User ID | string | 
 **show_in_ui** |  optional  | This detection is displayed or not in Falcon | boolean | 

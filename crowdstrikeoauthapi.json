@@ -3918,9 +3918,9 @@
                 "show_in_ui": {
                     "description": "This detection is displayed or not in Falcon",
                     "data_type": "boolean",
-                    "value_list": [
-                        true,
-                        false
+                    "example_value": [
+                        false,
+                        true
                     ],
                     "required": false,
                     "order": 3

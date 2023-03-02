@@ -505,7 +505,6 @@ class CrowdstrikeConnector(BaseConnector):
         while list_ids:
             param = {"ids": list_ids[:min(100, len(list_ids))]}
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, json_data=param, method=method)
-
             if phantom.is_fail(ret_val):
                 return None
 
@@ -1672,9 +1671,10 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = param.get("ids")
-        ids = [x.strip() for x in ids.split(',')]
-        ids = list(filter(None, ids))
+        ids = [det_id.strip() for det_id in param.get("ids").split(',')]
+        ids = list(set((filter(None, ids))))
+        if not ids:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="ids"))
 
         data = {"ids": ids}
 
@@ -1683,44 +1683,51 @@ class CrowdstrikeConnector(BaseConnector):
         if detection_details_list is None:
             return action_result.get_status()
 
-        for detection in detection_details_list:
-            action_result.add_data(detection)
+        [action_result.add_data(detection) for detection in detection_details_list]
 
         summary = action_result.update_summary({})
-        summary['total_detections'] = action_result.get_data_size()
+        summary['total_detections'] = len(detection_details_list)
 
-        return action_result.set_status(phantom.APP_SUCCESS, f"Detections fetched: {len(detection_details_list)}")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_detections(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = param.get("ids")
-        ids = [x.strip() for x in ids.split(',')]
-        ids = list(filter(None, ids))
+        assigned_to_uuid = param.get('assigned_to_uuid')
+        comment = param.get('comment')
+        show_in_ui = param.get('show_in_ui', False)
+        status = param.get('status')
+        ids = [det_id.strip() for det_id in param.get("ids").split(',')]
+        ids = list(set(filter(None, ids)))
+        if not ids:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="ids"))
 
-        data = {"ids": ids}
+        data = {
+            "ids": ids,
+            "comment": comment,
+            'show_in_ui': show_in_ui
+        }
 
-        if param.get('assigned_to_uuid'):
-            data.update({'assigned_to_uuid': param.get('assigned_to_uuid')})
-        
-        if param.get('comment'):
-            data.update({'comment': param.get('comment')})
-        
-        if param.get('show_in_ui'):
-            data.update({'show_in_ui': param.get('show_in_ui')})
+        if assigned_to_uuid:
+            data.update({'assigned_to_uuid': assigned_to_uuid})
 
-        if param.get('status'):
-            data.update({'status': param.get('status')})
+        if status:
+            if status not in CROWDSTRIKE_DETECTION_STATUSES:
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="status"))
+            data.update({'status': status})
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RESOLVE_DETECTION_APIPATH, json_data=data, method="patch")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-        
-        action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Detections update successfully")
+        action_result.add_data(response)
+        if response.get('meta', {}).get('writes', {}).get('resources_affected', 0) != len(ids):
+            errors = [error.get('message') for error in response.get('errors', [])]
+            return action_result.set_status(phantom.APP_ERROR, "Errors occurred while updating detections: {}".format('\r\n'.join(errors)))
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Detections updated successfully")
 
     def _handle_list_sessions(self, param):
 

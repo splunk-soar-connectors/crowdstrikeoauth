@@ -21,7 +21,7 @@
         }
     ],
     "license": "Copyright (c) 2019-2023 Splunk Inc.",
-    "app_version": "4.0.0-fdse.1",
+    "app_version": "4.1.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, January 20 2023, API versions: v1, v2"
     ],
@@ -3096,7 +3096,7 @@
             "parameters": {
                 "ids": {
                     "data_type": "string",
-                    "description": "List of detection IDs. Comma separated list allowed",
+                    "description": "List of detection IDs. Comma-separated list allowed",
                     "required": true,
                     "primary": true,
                     "order": 0,
@@ -3912,7 +3912,6 @@
                 "assigned_to_uuid": {
                     "description": "User ID",
                     "data_type": "string",
-                    "required": false,
                     "order": 2
                 },
                 "show_in_ui": {
@@ -3922,7 +3921,6 @@
                         false,
                         true
                     ],
-                    "required": false,
                     "order": 3
                 },
                 "status": {
@@ -3936,7 +3934,6 @@
                         "ignored",
                         "closed"
                     ],
-                    "required": false,
                     "order": 4
                 }
             },
@@ -3947,7 +3944,9 @@
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.ids",
@@ -4002,12 +4001,11 @@
                 {
                     "data_path": "action_result.data.*.meta.writes.resources_affected",
                     "data_type": "numeric",
-                    "contains": [
-                        "field indicates the number of IDs successfully updated"
-                    ],
                     "example_values": [
                         0
-                    ]
+                    ],
+                    "column_name": "Resource Affected",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.summary",

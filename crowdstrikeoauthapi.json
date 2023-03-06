@@ -3115,6 +3115,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.detection_ids",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike detections id"
+                    ]
+                },
+                {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
@@ -3560,6 +3567,9 @@
                     "data_type": "string",
                     "example_value": [
                         "ldt:46592f3d661a469eb2503d72a29afd3a:309255693652"
+                    ],
+                    "contains": [
+                        "crowdstrike detection id"
                     ]
                 },
                 {
@@ -3949,6 +3959,17 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.parameter.assigned_to_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "test comment"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.detection_ids",
                     "data_type": "string",
                     "contains": [
@@ -3959,23 +3980,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.comment",
-                    "data_type": "string",
-                    "example_values": [
-                        "values"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.show_in_ui",
                     "data_type": "boolean",
                     "example_values": [
                         true,
                         false
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.assigned_to_uuid",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.status",

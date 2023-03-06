@@ -3094,7 +3094,7 @@
             "identifier": "get_detections_details",
             "read_only": true,
             "parameters": {
-                "ids": {
+                "detection_ids": {
                     "data_type": "string",
                     "description": "List of detection IDs. Comma-separated list allowed",
                     "required": true,
@@ -3892,8 +3892,8 @@
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
-                "ids": {
-                    "description": "List of Detection IDs to update. Comma separated list allowed",
+                "detection_ids": {
+                    "description": "List of Detection IDs to update, Comma-separated list allowed",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike detection id"
@@ -3909,8 +3909,8 @@
                     "required": true,
                     "order": 1
                 },
-                "assigned_to_uuid": {
-                    "description": "User ID",
+                "assigned_to_user": {
+                    "description": "User ID to assign",
                     "data_type": "string",
                     "order": 2
                 },
@@ -3949,7 +3949,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.ids",
+                    "data_path": "action_result.parameter.detection_ids",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike detection id"
@@ -17625,7 +17625,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.13-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.14-py2.py3-none-any.whl"
             }
         ]
     },
@@ -17665,11 +17665,11 @@
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.4-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.13-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.14-py2.py3-none-any.whl"
             }
         ]
     }

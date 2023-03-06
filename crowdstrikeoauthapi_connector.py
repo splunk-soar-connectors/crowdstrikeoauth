@@ -1671,7 +1671,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = [det_id.strip() for det_id in param.get("ids").split(',')]
+        ids = [det_id.strip() for det_id in param.get("detection_ids").split(',')]
         ids = list(set((filter(None, ids))))
         if not ids:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="ids"))
@@ -1694,11 +1694,11 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        assigned_to_uuid = param.get('assigned_to_uuid')
+        assigned_to_user = param.get('assigned_to_user')
         comment = param.get('comment')
         show_in_ui = param.get('show_in_ui', False)
         status = param.get('status')
-        ids = [det_id.strip() for det_id in param.get("ids").split(',')]
+        ids = [det_id.strip() for det_id in param.get("detection_ids").split(',')]
         ids = list(set(filter(None, ids)))
         if not ids:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="ids"))
@@ -1709,15 +1709,16 @@ class CrowdstrikeConnector(BaseConnector):
             'show_in_ui': show_in_ui
         }
 
-        if assigned_to_uuid:
-            data.update({'assigned_to_uuid': assigned_to_uuid})
+        if assigned_to_user:
+            data.update({'assigned_to_uuid': assigned_to_user})
 
         if status:
             if status not in CROWDSTRIKE_DETECTION_STATUSES:
                 return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="status"))
             data.update({'status': status})
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RESOLVE_DETECTION_APIPATH, json_data=data, method="patch")
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RESOLVE_DETECTION_APIPATH,
+                                                               json_data=data, method="patch")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1727,7 +1728,10 @@ class CrowdstrikeConnector(BaseConnector):
             errors = [error.get('message') for error in response.get('errors', [])]
             return action_result.set_status(phantom.APP_ERROR, "Errors occurred while updating detections: {}".format('\r\n'.join(errors)))
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Detections updated successfully")
+        summary = action_result.update_summary({})
+        summary['detections_affected'] = len(ids)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_sessions(self, param):
 

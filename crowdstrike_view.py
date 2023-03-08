@@ -100,9 +100,12 @@ def get_ctx_result_hunt(result):
 
     param = result.get_param()
 
-    hunt_object = param.get('hash')
-    if (not hunt_object):
+    if 'hash' in param:
+        hunt_object = param.get('hash')
+    elif 'domain' in param:
         hunt_object = param.get('domain')
+    else:
+        hunt_object = param.get('ip')
 
     param['ioc'] = hunt_object
     ret_val, param['ioc_type'] = _get_ioc_type(hunt_object)

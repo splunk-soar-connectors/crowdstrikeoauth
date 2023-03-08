@@ -3101,7 +3101,7 @@
                     "primary": true,
                     "order": 0,
                     "contains": [
-                        "crowdstrike detections id"
+                        "crowdstrike detection id"
                     ]
                 }
             },
@@ -3118,12 +3118,26 @@
                     "data_path": "action_result.parameter.detection_ids",
                     "data_type": "string",
                     "contains": [
-                        "crowdstrike detections id"
+                        "crowdstrike detection id"
                     ]
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assigned_to_uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "usertest@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assigned_to_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test user"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.behaviors.*.alleged_filetype",
@@ -3995,6 +4009,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "legacy-detects"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.detections_affected",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.meta.query_time",
                     "data_type": "numeric",
                     "example_values": [
@@ -4012,7 +4040,7 @@
                     "data_path": "action_result.data.*.meta.writes.resources_affected",
                     "data_type": "numeric",
                     "example_values": [
-                        0
+                        2
                     ],
                     "column_name": "Resource Affected",
                     "column_order": 1
@@ -9121,6 +9149,122 @@
                     "data_type": "string",
                     "example_values": [
                         "Device count: 3"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "hunt ip",
+            "description": "Get a list of device IDs on which the ip was matched",
+            "verbose": "In case of count_only set to true, keep the limit value larger to fetch count of all the devices.",
+            "type": "investigate",
+            "identifier": "hunt_ip",
+            "read_only": true,
+            "versions": "EQ(*)",
+            "parameters": {
+                "ip": {
+                    "description": "IP address to search",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "count_only": {
+                    "description": "Get endpoint count only",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
+                },
+                "limit": {
+                    "description": "Maximum device IDs to be fetched (defaults to 100)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 2
+                }
+            },
+            "render": {
+                "title": "Hunt Ip",
+                "type": "custom",
+                "view": "crowdstrike_view.hunt_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.count_only",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "example_values": [
+                        "8.8.8.8",
+                        "2001:0db8:3c4d:0015:0000:0000:1a2f:1a2b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike device id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "Crowdstrike Device ID",
+                    "example_values": [
+                        "07c312fabcb8473454d0a16f118928fg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.device_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device count: 1"
                     ]
                 },
                 {

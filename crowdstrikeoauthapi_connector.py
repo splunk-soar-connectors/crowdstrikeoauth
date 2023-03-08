@@ -251,14 +251,13 @@ class CrowdstrikeConnector(BaseConnector):
     def _get_ioc_type(self, ioc, action_result):
 
         if util.is_ip(ioc):
-            return (phantom.APP_SUCCESS, "ipv4")
+            return phantom.APP_SUCCESS, "ipv4"
 
         ip = UnicodeDammit(ioc).unicode_markup.encode('UTF-8').decode('UTF-8')
         try:
-            ipv6_type = None
             ipv6_type = ipaddress.IPv6Address(ip)
             if ipv6_type:
-                return (phantom.APP_SUCCESS, "ipv6")
+                return phantom.APP_SUCCESS, "ipv6"
         except Exception:
             pass
 
@@ -266,7 +265,7 @@ class CrowdstrikeConnector(BaseConnector):
             return self._get_hash_type(ioc, action_result)
 
         if util.is_domain(ioc):
-            return (phantom.APP_SUCCESS, "domain")
+            return phantom.APP_SUCCESS, "domain"
 
         return action_result.set_status(phantom.APP_ERROR, "Failed to detect the IOC type")
 
@@ -635,6 +634,21 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         return self._get_devices_ran_on(domain, "domain", param, action_result)
+
+    def _handle_hunt_ip(self, param):
+
+        ioc = param[phantom.APP_JSON_IP]
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if ioc_type not in ["ipv4", "ipv6"]:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid ip")
+
+        return self._get_devices_ran_on(ioc, ioc_type, param, action_result)
 
     def _handle_get_device_detail(self, param):
 
@@ -3520,6 +3534,7 @@ class CrowdstrikeConnector(BaseConnector):
             'list_put_files': self._handle_list_put_files,
             'hunt_file': self._handle_hunt_file,
             'hunt_domain': self._handle_hunt_domain,
+            'hunt_ip': self._handle_hunt_ip,
             'get_process_detail': self._handle_get_process_detail,
             'get_device_detail': self._handle_get_device_detail,
             'resolve_detection': self._handle_resolve_detection,

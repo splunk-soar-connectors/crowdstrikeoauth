@@ -1718,13 +1718,15 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="ids"))
 
         data = {
-            "ids": ids,
-            "comment": comment,
+            'ids': ids,
             'show_in_ui': show_in_ui
         }
 
         if assigned_to_user:
             data.update({'assigned_to_uuid': assigned_to_user})
+
+        if comment:
+            data.update({'comment': comment})
 
         if status:
             if status not in CROWDSTRIKE_DETECTION_STATUSES:

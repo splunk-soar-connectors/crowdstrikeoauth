@@ -2748,8 +2748,8 @@
                     "example_value": [
                         "2022-09-26T11:30:42.246972793Z"
                     ],
-                    "column_name": "Timestamp",
-                    "column_order": 2
+                    "column_name": "Created Timestamp",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.date_updated",
@@ -2763,7 +2763,12 @@
                     "data_type": "string",
                     "example_value": [
                         "ldt:46592f3d661a469eb2503d72a29afd3a:309255693652"
-                    ]
+                    ],
+                    "contains": [
+                        "crowdstrike detection id"
+                    ],
+                    "column_name": "Detection ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.device.agent_load_flags",
@@ -2839,7 +2844,7 @@
                         "crowdstrike device id"
                     ],
                     "column_name": "Device ID",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.device.external_ip",
@@ -3048,7 +3053,7 @@
                         "new"
                     ],
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.summary.total_detections",
@@ -3566,8 +3571,8 @@
                     "example_value": [
                         "2022-09-26T11:30:42.246972793Z"
                     ],
-                    "column_name": "Timestamp",
-                    "column_order": 2
+                    "column_name": "Created Timestamp",
+                    "column_order": 7
                 },
                 {
                     "data_path": "action_result.data.*.date_updated",
@@ -3584,7 +3589,9 @@
                     ],
                     "contains": [
                         "crowdstrike detection id"
-                    ]
+                    ],
+                    "column_name": "Detection ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.device.agent_load_flags",
@@ -3660,7 +3667,7 @@
                         "crowdstrike device id"
                     ],
                     "column_name": "Device ID",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.device.external_ip",
@@ -3681,7 +3688,9 @@
                     "data_type": "string",
                     "example_value": [
                         "CB-TEST-02"
-                    ]
+                    ],
+                    "column_name": "Hostname",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.device.last_seen",
@@ -3730,7 +3739,9 @@
                     "data_type": "string",
                     "example_value": [
                         "2022-09-26T11:27:43Z"
-                    ]
+                    ],
+                    "column_name": "Modified Timestamp",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.device.os_version",
@@ -3751,7 +3762,9 @@
                     "data_type": "string",
                     "example_value": [
                         "Windows"
-                    ]
+                    ],
+                    "column_name": "Platform Name",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.device.product_type",
@@ -3839,7 +3852,9 @@
                     "data_type": "string",
                     "example_value": [
                         "High"
-                    ]
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.seconds_to_resolved",
@@ -3869,7 +3884,7 @@
                         "new"
                     ],
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.summary.total_detections",
@@ -3937,8 +3952,9 @@
                     "order": 2
                 },
                 "show_in_ui": {
-                    "description": "This detection is displayed or not in Falcon",
+                    "description": "This detection is displayed or not in falcon UI",
                     "data_type": "boolean",
+                    "default": true,
                     "example_value": [
                         false,
                         true

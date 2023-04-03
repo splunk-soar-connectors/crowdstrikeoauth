@@ -1710,7 +1710,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         assigned_to_user = param.get('assigned_to_user')
         comment = param.get('comment')
-        show_in_ui = param.get('show_in_ui', False)
+        show_in_ui = param.get('show_in_ui', True)
         status = param.get('status')
         ids = [det_id.strip() for det_id in param.get("detection_ids").split(',')]
         ids = list(set(filter(None, ids)))

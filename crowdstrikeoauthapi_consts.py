@@ -129,6 +129,7 @@ CROWDSTRIKE_ENCRYPTION_ERROR = "Error occurred while encrypting the state file"
 CROWDSTRIKE_DECRYPTION_ERROR = "Error occurred while decrypting the state file"
 CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR = "Status Code {code}. Empty response and no information in the header"
 CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM = "Please provide a valid value in the '{key}' parameter"
+CROWDSTRIKE_ERROR_INVALID_COMMENT_PARAM = "Please provide less than 2048 characters in the 'comment' parameter"
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"

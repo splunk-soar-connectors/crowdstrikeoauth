@@ -3942,7 +3942,7 @@
                     "order": 0
                 },
                 "comment": {
-                    "description": "Comment to add to the detection",
+                    "description": "Comment to add to the detection (Maximum 2048 bytes)",
                     "data_type": "string",
                     "order": 1
                 },

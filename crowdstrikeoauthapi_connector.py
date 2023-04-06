@@ -1726,7 +1726,7 @@ class CrowdstrikeConnector(BaseConnector):
             data.update({'assigned_to_uuid': assigned_to_user})
 
         if comment:
-            if len(bytes(comment, 'utf-8')) > 2048:
+            if len(bytes(comment, 'utf-8')) > MAXIMUM_COMMENT_LENGTH:
                 return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_COMMENT_PARAM)
             data.update({'comment': comment})
 

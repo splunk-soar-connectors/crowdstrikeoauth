@@ -268,6 +268,15 @@ def display_view(provides, all_app_runs, context):
     if provides == 'get device scroll':
         return 'crowdstrike_get_device_scroll.html'
 
+    if provides == 'list users':
+        return 'crowdstrike_list_users.html'
+
+    if provides == 'list detections':
+        return 'crowdstrike_list_detections.html'
+
+    if provides == 'get detections details':
+        return 'crowdstrike_get_detections_details.html'
+
 
 def hunt_view(provides, all_app_runs, context):
 

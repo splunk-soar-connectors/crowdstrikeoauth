@@ -1,5 +1,5 @@
 **Unreleased**
-* Added three new actions support 
+* Added three new actions
     * get detections details
     * update detections 
     * hunt ip

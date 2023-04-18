@@ -636,7 +636,7 @@ class CrowdstrikeConnector(BaseConnector):
         return self._get_devices_ran_on(domain, "domain", param, action_result)
 
     def _handle_hunt_ip(self, param):
-
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         ioc = param[phantom.APP_JSON_IP]
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -644,9 +644,6 @@ class CrowdstrikeConnector(BaseConnector):
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-
-        if ioc_type not in ["ipv4", "ipv6"]:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide valid ip")
 
         return self._get_devices_ran_on(ioc, ioc_type, param, action_result)
 
@@ -975,8 +972,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         # Add the response into the data section
         action_result.add_data(response)
+        summary = action_result.update_summary({})
+        summary['total_users'] = len(response.get('resources', []))
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Users listed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_user_roles(self, param):
 
@@ -1686,7 +1685,7 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ids = [det_id.strip() for det_id in param.get("detection_ids").split(',')]
-        ids = list(set((filter(None, ids))))
+        ids = list(set(filter(None, ids)))
         if not ids:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="ids"))
 

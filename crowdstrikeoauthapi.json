@@ -23,13 +23,13 @@
     "license": "Copyright (c) 2019-2023 Splunk Inc.",
     "app_version": "4.1.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, March 6 2023, API versions: v1, v2"
+        "Cloud, API api.crowdstrike.com, August 21st 2023, API versions: v1, v2"
     ],
     "utctime_updated": "2022-05-04T23:15:36.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "5.5.0",
+    "min_phantom_version": "6.0.2",
     "python_version": "3",
     "fips_compliant": true,
     "app_wizard_version": "1.0.0",
@@ -17728,15 +17728,15 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.12.7-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2023.7.22-py3-none-any.whl"
             },
             {
-                "module": "chardet",
-                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
+                "module": "charset_normalizer",
+                "input_file": "wheels/py3/charset_normalizer-2.0.12-py3-none-any.whl"
             },
             {
                 "module": "idna",
-                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/idna-3.4-py3-none-any.whl"
             },
             {
                 "module": "pytz",
@@ -17744,7 +17744,7 @@
             },
             {
                 "module": "requests",
-                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/requests-2.27.1-py2.py3-none-any.whl"
             },
             {
                 "module": "requests_toolbelt",
@@ -17760,7 +17760,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.14-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.16-py2.py3-none-any.whl"
             }
         ]
     },
@@ -17772,15 +17772,15 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.12.7-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2023.7.22-py3-none-any.whl"
             },
             {
-                "module": "chardet",
-                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
+                "module": "charset_normalizer",
+                "input_file": "wheels/py39/charset_normalizer-3.2.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
             },
             {
                 "module": "idna",
-                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/idna-3.4-py3-none-any.whl"
             },
             {
                 "module": "pytz",
@@ -17788,7 +17788,7 @@
             },
             {
                 "module": "requests",
-                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/requests-2.31.0-py3-none-any.whl"
             },
             {
                 "module": "requests_toolbelt",
@@ -17800,11 +17800,11 @@
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.4-py3-none-any.whl"
+                "input_file": "wheels/py3/soupsieve-2.4.1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.14-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/urllib3-2.0.4-py3-none-any.whl"
             }
         ]
     }

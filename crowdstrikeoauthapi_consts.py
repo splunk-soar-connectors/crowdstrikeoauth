@@ -219,6 +219,6 @@ CROWDSTRIKE_DETECTION_STATUSES = [
     "true_positive",
     "false_positive",
     "ignored",
-    "closed"
+    "closed",
+    "reopened"
 ]
-MAXIMUM_COMMENT_LENGTH = 2048

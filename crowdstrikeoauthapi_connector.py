@@ -473,6 +473,7 @@ class CrowdstrikeConnector(BaseConnector):
             param = {}
 
         param.update({'limit': 1})
+        self.save_progress("Fetching devices")
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params=param)
 
         if phantom.is_fail(ret_val):

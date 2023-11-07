@@ -1973,7 +1973,7 @@
                     "data_path": "action_result.data.*.resources.*.scripts.*.examples",
                     "data_type": "string",
                     "example_values": [
-                        "    C:\\> cat c:\\mytextfile.txt\r\n        Display the contents of the text file (ASCII encoding)\r\n    C:\\> cat c:\\windows\\system32\\cmd.exe 100 -ShowHex\r\n        Display the first 100 hexadecimal characters for cmd.exe"
+                        "    C:\\> cat c:\\mytextfile.txt<br>        Display the contents of the text file (ASCII encoding)<br>    C:\\> cat c:\\windows\\system32\\cmd.exe 100 -ShowHex<br>        Display the first 100 hexadecimal characters for cmd.exe"
                     ],
                     "contains": [
                         "file path"
@@ -2111,7 +2111,7 @@
                     "data_path": "action_result.data.*.resources.*.scripts.*.sub_commands.*.examples",
                     "data_type": "string",
                     "example_values": [
-                        "    C:\\> eventlog view Application 5\r\n        Displays the 5 most recent event log entries in the \"Application\" event source log"
+                        "    C:\\> eventlog view Application 5<br>        Displays the 5 most recent event log entries in the \"Application\" event source log"
                     ]
                 },
                 {
@@ -4833,7 +4833,7 @@
                     "data_path": "action_result.data.*.resources.*.stdout",
                     "data_type": "string",
                     "example_values": [
-                        "Directory listing for C:\\ -\n\nName"
+                        "Directory listing for C:\\ - <br>Name"
                     ]
                 },
                 {
@@ -5055,7 +5055,7 @@
                     "data_path": "action_result.data.*.resources.*.stdout",
                     "data_type": "string",
                     "example_values": [
-                        "Directory listing for C:\\ -\n\nName"
+                        "Directory listing for C:\\ - <br>Name"
                     ]
                 },
                 {
@@ -5214,7 +5214,7 @@
                     "data_path": "action_result.data.*.resources.*.stdout",
                     "data_type": "string",
                     "example_values": [
-                        "Directory listing for C:\\ -\n\nName"
+                        "Directory listing for C:\\ - <br>Name"
                     ],
                     "column_name": "Stdout",
                     "column_order": 2
@@ -10126,7 +10126,7 @@
                     "data_path": "action_result.data.*.domain.*.metadata.filename",
                     "data_type": "string",
                     "example_values": [
-                        "esxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegfesxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegf"
+                        "EMAPLEMETADATAvftcdrxcftvgybhhubsdgvfyuegwwiqeqTESTuifgwieugfhiugybhugvftcdrxcftvgbhubsdgvfyuegwwiqeqpdiheuifgEXAMPLE"
                     ]
                 },
                 {
@@ -12924,14 +12924,14 @@
                     "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.filename",
                     "data_type": "string",
                     "example_values": [
-                        "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.bin"
+                        "EXAMPLEd6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2aTEST.bin"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.process",
                     "data_type": "string",
                     "example_values": [
-                        "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.exe"
+                        "EXAMPLEd6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2aTEST.exe"
                     ]
                 },
                 {
@@ -12980,7 +12980,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
                     "data_type": "string",
                     "example_values": [
-                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Test-CryptoAPI/10.0\nHost: ocsp.pki.goog"
+                        "GET /gsr2/TESTgwRjAJBgUrDgMCTESTBBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtEXAMPLEhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: */*<br>User-Agent: Test-CryptoAPI/10.0<br>Host: ocsp.pki.goog"
                     ]
                 },
                 {
@@ -13320,7 +13320,7 @@
                     "data_path": "action_result.data.*.sandbox.*.signatures.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "\"<Input Sample>.exe\" created file \"%TEMP%\\329babfa-d618-4d17-a6b0-79fe02a2d94d\\AgileDotNetRT.dll\""
+                        "\"example_input.exe\" created file \"%TEMP%\\329babfa-d618-4d17-a6b0-79fe02a2d94d\\AgileDotNetRT.dll\""
                     ]
                 },
                 {
@@ -14103,7 +14103,7 @@
                     "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.value",
                     "data_type": "string",
                     "example_values": [
-                        "\"!\ufffd\ufffd\\\ufffd\ufffd\ufffd\ufffd|\ufffdA%K\ufffd\u2cf0#\ufffdB\ufffd\ufffdw\ufffdR\u0413\ufffd\ufffd@\ufffdJ\ufffdJ\ufffd>\u0213J\ufffd\ufffd\ufffd\ufffdZ\ufffd\ufffdY\ufffd\ufffd\ufffd_1+\ufffd8'\ufffdS\ufffd\ufffd/\ufffd\u024ay\ufffd\ufffd\ufffdw]\ufffd*e\ufffd\ufffd\ufffd\ufffd|H\ufffd9\ufffdl\ufffdN\ufffdk\ufffdrN\ufffd+\u0708\ufffd\ufffd \ufffd\ufffdUB\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdFT\ufffd\ufffd\ufffdv}\ufffd9,\ufffd\ufffd^%\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd,4\ufffd`pa\ufffd\ufffd\ufffd\ufffd\ufffd%m\ufffd\ufffd\ufffdl$\ufffd\ufffd\ufffd|OY\ufffd@`\ufffd^(\ufffd*\ufffd^B\ufffd2`\ufffd10\ufffdS\ufffd\ufffd\ufffd\ufffd\ufffd`\ufffd\ufffdj;H\ufffd#Uq\ufffd\ufffd\ufffd=\ufffd\ufffd?\ufffd\ufffd\ufffd9\ufffdb|\ufffd\ufffd\ufffd\ufffdZ\ufffdu\ufffdd\ufffdF\ufffd\ufffd0=h\ufffd\ufffd\ufffd\ufffd\ufffd]}ene\ufffd\ufffd\ufffd\ufffdJp\ufffd\u036c/w\ufffd\ufffd\u014c\ufffdd\ufffdR\ufffd(|\ufffddi\ufffdy:\ufffd\ufffdD[\ufffd\u00e4\ufffd\ufffd,\ufffdP \ufffdG\ufffd@<\ufffdbC\ufffdN\ufffd^*+f\ufffdn\ufffdr2\ufffd\ufffd\ufffd\ufffd\ufffdfq~\ufffd\ufffd6\ufffd\ufffd$\ufffd>\ufffd<\ufffd\ufffdqF\ufffdS9\ufffdW'+\ufffd\ufffdr\ufffd\ufffdG\ufffde\ufffdo\ufffd\ufffd\ufffdw8/\ufffd%\ufffdy\ufffd/\ufffd\ufffd\ufffdH\ufffd\ufffd1\ufffdc{\ufffd#\ufffd\ufffd|8\ufffd\ufffd3\ufffd~up\ufffdn\u079d\ufffd\ufffdOr\ufffd!\ufffd;r\ufffdJJ\ufffd3\ufffd\ufffdwb\ufffd\ufffd(\ufffd\ufffdG\ufffd\ufffd\ufffd\ufffd,\ufffd\ufffd\ufffd\ufffd\ufffd2\ufffd\ufffd-)\ufffd\ufffd,\ufffd^\u0743\ufffd\ufffd%td\ufffd\ufffd\ufffd\ufffdE\ufffdR\ufffd\ufffd\ufffd\u0737|\ufffd\ufffdD\ufffd\ufffd>\ufffd\ufffd#\ufffd\ufffd\ufffd\\\ufffd\ufffdEC\ufffd\ufffduk\ufffdOs[TwW\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd/\ufffd\ufffd\ufffdyh7px\ufffd\ufffd\ufffdt\u01b31\ufffd\ufffdv\ufffdvbH\ufffdvw\ufffd\ufffd\ufffd\u021b\ufffdY\ufffd\ufffd|\ufffd\ufffd:\ufffd\u06c2\u02d7C\ufffd\ufffd\ufffds\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdM\ufffdU\ufffdQh''w'\ufffd\ufffd\ufffd\ufffdQ\ufffd\ufffd}|\ufffdN\u0366q3,O\u05e3\u02fe['Go.4\ufffdG\ufffd\ufffd&,C\ufffdIYe\ufffd\ufffd.{kB\ufffd\ufffd\ufffd\u0444\ufffd\ufffdnA\ufffdp:c\ufffd\ufffd^\ufffd-V\ufffd\ufffdFOS\ufffd\ufffd\ufffdw|/(r9H\ufffd\ufffd\u079d)\ufffdh:\ufffd\ufffd\ufffd\u66d0Ql\ufffd i\ufffd\u0123c\ufffd\ufffdE\ufffd3\ufffdy&\"Pw\ufffd\ufffdy\ufffdG\ufffd\ufffd:n\ufffd\ufffd\ufffdq(|%\ufffd\ufffd\u0658|;|\u0625\ufffdJ>\ufffd(\ufffd\u03d0\ufffd\ufffd\ufffdo/.\ufffd\ufffd\ufffd\ufffd\ufffd/?~$\ufffd<'\u0414\ufffd<\ufffd\ufffdG?\u03c3\u0173\ufffd\ufffd\ufffd\ufffd \ufffd\u05afQ\ufffd\ufffd$~\ufffd\ufffdM\ufffd\ufffdp\ufffdE\ufffdpx\ufffdLc4\ufffd\ufffd\ufffd\ufffd\ufffd!\ufffd@yz&\ufffd,\ufffdu\ufffd\ufffdq\ufffd\ufffd\ufffdz\ufffd\ufffdB\ufffd\ufffd\ufffd\ufffd\ufffdU\ufffdbc\ufffdxk\ufffd>"
+                        ".http://www.digicert.com/ssl-cps-repository.htm0"
                     ]
                 },
                 {
@@ -14117,7 +14117,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
                     "data_type": "string",
                     "example_values": [
-                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Test-CryptoAPI/6.1\nHost: ocsp.pki.goog"
+                        "GET /gsr2/EXAMPLEDBKMEgwRjAJBgUrDgMCGgTESTXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJoEXAMPLEQHjtJqhjYqpgSVpULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: */*<br>User-Agent: Test-CryptoAPI/6.1<br>Host: ocsp.pki.goog"
                     ]
                 },
                 {
@@ -14383,7 +14383,7 @@
                     "data_path": "action_result.data.*.sandbox.*.signatures.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "\"21X.5X.1XX.6X:4XX\"\n \"21X.5X.1XX.1XX:8X\"\n \"1XX.X1X.1XX.1XX:4XX\"\n \"1XX.2XX.X.4X:4XX\"\n \"1XX.2XX.X.6X:4XX\"\n \"2XX.5X.1XX.6X:4XX\"\n \"1XX.2XX.1XX.1XX:4XX\""
+                        "\"21X.5X.1XX.6X:4XX\"<br> \"21X.5X.1XX.1XX:8X\""
                     ]
                 },
                 {
@@ -15435,7 +15435,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
                     "data_type": "string",
                     "example_values": [
-                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Test-CryptoAPI/10.0\nHost: ocsp.pki.goog"
+                        "GET /gsr2/TESTMEgwRjAJBgUrDgMCGgUABBTgXIsxbvEXAMPLEkIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqTESTULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: */*<br>User-Agent: Test-CryptoAPI/10.0<br>Host: ocsp.pki.goog"
                     ]
                 },
                 {
@@ -16671,7 +16671,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
                     "data_type": "string",
                     "example_values": [
-                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Test-CryptoAPI/10.0\nHost: ocsp.pki.goog"
+                        "GET /gsr2/EXAMPLEMEgwRjAJBgUrDgMCGgUABBTgXTEST2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBtTESTt39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: */*<br>User-Agent: Test-CryptoAPI/10.0<br>Host: ocsp.pki.goog"
                     ]
                 },
                 {

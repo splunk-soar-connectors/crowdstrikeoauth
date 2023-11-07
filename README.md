@@ -6,7 +6,7 @@ Connector Version: 4.1.0
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.5.0  
+Minimum Product Version: 6.0.2  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
@@ -15,6 +15,70 @@ This app integrates with CrowdStrike OAuth2 authentication standard to implement
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
+## Steps to create API clients and key
+
+- In Falcon UI, Go to menubar on the left, From **Support and resources** section, Select **API clients and keys**.
+- Click on **Create API client**.
+- Add **Client name**, **Description(optional)** and [Scopes](#minimal-required-scopes-to-run-all-actions) (defined below).
+- Click on **Create** to obtain the **Client ID** and **Client secret**.
+
+## Minimal required scope(s) (Action wise)
+| **Action**                                                  | **Required Scope(s)**          | **Read**             | **Write**            |
+|-------------------------------------------------------------|--------------------------------|----------------------|----------------------|
+| [test connectivity](#action-test-connectivity)              | Hosts                          | &check;              | &cross;              |
+| [query device](#action-query-device)                        | Hosts                          | &check;              | &cross;              |
+| [list groups](#action-list-groups)                          | Host Groups                    | &check;              | &cross;              |
+| [quarantine device](#action-quarantine-device)              | Hosts                          | &check;              | &check;              |
+| [unquarantine device](#action-unquarantine-device)          | Hosts                          | &check;              | &check;              |
+| [assign hosts](#action-assign-hosts)                        | Hosts <br> Hosts Group         | &check; <br> &cross; | &cross; <br> &check; |
+| [remove hosts](#action-remove-hosts)                        | Hosts <br> Hosts Group         | &check; <br> &cross; | &cross; <br> &check; |
+| [create session](#action-create-session)                    | Real time response(RTR)        | &check;              | &cross;              |
+| [delete session](#action-delete-session)                    | Real time response(RTR)        | &check;              | &cross;              |
+| [list detections](#action-list-detections)                  | Detections                     | &check;              | &cross;              |
+| [get detections details](#action-get-detections-details)    | Detections                     | &check;              | &cross;              |
+| [update detections](#action-update-detections)              | Detections                     | &cross;              | &check;              |
+| [list alerts](#action-list-alerts)                          | Alerts                         | &check;              | &cross;              |
+| [list sessions](#action-list-sessions)                      | Real time response(RTR)        | &check;              | &cross;              |
+| [run command](#action-run-command)                          | Real time response(RTR)        | &check;              | &cross;              |
+| [run admin command](#action-run-admin-command)              | Real time response(admin)      | &cross;              | &check;              |
+| [get command details](#action-get-command-details)          | Real time response(RTR)        | &cross;              | &check;              |
+| [list session files](#action-list-session-files)            | Real time response(RTR)        | &cross;              | &check;              |
+| [get incident behaviors](#action-get-incident-behaviors)    | Incidents                      | &check;              | &cross;              |
+| [update incident](#action-update-incident)                  | Incidents                      | &cross;              | &check;              |
+| [list users](#action-list-users)                            | User Management                | &check;              | &cross;              |
+| [get user roles](#action-get-user-roles)                    | User Management                | &check;              | &cross;              |
+| [list roles](#action-list-roles)                            | User Management                | &check;              | &cross;              |
+| [get role](#action-get-role)                                | User Management                | &check;              | &cross;              |
+| [list crowdscores](#action-list-crowdscores)                | Incidents                      | &check;              | &cross;              |
+| [get incident details](#action-get-incident-details)        | Incidents                      | &check;              | &cross;              |
+| [list incident behaviors](#action-list-incident-behaviors)  | Incidents                      | &check;              | &cross;              |
+| [list incidents](#action-list-incidents)                    | Incidents                      | &check;              | &cross;              |
+| [get session file](#action-get-session-file)                | Real time response(RTR)        | &cross;              | &check;              |
+| [set status](#action-set-status)                            | Detections                     | &cross;              | &check;              |
+| [get system info](#action-get-system-info)                  | Hosts                          | &check;              | &cross;              |
+| [get process detail](#action-get-process-detail)            | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [hunt file](#action-hunt-file)                              | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [hunt domain](#action-hunt-domain)                          | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [hunt ip](#action-hunt-ip)                                  | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [upload put file](#action-upload-put-file)                  | Real time response             | &cross;              | &check;              |
+| [get indicator](#action-get-indicator)                      | IOC Management                 | &check;              | &cross;              |
+| [list custom indicators](#action-list-custom-indicators)    | IOC Management                 | &check;              | &cross;              |
+| [list put files](#action-list-put-files)                    | Real time response(admin)      | &cross;              | &check;              |
+| [on poll](#action-on-poll)                                  | Event Stream                   | &check;              | &cross;              |
+| [list processes](#action-list-processes)                    | IOCs                           | &check;              | &cross;              |
+| [upload indicator](#action-upload-indicator)                | IOC Management                | &cross;              | &check;              |
+| [delete indicator](#action-delete-indicator)                | IOC Management                | &check;              | &check;              |
+| [update indicator](#action-update-indicator)                | IOC Management                | &cross;              | &check;              |
+| [file reputation](#action-file-reputation)                  | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [url reputation](#action-url-reputation)                    | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [download report](#action-download-report)                  | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [detonate file](#action-detonate-file)                      | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [detonate url](#action-detonate-url)                        | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [check status](#action-check-status)                        | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [get device scroll](#action-get-device-scroll)              | Hosts                          | &check;              | &cross;              |
+| [get zta data](#action-get-zta-data)                        | Zero Trust Assessment          | &check;              | &cross;              |
+
+
 ## Preprocess Script
 
 The user can add a script file in the configuration parameter \[ **Script with functions to
@@ -24,57 +88,60 @@ error.
 
 ## App ID
 
-- Optionally, you can specify an **App ID** to be used with the Crowdstrike OAuth API used in the on
-  poll action. If one isn't set, it will default to the asset ID.
-- It is recommended to have a unique **App ID** for each connection to the Crowdstrike OAuth API.
-  That is to say, if you are planning on having multiple assets using the Crowdstrike OAuth API at
-  once, you should give them unique App IDs.
+-   Optionally, you can specify an **App ID** to be used with the Crowdstrike OAuth API used in the
+    on poll action. If one isn't set, it will default to the asset ID.
+-   It is recommended to have a unique **App ID** for each connection to the Crowdstrike OAuth API.
+    That is to say, if you are planning on having multiple assets using the Crowdstrike OAuth API at
+    once, you should give them unique App IDs.
 
 ## On Poll
 
-- Common points for both manual and scheduled interval polling
-  - Default parameters of the On Poll action are ignored in the app. i.e. start_time, end_time,
-    container_count, artifact_count
-  - The app will fetch all the events based on the value specified in the configuration parameters
-    \[Maximum events to get while POLL NOW\] (default 2000 if not specified) and \[Maximum events to
-    get while scheduled and interval polling\] (default 10,000 if not specified). For ingestion, the
-    events are fetched after filtering them based on the event type - **DetectionSummaryEvent** .
-    The app will exit from the polling cycle in the below-mentioned 2 cases whichever is earlier.
-    - If the total DetectionSummaryEvents fetched equals the value provided in the \[Maximum events
-      to get while POLL NOW\] (for manual polling) or \[Maximum events to get while scheduled and
-      interval polling\] (for scheduled | interval polling) parameters
-    - If the total number of continuous blank lines encountered while streaming the data equals the
-      value provided in the \[Maximum allowed continuous blank lines\] (default 50 if not specified)
-      asset configuration parameter
-  - The default behavior of the app is that each event will be placed in its container. By checking
-    the configuration parameter \[Merge containers for Hostname and Eventname\] as well as
-    specifying an interval in the configuration parameter \[Merge same containers within specified
-    seconds\], all events which are of the same type and on the same host will be put into one
-    container, as long as the time between those two events is less than the interval.
-  - The \[Maximum allowed continuous blank lines\] asset configuration parameter will be used to
-    indicate the allowed number of continuous blank lines while fetching **DetectionSummaryEvents**
-    . For example, of the entire data of the DetectionSummaryEvents, some of the
-    'DetectionSummaryEvents' exists after 100 continuous blank lines and if you've set the \[Maximum
-    allowed continues blank lines\] parameter value to 500, it will keep on ingesting all the
-    'DetectionSummaryEvents' until the code gets 500 continuous blank lines and hence, it will be
-    able to cover the DetectionSummaryEvents successfully even after the 100 blank lines. If you set
-    it to 50, it will break after the 50th blank line is encountered. Hence, it won't be able to
-    ingest the events which exist after the 100 continuous blank lines because the code considers
-    that after the configured value in the \[Maximum allowed continuous blank lines\] configuration
-    parameter (here 50), there is no data available for the 'DetectionSummaryEvents'.
-- Manual Polling
-  - During manual poll now, the app starts from the first event that it can query up to the value
-    configured in the configuration parameter \[Maximum events to get while POLL NOW\] and creates
-    artifacts for all the fetched DetectionSummaryEvents. The last queried event's offset ID will
-    not be remembered in Manual POLL NOW and it fetches everything every time from the beginning.
-- Scheduled | Interval Polling
-  - During scheduled | interval polling, the app starts from the first event that it can query up
-    to the value configured in the configuration parameter \[Maximum events to get while scheduled
-    and interval polling\] and creates artifacts for all the fetched DetectionSummaryEvents. Then,
-    it remembers the last event's offset ID and stores it in the state file against the key
-    \[last_offset_id\]. In the next scheduled poll run, it will start from the stored offset ID in
-    the state file and will fetch the maximum events as configured in the \[Maximum events to get
-    while scheduled and interval polling\] parameter.
+-   Common points for both manual and scheduled interval polling
+    -   Default parameters of the On Poll action are ignored in the app. i.e. start_time, end_time,
+        container_count, artifact_count
+    -   The app will fetch all the events based on the value specified in the configuration
+        parameters \[Maximum events to get while POLL NOW\] (default 2000 if not specified) and
+        \[Maximum events to get while scheduled and interval polling\] (default 10,000 if not
+        specified). For ingestion, the events are fetched after filtering them based on the event
+        type - **DetectionSummaryEvent** . The app will exit from the polling cycle in the
+        below-mentioned 2 cases whichever is earlier.
+        -   If the total DetectionSummaryEvents fetched equals the value provided in the \[Maximum
+            events to get while POLL NOW\] (for manual polling) or \[Maximum events to get while
+            scheduled and interval polling\] (for scheduled | interval polling) parameters
+        -   If the total number of continuous blank lines encountered while streaming the data
+            equals the value provided in the \[Maximum allowed continuous blank lines\] (default 50
+            if not specified) asset configuration parameter
+    -   The default behavior of the app is that each event will be placed in its container. By
+        checking the configuration parameter \[Merge containers for Hostname and Eventname\] as well
+        as specifying an interval in the configuration parameter \[Merge same containers within
+        specified seconds\], all events which are of the same type and on the same host will be put
+        into one container, as long as the time between those two events is less than the interval.
+    -   The \[Maximum allowed continuous blank lines\] asset configuration parameter will be used to
+        indicate the allowed number of continuous blank lines while fetching
+        **DetectionSummaryEvents** . For example, of the entire data of the DetectionSummaryEvents,
+        some of the 'DetectionSummaryEvents' exists after 100 continuous blank lines and if you've
+        set the \[Maximum allowed continues blank lines\] parameter value to 500, it will keep on
+        ingesting all the 'DetectionSummaryEvents' until the code gets 500 continuous blank lines
+        and hence, it will be able to cover the DetectionSummaryEvents successfully even after the
+        100 blank lines. If you set it to 50, it will break after the 50th blank line is
+        encountered. Hence, it won't be able to ingest the events which exist after the 100
+        continuous blank lines because the code considers that after the configured value in the
+        \[Maximum allowed continuous blank lines\] configuration parameter (here 50), there is no
+        data available for the 'DetectionSummaryEvents'.
+-   Manual Polling
+    -   During manual poll now, the app starts from the first event that it can query up to the
+        value configured in the configuration parameter \[Maximum events to get while POLL NOW\] and
+        creates artifacts for all the fetched DetectionSummaryEvents. The last queried event's
+        offset ID will not be remembered in Manual POLL NOW and it fetches everything every time
+        from the beginning.
+-   Scheduled | Interval Polling
+    -   During scheduled | interval polling, the app starts from the first event that it can query
+        up to the value configured in the configuration parameter \[Maximum events to get while
+        scheduled and interval polling\] and creates artifacts for all the fetched
+        DetectionSummaryEvents. Then, it remembers the last event's offset ID and stores it in the
+        state file against the key \[last_offset_id\]. In the next scheduled poll run, it will start
+        from the stored offset ID in the state file and will fetch the maximum events as configured
+        in the \[Maximum events to get while scheduled and interval polling\] parameter.
 
 The **DetectionSummaryEvent** is parsed to extract the following values into an Artifact.  
 
@@ -92,12 +159,12 @@ The **DetectionSummaryEvent** is parsed to extract the following values into an 
 
 The app also parses the following **sub-events** into their own artifacts.  
 
-- Documents Accessed
-- Executables Written
-- Network Access
-- Scan Result
-- Quarantine Files
-- DNS Requests
+-   Documents Accessed
+-   Executables Written
+-   Network Access
+-   Scan Result
+-   Quarantine Files
+-   DNS Requests
 
 Each of the sub-events has a CEF key called **parentSdi** which stands for Parent Source Data
 Identifier. This is the value of the SDI of the main event that the sub-events were generated from.
@@ -106,180 +173,184 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
 
 **This is different from Falcon Sandbox.**
 
-- **Action -** File Reputation, Url reputation
+-   **Action -** File Reputation, Url reputation
 
 <!-- -->
 
-- Report of the resource will be fetched if it has been detonated previously on the CrowdStrike
-  Server otherwise no data found message will be displayed to the user.
+-   Report of the resource will be fetched if it has been detonated previously on the CrowdStrike
+    Server otherwise no data found message will be displayed to the user.
 
 <!-- -->
 
-- **Action -** Download Report
+-   **Action -** Download Report
 
 <!-- -->
 
-- This action will download the resource report based on the provided artifact ID. Currently, we
-  support the following Strict IOC CSV, Strict IOC JSON, Strict IOC STIX2.1, Strict IOC MAEC5.0,
-  Broad IOC CSV, Broad IOC JSON, Broad IOC STIX2.1, Broad IOC MAEC5.0, Memory Strings, Icon,
-  Screenshot artifact IDs.
+-   This action will download the resource report based on the provided artifact ID. Currently, we
+    support the following Strict IOC CSV, Strict IOC JSON, Strict IOC STIX2.1, Strict IOC MAEC5.0,
+    Broad IOC CSV, Broad IOC JSON, Broad IOC STIX2.1, Broad IOC MAEC5.0, Memory Strings, Icon,
+    Screenshot artifact IDs.
 
 <!-- -->
 
-- **Action -** Detonate File
+-   **Action -** Detonate File
 
 <!-- -->
 
-- This action will upload the given file to the CrowdStrike sandbox and will submit it for analysis
-  with the entered environment details. If the report of the given file is already present with the
-  same environment, it will fetch the result and the file won't be submitted again.
-- If the analysis is in progress and reaches the time entered in the detonate_timeout parameter,
-  then this action will return the resource_id of the submitted file using which the submission
-  status can be checked.
-- If the submitted file will be analyzed within the entered time in the detonate_timeout parameter,
-  its report will be fetched. Currently, these file types are supported .exe, .scr, .pif, .dll,
-  .com, .cpl, etc., .doc, .docx, .ppt, .pps, .pptx, .ppsx, .xls, .xlsx, .rtf, .pub, .pdf, Executable
-  JAR, .sct, .lnk, .chm, .hta, .wsf, .js, .vbs, .vbe, .swf, pl, .ps1, .psd1, .psm1, .svg, .py, Linux
-  ELF executables, .eml, .msg.
+-   This action will upload the given file to the CrowdStrike sandbox and will submit it for
+    analysis with the entered environment details. If the report of the given file is already
+    present with the same environment, it will fetch the result and the file won't be submitted
+    again.
+-   If the analysis is in progress and reaches the time entered in the detonate_timeout parameter,
+    then this action will return the resource_id of the submitted file using which the submission
+    status can be checked.
+-   If the submitted file will be analyzed within the entered time in the detonate_timeout
+    parameter, its report will be fetched. Currently, these file types are supported .exe, .scr,
+    .pif, .dll, .com, .cpl, etc., .doc, .docx, .ppt, .pps, .pptx, .ppsx, .xls, .xlsx, .rtf, .pub,
+    .pdf, Executable JAR, .sct, .lnk, .chm, .hta, .wsf, .js, .vbs, .vbe, .swf, pl, .ps1, .psd1,
+    .psm1, .svg, .py, Linux ELF executables, .eml, .msg.
 
 <!-- -->
 
-- **Action -** Detonate Url
+-   **Action -** Detonate Url
 
 <!-- -->
 
-- This action will submit the given URL for analysis with the entered environment details. If the
-  report of the given URL is already present with the same environment, it will fetch the result and
-  the url won't be submitted again.
-- If the analysis is in progress and it reaches the time entered in the detonate_timeout parameter,
-  then this action will return the resource_id of the submitted URL using which the status of the
-  submission can be checked. If the analysis status is running then do not re-run the detonate URL
-  action, otherwise, the URL will be again submitted for the analysis.
-- If the submitted URL will be analyzed within the entered time in the detonate_timeout parameter,
-  its report will be fetched. Currently, 3 domains of URL are supported http, https, and ftp.
+-   This action will submit the given URL for analysis with the entered environment details. If the
+    report of the given URL is already present with the same environment, it will fetch the result
+    and the url won't be submitted again.
+-   If the analysis is in progress and it reaches the time entered in the detonate_timeout
+    parameter, then this action will return the resource_id of the submitted URL using which the
+    status of the submission can be checked. If the analysis status is running then do not re-run
+    the detonate URL action, otherwise, the URL will be again submitted for the analysis.
+-   If the submitted URL will be analyzed within the entered time in the detonate_timeout parameter,
+    its report will be fetched. Currently, 3 domains of URL are supported http, https, and ftp.
 
 <!-- -->
 
-- **Action -** Check Status
+-   **Action -** Check Status
 
 <!-- -->
 
-- This action will return the status of the given resource_id in case of timeout in detonate file
-  and detonate URL actions.
+-   This action will return the status of the given resource_id in case of timeout in detonate file
+    and detonate URL actions.
 
 ## Notes
 
-- **Action -** List Groups
+-   **Action -** List Groups
 
 <!-- -->
 
-- The filter parameter values follow the <a
-  href="https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-fql-reference"
-  target="_blank">FQL Syntax</a> .
-- The sort parameter value has to be provided in the format property_name.asc for ascending and
-  property_name.desc for descending order.
+-   The filter parameter values follow the [FQL
+    Syntax](https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-fql-reference)
+    .
+-   The sort parameter value has to be provided in the format property_name.asc for ascending and
+    property_name.desc for descending order.
 
   
 
-- **Action -** Query Device
+-   **Action -** Query Device
 
 <!-- -->
 
-- Both the filter and sort parameters follow the same concepts as mentioned above for the list
-  groups action.
+-   Both the filter and sort parameters follow the same concepts as mentioned above for the list
+    groups action.
 
   
 
-- **Action -** Assign Hosts, Remove Hosts, Quarantine Device, and Unquarantine Device
+-   **Action -** Assign Hosts, Remove Hosts, Quarantine Device, and Unquarantine Device
 
 <!-- -->
 
-- The devices will be fetched based on the values provided in both the device_id and hostname
-  parameters.
-- If an incorrect value is provided in both the device_id and hostname parameters each, then, the
-  action will fail with an appropriate error message.
+-   The devices will be fetched based on the values provided in both the device_id and hostname
+    parameters.
+-   If an incorrect value is provided in both the device_id and hostname parameters each, then, the
+    action will fail with an appropriate error message.
 
 <!-- -->
 
-- **Action -** List Session Files, Get Session File
+-   **Action -** List Session Files, Get Session File
 
 <!-- -->
 
-- To add \[session id\] to the action parameters of these actions, a session with the Create Session
-  action needs to be created. Also, the user can delete the session using the Delete Session action.
+-   To add \[session id\] to the action parameters of these actions, a session with the Create
+    Session action needs to be created. Also, the user can delete the session using the Delete
+    Session action.
 
   
 
-- **Action -** Run Command
+-   **Action -** Run Command
 
 <!-- -->
 
-- This action can run the below-mentioned RTR commands on the host:
-  - cat
-  - cd
-  - env
-  - eventlog
-  - filehash
-  - getsid
-  - ipconfig
-  - ls
-  - mount
-  - netstat
-  - ps
-  - reg query
-- To add \[session id\] to the action parameters of these actions, a session with the Create Session
-  action needs to be created. Also, the user can delete the session using the Delete Session action.
-- Example action run: If "cd C:\some_directory" command needs to be run using this action, valid
-  \[device_id\] and \[session_id\] parameters should be provided by the user. The user should select
-  "cd" from the \[command\] dropdown parameter and provide "C:\some_directory" input in the \[data\]
-  parameter.
+-   This action can run the below-mentioned RTR commands on the host:
+    -   cat
+    -   cd
+    -   env
+    -   eventlog
+    -   filehash
+    -   getsid
+    -   ipconfig
+    -   ls
+    -   mount
+    -   netstat
+    -   ps
+    -   reg query
+-   To add \[session id\] to the action parameters of these actions, a session with the Create
+    Session action needs to be created. Also, the user can delete the session using the Delete
+    Session action.
+-   Example action run: If "cd C:\\some_directory" command needs to be run using this action, valid
+    \[device_id\] and \[session_id\] parameters should be provided by the user. The user should
+    select "cd" from the \[command\] dropdown parameter and provide "C:\\some_directory" input in
+    the \[data\] parameter.
 
 <!-- -->
 
-- **Action -** Run Admin Command
+-   **Action -** Run Admin Command
 
 <!-- -->
 
-- This action can run the below-mentioned RTR administrator commands on the host:
-  - cat
-  - cd
-  - cp
-  - encrypt
-  - env
-  - eventlog
-  - filehash
-  - get
-  - getsid
-  - ipconfig
-  - kill
-  - ls
-  - map
-  - memdump
-  - mkdir
-  - mount
-  - mv
-  - netstat
-  - ps
-  - put
-  - reg query
-  - reg set
-  - reg delete
-  - reg load
-  - reg unload
-  - restart
-  - rm
-  - run
-  - runscript
-  - shutdown
-  - unmap
-  - xmemdump
-  - zip
-- To add \[session id\] to the action parameters of these actions, a session with the Create Session
-  action needs to be created. Also, the user can delete the session using the Delete Session action.
-- Example action run: If "cd C:\some_directory" command needs to be run using this action, valid
-  \[device_id\] and \[session_id\] parameters should be provided by the user. The user should select
-  "cd" from the \[command\] dropdown parameter and provide "C:\some_directory" input in the \[data\]
-  parameter.
+-   This action can run the below-mentioned RTR administrator commands on the host:
+    -   cat
+    -   cd
+    -   cp
+    -   encrypt
+    -   env
+    -   eventlog
+    -   filehash
+    -   get
+    -   getsid
+    -   ipconfig
+    -   kill
+    -   ls
+    -   map
+    -   memdump
+    -   mkdir
+    -   mount
+    -   mv
+    -   netstat
+    -   ps
+    -   put
+    -   reg query
+    -   reg set
+    -   reg delete
+    -   reg load
+    -   reg unload
+    -   restart
+    -   rm
+    -   run
+    -   runscript
+    -   shutdown
+    -   unmap
+    -   xmemdump
+    -   zip
+-   To add \[session id\] to the action parameters of these actions, a session with the Create
+    Session action needs to be created. Also, the user can delete the session using the Delete
+    Session action.
+-   Example action run: If "cd C:\\some_directory" command needs to be run using this action, valid
+    \[device_id\] and \[session_id\] parameters should be provided by the user. The user should
+    select "cd" from the \[command\] dropdown parameter and provide "C:\\some_directory" input in
+    the \[data\] parameter.
 
 ## Port Information
 
@@ -293,19 +364,19 @@ default ports used by Splunk SOAR.
 
 ## Playbook Backward Compatibility
 
-- The output data-paths have been updated in the below-existing action. Hence, it is requested to
-  update existing playbooks created in the earlier versions of the app by re-inserting | modifying
-  | deleting the corresponding action blocks.
-
-    
-
-  - list users - Below output data-paths have been updated.
+-   The output data-paths have been updated in the below-existing action. Hence, it is requested to
+    update existing playbooks created in the earlier versions of the app by re-inserting |
+    modifying | deleting the corresponding action blocks.
 
       
 
-    - Updated name from 'customer' to 'cid'
-    - Updated name from 'firstName' to 'first_name'
-    - Updated name from 'lastName' to 'last_name'
+    -   list users - Below output data-paths have been updated.
+
+          
+
+        -   Updated name from 'customer' to 'cid'
+        -   Updated name from 'firstName' to 'first_name'
+        -   Updated name from 'lastName' to 'last_name'
 
 
 ### Configuration Variables
@@ -716,10 +787,7 @@ action_result.data.\*.resources.\*.scripts.\*.args.\*.sequence | numeric |  |   
 action_result.data.\*.resources.\*.scripts.\*.args.\*.updated_at | string |  |   2019-06-25T23:48:59Z 
 action_result.data.\*.resources.\*.scripts.\*.command | string |  |   cat 
 action_result.data.\*.resources.\*.scripts.\*.description | string |  |   Read a file from disk and display as ASCII or hex 
-action_result.data.\*.resources.\*.scripts.\*.examples | string |  `file path`  |       C:\\> cat c:\\mytextfile.txt
-        Display the contents of the text file (ASCII encoding)
-    C:\\> cat c:\\windows\\system32\\cmd.exe 100 -ShowHex
-        Display the first 100 hexadecimal characters for cmd.exe 
+action_result.data.\*.resources.\*.scripts.\*.examples | string |  `file path`  |       C:\\> cat c:\\mytextfile.txt<br>        Display the contents of the text file (ASCII encoding)<br>    C:\\> cat c:\\windows\\system32\\cmd.exe 100 -ShowHex<br>        Display the first 100 hexadecimal characters for cmd.exe 
 action_result.data.\*.resources.\*.scripts.\*.internal_only | boolean |  |   True  False 
 action_result.data.\*.resources.\*.scripts.\*.runnable | boolean |  |   True  False 
 action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.arg_name | string |  |   Name 
@@ -739,8 +807,7 @@ action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.sequence |
 action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.updated_at | string |  |   2018-05-01T19:38:30Z 
 action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.command | string |  |   view 
 action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.description | string |  |   View most recent N events in a given event log 
-action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.examples | string |  |       C:\\> eventlog view Application 5
-        Displays the 5 most recent event log entries in the "Application" event source log 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.examples | string |  |       C:\\> eventlog view Application 5<br>        Displays the 5 most recent event log entries in the "Application" event source log 
 action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.internal_only | boolean |  |   True  False 
 action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.runnable | boolean |  |   True  False 
 action_result.data.\*.resources.\*.session_id | string |  `crowdstrike rtr session id`  |   c0ab8e89-edb0-485f-a8ee-b52d73453a4b 
@@ -1200,9 +1267,7 @@ action_result.data.\*.resources.\*.base_command | string |  |   ls
 action_result.data.\*.resources.\*.complete | boolean |  |   True  False 
 action_result.data.\*.resources.\*.session_id | string |  |   9705111a-9928-4c10-b385-eefda32f9575 
 action_result.data.\*.resources.\*.stderr | string |  |   Check your filename. Couldn't find 'some_file.txt' 
-action_result.data.\*.resources.\*.stdout | string |  |   Directory listing for C:\\ -
-
-Name 
+action_result.data.\*.resources.\*.stdout | string |  |   Directory listing for C:\\ - <br>Name 
 action_result.data.\*.resources.\*.task_id | string |  |   d901dbea-f556-4f32-921b-056bbc00b4e0 
 action_result.summary.cloud_request_id | string |  `crowdstrike cloud request id`  |   4b185028-39a3-4452-8e96-6da3729095fa 
 action_result.message | string |  |   Cloud request id: d901dbea-f556-4f32-921b-056bbc00b4e0 
@@ -1240,9 +1305,7 @@ action_result.data.\*.resources.\*.base_command | string |  |   ls
 action_result.data.\*.resources.\*.complete | boolean |  |   True  False 
 action_result.data.\*.resources.\*.session_id | string |  |   9705111a-9928-4c10-b385-eefda32f9575 
 action_result.data.\*.resources.\*.stderr | string |  |   Check your filename. Couldn't find 'some_file.txt' 
-action_result.data.\*.resources.\*.stdout | string |  |   Directory listing for C:\\ -
-
-Name 
+action_result.data.\*.resources.\*.stdout | string |  |   Directory listing for C:\\ - <br>Name 
 action_result.data.\*.resources.\*.task_id | string |  |   d901dbea-f556-4f32-921b-056bbc00b4e0 
 action_result.summary.cloud_request_id | string |  `crowdstrike cloud request id`  |   4b185028-39a3-4452-8e96-6da3729095fa 
 action_result.message | string |  |   Cloud request id: d901dbea-f556-4f32-921b-056bbc00b4e0 
@@ -1274,9 +1337,7 @@ action_result.data.\*.resources.\*.base_command | string |  |   ls
 action_result.data.\*.resources.\*.complete | boolean |  |   True  False 
 action_result.data.\*.resources.\*.session_id | string |  |   9705111a-9928-4c10-b385-eefda32f9575 
 action_result.data.\*.resources.\*.stderr | string |  |   Check your filename. Couldn't find 'some_file.txt' 
-action_result.data.\*.resources.\*.stdout | string |  |   Directory listing for C:\\ -
-
-Name 
+action_result.data.\*.resources.\*.stdout | string |  |   Directory listing for C:\\ - <br>Name 
 action_result.data.\*.resources.\*.task_id | string |  |   d901dbea-f556-4f32-921b-056bbc00b4e0 
 action_result.summary.results | string |  |   Successfully executed command 
 action_result.message | string |  |   Results: Successfully executed command 
@@ -2171,7 +2232,7 @@ action_result.data.\*.domain.\*.expired | boolean |  |   False
 action_result.data.\*.domain.\*.from_parent | boolean |  |   False 
 action_result.data.\*.domain.\*.host_groups.\* | string |  `crowdstrike host group id`  |   0491ecd214614b5ab3bca1037a15390b 
 action_result.data.\*.domain.\*.id | string |  `crowdstrike indicator id`  |   010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb 
-action_result.data.\*.domain.\*.metadata.filename | string |  |   esxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegfesxdrcftvgybhugvftcdrxcftvgybhugyvftcdrftvgybhunbgyvftcdrftvygbhubsdgvfyuegwwiqeqpdiheuifgwieugfhiuwgfhoiwuegfowiehfoqwiehqfuhwebufigqfoejqgfuquowegfywuhiqgbefygehfgyuegf 
+action_result.data.\*.domain.\*.metadata.filename | string |  |   EMAPLEMETADATAvftcdrxcftvgybhhubsdgvfyuegwwiqeqTESTuifgwieugfhiugybhugvftcdrxcftvgbhubsdgvfyuegwwiqeqpdiheuifgEXAMPLE 
 action_result.data.\*.domain.\*.mobile_action | string |  |   no_action 
 action_result.data.\*.domain.\*.modified_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
 action_result.data.\*.domain.\*.modified_on | string |  |   2021-09-15T09:52:27.651770437Z 
@@ -2604,19 +2665,15 @@ action_result.data.\*.sandbox.\*.extracted_files.\*.runtime_process | string |  
 action_result.data.\*.sandbox.\*.extracted_files.\*.sha1 | string |  `sha1`  |   48c1d47e4a23ebfd739aa86830842d1ead7ced59 
 action_result.data.\*.sandbox.\*.extracted_files.\*.sha256 | string |  `sha256`  |   c619f87556667f2c1799672d36d55172597f4fed158800d5622edc8abee930e8 
 action_result.data.\*.sandbox.\*.extracted_files.\*.threat_level_readable | string |  |   no specific threat 
-action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.filename | string |  |   789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.bin 
-action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.process | string |  |   789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.exe 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.filename | string |  |   EXAMPLEd6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2aTEST.bin 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.process | string |  |   EXAMPLEd6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2aTEST.exe 
 action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.source | string |  |   Memory/File Scan 
 action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.type | string |  |   Ansi 
 action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.value | string |  |   .http://www.digicert.com/ssl-cps-repository.htm0 
 action_result.data.\*.sandbox.\*.file_imports.\*.module | string |  |   mscoree.dll 
 action_result.data.\*.sandbox.\*.file_size | numeric |  |   224888 
 action_result.data.\*.sandbox.\*.file_type | string |  |   PE32 executable (console) Intel 80386 Mono/.Net assembly, for MS Windows 
-action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1
-Connection: Keep-Alive
-Accept: \*/\*
-User-Agent: Test-CryptoAPI/10.0
-Host: ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/TESTgwRjAJBgUrDgMCTESTBBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtEXAMPLEhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: \*/\*<br>User-Agent: Test-CryptoAPI/10.0<br>Host: ocsp.pki.goog 
 action_result.data.\*.sandbox.\*.http_requests.\*.host | string |  `domain`  `ip`  |   ocsp.pki.goog 
 action_result.data.\*.sandbox.\*.http_requests.\*.host_ip | string |  `ip`  |   1XX.2XX.1X.6X 
 action_result.data.\*.sandbox.\*.http_requests.\*.host_port | numeric |  `port`  |   80 
@@ -2661,7 +2718,7 @@ action_result.data.\*.sandbox.\*.processes.\*.uid | string |  |   00064737-00003
 action_result.data.\*.sandbox.\*.sha256 | string |  `sha256`  |   789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24 
 action_result.data.\*.sandbox.\*.signatures.\*.attack_id | string |  |   T1116 
 action_result.data.\*.sandbox.\*.signatures.\*.category | string |  |   General 
-action_result.data.\*.sandbox.\*.signatures.\*.description | string |  |   "<Input Sample>.exe" created file "%TEMP%\\329babfa-d618-4d17-a6b0-79fe02a2d94d\\AgileDotNetRT.dll" 
+action_result.data.\*.sandbox.\*.signatures.\*.description | string |  |   "example_input.exe" created file "%TEMP%\\329babfa-d618-4d17-a6b0-79fe02a2d94d\\AgileDotNetRT.dll" 
 action_result.data.\*.sandbox.\*.signatures.\*.identifier | string |  |   api-4 
 action_result.data.\*.sandbox.\*.signatures.\*.name | string |  |   Creates a writable file in a temporary directory 
 action_result.data.\*.sandbox.\*.signatures.\*.origin | string |  |   API Call 
@@ -2773,13 +2830,9 @@ action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.filename | str
 action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.process | string |  |   iexplore.exe 
 action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.source | string |  |   Decrypted SSL Data 
 action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.type | string |  |   Ansi 
-action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.value | string |  |   "!��\\����|�A%K�⳰#�B��w�RГ��@�J�J�>ȓJ����Z��Y���_1+�8'�S��/�Ɋy���w]�\*e����|H�9�l�N�k�rN�+܈�� ��UB�������FT���v}�9,��^%����������,4�`pa�����%m���l$���|OY�@`�^(�\*�^B�2`�10�S�����`��j;H�#Uq���=��?���9�b|����Z�u�d�F��0=h�����]}ene����Jp�ͬ/w��Ō�d�R�(|�di�y:��D[�ä��,�P �G�@<�bC�N�^\*+f�n�r2�����fq~��6��$�>�<��qF�S9�W'+��r��G�e�o���w8/�%�y�/���H��1�c{�#��|8��3�~up�nޝ��Or�!�;r�JJ�3��wb��(��G����,�����2��-)��,�^݃��%td����E�R���ܷ|��D��>��#���\\��EC��uk�Os[TwW������/���yh7px���tƳ1��v�vbH�vw���ț�Y��|��:�ۂ˗C���s������M�U�Qh''w'����Q��}|�Nͦq3,Oף˾['Go.4�G��&,C�IYe��.{kB���ф��nA�p:c��^�-V��FOS���w|/(r9H��ޝ)�h:���曐Ql� i�ģc��E�3�y&"Pw��y�G��:n���q(|%��٘|;|إ�J>�(�ϐ���o/.�����/?~$�<'Д�<��G?σų���� �֯Q��$~��M��p�E�px�Lc4�����!�@yz&�,�u��q���z��B�����U�bc�xk�> 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.value | string |  |   .http://www.digicert.com/ssl-cps-repository.htm0 
 action_result.data.\*.sandbox.\*.file_type | string |  |   PE32 executable (GUI) Intel 80386, for MS Windows, UPX compressed 
-action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1
-Connection: Keep-Alive
-Accept: \*/\*
-User-Agent: Test-CryptoAPI/6.1
-Host: ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/EXAMPLEDBKMEgwRjAJBgUrDgMCGgTESTXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJoEXAMPLEQHjtJqhjYqpgSVpULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: \*/\*<br>User-Agent: Test-CryptoAPI/6.1<br>Host: ocsp.pki.goog 
 action_result.data.\*.sandbox.\*.http_requests.\*.host | string |  |   ocsp.pki.goog 
 action_result.data.\*.sandbox.\*.http_requests.\*.host_ip | string |  `ip`  |   2XX.5X.1XX.1XX 
 action_result.data.\*.sandbox.\*.http_requests.\*.host_port | numeric |  `port`  |   80 
@@ -2814,13 +2867,7 @@ action_result.data.\*.sandbox.\*.processes.\*.uid | string |  |   00065605-00002
 action_result.data.\*.sandbox.\*.sha256 | string |  `sha256`  |   3cfc7f2806efb5b01deb01164fa00adb46eb73a0d24871a566051fb2204094af 
 action_result.data.\*.sandbox.\*.signatures.\*.attack_id | string |  |   T1085 
 action_result.data.\*.sandbox.\*.signatures.\*.category | string |  |   General 
-action_result.data.\*.sandbox.\*.signatures.\*.description | string |  |   "21X.5X.1XX.6X:4XX"
- "21X.5X.1XX.1XX:8X"
- "1XX.X1X.1XX.1XX:4XX"
- "1XX.2XX.X.4X:4XX"
- "1XX.2XX.X.6X:4XX"
- "2XX.5X.1XX.6X:4XX"
- "1XX.2XX.1XX.1XX:4XX" 
+action_result.data.\*.sandbox.\*.signatures.\*.description | string |  |   "21X.5X.1XX.6X:4XX"<br> "21X.5X.1XX.1XX:8X" 
 action_result.data.\*.sandbox.\*.signatures.\*.identifier | string |  |   network-1 
 action_result.data.\*.sandbox.\*.signatures.\*.name | string |  |   Contacts server 
 action_result.data.\*.sandbox.\*.signatures.\*.origin | string |  |   Network Traffic 
@@ -2979,11 +3026,7 @@ action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.value | string
 action_result.data.\*.sandbox.\*.file_imports.\*.module | string |  |   KERNEL32.dll 
 action_result.data.\*.sandbox.\*.file_size | numeric |  |   70595 
 action_result.data.\*.sandbox.\*.file_type | string |  |   SVG Scalable Vector Graphics image 
-action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1
-Connection: Keep-Alive
-Accept: \*/\*
-User-Agent: Test-CryptoAPI/10.0
-Host: ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/TESTMEgwRjAJBgUrDgMCGgUABBTgXIsxbvEXAMPLEkIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqTESTULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: \*/\*<br>User-Agent: Test-CryptoAPI/10.0<br>Host: ocsp.pki.goog 
 action_result.data.\*.sandbox.\*.http_requests.\*.host | string |  `hostname`  |   ocsp.pki.goog 
 action_result.data.\*.sandbox.\*.http_requests.\*.host_ip | string |  `ip`  |   1X2.2X7.13.67 
 action_result.data.\*.sandbox.\*.http_requests.\*.host_port | numeric |  `port`  |   80 
@@ -3154,11 +3197,7 @@ action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.type | string 
 action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.value | string |  |   "%WINDIR%\\system32\\ieframe.dll",OpenURL C:\\a3d7be9b5d8f9070d96789cdf7ee5ce2f1ee827f261faa0d43d4de605ad3194c.url 
 action_result.data.\*.sandbox.\*.file_size | numeric |  |   690028 
 action_result.data.\*.sandbox.\*.file_type | string |  |   PDF document, version 1.6 
-action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1
-Connection: Keep-Alive
-Accept: \*/\*
-User-Agent: Test-CryptoAPI/10.0
-Host: ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/EXAMPLEMEgwRjAJBgUrDgMCGgUABBTgXTEST2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBtTESTt39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: \*/\*<br>User-Agent: Test-CryptoAPI/10.0<br>Host: ocsp.pki.goog 
 action_result.data.\*.sandbox.\*.http_requests.\*.host | string |  `hostname`  |   ocsp.pki.goog 
 action_result.data.\*.sandbox.\*.http_requests.\*.host_ip | string |  `ip`  |   1XX.2XX.X.6X 
 action_result.data.\*.sandbox.\*.http_requests.\*.host_port | numeric |  |   80 

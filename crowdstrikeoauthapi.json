@@ -3078,7 +3078,7 @@
         },
         {
             "action": "get detections details",
-            "description": "Get a list of detections details by providing detection ID's",
+            "description": "Get a list of detections details by providing detection IDs",
             "type": "investigate",
             "identifier": "get_detections_details",
             "read_only": true,

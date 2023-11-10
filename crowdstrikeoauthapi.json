@@ -10126,7 +10126,7 @@
                     "data_path": "action_result.data.*.domain.*.metadata.filename",
                     "data_type": "string",
                     "example_values": [
-                        "EMAPLEMETADATAvftcdrxcftvgybhhubsdgvfyuegwwiqeqTESTuifgwieugfhiugybhugvftcdrxcftvgbhubsdgvfyuegwwiqeqpdiheuifgEXAMPLE"
+                        "EXAMPLEMETADATAvftcdrxcftvgybhhubsdgvfyuegwwiqeqTESTuifgwieugfhiugybhugvftcdrxcftvgbhubsdgvfyuegwwiqeqpdiheuifgEXAMPLE"
                     ]
                 },
                 {

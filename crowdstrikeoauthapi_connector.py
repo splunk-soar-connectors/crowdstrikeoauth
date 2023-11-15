@@ -1723,15 +1723,15 @@ class CrowdstrikeConnector(BaseConnector):
         }
 
         if assigned_to_user:
-            data.update({'assigned_to_uuid': assigned_to_user})
+            data['assigned_to_uuid'] = assigned_to_user
 
         if comment:
-            data.update({'comment': comment})
+            data['comment'] = comment
 
         if status:
             if status not in CROWDSTRIKE_DETECTION_STATUSES:
                 return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="status"))
-            data.update({'status': status})
+            data['status'] = status
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RESOLVE_DETECTION_APIPATH,
                                                                json_data=data, method="patch")

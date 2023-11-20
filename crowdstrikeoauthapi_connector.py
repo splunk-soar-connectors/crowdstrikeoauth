@@ -370,6 +370,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         return containers_processed
 
+    @staticmethod
+    def validate_comma_seperated_values(values):
+        return list(set(val.strip() for val in values.split(',') if val.strip()))
+
     def _paginator(self, action_result, endpoint, param=None):
         """
         This action is used to create an iterator that will paginate through responses from called methods.
@@ -1685,19 +1689,21 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = [det_id.strip() for det_id in param.get("detection_ids").split(',')]
-        ids = list(set(filter(None, ids)))
+        ids = self.validate_comma_seperated_values(param.get('detection_ids'))
         if not ids:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="ids"))
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM
+                                            .format(key="detection_ids"))
 
         data = {"ids": ids}
 
-        detection_details_list = self._get_details(action_result, CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT, data, method='post')
+        detection_details_list = self._get_details(action_result, CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT, data,
+                                                   method='post')
 
         if detection_details_list is None:
             return action_result.get_status()
 
-        [action_result.add_data(detection) for detection in detection_details_list]
+        for detection in detection_details_list:
+            action_result.add_data(detection)
 
         summary = action_result.update_summary({})
         summary['total_detections'] = len(detection_details_list)
@@ -1712,10 +1718,10 @@ class CrowdstrikeConnector(BaseConnector):
         comment = param.get('comment')
         show_in_ui = param.get('show_in_ui', True)
         status = param.get('status')
-        ids = [det_id.strip() for det_id in param.get("detection_ids").split(',')]
-        ids = list(set(filter(None, ids)))
+        ids = self.validate_comma_seperated_values(param.get('detection_ids'))
         if not ids:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="ids"))
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM
+                                            .format(key="detection_ids"))
 
         data = {
             'ids': ids,

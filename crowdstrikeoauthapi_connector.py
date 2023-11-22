@@ -33,6 +33,7 @@ from bs4 import BeautifulSoup, UnicodeDammit
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from phantom.vault import Vault
+from phantom_common import paths
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 import parse_cs_events as events_parser
@@ -3226,7 +3227,7 @@ class CrowdstrikeConnector(BaseConnector):
             vault_tmp_dir = Vault.get_vault_tmp_dir().rstrip('/')
             local_dir = '{}/{}'.format(vault_tmp_dir, guid)
         else:
-            local_dir = '/opt/phantom/vault/tmp/{}'.format(guid)
+            local_dir = os.path.join(paths.PHANTOM_VAULT, "tmp", str(guid))
 
         self.save_progress("Using temp directory: {0}".format(guid))
         self.debug_print("Using temp directory: {0}".format(guid))

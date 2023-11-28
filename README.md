@@ -6,7 +6,7 @@ Connector Version: 4.1.0
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.0.2  
+Minimum Product Version: 6.1.0  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
@@ -408,7 +408,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [create session](#action-create-session) - Initialize a new session with the Real Time Response cloud  
 [delete session](#action-delete-session) - Deletes a Real Time Response session  
 [list detections](#action-list-detections) - Get a list of detections  
-[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection ID's  
+[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection IDs  
 [update detections](#action-update-detections) - Update detections in crowdstrike host  
 [list alerts](#action-list-alerts) - Get a list of alerts  
 [list sessions](#action-list-sessions) - Lists Real Time Response sessions  
@@ -966,7 +966,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get detections details'
-Get a list of detections details by providing detection ID's
+Get a list of detections details by providing detection IDs
 
 Type: **investigate**  
 Read only: **True**
@@ -2232,7 +2232,7 @@ action_result.data.\*.domain.\*.expired | boolean |  |   False
 action_result.data.\*.domain.\*.from_parent | boolean |  |   False 
 action_result.data.\*.domain.\*.host_groups.\* | string |  `crowdstrike host group id`  |   0491ecd214614b5ab3bca1037a15390b 
 action_result.data.\*.domain.\*.id | string |  `crowdstrike indicator id`  |   010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb 
-action_result.data.\*.domain.\*.metadata.filename | string |  |   EMAPLEMETADATAvftcdrxcftvgybhhubsdgvfyuegwwiqeqTESTuifgwieugfhiugybhugvftcdrxcftvgbhubsdgvfyuegwwiqeqpdiheuifgEXAMPLE 
+action_result.data.\*.domain.\*.metadata.filename | string |  |   EXAMPLEMETADATAvftcdrxcftvgybhhubsdgvfyuegwwiqeqTESTuifgwieugfhiugybhugvftcdrxcftvgbhubsdgvfyuegwwiqeqpdiheuifgEXAMPLE 
 action_result.data.\*.domain.\*.mobile_action | string |  |   no_action 
 action_result.data.\*.domain.\*.modified_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
 action_result.data.\*.domain.\*.modified_on | string |  |   2021-09-15T09:52:27.651770437Z 

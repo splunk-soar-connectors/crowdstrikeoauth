@@ -23,7 +23,7 @@
     "license": "Copyright (c) 2019-2023 Splunk Inc.",
     "app_version": "4.1.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, August 21st 2023, API versions: v1, v2"
+        "Cloud, API api.crowdstrike.com, November 28th 2023, API versions: v1, v2"
     ],
     "utctime_updated": "2022-05-04T23:15:36.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",

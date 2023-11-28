@@ -3,6 +3,70 @@
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
+## Steps to create API clients and key
+
+- In Falcon UI, Go to menubar on the left, From **Support and resources** section, Select **API clients and keys**.
+- Click on **Create API client**.
+- Add **Client name**, **Description(optional)** and [Scopes](#minimal-required-scopes-to-run-all-actions) (defined below).
+- Click on **Create** to obtain the **Client ID** and **Client secret**.
+
+## Minimal required scope(s) (Action wise)
+| **Action**                                                  | **Required Scope(s)**          | **Read**             | **Write**            |
+|-------------------------------------------------------------|--------------------------------|----------------------|----------------------|
+| [test connectivity](#action-test-connectivity)              | Hosts                          | &check;              | &cross;              |
+| [query device](#action-query-device)                        | Hosts                          | &check;              | &cross;              |
+| [list groups](#action-list-groups)                          | Host Groups                    | &check;              | &cross;              |
+| [quarantine device](#action-quarantine-device)              | Hosts                          | &check;              | &check;              |
+| [unquarantine device](#action-unquarantine-device)          | Hosts                          | &check;              | &check;              |
+| [assign hosts](#action-assign-hosts)                        | Hosts <br> Hosts Group         | &check; <br> &cross; | &cross; <br> &check; |
+| [remove hosts](#action-remove-hosts)                        | Hosts <br> Hosts Group         | &check; <br> &cross; | &cross; <br> &check; |
+| [create session](#action-create-session)                    | Real time response(RTR)        | &check;              | &cross;              |
+| [delete session](#action-delete-session)                    | Real time response(RTR)        | &check;              | &cross;              |
+| [list detections](#action-list-detections)                  | Detections                     | &check;              | &cross;              |
+| [get detections details](#action-get-detections-details)    | Detections                     | &check;              | &cross;              |
+| [update detections](#action-update-detections)              | Detections                     | &cross;              | &check;              |
+| [list alerts](#action-list-alerts)                          | Alerts                         | &check;              | &cross;              |
+| [list sessions](#action-list-sessions)                      | Real time response(RTR)        | &check;              | &cross;              |
+| [run command](#action-run-command)                          | Real time response(RTR)        | &check;              | &cross;              |
+| [run admin command](#action-run-admin-command)              | Real time response(admin)      | &cross;              | &check;              |
+| [get command details](#action-get-command-details)          | Real time response(RTR)        | &cross;              | &check;              |
+| [list session files](#action-list-session-files)            | Real time response(RTR)        | &cross;              | &check;              |
+| [get incident behaviors](#action-get-incident-behaviors)    | Incidents                      | &check;              | &cross;              |
+| [update incident](#action-update-incident)                  | Incidents                      | &cross;              | &check;              |
+| [list users](#action-list-users)                            | User Management                | &check;              | &cross;              |
+| [get user roles](#action-get-user-roles)                    | User Management                | &check;              | &cross;              |
+| [list roles](#action-list-roles)                            | User Management                | &check;              | &cross;              |
+| [get role](#action-get-role)                                | User Management                | &check;              | &cross;              |
+| [list crowdscores](#action-list-crowdscores)                | Incidents                      | &check;              | &cross;              |
+| [get incident details](#action-get-incident-details)        | Incidents                      | &check;              | &cross;              |
+| [list incident behaviors](#action-list-incident-behaviors)  | Incidents                      | &check;              | &cross;              |
+| [list incidents](#action-list-incidents)                    | Incidents                      | &check;              | &cross;              |
+| [get session file](#action-get-session-file)                | Real time response(RTR)        | &cross;              | &check;              |
+| [set status](#action-set-status)                            | Detections                     | &cross;              | &check;              |
+| [get system info](#action-get-system-info)                  | Hosts                          | &check;              | &cross;              |
+| [get process detail](#action-get-process-detail)            | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [hunt file](#action-hunt-file)                              | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [hunt domain](#action-hunt-domain)                          | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [hunt ip](#action-hunt-ip)                                  | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [upload put file](#action-upload-put-file)                  | Real time response             | &cross;              | &check;              |
+| [get indicator](#action-get-indicator)                      | IOC Management                 | &check;              | &cross;              |
+| [list custom indicators](#action-list-custom-indicators)    | IOC Management                 | &check;              | &cross;              |
+| [list put files](#action-list-put-files)                    | Real time response(admin)      | &cross;              | &check;              |
+| [on poll](#action-on-poll)                                  | Event Stream                   | &check;              | &cross;              |
+| [list processes](#action-list-processes)                    | IOCs                           | &check;              | &cross;              |
+| [upload indicator](#action-upload-indicator)                | IOC Management                | &cross;              | &check;              |
+| [delete indicator](#action-delete-indicator)                | IOC Management                | &check;              | &check;              |
+| [update indicator](#action-update-indicator)                | IOC Management                | &cross;              | &check;              |
+| [file reputation](#action-file-reputation)                  | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [url reputation](#action-url-reputation)                    | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [download report](#action-download-report)                  | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [detonate file](#action-detonate-file)                      | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [detonate url](#action-detonate-url)                        | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [check status](#action-check-status)                        | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [get device scroll](#action-get-device-scroll)              | Hosts                          | &check;              | &cross;              |
+| [get zta data](#action-get-zta-data)                        | Zero Trust Assessment          | &check;              | &cross;              |
+
+
 ## Preprocess Script
 
 The user can add a script file in the configuration parameter \[ **Script with functions to

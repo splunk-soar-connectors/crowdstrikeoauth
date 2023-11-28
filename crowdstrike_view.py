@@ -100,9 +100,12 @@ def get_ctx_result_hunt(result):
 
     param = result.get_param()
 
-    hunt_object = param.get('hash')
-    if (not hunt_object):
+    if 'hash' in param:
+        hunt_object = param.get('hash')
+    elif 'domain' in param:
         hunt_object = param.get('domain')
+    else:
+        hunt_object = param.get('ip')
 
     param['ioc'] = hunt_object
     ret_val, param['ioc_type'] = _get_ioc_type(hunt_object)
@@ -264,6 +267,15 @@ def display_view(provides, all_app_runs, context):
 
     if provides == 'get device scroll':
         return 'crowdstrike_get_device_scroll.html'
+
+    if provides == 'list users':
+        return 'crowdstrike_list_users.html'
+
+    if provides == 'list detections':
+        return 'crowdstrike_list_detections.html'
+
+    if provides == 'get detections details':
+        return 'crowdstrike_get_detections_details.html'
 
 
 def hunt_view(provides, all_app_runs, context):

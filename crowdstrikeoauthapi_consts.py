@@ -128,6 +128,8 @@ CROWDSTRIKE_STATE_FILE_CORRUPT_ERROR = (
 CROWDSTRIKE_ENCRYPTION_ERROR = "Error occurred while encrypting the state file"
 CROWDSTRIKE_DECRYPTION_ERROR = "Error occurred while decrypting the state file"
 CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR = "Status Code {code}. Empty response and no information in the header"
+CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM = "Please provide a valid value in the '{key}' parameter"
+CROWDSTRIKE_ERROR_INVALID_COMMENT_PARAM = "Please provide maximum of 2048 bytes in the 'comment' parameter"
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"
@@ -211,3 +213,12 @@ CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR = "Please enter valid value in '{}' paramet
 CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc",
 "last_modified.asc", "indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]
 CROWDSTRIKE_API_SUCC_CODES = [200, 202, 204]
+CROWDSTRIKE_DETECTION_STATUSES = [
+    "new",
+    "in_progress",
+    "true_positive",
+    "false_positive",
+    "ignored",
+    "closed",
+    "reopened"
+]

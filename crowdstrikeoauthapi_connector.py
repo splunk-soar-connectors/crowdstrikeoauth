@@ -33,6 +33,7 @@ from bs4 import BeautifulSoup, UnicodeDammit
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from phantom.vault import Vault
+from phantom_common import paths
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 import parse_cs_events as events_parser
@@ -251,14 +252,13 @@ class CrowdstrikeConnector(BaseConnector):
     def _get_ioc_type(self, ioc, action_result):
 
         if util.is_ip(ioc):
-            return (phantom.APP_SUCCESS, "ipv4")
+            return phantom.APP_SUCCESS, "ipv4"
 
         ip = UnicodeDammit(ioc).unicode_markup.encode('UTF-8').decode('UTF-8')
         try:
-            ipv6_type = None
             ipv6_type = ipaddress.IPv6Address(ip)
             if ipv6_type:
-                return (phantom.APP_SUCCESS, "ipv6")
+                return phantom.APP_SUCCESS, "ipv6"
         except Exception:
             pass
 
@@ -266,7 +266,7 @@ class CrowdstrikeConnector(BaseConnector):
             return self._get_hash_type(ioc, action_result)
 
         if util.is_domain(ioc):
-            return (phantom.APP_SUCCESS, "domain")
+            return phantom.APP_SUCCESS, "domain"
 
         return action_result.set_status(phantom.APP_ERROR, "Failed to detect the IOC type")
 
@@ -371,6 +371,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         return containers_processed
 
+    @staticmethod
+    def validate_comma_seperated_values(values):
+        return list(set(val.strip() for val in values.split(',') if val.strip()))
+
     def _paginator(self, action_result, endpoint, param=None):
         """
         This action is used to create an iterator that will paginate through responses from called methods.
@@ -474,6 +478,7 @@ class CrowdstrikeConnector(BaseConnector):
             param = {}
 
         param.update({'limit': 1})
+        self.save_progress("Fetching devices")
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params=param)
 
         if phantom.is_fail(ret_val):
@@ -505,7 +510,6 @@ class CrowdstrikeConnector(BaseConnector):
         while list_ids:
             param = {"ids": list_ids[:min(100, len(list_ids))]}
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, json_data=param, method=method)
-
             if phantom.is_fail(ret_val):
                 return None
 
@@ -636,6 +640,18 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         return self._get_devices_ran_on(domain, "domain", param, action_result)
+
+    def _handle_hunt_ip(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        ioc = param[phantom.APP_JSON_IP]
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return self._get_devices_ran_on(ioc, ioc_type, param, action_result)
 
     def _handle_get_device_detail(self, param):
 
@@ -962,8 +978,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         # Add the response into the data section
         action_result.add_data(response)
+        summary = action_result.update_summary({})
+        summary['total_users'] = len(response.get('resources', []))
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Users listed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_user_roles(self, param):
 
@@ -1665,6 +1683,76 @@ class CrowdstrikeConnector(BaseConnector):
 
         summary = action_result.update_summary({})
         summary['total_detections'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_detections_details(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ids = self.validate_comma_seperated_values(param.get('detection_ids'))
+        if not ids:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM
+                                            .format(key="detection_ids"))
+
+        data = {"ids": ids}
+
+        detection_details_list = self._get_details(action_result, CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT, data,
+                                                   method='post')
+
+        if detection_details_list is None:
+            return action_result.get_status()
+
+        for detection in detection_details_list:
+            action_result.add_data(detection)
+
+        summary = action_result.update_summary({})
+        summary['total_detections'] = len(detection_details_list)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_update_detections(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        assigned_to_user = param.get('assigned_to_user')
+        comment = param.get('comment')
+        show_in_ui = param.get('show_in_ui', True)
+        status = param.get('status')
+        ids = self.validate_comma_seperated_values(param.get('detection_ids'))
+        if not ids:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM
+                                            .format(key="detection_ids"))
+
+        data = {
+            'ids': ids,
+            'show_in_ui': show_in_ui
+        }
+
+        if assigned_to_user:
+            data['assigned_to_uuid'] = assigned_to_user
+
+        if comment:
+            data['comment'] = comment
+
+        if status:
+            if status not in CROWDSTRIKE_DETECTION_STATUSES:
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="status"))
+            data['status'] = status
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_RESOLVE_DETECTION_APIPATH,
+                                                               json_data=data, method="patch")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(response)
+        if response.get('meta', {}).get('writes', {}).get('resources_affected', 0) != len(ids):
+            errors = [error.get('message') for error in response.get('errors', [])]
+            return action_result.set_status(phantom.APP_ERROR, "Errors occurred while updating detections: {}".format('\r\n'.join(errors)))
+
+        summary = action_result.update_summary({})
+        summary['detections_affected'] = len(ids)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -3139,7 +3227,7 @@ class CrowdstrikeConnector(BaseConnector):
             vault_tmp_dir = Vault.get_vault_tmp_dir().rstrip('/')
             local_dir = '{}/{}'.format(vault_tmp_dir, guid)
         else:
-            local_dir = '/opt/phantom/vault/tmp/{}'.format(guid)
+            local_dir = os.path.join(paths.PHANTOM_VAULT, "tmp", str(guid))
 
         self.save_progress("Using temp directory: {0}".format(guid))
         self.debug_print("Using temp directory: {0}".format(guid))
@@ -3441,6 +3529,8 @@ class CrowdstrikeConnector(BaseConnector):
             'delete_session': self._handle_delete_session,
             "list_alerts": self._handle_list_alerts,
             "list_detections": self._handle_list_detections,
+            'get_detections_details': self._handle_get_detections_details,
+            'update_detections': self._handle_update_detections,
             'list_sessions': self._handle_list_sessions,
             'run_command': self._handle_run_command,
             'run_admin_command': self._handle_run_admin_command,
@@ -3453,6 +3543,7 @@ class CrowdstrikeConnector(BaseConnector):
             'list_put_files': self._handle_list_put_files,
             'hunt_file': self._handle_hunt_file,
             'hunt_domain': self._handle_hunt_domain,
+            'hunt_ip': self._handle_hunt_ip,
             'get_process_detail': self._handle_get_process_detail,
             'get_device_detail': self._handle_get_device_detail,
             'resolve_detection': self._handle_resolve_detection,

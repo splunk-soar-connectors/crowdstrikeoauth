@@ -477,6 +477,10 @@ class CrowdstrikeConnector(BaseConnector):
         if not param:
             param = {}
 
+        ret_val = self._get_token(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         param.update({'limit': 1})
         self.save_progress("Fetching devices")
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params=param)
@@ -3459,11 +3463,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, resp_json
 
-    def _get_token(self, action_result, from_action=False):
+    def _get_token(self, action_result):
         """ This function is used to get a token via REST Call.
 
         :param action_result: Object of action result
-        :param from_action: Boolean object of from_action
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
 
@@ -3482,6 +3485,7 @@ class CrowdstrikeConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers=headers, data=data, method='post')
 
         if phantom.is_fail(ret_val):
+            self._oauth_access_token = None
             self._state.pop(CROWDSTRIKE_OAUTH_TOKEN_STRING, {})
             return action_result.get_status()
 

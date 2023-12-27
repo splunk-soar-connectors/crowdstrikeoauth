@@ -2,11 +2,11 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 4\.0\.0  
+Connector Version: 4.1.0  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
-Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.4\.0  
+Product Version Supported (regex): ".\*"  
+Minimum Product Version: 6.1.0  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
@@ -15,6 +15,70 @@ This app integrates with CrowdStrike OAuth2 authentication standard to implement
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
+## Steps to create API clients and key
+
+- In Falcon UI, Go to menubar on the left, From **Support and resources** section, Select **API clients and keys**.
+- Click on **Create API client**.
+- Add **Client name**, **Description(optional)** and [Scopes](#minimal-required-scopes-to-run-all-actions) (defined below).
+- Click on **Create** to obtain the **Client ID** and **Client secret**.
+
+## Minimal required scope(s) (Action wise)
+| **Action**                                                  | **Required Scope(s)**          | **Read**             | **Write**            |
+|-------------------------------------------------------------|--------------------------------|----------------------|----------------------|
+| [test connectivity](#action-test-connectivity)              | Hosts                          | &check;              | &cross;              |
+| [query device](#action-query-device)                        | Hosts                          | &check;              | &cross;              |
+| [list groups](#action-list-groups)                          | Host Groups                    | &check;              | &cross;              |
+| [quarantine device](#action-quarantine-device)              | Hosts                          | &check;              | &check;              |
+| [unquarantine device](#action-unquarantine-device)          | Hosts                          | &check;              | &check;              |
+| [assign hosts](#action-assign-hosts)                        | Hosts <br> Hosts Group         | &check; <br> &cross; | &cross; <br> &check; |
+| [remove hosts](#action-remove-hosts)                        | Hosts <br> Hosts Group         | &check; <br> &cross; | &cross; <br> &check; |
+| [create session](#action-create-session)                    | Real time response(RTR)        | &check;              | &cross;              |
+| [delete session](#action-delete-session)                    | Real time response(RTR)        | &check;              | &cross;              |
+| [list detections](#action-list-detections)                  | Detections                     | &check;              | &cross;              |
+| [get detections details](#action-get-detections-details)    | Detections                     | &check;              | &cross;              |
+| [update detections](#action-update-detections)              | Detections                     | &cross;              | &check;              |
+| [list alerts](#action-list-alerts)                          | Alerts                         | &check;              | &cross;              |
+| [list sessions](#action-list-sessions)                      | Real time response(RTR)        | &check;              | &cross;              |
+| [run command](#action-run-command)                          | Real time response(RTR)        | &check;              | &cross;              |
+| [run admin command](#action-run-admin-command)              | Real time response(admin)      | &cross;              | &check;              |
+| [get command details](#action-get-command-details)          | Real time response(RTR)        | &cross;              | &check;              |
+| [list session files](#action-list-session-files)            | Real time response(RTR)        | &cross;              | &check;              |
+| [get incident behaviors](#action-get-incident-behaviors)    | Incidents                      | &check;              | &cross;              |
+| [update incident](#action-update-incident)                  | Incidents                      | &cross;              | &check;              |
+| [list users](#action-list-users)                            | User Management                | &check;              | &cross;              |
+| [get user roles](#action-get-user-roles)                    | User Management                | &check;              | &cross;              |
+| [list roles](#action-list-roles)                            | User Management                | &check;              | &cross;              |
+| [get role](#action-get-role)                                | User Management                | &check;              | &cross;              |
+| [list crowdscores](#action-list-crowdscores)                | Incidents                      | &check;              | &cross;              |
+| [get incident details](#action-get-incident-details)        | Incidents                      | &check;              | &cross;              |
+| [list incident behaviors](#action-list-incident-behaviors)  | Incidents                      | &check;              | &cross;              |
+| [list incidents](#action-list-incidents)                    | Incidents                      | &check;              | &cross;              |
+| [get session file](#action-get-session-file)                | Real time response(RTR)        | &cross;              | &check;              |
+| [set status](#action-set-status)                            | Detections                     | &cross;              | &check;              |
+| [get system info](#action-get-system-info)                  | Hosts                          | &check;              | &cross;              |
+| [get process detail](#action-get-process-detail)            | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [hunt file](#action-hunt-file)                              | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [hunt domain](#action-hunt-domain)                          | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [hunt ip](#action-hunt-ip)                                  | IOCs(Indicators of Compromise) | &check;              | &cross;              |
+| [upload put file](#action-upload-put-file)                  | Real time response             | &cross;              | &check;              |
+| [get indicator](#action-get-indicator)                      | IOC Management                 | &check;              | &cross;              |
+| [list custom indicators](#action-list-custom-indicators)    | IOC Management                 | &check;              | &cross;              |
+| [list put files](#action-list-put-files)                    | Real time response(admin)      | &cross;              | &check;              |
+| [on poll](#action-on-poll)                                  | Event Stream                   | &check;              | &cross;              |
+| [list processes](#action-list-processes)                    | IOCs                           | &check;              | &cross;              |
+| [upload indicator](#action-upload-indicator)                | IOC Management                | &cross;              | &check;              |
+| [delete indicator](#action-delete-indicator)                | IOC Management                | &check;              | &check;              |
+| [update indicator](#action-update-indicator)                | IOC Management                | &cross;              | &check;              |
+| [file reputation](#action-file-reputation)                  | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [url reputation](#action-url-reputation)                    | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [download report](#action-download-report)                  | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [detonate file](#action-detonate-file)                      | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [detonate url](#action-detonate-url)                        | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [check status](#action-check-status)                        | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
+| [get device scroll](#action-get-device-scroll)              | Hosts                          | &check;              | &cross;              |
+| [get zta data](#action-get-zta-data)                        | Zero Trust Assessment          | &check;              | &cross;              |
+
+
 ## Preprocess Script
 
 The user can add a script file in the configuration parameter \[ **Script with functions to
@@ -43,7 +107,7 @@ error.
         below-mentioned 2 cases whichever is earlier.
         -   If the total DetectionSummaryEvents fetched equals the value provided in the \[Maximum
             events to get while POLL NOW\] (for manual polling) or \[Maximum events to get while
-            scheduled and interval polling\] (for scheduled \| interval polling) parameters
+            scheduled and interval polling\] (for scheduled | interval polling) parameters
         -   If the total number of continuous blank lines encountered while streaming the data
             equals the value provided in the \[Maximum allowed continuous blank lines\] (default 50
             if not specified) asset configuration parameter
@@ -70,8 +134,8 @@ error.
         creates artifacts for all the fetched DetectionSummaryEvents. The last queried event's
         offset ID will not be remembered in Manual POLL NOW and it fetches everything every time
         from the beginning.
--   Scheduled \| Interval Polling
-    -   During scheduled \| interval polling, the app starts from the first event that it can query
+-   Scheduled | Interval Polling
+    -   During scheduled | interval polling, the app starts from the first event that it can query
         up to the value configured in the configuration parameter \[Maximum events to get while
         scheduled and interval polling\] and creates artifacts for all the fetched
         DetectionSummaryEvents. Then, it remembers the last event's offset ID and stores it in the
@@ -301,8 +365,8 @@ default ports used by Splunk SOAR.
 ## Playbook Backward Compatibility
 
 -   The output data-paths have been updated in the below-existing action. Hence, it is requested to
-    update existing playbooks created in the earlier versions of the app by re-inserting \|
-    modifying \| deleting the corresponding action blocks.
+    update existing playbooks created in the earlier versions of the app by re-inserting |
+    modifying | deleting the corresponding action blocks.
 
       
 
@@ -321,20 +385,20 @@ The below configuration variables are required for this Connector to operate.  T
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **url** |  required  | string | Base URL
-**place\_holder** |  optional  | ph | Placeholder
-**client\_id** |  required  | password | Client ID
-**client\_secret** |  required  | password | Client Secret
-**app\_id** |  optional  | string | App ID
-**max\_events** |  optional  | numeric | Maximum events to get for scheduled and interval polling
-**max\_events\_poll\_now** |  optional  | numeric | Maximum events to get while POLL NOW
+**place_holder** |  optional  | ph | Placeholder
+**client_id** |  required  | password | Client ID
+**client_secret** |  required  | password | Client Secret
+**app_id** |  optional  | string | App ID
+**max_events** |  optional  | numeric | Maximum events to get for scheduled and interval polling
+**max_events_poll_now** |  optional  | numeric | Maximum events to get while POLL NOW
 **collate** |  optional  | boolean | Merge containers for hostname and eventname
-**merge\_time\_interval** |  optional  | numeric | Merge same containers within specified seconds
-**max\_crlf** |  optional  | numeric | Maximum allowed continuous blank lines
-**preprocess\_script** |  optional  | file | Script with functions to preprocess containers and artifacts
-**detonate\_timeout** |  optional  | numeric | Timeout for detonation result in minutes \(Default\: 15 minutes\)
+**merge_time_interval** |  optional  | numeric | Merge same containers within specified seconds
+**max_crlf** |  optional  | numeric | Maximum allowed continuous blank lines
+**preprocess_script** |  optional  | file | Script with functions to preprocess containers and artifacts
+**detonate_timeout** |  optional  | numeric | Timeout for detonation result in minutes (Default: 15 minutes)
 
 ### Supported Actions  
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity\. This action logs into the site to check the connection and credentials  
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials  
 [query device](#action-query-device) - Fetch the device details based on the provided query  
 [list groups](#action-list-groups) - Fetch the details of the host groups  
 [quarantine device](#action-quarantine-device) - Block the device  
@@ -344,6 +408,8 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [create session](#action-create-session) - Initialize a new session with the Real Time Response cloud  
 [delete session](#action-delete-session) - Deletes a Real Time Response session  
 [list detections](#action-list-detections) - Get a list of detections  
+[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection IDs  
+[update detections](#action-update-detections) - Update detections in crowdstrike host  
 [list alerts](#action-list-alerts) - Get a list of alerts  
 [list sessions](#action-list-sessions) - Lists Real Time Response sessions  
 [run command](#action-run-command) - Execute an active responder command on a single host  
@@ -366,11 +432,12 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [get process detail](#action-get-process-detail) - Retrieve the details of a process that is running or that previously ran, given a process ID  
 [hunt file](#action-hunt-file) - Hunt for a file on the network by querying for the hash  
 [hunt domain](#action-hunt-domain) - Get a list of device IDs on which the domain was matched  
-[upload put file](#action-upload-put-file) - Upload a new put\-file to use for the RTR \`put\` command  
+[hunt ip](#action-hunt-ip) - Get a list of device IDs on which the ip was matched  
+[upload put file](#action-upload-put-file) - Upload a new put-file to use for the RTR `put` command  
 [get indicator](#action-get-indicator) - Get the full definition of one or more indicators that are being watched  
 [list custom indicators](#action-list-custom-indicators) - Queries for custom indicators in your customer account  
-[list put files](#action-list-put-files) - Queries for files uploaded to Crowdstrike for use with the RTR \`put\` command  
-[on poll](#action-on-poll) - Callback action for the on\_poll ingest functionality  
+[list put files](#action-list-put-files) - Queries for files uploaded to Crowdstrike for use with the RTR `put` command  
+[on poll](#action-on-poll) - Callback action for the on_poll ingest functionality  
 [list processes](#action-list-processes) - List processes that have recently used the IOC on a particular device  
 [upload indicator](#action-upload-indicator) - Upload indicator that you want CrowdStrike to watch  
 [delete indicator](#action-delete-indicator) - Delete an indicator that is being watched  
@@ -381,11 +448,11 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [detonate file](#action-detonate-file) - Upload a file to CrowdStrike and retrieve the analysis results  
 [detonate url](#action-detonate-url) - Upload an url to CrowdStrike and retrieve the analysis results  
 [check status](#action-check-status) - To check detonation status of the provided resource id  
-[get device scroll](#action-get-device-scroll) - Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability \(based on offset pointer which expires after 2 minutes with no maximum limit\)  
-[get zta data](#action-get-zta-data) - Get Zero Trust Assessment data for one or more hosts by providing agent IDs \(AID\)  
+[get device scroll](#action-get-device-scroll) - Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)  
+[get zta data](#action-get-zta-data) - Get Zero Trust Assessment data for one or more hosts by providing agent IDs (AID)  
 
 ## action: 'test connectivity'
-Validate the asset configuration for connectivity\. This action logs into the site to check the connection and credentials
+Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials
 
 Type: **test**  
 Read only: **True**
@@ -406,121 +473,121 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **limit** |  optional  | Maximum devices to be fetched | numeric | 
-**offset** |  optional  | Starting index of overall result set from which to return ids\. \(Defaults to 0\) | numeric | 
-**filter** |  optional  | Filter expression used to limit the fetched devices \(FQL Syntax\) | string | 
+**offset** |  optional  | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | 
+**filter** |  optional  | Filter expression used to limit the fetched devices (FQL Syntax) | string | 
 **sort** |  optional  | Property to sort by | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data\.\*\.agent\_load\_flags | string | 
-action\_result\.data\.\*\.agent\_local\_time | string | 
-action\_result\.data\.\*\.agent\_version | string | 
-action\_result\.data\.\*\.bios\_manufacturer | string | 
-action\_result\.data\.\*\.bios\_version | string | 
-action\_result\.data\.\*\.build\_number | string | 
-action\_result\.data\.\*\.cid | string |  `md5` 
-action\_result\.data\.\*\.config\_id\_base | string | 
-action\_result\.data\.\*\.config\_id\_build | string | 
-action\_result\.data\.\*\.config\_id\_platform | string | 
-action\_result\.data\.\*\.connection\_ip | string |  `ip` 
-action\_result\.data\.\*\.connection\_mac\_address | string | 
-action\_result\.data\.\*\.cpu\_signature | string | 
-action\_result\.data\.\*\.default\_gateway\_ip | string |  `ip` 
-action\_result\.data\.\*\.device\_id | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.device\_policies\.device\_control\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.device\_control\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.device\_control\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.device\_control\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.device\_policies\.device\_control\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.firewall\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.policy\_id | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.rule\_set\_id | string | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.device\_policies\.global\_config\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.settings\_hash | string | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.applied | numeric | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.settings\_hash | string |  `sha256` 
-action\_result\.data\.\*\.device\_policies\.prevention\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.prevention\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.prevention\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.prevention\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.device\_policies\.prevention\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.prevention\.settings\_hash | string | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.settings\_hash | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.settings\_hash | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.uninstall\_protection | string | 
-action\_result\.data\.\*\.external\_ip | string |  `ip` 
-action\_result\.data\.\*\.first\_seen | string | 
-action\_result\.data\.\*\.group\_hash | string |  `sha256` 
-action\_result\.data\.\*\.groups | string |  `md5` 
-action\_result\.data\.\*\.hostname | string |  `host name` 
-action\_result\.data\.\*\.instance\_id | string | 
-action\_result\.data\.\*\.kernel\_version | string | 
-action\_result\.data\.\*\.last\_seen | string | 
-action\_result\.data\.\*\.local\_ip | string |  `ip` 
-action\_result\.data\.\*\.mac\_address | string | 
-action\_result\.data\.\*\.machine\_domain | string |  `domain` 
-action\_result\.data\.\*\.major\_version | string | 
-action\_result\.data\.\*\.meta\.version | string | 
-action\_result\.data\.\*\.minor\_version | string | 
-action\_result\.data\.\*\.modified\_timestamp | string | 
-action\_result\.data\.\*\.os\_build | string | 
-action\_result\.data\.\*\.os\_version | string | 
-action\_result\.data\.\*\.ou | string | 
-action\_result\.data\.\*\.platform\_id | string | 
-action\_result\.data\.\*\.platform\_name | string | 
-action\_result\.data\.\*\.pointer\_size | string | 
-action\_result\.data\.\*\.policies\.\*\.applied | boolean | 
-action\_result\.data\.\*\.policies\.\*\.applied\_date | string | 
-action\_result\.data\.\*\.policies\.\*\.assigned\_date | string | 
-action\_result\.data\.\*\.policies\.\*\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.policies\.\*\.policy\_type | string | 
-action\_result\.data\.\*\.policies\.\*\.settings\_hash | string | 
-action\_result\.data\.\*\.product\_type | string | 
-action\_result\.data\.\*\.product\_type\_desc | string | 
-action\_result\.data\.\*\.provision\_status | string | 
-action\_result\.data\.\*\.reduced\_functionality\_mode | string | 
-action\_result\.data\.\*\.serial\_number | string | 
-action\_result\.data\.\*\.service\_pack\_major | string | 
-action\_result\.data\.\*\.service\_pack\_minor | string | 
-action\_result\.data\.\*\.service\_provider | string | 
-action\_result\.data\.\*\.service\_provider\_account\_id | string | 
-action\_result\.data\.\*\.site\_name | string | 
-action\_result\.data\.\*\.slow\_changing\_modified\_timestamp | string | 
-action\_result\.data\.\*\.status | string | 
-action\_result\.data\.\*\.system\_manufacturer | string | 
-action\_result\.data\.\*\.system\_product\_name | string | 
-action\_result\.data\.\*\.zone\_group | string | 
-action\_result\.summary\.total\_devices | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   hostname: 'E\*'  platform_name:'Windows' 
+action_result.parameter.limit | numeric |  |   120 
+action_result.parameter.offset | numeric |  |   10 
+action_result.parameter.sort | string |  |   hostname.desc 
+action_result.data.\*.agent_load_flags | string |  |   1 
+action_result.data.\*.agent_local_time | string |  |   2019-06-13T10:46:11.024Z 
+action_result.data.\*.agent_version | string |  |   5.10.9106.0 
+action_result.data.\*.bios_manufacturer | string |  |   XYZ Technologies LTD 
+action_result.data.\*.bios_version | string |  |   6.00 
+action_result.data.\*.build_number | string |  |   17134 
+action_result.data.\*.cid | string |  `md5`  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.config_id_base | string |  |   65994753 
+action_result.data.\*.config_id_build | string |  |   9106 
+action_result.data.\*.config_id_platform | string |  |   3 
+action_result.data.\*.connection_ip | string |  `ip`  |   10.1.18.205 
+action_result.data.\*.connection_mac_address | string |  |   00-50-56-12-34-56 
+action_result.data.\*.cpu_signature | string |  |   329300 
+action_result.data.\*.default_gateway_ip | string |  `ip`  |   10.1.16.1 
+action_result.data.\*.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928ab 
+action_result.data.\*.device_policies.device_control.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.device_control.applied_date | string |  |   2019-04-18T13:16:17.246147089Z 
+action_result.data.\*.device_policies.device_control.assigned_date | string |  |   2019-04-18T13:09:53.221767635Z 
+action_result.data.\*.device_policies.device_control.policy_id | string |  `md5`  |   cb4babb273274f79a91e8a0e84164916 
+action_result.data.\*.device_policies.device_control.policy_type | string |  |   device-control 
+action_result.data.\*.device_policies.firewall.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.firewall.applied_date | string |  |   2020-07-08T03:12:30.212194872Z 
+action_result.data.\*.device_policies.firewall.assigned_date | string |  |   2020-07-08T03:07:38.48127371Z 
+action_result.data.\*.device_policies.firewall.policy_id | string |  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.data.\*.device_policies.firewall.policy_type | string |  |   firewall 
+action_result.data.\*.device_policies.firewall.rule_set_id | string |  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.data.\*.device_policies.global_config.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.global_config.applied_date | string |  |   2019-06-03T23:31:25.402021685Z 
+action_result.data.\*.device_policies.global_config.assigned_date | string |  |   2019-06-03T23:27:22.325516295Z 
+action_result.data.\*.device_policies.global_config.policy_id | string |  `md5`  |   49ee9efc99164562ad89640955f372ce 
+action_result.data.\*.device_policies.global_config.policy_type | string |  |   globalconfig 
+action_result.data.\*.device_policies.global_config.settings_hash | string |  |   a75911b0 
+action_result.data.\*.device_policies.jumpcloud.applied | numeric |  |   True 
+action_result.data.\*.device_policies.jumpcloud.applied_date | string |  |   2022-07-13T17:41:16.271074445Z 
+action_result.data.\*.device_policies.jumpcloud.assigned_date | string |  |   2022-07-13T17:40:53.552991354Z 
+action_result.data.\*.device_policies.jumpcloud.policy_id | string |  `md5`  |   234766dcce654217babcbaa247ca31f0 
+action_result.data.\*.device_policies.jumpcloud.policy_type | string |  |   jumpcloud 
+action_result.data.\*.device_policies.jumpcloud.settings_hash | string |  `sha256`  |   0aec295a677907c6e4de672edf1f172d2cefcc5ca96ed2b5e56f4d6745289694 
+action_result.data.\*.device_policies.prevention.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.prevention.applied_date | string |  |   2019-04-03T23:57:05.493184498Z 
+action_result.data.\*.device_policies.prevention.assigned_date | string |  |   2019-04-03T23:53:41.614339193Z 
+action_result.data.\*.device_policies.prevention.policy_id | string |  `md5`  |   ad0dad6639454b4d8bbfc963bf9510c9 
+action_result.data.\*.device_policies.prevention.policy_type | string |  |   prevention 
+action_result.data.\*.device_policies.prevention.settings_hash | string |  |   4aa96e52 
+action_result.data.\*.device_policies.remote_response.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.remote_response.applied_date | string |  |   2019-02-08T02:39:21.726331953Z 
+action_result.data.\*.device_policies.remote_response.assigned_date | string |  |   2019-02-08T02:36:05.073298048Z 
+action_result.data.\*.device_policies.remote_response.policy_id | string |  `md5`  |   6c74313d6c864180bd759c3235dbd550 
+action_result.data.\*.device_policies.remote_response.policy_type | string |  |   remote-response 
+action_result.data.\*.device_policies.remote_response.settings_hash | string |  |   f472bd8e 
+action_result.data.\*.device_policies.sensor_update.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.sensor_update.applied_date | string |  |   2019-05-30T23:21:58.956282211Z 
+action_result.data.\*.device_policies.sensor_update.assigned_date | string |  |   2019-05-30T23:02:19.540591355Z 
+action_result.data.\*.device_policies.sensor_update.policy_id | string |  `md5`  |   226d7067a47b4ea7a3369f7e9114b180 
+action_result.data.\*.device_policies.sensor_update.policy_type | string |  |   sensor-update 
+action_result.data.\*.device_policies.sensor_update.settings_hash | string |  |   65994753|3|2|automatic;101 
+action_result.data.\*.device_policies.sensor_update.uninstall_protection | string |  |   ENABLED 
+action_result.data.\*.external_ip | string |  `ip`  |   204.107.141.240 
+action_result.data.\*.first_seen | string |  |   2018-04-19T19:10:14Z 
+action_result.data.\*.group_hash | string |  `sha256`  |   e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 
+action_result.data.\*.groups | string |  `md5`  |   4493ec18e3c942078b7c0bd4248d3f5e 
+action_result.data.\*.hostname | string |  `host name`  |   CB-TEST-01 
+action_result.data.\*.instance_id | string |  |   i-058fca45cda978e00 
+action_result.data.\*.kernel_version | string |  |   10.0.19044.1766 
+action_result.data.\*.last_seen | string |  |   2019-06-20T14:01:26Z 
+action_result.data.\*.local_ip | string |  `ip`  |   10.1.18.49 
+action_result.data.\*.mac_address | string |  |   00-0c-29-a0-10-27 
+action_result.data.\*.machine_domain | string |  `domain`  |   corp.xyz.com 
+action_result.data.\*.major_version | string |  |   10 
+action_result.data.\*.meta.version | string |  |   59509 
+action_result.data.\*.minor_version | string |  |   0 
+action_result.data.\*.modified_timestamp | string |  |   2019-06-20T14:04:12Z 
+action_result.data.\*.os_build | string |  |   19044 
+action_result.data.\*.os_version | string |  |   Windows 10 
+action_result.data.\*.ou | string |  |   Domain Controllers 
+action_result.data.\*.platform_id | string |  |   0 
+action_result.data.\*.platform_name | string |  |   Windows 
+action_result.data.\*.pointer_size | string |  |   8 
+action_result.data.\*.policies.\*.applied | boolean |  |   True  False 
+action_result.data.\*.policies.\*.applied_date | string |  |   2019-04-03T23:57:05.493184498Z 
+action_result.data.\*.policies.\*.assigned_date | string |  |   2019-04-03T23:53:41.614339193Z 
+action_result.data.\*.policies.\*.policy_id | string |  `md5`  |   ad0dad6639454b4d8bbfc963bf9510c9 
+action_result.data.\*.policies.\*.policy_type | string |  |   prevention 
+action_result.data.\*.policies.\*.settings_hash | string |  |   4aa96e52 
+action_result.data.\*.product_type | string |  |   1 
+action_result.data.\*.product_type_desc | string |  |   Server 
+action_result.data.\*.provision_status | string |  |   Provisioned 
+action_result.data.\*.reduced_functionality_mode | string |  |   no 
+action_result.data.\*.serial_number | string |  |   VMware-56 4d c8 00 40 ed 10 1a-e5 4d 5b d5 e1 a0 10 27 
+action_result.data.\*.service_pack_major | string |  |   0 
+action_result.data.\*.service_pack_minor | string |  |   0 
+action_result.data.\*.service_provider | string |  |   test 
+action_result.data.\*.service_provider_account_id | string |  |   427749959855 
+action_result.data.\*.site_name | string |  |   Default-First-Site-Name 
+action_result.data.\*.slow_changing_modified_timestamp | string |  |   2019-06-17T16:08:07Z 
+action_result.data.\*.status | string |  |   contained 
+action_result.data.\*.system_manufacturer | string |  |   XYZ, Inc. 
+action_result.data.\*.system_product_name | string |  |   VM Platform 
+action_result.data.\*.zone_group | string |  |   us-east-1a 
+action_result.summary.total_devices | numeric |  |   2 
+action_result.message | string |  |   Total devices: 2 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list groups'
 Fetch the details of the host groups
@@ -532,30 +599,30 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **limit** |  optional  | Maximum host groups to be fetched | numeric | 
-**filter** |  optional  | Filter expression used to limit the fetched host groups \(FQL Syntax\) | string | 
+**filter** |  optional  | Filter expression used to limit the fetched host groups (FQL Syntax) | string | 
 **sort** |  optional  | Property to sort by | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data\.\*\.assignment\_rule | string | 
-action\_result\.data\.\*\.created\_by | string |  `email` 
-action\_result\.data\.\*\.created\_timestamp | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.group\_type | string | 
-action\_result\.data\.\*\.id | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.modified\_by | string |  `email` 
-action\_result\.data\.\*\.modified\_timestamp | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.summary\.total\_host\_group | numeric | 
-action\_result\.summary\.total\_host\_groups | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   modified_timestamp:<='2019-06-14T10:22:02.02236652Z' 
+action_result.parameter.limit | numeric |  |   120 
+action_result.parameter.sort | string |  |   created_timestamp.asc 
+action_result.data.\*.assignment_rule | string |  |   device_id:[''],hostname:['','EC2AMAZ-K5LEL73'] 
+action_result.data.\*.created_by | string |  `email`  |   first.last@xyz.com 
+action_result.data.\*.created_timestamp | string |  |   2019-05-28T22:51:01.124782712Z 
+action_result.data.\*.description | string |  |   This is a sample test group 
+action_result.data.\*.group_type | string |  |   static 
+action_result.data.\*.id | string |  `crowdstrike host group id`  |   b5098f79716c4beb8f9c2aebff609075 
+action_result.data.\*.modified_by | string |  `email`  |   test.user@example.us 
+action_result.data.\*.modified_timestamp | string |  |   2019-05-28T22:51:01.124782712Z 
+action_result.data.\*.name | string |  |   super secure group 
+action_result.summary.total_host_group | numeric |  |   529 
+action_result.summary.total_host_groups | numeric |  |   1 
+action_result.message | string |  |   Total host groups: 2 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'quarantine device'
 Block the device
@@ -563,26 +630,26 @@ Block the device
 Type: **contain**  
 Read only: **False**
 
-This action contains the host, which stops any network communications to locations other than the CrowdStrike cloud and IPs specified in the user's containment policy\.
+This action contains the host, which stops any network communications to locations other than the CrowdStrike cloud and IPs specified in the user's containment policy.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**device\_id** |  optional  | Comma\-separated list of device IDs | string |  `crowdstrike device id` 
-**hostname** |  optional  | Comma\-separated list of hostnames | string |  `host name` 
+**device_id** |  optional  | Comma-separated list of device IDs | string |  `crowdstrike device id` 
+**hostname** |  optional  | Comma-separated list of hostnames | string |  `host name` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.device\_id | string |  `crowdstrike device id` 
-action\_result\.parameter\.hostname | string |  `host name` 
-action\_result\.data\.\*\.id | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.path | string | 
-action\_result\.summary\.total\_quarantined\_device | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.device_id | string |  `crowdstrike device id`  |   c70bbe8334aa47bd61046603eb27b15a 
+action_result.parameter.hostname | string |  `host name`  |   CB-TEST-01 
+action_result.data.\*.id | string |  `crowdstrike device id`  |   c70bbe8334aa47bd61046603eb27b15a 
+action_result.data.\*.path | string |  |   /devices/entities/devices/v1 
+action_result.summary.total_quarantined_device | numeric |  |   1 
+action_result.message | string |  |   Device quarantined successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'unquarantine device'
 Unblock the device
@@ -590,26 +657,26 @@ Unblock the device
 Type: **correct**  
 Read only: **False**
 
-This action lifts containment on the host, which returns its network communications to normal\.
+This action lifts containment on the host, which returns its network communications to normal.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**device\_id** |  optional  | Comma\-separated list of device IDs | string |  `crowdstrike device id` 
-**hostname** |  optional  | Comma\-separated list of hostnames | string |  `host name` 
+**device_id** |  optional  | Comma-separated list of device IDs | string |  `crowdstrike device id` 
+**hostname** |  optional  | Comma-separated list of hostnames | string |  `host name` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.device\_id | string |  `crowdstrike device id` 
-action\_result\.parameter\.hostname | string |  `host name` 
-action\_result\.data\.\*\.id | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.path | string | 
-action\_result\.summary\.total\_unquarantined\_device | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.device_id | string |  `crowdstrike device id`  |   c70bbe8334aa47bd61046603eb27b15a 
+action_result.parameter.hostname | string |  `host name`  |   CB-TEST-01 
+action_result.data.\*.id | string |  `crowdstrike device id`  |   c70bbe8334aa47bd61046603eb27b15a 
+action_result.data.\*.path | string |  |   /devices/entities/devices/v1 
+action_result.summary.total_unquarantined_device | numeric |  |   1 
+action_result.message | string |  |   Device unquarantined successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'assign hosts'
 Assign one or more hosts to the static host group
@@ -620,30 +687,30 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**device\_id** |  optional  | Comma\-separated list of device IDs | string |  `crowdstrike device id` 
+**device_id** |  optional  | Comma-separated list of device IDs | string |  `crowdstrike device id` 
 **hostname** |  optional  | Comma separated list of hostnames | string |  `host name` 
-**host\_group\_id** |  required  | Static host group ID | string |  `crowdstrike host group id` 
+**host_group_id** |  required  | Static host group ID | string |  `crowdstrike host group id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.device\_id | string |  `crowdstrike device id` 
-action\_result\.parameter\.host\_group\_id | string |  `crowdstrike host group id` 
-action\_result\.parameter\.hostname | string |  `host name` 
-action\_result\.data\.\*\.assignment\_rule | string | 
-action\_result\.data\.\*\.created\_by | string | 
-action\_result\.data\.\*\.created\_timestamp | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.group\_type | string | 
-action\_result\.data\.\*\.id | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.modified\_by | string | 
-action\_result\.data\.\*\.modified\_timestamp | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.summary\.total\_assigned\_device | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928ab 
+action_result.parameter.host_group_id | string |  `crowdstrike host group id`  |   5c3203cee6934edd894c0c02d5a7d2ad 
+action_result.parameter.hostname | string |  `host name`  |   CB-TEST-01 
+action_result.data.\*.assignment_rule | string |  |   device_id:[''],hostname:['CB-TEST-01'] 
+action_result.data.\*.created_by | string |  |   api-client-id:ae1690074e144336ae1de4de9dc1bd93 
+action_result.data.\*.created_timestamp | string |  |   2019-06-18T06:43:48.348572725Z 
+action_result.data.\*.description | string |  |   test 6 
+action_result.data.\*.group_type | string |  |   static 
+action_result.data.\*.id | string |  `crowdstrike host group id`  |   5c3203cee6934edd894c0c02d5a7d2ad 
+action_result.data.\*.modified_by | string |  |   api-client-id:ae1690074e144336ae1de4de9dc1bd93 
+action_result.data.\*.modified_timestamp | string |  |   2019-06-18T06:43:48.348572725Z 
+action_result.data.\*.name | string |  |   test 7 
+action_result.summary.total_assigned_device | numeric |  |   1 
+action_result.message | string |  |   Host added successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'remove hosts'
 Remove one or more hosts from the static host group
@@ -654,30 +721,30 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**device\_id** |  optional  | Comma\-separated list of device IDs | string |  `crowdstrike device id` 
-**hostname** |  optional  | Comma\-separated list of hostnames | string |  `host name` 
-**host\_group\_id** |  required  | Static host group ID | string |  `crowdstrike host group id` 
+**device_id** |  optional  | Comma-separated list of device IDs | string |  `crowdstrike device id` 
+**hostname** |  optional  | Comma-separated list of hostnames | string |  `host name` 
+**host_group_id** |  required  | Static host group ID | string |  `crowdstrike host group id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.device\_id | string |  `crowdstrike device id` 
-action\_result\.parameter\.host\_group\_id | string |  `crowdstrike host group id` 
-action\_result\.parameter\.hostname | string |  `host name` 
-action\_result\.data\.\*\.assignment\_rule | string | 
-action\_result\.data\.\*\.created\_by | string | 
-action\_result\.data\.\*\.created\_timestamp | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.group\_type | string | 
-action\_result\.data\.\*\.id | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.modified\_by | string | 
-action\_result\.data\.\*\.modified\_timestamp | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.summary\.total\_removed\_device | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928ab 
+action_result.parameter.host_group_id | string |  `crowdstrike host group id`  |   5c3203cee6934edd894c0c02d5a7d2ad 
+action_result.parameter.hostname | string |  `host name`  |   CB-TEST-01 
+action_result.data.\*.assignment_rule | string |  |   device_id:[''],hostname:[''] 
+action_result.data.\*.created_by | string |  |   api-client-id:ae1690074e144336ae1de4de9dc1bd93 
+action_result.data.\*.created_timestamp | string |  |   2019-06-18T06:43:48.348572725Z 
+action_result.data.\*.description | string |  |   test 6 
+action_result.data.\*.group_type | string |  |   static 
+action_result.data.\*.id | string |  `crowdstrike host group id`  |   5c3203cee6934edd894c0c02d5a7d2ad 
+action_result.data.\*.modified_by | string |  |   api-client-id:ae1690074e144336ae1de4de9dc1bd93 
+action_result.data.\*.modified_timestamp | string |  |   2019-06-18T06:43:48.348572725Z 
+action_result.data.\*.name | string |  |   test 7 
+action_result.summary.total_removed_device | numeric |  |   1 
+action_result.message | string |  |   Host removed successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'create session'
 Initialize a new session with the Real Time Response cloud
@@ -688,66 +755,66 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**device\_id** |  required  | Device ID for session to be created | string |  `crowdstrike device id` 
+**device_id** |  required  | Device ID for session to be created | string |  `crowdstrike device id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.device\_id | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.errors | string | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.created\_at | string | 
-action\_result\.data\.\*\.resources\.\*\.existing\_aid\_sessions | numeric | 
-action\_result\.data\.\*\.resources\.\*\.offline\_queued | boolean | 
-action\_result\.data\.\*\.resources\.\*\.pwd | string |  `file path` 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.arg\_name | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.arg\_type | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.command\_level | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.created\_at | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.data\_type | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.default\_value | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.description | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.encoding | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.id | numeric | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.options | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.required | boolean | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.requires\_value | boolean | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.script\_id | numeric | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.sequence | numeric | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.args\.\*\.updated\_at | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.command | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.description | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.examples | string |  `file path` 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.internal\_only | boolean | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.runnable | boolean | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.arg\_name | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.arg\_type | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.command\_level | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.created\_at | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.data\_type | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.default\_value | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.description | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.encoding | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.id | numeric | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.options | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.required | boolean | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.requires\_value | boolean | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.script\_id | numeric | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.sequence | numeric | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.args\.\*\.updated\_at | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.command | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.description | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.examples | string | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.internal\_only | boolean | 
-action\_result\.data\.\*\.resources\.\*\.scripts\.\*\.sub\_commands\.\*\.runnable | boolean | 
-action\_result\.data\.\*\.resources\.\*\.session\_id | string |  `crowdstrike rtr session id` 
-action\_result\.summary\.session\_id | string |  `crowdstrike rtr session id` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928ab 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\*.created_at | string |  |   2019-09-24T20:52:08.595772499Z 
+action_result.data.\*.resources.\*.existing_aid_sessions | numeric |  |   1 
+action_result.data.\*.resources.\*.offline_queued | boolean |  |   True  False 
+action_result.data.\*.resources.\*.pwd | string |  `file path`  |   C:\\ 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.arg_name | string |  |   Path 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.arg_type | string |  |   arg 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.command_level | string |  |   non-destructive 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.created_at | string |  |   2019-06-25T23:48:59Z 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.data_type | string |  |   string 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.default_value | string |  |  
+action_result.data.\*.resources.\*.scripts.\*.args.\*.description | string |  |   File to concatenate 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.encoding | string |  |  
+action_result.data.\*.resources.\*.scripts.\*.args.\*.id | numeric |  |   7 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.options | string |  |  
+action_result.data.\*.resources.\*.scripts.\*.args.\*.required | boolean |  |   True  False 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.requires_value | boolean |  |   True  False 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.script_id | numeric |  |   6 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.sequence | numeric |  |   1 
+action_result.data.\*.resources.\*.scripts.\*.args.\*.updated_at | string |  |   2019-06-25T23:48:59Z 
+action_result.data.\*.resources.\*.scripts.\*.command | string |  |   cat 
+action_result.data.\*.resources.\*.scripts.\*.description | string |  |   Read a file from disk and display as ASCII or hex 
+action_result.data.\*.resources.\*.scripts.\*.examples | string |  `file path`  |       C:\\> cat c:\\mytextfile.txt<br>        Display the contents of the text file (ASCII encoding)<br>    C:\\> cat c:\\windows\\system32\\cmd.exe 100 -ShowHex<br>        Display the first 100 hexadecimal characters for cmd.exe 
+action_result.data.\*.resources.\*.scripts.\*.internal_only | boolean |  |   True  False 
+action_result.data.\*.resources.\*.scripts.\*.runnable | boolean |  |   True  False 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.arg_name | string |  |   Name 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.arg_type | string |  |   arg 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.command_level | string |  |   non-destructive 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.created_at | string |  |   2018-05-01T19:38:30Z 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.data_type | string |  |   string 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.default_value | string |  |  
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.description | string |  |   Name of the event log, for example "Application", "System" 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.encoding | string |  |  
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.id | numeric |  |   35 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.options | string |  |  
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.required | boolean |  |   True  False 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.requires_value | boolean |  |   True  False 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.script_id | numeric |  |   25 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.sequence | numeric |  |   1 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.args.\*.updated_at | string |  |   2018-05-01T19:38:30Z 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.command | string |  |   view 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.description | string |  |   View most recent N events in a given event log 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.examples | string |  |       C:\\> eventlog view Application 5<br>        Displays the 5 most recent event log entries in the "Application" event source log 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.internal_only | boolean |  |   True  False 
+action_result.data.\*.resources.\*.scripts.\*.sub_commands.\*.runnable | boolean |  |   True  False 
+action_result.data.\*.resources.\*.session_id | string |  `crowdstrike rtr session id`  |   c0ab8e89-edb0-485f-a8ee-b52d73453a4b 
+action_result.summary.session_id | string |  `crowdstrike rtr session id`  |   b2403653-1294-488e-be81-7aadb69b52f1 
+action_result.message | string |  |   Session created successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'delete session'
 Deletes a Real Time Response session
@@ -758,18 +825,18 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**session\_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
+**session_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.session\_id | string |  `crowdstrike rtr session id` 
-action\_result\.data | string | 
-action\_result\.summary\.results | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.session_id | string |  `crowdstrike rtr session id`  |   cdc3b485-6d71-4417-b091-939336154e83 
+action_result.data | string |  |  
+action_result.summary.results | string |  |   Successfully removed session: b2403653-1294-488e-be81-7aadb69b52f1 
+action_result.message | string |  |   Session ended successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list detections'
 Get a list of detections
@@ -777,126 +844,283 @@ Get a list of detections
 Type: **investigate**  
 Read only: **True**
 
-This action supports filtering in order to retrieve a particular set of detections\.
+This action supports filtering in order to retrieve a particular set of detections.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **limit** |  optional  | Maximum detections to be fetched | numeric | 
-**filter** |  optional  | Filter expression used to limit the fetched detections \(FQL Syntax\) | string | 
+**filter** |  optional  | Filter expression used to limit the fetched detections (FQL Syntax) | string | 
 **sort** |  optional  | Property to sort by | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data | string | 
-action\_result\.data\.\*\.behaviors\.\*\.alleged\_filetype | string | 
-action\_result\.data\.\*\.behaviors\.\*\.behavior\_id | string | 
-action\_result\.data\.\*\.behaviors\.\*\.cmdline | string | 
-action\_result\.data\.\*\.behaviors\.\*\.confidence | numeric | 
-action\_result\.data\.\*\.behaviors\.\*\.control\_graph\_id | string | 
-action\_result\.data\.\*\.behaviors\.\*\.description | string | 
-action\_result\.data\.\*\.behaviors\.\*\.device\_id | string |  `md5`  `crowdstrike device id` 
-action\_result\.data\.\*\.behaviors\.\*\.display\_name | string | 
-action\_result\.data\.\*\.behaviors\.\*\.filename | string | 
-action\_result\.data\.\*\.behaviors\.\*\.filepath | string | 
-action\_result\.data\.\*\.behaviors\.\*\.ioc\_description | string | 
-action\_result\.data\.\*\.behaviors\.\*\.ioc\_source | string | 
-action\_result\.data\.\*\.behaviors\.\*\.ioc\_type | string | 
-action\_result\.data\.\*\.behaviors\.\*\.ioc\_value | string | 
-action\_result\.data\.\*\.behaviors\.\*\.md5 | string | 
-action\_result\.data\.\*\.behaviors\.\*\.objective | string | 
-action\_result\.data\.\*\.behaviors\.\*\.parent\_details\.parent\_cmdline | string | 
-action\_result\.data\.\*\.behaviors\.\*\.parent\_details\.parent\_md5 | string | 
-action\_result\.data\.\*\.behaviors\.\*\.parent\_details\.parent\_process\_graph\_id | string | 
-action\_result\.data\.\*\.behaviors\.\*\.parent\_details\.parent\_sha256 | string | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition | numeric | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.blocking\_unsupported\_or\_disabled | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.bootup\_safeguard\_enabled | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.critical\_process\_disabled | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.detect | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.fs\_operation\_blocked | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.handle\_operation\_downgraded | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.inddet\_mask | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.indicator | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.kill\_action\_failed | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.kill\_parent | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.kill\_process | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.kill\_subprocess | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.operation\_blocked | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.policy\_disabled | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.process\_blocked | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.quarantine\_file | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.quarantine\_machine | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.registry\_operation\_blocked | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.rooting | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.sensor\_only | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.suspend\_parent | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.pattern\_disposition\_details\.suspend\_process | boolean | 
-action\_result\.data\.\*\.behaviors\.\*\.scenario | string | 
-action\_result\.data\.\*\.behaviors\.\*\.severity | numeric | 
-action\_result\.data\.\*\.behaviors\.\*\.sha256 | string | 
-action\_result\.data\.\*\.behaviors\.\*\.tactic | string | 
-action\_result\.data\.\*\.behaviors\.\*\.tactic\_id | string | 
-action\_result\.data\.\*\.behaviors\.\*\.technique | string | 
-action\_result\.data\.\*\.behaviors\.\*\.technique\_id | string | 
-action\_result\.data\.\*\.behaviors\.\*\.template\_instance\_id | string | 
-action\_result\.data\.\*\.behaviors\.\*\.timestamp | string | 
-action\_result\.data\.\*\.behaviors\.\*\.triggering\_process\_graph\_id | string | 
-action\_result\.data\.\*\.behaviors\.\*\.user\_id | string | 
-action\_result\.data\.\*\.behaviors\.\*\.user\_name | string | 
-action\_result\.data\.\*\.cid | string |  `md5` 
-action\_result\.data\.\*\.created\_timestamp | string | 
-action\_result\.data\.\*\.date\_updated | string | 
-action\_result\.data\.\*\.detection\_id | string | 
-action\_result\.data\.\*\.device\.agent\_load\_flags | string | 
-action\_result\.data\.\*\.device\.agent\_local\_time | string | 
-action\_result\.data\.\*\.device\.agent\_version | string | 
-action\_result\.data\.\*\.device\.bios\_manufacturer | string | 
-action\_result\.data\.\*\.device\.bios\_version | string | 
-action\_result\.data\.\*\.device\.cid | string | 
-action\_result\.data\.\*\.device\.config\_id\_base | string | 
-action\_result\.data\.\*\.device\.config\_id\_build | string | 
-action\_result\.data\.\*\.device\.config\_id\_platform | string | 
-action\_result\.data\.\*\.device\.device\_id | string |  `md5`  `crowdstrike device id` 
-action\_result\.data\.\*\.device\.external\_ip | string | 
-action\_result\.data\.\*\.device\.first\_seen | string | 
-action\_result\.data\.\*\.device\.hostname | string | 
-action\_result\.data\.\*\.device\.last\_seen | string | 
-action\_result\.data\.\*\.device\.local\_ip | string | 
-action\_result\.data\.\*\.device\.mac\_address | string | 
-action\_result\.data\.\*\.device\.machine\_domain | string | 
-action\_result\.data\.\*\.device\.major\_version | string | 
-action\_result\.data\.\*\.device\.minor\_version | string | 
-action\_result\.data\.\*\.device\.modified\_timestamp | string | 
-action\_result\.data\.\*\.device\.os\_version | string | 
-action\_result\.data\.\*\.device\.platform\_id | string | 
-action\_result\.data\.\*\.device\.platform\_name | string | 
-action\_result\.data\.\*\.device\.product\_type | string | 
-action\_result\.data\.\*\.device\.product\_type\_desc | string | 
-action\_result\.data\.\*\.device\.site\_name | string | 
-action\_result\.data\.\*\.device\.status | string | 
-action\_result\.data\.\*\.device\.system\_manufacturer | string | 
-action\_result\.data\.\*\.device\.system\_product\_name | string | 
-action\_result\.data\.\*\.email\_sent | boolean | 
-action\_result\.data\.\*\.first\_behavior | string | 
-action\_result\.data\.\*\.hostinfo\.domain | string | 
-action\_result\.data\.\*\.last\_behavior | string | 
-action\_result\.data\.\*\.max\_confidence | numeric | 
-action\_result\.data\.\*\.max\_severity | numeric | 
-action\_result\.data\.\*\.max\_severity\_displayname | string | 
-action\_result\.data\.\*\.seconds\_to\_resolved | numeric | 
-action\_result\.data\.\*\.seconds\_to\_triaged | numeric | 
-action\_result\.data\.\*\.show\_in\_ui | boolean | 
-action\_result\.data\.\*\.status | string | 
-action\_result\.summary\.total\_detections | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   modified_timestamp:<='2019-06-14T10:22:02.02236652Z' 
+action_result.parameter.limit | numeric |  |   120 
+action_result.parameter.sort | string |  |   created_timestamp.asc 
+action_result.data | string |  |  
+action_result.data.\*.behaviors.\*.alleged_filetype | string |  |   exe 
+action_result.data.\*.behaviors.\*.behavior_id | string |  |   10354 
+action_result.data.\*.behaviors.\*.cmdline | string |  |  
+action_result.data.\*.behaviors.\*.confidence | numeric |  |   80 
+action_result.data.\*.behaviors.\*.control_graph_id | string |  |   ctg:46592f3d661a469eb2503d72a29afd3a:309255693652 
+action_result.data.\*.behaviors.\*.description | string |  |  
+action_result.data.\*.behaviors.\*.device_id | string |  `md5`  `crowdstrike device id`  |   46592f3d661a469eb2503d72a29afd3a 
+action_result.data.\*.behaviors.\*.display_name | string |  |   CredentialsInFilesCredentialAccess 
+action_result.data.\*.behaviors.\*.filename | string |  |   powershell.exe 
+action_result.data.\*.behaviors.\*.filepath | string |  |   \\Device\\HarddiskVolume2\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe 
+action_result.data.\*.behaviors.\*.ioc_description | string |  |   \\Device\\HarddiskVolume2\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe 
+action_result.data.\*.behaviors.\*.ioc_source | string |  |   library_load 
+action_result.data.\*.behaviors.\*.ioc_type | string |  |   hash_sha256 
+action_result.data.\*.behaviors.\*.ioc_value | string |  |   9f914d42706fe215501044acd85a32d58aaef1419d404fddfa5d3b48f66ccd9f 
+action_result.data.\*.behaviors.\*.md5 | string |  |   04029e121a0cfa5991749937dd22a1d9 
+action_result.data.\*.behaviors.\*.objective | string |  |   Gain Access 
+action_result.data.\*.behaviors.\*.parent_details.parent_cmdline | string |  |   "C:\\WINDOWS\\system32\\cmd.exe"  
+action_result.data.\*.behaviors.\*.parent_details.parent_md5 | string |  |   8a2122e8162dbef04694b9c3e0b6cdee 
+action_result.data.\*.behaviors.\*.parent_details.parent_process_graph_id | string |  |   pid:46592f3d661a469eb2503d72a29afd3a:740512001748 
+action_result.data.\*.behaviors.\*.parent_details.parent_sha256 | string |  |   b99d61d874728edc0918ca0eb10eab93d381e7367e377406e65963366c874450 
+action_result.data.\*.behaviors.\*.pattern_disposition | numeric |  |   2048 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.blocking_unsupported_or_disabled | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.bootup_safeguard_enabled | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.critical_process_disabled | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.detect | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.fs_operation_blocked | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.handle_operation_downgraded | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.inddet_mask | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.indicator | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_action_failed | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_parent | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_process | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_subprocess | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.operation_blocked | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.policy_disabled | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.process_blocked | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.quarantine_file | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.quarantine_machine | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.registry_operation_blocked | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.rooting | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.sensor_only | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.suspend_parent | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.suspend_process | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.scenario | string |  |   suspicious_activity 
+action_result.data.\*.behaviors.\*.severity | numeric |  |   70 
+action_result.data.\*.behaviors.\*.sha256 | string |  |   9f914d42706fe215501044acd85a32d58aaef1419d404fddfa5d3b48f66ccd9f 
+action_result.data.\*.behaviors.\*.tactic | string |  |   Credential Access 
+action_result.data.\*.behaviors.\*.tactic_id | string |  |   TA0006 
+action_result.data.\*.behaviors.\*.technique | string |  |   Credentials In Files 
+action_result.data.\*.behaviors.\*.technique_id | string |  |   T1552.001 
+action_result.data.\*.behaviors.\*.template_instance_id | string |  |   2649 
+action_result.data.\*.behaviors.\*.timestamp | string |  |   2022-09-26T11:30:26Z 
+action_result.data.\*.behaviors.\*.triggering_process_graph_id | string |  |   pid:46592f3d661a469eb2503d72a29afd3a:743690872884 
+action_result.data.\*.behaviors.\*.user_id | string |  |   S-1-5-21-3607613384-2395287924-1763154957-1001 
+action_result.data.\*.behaviors.\*.user_name | string |  |   testuser 
+action_result.data.\*.cid | string |  `md5`  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.created_timestamp | string |  |   2022-09-26T11:30:42.246972793Z 
+action_result.data.\*.date_updated | string |  |   2022-09-26T11:45:46Z 
+action_result.data.\*.detection_id | string |  `crowdstrike detection id`  |   ldt:46592f3d661a469eb2503d72a29afd3a:309255693652 
+action_result.data.\*.device.agent_load_flags | string |  |   0 
+action_result.data.\*.device.agent_local_time | string |  |   2022-08-22T15:45:16.195Z 
+action_result.data.\*.device.agent_version | string |  |   6.44.15806.0 
+action_result.data.\*.device.bios_manufacturer | string |  |   Phoenix Technologies LTD 
+action_result.data.\*.device.bios_version | string |  |   6.00 
+action_result.data.\*.device.cid | string |  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.device.config_id_base | string |  |   65994753 
+action_result.data.\*.device.config_id_build | string |  |   15806 
+action_result.data.\*.device.config_id_platform | string |  |   3 
+action_result.data.\*.device.device_id | string |  `md5`  `crowdstrike device id`  |   46592f3d661a469eb2503d72a29afd3a 
+action_result.data.\*.device.external_ip | string |  |   204.107.141.240 
+action_result.data.\*.device.first_seen | string |  |   2020-08-13T23:45:59Z 
+action_result.data.\*.device.hostname | string |  |   CB-TEST-02 
+action_result.data.\*.device.last_seen | string |  |   2022-09-26T11:21:40Z 
+action_result.data.\*.device.local_ip | string |  |   10.1.18.205 
+action_result.data.\*.device.mac_address | string |  |   00-50-56-12-34-56 
+action_result.data.\*.device.machine_domain | string |  |   sql19.local 
+action_result.data.\*.device.major_version | string |  |   10 
+action_result.data.\*.device.minor_version | string |  |   0 
+action_result.data.\*.device.modified_timestamp | string |  |   2022-09-26T11:27:43Z 
+action_result.data.\*.device.os_version | string |  |   Windows 10 
+action_result.data.\*.device.platform_id | string |  |   0 
+action_result.data.\*.device.platform_name | string |  |   Windows 
+action_result.data.\*.device.product_type | string |  |   1 
+action_result.data.\*.device.product_type_desc | string |  |   Workstation 
+action_result.data.\*.device.site_name | string |  |   Default-First-Site-Name 
+action_result.data.\*.device.status | string |  |   normal 
+action_result.data.\*.device.system_manufacturer | string |  |   VMware, Inc. 
+action_result.data.\*.device.system_product_name | string |  |   VMware Virtual Platform 
+action_result.data.\*.email_sent | boolean |  |   False 
+action_result.data.\*.first_behavior | string |  |   2022-09-26T11:30:26Z 
+action_result.data.\*.hostinfo.domain | string |  |  
+action_result.data.\*.last_behavior | string |  |   2022-09-26T11:30:26Z 
+action_result.data.\*.max_confidence | numeric |  |   80 
+action_result.data.\*.max_severity | numeric |  |   70 
+action_result.data.\*.max_severity_displayname | string |  |   High 
+action_result.data.\*.seconds_to_resolved | numeric |  |   0 
+action_result.data.\*.seconds_to_triaged | numeric |  |   0 
+action_result.data.\*.show_in_ui | boolean |  |   True 
+action_result.data.\*.status | string |  |   new 
+action_result.summary.total_detections | numeric |  |   44 
+action_result.message | string |  |   Total detections: 44 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'get detections details'
+Get a list of detections details by providing detection IDs
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**detection_ids** |  required  | List of detection IDs. Comma-separated list allowed | string |  `crowdstrike detection id` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.detection_ids | string |  `crowdstrike detection id`  |  
+action_result.data | string |  |  
+action_result.data.\*.assigned_to_name | string |  |   test user 
+action_result.data.\*.assigned_to_uid | string |  |   usertest@gmail.com 
+action_result.data.\*.behaviors.\*.alleged_filetype | string |  |   exe 
+action_result.data.\*.behaviors.\*.behavior_id | string |  |   10354 
+action_result.data.\*.behaviors.\*.cmdline | string |  |  
+action_result.data.\*.behaviors.\*.confidence | numeric |  |   80 
+action_result.data.\*.behaviors.\*.control_graph_id | string |  |   ctg:46592f3d661a469eb2503d72a29afd3a:309255693652 
+action_result.data.\*.behaviors.\*.description | string |  |  
+action_result.data.\*.behaviors.\*.device_id | string |  `md5`  `crowdstrike device id`  |   46592f3d661a469eb2503d72a29afd3a 
+action_result.data.\*.behaviors.\*.display_name | string |  |   CredentialsInFilesCredentialAccess 
+action_result.data.\*.behaviors.\*.filename | string |  |   powershell.exe 
+action_result.data.\*.behaviors.\*.filepath | string |  |   \\Device\\HarddiskVolume2\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe 
+action_result.data.\*.behaviors.\*.ioc_description | string |  |   \\Device\\HarddiskVolume2\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe 
+action_result.data.\*.behaviors.\*.ioc_source | string |  |   library_load 
+action_result.data.\*.behaviors.\*.ioc_type | string |  |   hash_sha256 
+action_result.data.\*.behaviors.\*.ioc_value | string |  |   9f914d42706fe215501044acd85a32d58aaef1419d404fddfa5d3b48f66ccd9f 
+action_result.data.\*.behaviors.\*.md5 | string |  |   04029e121a0cfa5991749937dd22a1d9 
+action_result.data.\*.behaviors.\*.objective | string |  |   Gain Access 
+action_result.data.\*.behaviors.\*.parent_details.parent_cmdline | string |  |   "C:\\WINDOWS\\system32\\cmd.exe"  
+action_result.data.\*.behaviors.\*.parent_details.parent_md5 | string |  |   8a2122e8162dbef04694b9c3e0b6cdee 
+action_result.data.\*.behaviors.\*.parent_details.parent_process_graph_id | string |  |   pid:46592f3d661a469eb2503d72a29afd3a:740512001748 
+action_result.data.\*.behaviors.\*.parent_details.parent_sha256 | string |  |   b99d61d874728edc0918ca0eb10eab93d381e7367e377406e65963366c874450 
+action_result.data.\*.behaviors.\*.pattern_disposition | numeric |  |   2048 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.blocking_unsupported_or_disabled | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.bootup_safeguard_enabled | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.critical_process_disabled | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.detect | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.fs_operation_blocked | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.handle_operation_downgraded | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.inddet_mask | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.indicator | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_action_failed | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_parent | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_process | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_subprocess | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.operation_blocked | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.policy_disabled | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.process_blocked | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.quarantine_file | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.quarantine_machine | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.registry_operation_blocked | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.rooting | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.sensor_only | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.suspend_parent | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.pattern_disposition_details.suspend_process | boolean |  |   False  True 
+action_result.data.\*.behaviors.\*.scenario | string |  |   suspicious_activity 
+action_result.data.\*.behaviors.\*.severity | numeric |  |   70 
+action_result.data.\*.behaviors.\*.sha256 | string |  |   9f914d42706fe215501044acd85a32d58aaef1419d404fddfa5d3b48f66ccd9f 
+action_result.data.\*.behaviors.\*.tactic | string |  |   Credential Access 
+action_result.data.\*.behaviors.\*.tactic_id | string |  |   TA0006 
+action_result.data.\*.behaviors.\*.technique | string |  |   Credentials In Files 
+action_result.data.\*.behaviors.\*.technique_id | string |  |   T1552.001 
+action_result.data.\*.behaviors.\*.template_instance_id | string |  |   2649 
+action_result.data.\*.behaviors.\*.timestamp | string |  |   2022-09-26T11:30:26Z 
+action_result.data.\*.behaviors.\*.triggering_process_graph_id | string |  |   pid:46592f3d661a469eb2503d72a29afd3a:743690872884 
+action_result.data.\*.behaviors.\*.user_id | string |  |   S-1-5-21-3607613384-2395287924-1763154957-1001 
+action_result.data.\*.behaviors.\*.user_name | string |  |   testuser 
+action_result.data.\*.cid | string |  `md5`  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.created_timestamp | string |  |   2022-09-26T11:30:42.246972793Z 
+action_result.data.\*.date_updated | string |  |   2022-09-26T11:45:46Z 
+action_result.data.\*.detection_id | string |  `crowdstrike detection id`  |   ldt:46592f3d661a469eb2503d72a29afd3a:309255693652 
+action_result.data.\*.device.agent_load_flags | string |  |   0 
+action_result.data.\*.device.agent_local_time | string |  |   2022-08-22T15:45:16.195Z 
+action_result.data.\*.device.agent_version | string |  |   6.44.15806.0 
+action_result.data.\*.device.bios_manufacturer | string |  |   Phoenix Technologies LTD 
+action_result.data.\*.device.bios_version | string |  |   6.00 
+action_result.data.\*.device.cid | string |  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.device.config_id_base | string |  |   65994753 
+action_result.data.\*.device.config_id_build | string |  |   15806 
+action_result.data.\*.device.config_id_platform | string |  |   3 
+action_result.data.\*.device.device_id | string |  `md5`  `crowdstrike device id`  |   46592f3d661a469eb2503d72a29afd3a 
+action_result.data.\*.device.external_ip | string |  |   204.107.141.240 
+action_result.data.\*.device.first_seen | string |  |   2020-08-13T23:45:59Z 
+action_result.data.\*.device.hostname | string |  |   CB-TEST-02 
+action_result.data.\*.device.last_seen | string |  |   2022-09-26T11:21:40Z 
+action_result.data.\*.device.local_ip | string |  |   10.1.18.205 
+action_result.data.\*.device.mac_address | string |  |   00-50-56-12-34-56 
+action_result.data.\*.device.machine_domain | string |  |   sql19.local 
+action_result.data.\*.device.major_version | string |  |   10 
+action_result.data.\*.device.minor_version | string |  |   0 
+action_result.data.\*.device.modified_timestamp | string |  |   2022-09-26T11:27:43Z 
+action_result.data.\*.device.os_version | string |  |   Windows 10 
+action_result.data.\*.device.platform_id | string |  |   0 
+action_result.data.\*.device.platform_name | string |  |   Windows 
+action_result.data.\*.device.product_type | string |  |   1 
+action_result.data.\*.device.product_type_desc | string |  |   Workstation 
+action_result.data.\*.device.site_name | string |  |   Default-First-Site-Name 
+action_result.data.\*.device.status | string |  |   normal 
+action_result.data.\*.device.system_manufacturer | string |  |   VMware, Inc. 
+action_result.data.\*.device.system_product_name | string |  |   VMware Virtual Platform 
+action_result.data.\*.email_sent | boolean |  |   False 
+action_result.data.\*.first_behavior | string |  |   2022-09-26T11:30:26Z 
+action_result.data.\*.hostinfo.domain | string |  |  
+action_result.data.\*.last_behavior | string |  |   2022-09-26T11:30:26Z 
+action_result.data.\*.max_confidence | numeric |  |   80 
+action_result.data.\*.max_severity | numeric |  |   70 
+action_result.data.\*.max_severity_displayname | string |  |   High 
+action_result.data.\*.seconds_to_resolved | numeric |  |   2 
+action_result.data.\*.seconds_to_triaged | numeric |  |   1 
+action_result.data.\*.show_in_ui | boolean |  |   True 
+action_result.data.\*.status | string |  |   new 
+action_result.summary.total_detections | numeric |  |   44 
+action_result.message | string |  |   Total detections: 44 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'update detections'
+Update detections in crowdstrike host
+
+Type: **generic**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**detection_ids** |  required  | List of Detection IDs to update, Comma-separated list allowed | string |  `crowdstrike detection id` 
+**comment** |  optional  | Comment to add to the detection (Maximum 2048 bytes) | string | 
+**assigned_to_user** |  optional  | User ID to assign | string |  `crowdstrike unique user id` 
+**show_in_ui** |  optional  | This detection is displayed or not in falcon UI | boolean | 
+**status** |  optional  | Status to set | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.assigned_to_user | string |  `crowdstrike unique user id`  |  
+action_result.parameter.comment | string |  |   update status of detection 
+action_result.parameter.detection_ids | string |  `crowdstrike detection id`  |   ldt:07c312fabcb8473454d0a16f118928fg:10548439893999 
+action_result.parameter.show_in_ui | boolean |  |   True  False 
+action_result.parameter.status | string |  |   in_progress 
+action_result.data.\*.meta.powered_by | string |  |   legacy-detects 
+action_result.data.\*.meta.query_time | numeric |  |   0 
+action_result.data.\*.meta.trace_id | string |  |   a30c7b54-ae00-4a87-8324-0a575ba7dcb4 
+action_result.data.\*.meta.writes.resources_affected | numeric |  |   2 
+action_result.summary | string |  |  
+action_result.summary.detections_affected | numeric |  |   1 
+action_result.message | string |  |   Detections affected: 1 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list alerts'
 Get a list of alerts
@@ -904,59 +1128,59 @@ Get a list of alerts
 Type: **investigate**  
 Read only: **True**
 
-This action supports filtering in order to retrieve a particular set of alerts\.
+This action supports filtering in order to retrieve a particular set of alerts.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **limit** |  optional  | Maximum alerts to be fetched | numeric | 
-**filter** |  optional  | Filter expression used to limit the fetched alerts \(FQL Syntax\) | string | 
+**filter** |  optional  | Filter expression used to limit the fetched alerts (FQL Syntax) | string | 
 **sort** |  optional  | Property to sort by | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data\.\*\.aggregate\_id | string | 
-action\_result\.data\.\*\.cid | string |  `md5` 
-action\_result\.data\.\*\.composite\_id | string | 
-action\_result\.data\.\*\.confidence | numeric | 
-action\_result\.data\.\*\.context\_timestamp | string | 
-action\_result\.data\.\*\.crawled\_timestamp | string | 
-action\_result\.data\.\*\.created\_timestamp | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.display\_name | string | 
-action\_result\.data\.\*\.end\_time | string | 
-action\_result\.data\.\*\.falcon\_host\_link | string | 
-action\_result\.data\.\*\.id | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.data\.\*\.objective | string | 
-action\_result\.data\.\*\.pattern\_id | numeric | 
-action\_result\.data\.\*\.previous\_privileges | string | 
-action\_result\.data\.\*\.privileges | string | 
-action\_result\.data\.\*\.product | string | 
-action\_result\.data\.\*\.scenario | string | 
-action\_result\.data\.\*\.severity | numeric | 
-action\_result\.data\.\*\.show\_in\_ui | boolean | 
-action\_result\.data\.\*\.source\_account\_domain | string | 
-action\_result\.data\.\*\.source\_account\_name | string | 
-action\_result\.data\.\*\.source\_account\_object\_sid | string | 
-action\_result\.data\.\*\.start\_time | string | 
-action\_result\.data\.\*\.status | string | 
-action\_result\.data\.\*\.tactic | string | 
-action\_result\.data\.\*\.tactic\_id | string | 
-action\_result\.data\.\*\.technique | string | 
-action\_result\.data\.\*\.technique\_id | string | 
-action\_result\.data\.\*\.timestamp | string | 
-action\_result\.data\.\*\.type | string | 
-action\_result\.data\.\*\.updated\_timestamp | string | 
-action\_result\.summary\.total\_alerts | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   modified_timestamp:<='2019-06-14T10:22:02.02236652Z' 
+action_result.parameter.limit | numeric |  |   120 
+action_result.parameter.sort | string |  |   created_timestamp.asc 
+action_result.data.\*.aggregate_id | string |  |   aggind:3061c7ff3b634e22b38274d4b586558e:3EC58D8F-599D-4CEC-8BB1-BFDE96477FB1 
+action_result.data.\*.cid | string |  `md5`  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.composite_id | string |  |   3061c7ff3b634e22b38274d4b586558e:ind:3061c7ff3b634e22b38274d4b586558e:3EC58D8F-599D-4CEC-8BB1-BFDE96477FB1 
+action_result.data.\*.confidence | numeric |  |   20 
+action_result.data.\*.context_timestamp | string |  |   2022-11-16T09:42:26.413Z 
+action_result.data.\*.crawled_timestamp | string |  |   2022-11-16T09:47:26.563805668Z 
+action_result.data.\*.created_timestamp | string |  |   2022-11-16T09:43:26.560807901Z 
+action_result.data.\*.description | string |  |   A user received new privileges 
+action_result.data.\*.display_name | string |  |   Privilege escalation (user) 
+action_result.data.\*.end_time | string |  |   2022-11-16T09:42:26.413Z 
+action_result.data.\*.falcon_host_link | string |  |   https://falcon.crowdstrike.com/identity-protection/detections/3061c7ff3b634e22b38274d4b586558e:ind:3061c7ff3b634e22b38274d4b586558e:3EC58D8F-599D-4CEC-8BB1-BFDE96477FB1?cid=3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.id | string |  |   ind:3061c7ff3b634e22b38274d4b586558e:3EC58D8F-599D-4CEC-8BB1-BFDE96477FB1 
+action_result.data.\*.name | string |  |   IdpEntityPrivilegeEscalationUser 
+action_result.data.\*.objective | string |  |   Gain Access 
+action_result.data.\*.pattern_id | numeric |  |   51113 
+action_result.data.\*.previous_privileges | string |  |   0 
+action_result.data.\*.privileges | string |  |   8321 
+action_result.data.\*.product | string |  |   idp 
+action_result.data.\*.scenario | string |  |   privilege_escalation 
+action_result.data.\*.severity | numeric |  |   2 
+action_result.data.\*.show_in_ui | boolean |  |   True 
+action_result.data.\*.source_account_domain | string |  |   IDENTITY.TEST 
+action_result.data.\*.source_account_name | string |  |   test1 
+action_result.data.\*.source_account_object_sid | string |  |   S-1-5-21-14850137-2860523753-2226348357-1103 
+action_result.data.\*.start_time | string |  |   2022-11-16T09:42:26.413Z 
+action_result.data.\*.status | string |  |   new 
+action_result.data.\*.tactic | string |  |   Privilege Escalation 
+action_result.data.\*.tactic_id | string |  |   TA0004 
+action_result.data.\*.technique | string |  |   Valid Accounts 
+action_result.data.\*.technique_id | string |  |   T1078 
+action_result.data.\*.timestamp | string |  |   2022-11-16T09:42:26.56Z 
+action_result.data.\*.type | string |  |   idp-user-endpoint-app-info 
+action_result.data.\*.updated_timestamp | string |  |   2022-11-16T09:47:26.561192951Z 
+action_result.summary.total_alerts | numeric |  |   50 
+action_result.message | string |  |   Total alerts: 50 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list sessions'
 Lists Real Time Response sessions
@@ -964,53 +1188,53 @@ Lists Real Time Response sessions
 Type: **investigate**  
 Read only: **True**
 
-This action supports filtering in order to retrieve a particular session\.
+This action supports filtering in order to retrieve a particular session.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **limit** |  optional  | Maximum RTR sessions to be fetched | numeric | 
-**filter** |  optional  | Filter expression used to limit the fetched RTR sessions \(FQL Syntax\) | string | 
+**filter** |  optional  | Filter expression used to limit the fetched RTR sessions (FQL Syntax) | string | 
 **sort** |  optional  | Property to sort by | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data\.\*\.cid | string |  `md5` 
-action\_result\.data\.\*\.cloud\_request\_ids | string | 
-action\_result\.data\.\*\.commands | string | 
-action\_result\.data\.\*\.commands\_queued | boolean | 
-action\_result\.data\.\*\.created\_at | string | 
-action\_result\.data\.\*\.deleted\_at | string | 
-action\_result\.data\.\*\.device\_details | string | 
-action\_result\.data\.\*\.device\_id | string |  `md5`  `crowdstrike device id` 
-action\_result\.data\.\*\.duration | numeric | 
-action\_result\.data\.\*\.hostname | string |  `host name` 
-action\_result\.data\.\*\.id | string |  `crowdstrike rtr session id` 
-action\_result\.data\.\*\.logs\.\*\.base\_command | string | 
-action\_result\.data\.\*\.logs\.\*\.cloud\_request\_id | string | 
-action\_result\.data\.\*\.logs\.\*\.command\_string | string | 
-action\_result\.data\.\*\.logs\.\*\.created\_at | string | 
-action\_result\.data\.\*\.logs\.\*\.current\_directory | string | 
-action\_result\.data\.\*\.logs\.\*\.id | numeric | 
-action\_result\.data\.\*\.logs\.\*\.session\_id | string | 
-action\_result\.data\.\*\.logs\.\*\.updated\_at | string | 
-action\_result\.data\.\*\.offline\_queued | boolean | 
-action\_result\.data\.\*\.origin | string | 
-action\_result\.data\.\*\.platform\_id | numeric | 
-action\_result\.data\.\*\.platform\_name | string | 
-action\_result\.data\.\*\.pwd | string | 
-action\_result\.data\.\*\.updated\_at | string | 
-action\_result\.data\.\*\.user\_id | string | 
-action\_result\.data\.\*\.user\_uuid | string | 
-action\_result\.summary\.total\_sessions | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   modified_timestamp:<='2019-06-14T10:22:02.02236652Z' 
+action_result.parameter.limit | numeric |  |   120 
+action_result.parameter.sort | string |  |   created_timestamp.asc 
+action_result.data.\*.cid | string |  `md5`  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.cloud_request_ids | string |  |   06f052a0-d7a6-431b-987f-4afd92925a19 
+action_result.data.\*.commands | string |  |  
+action_result.data.\*.commands_queued | boolean |  |   True  False 
+action_result.data.\*.created_at | string |  |   2019-09-24T20:52:08Z 
+action_result.data.\*.deleted_at | string |  |   2019-09-24T20:54:04Z 
+action_result.data.\*.device_details | string |  |  
+action_result.data.\*.device_id | string |  `md5`  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928ab 
+action_result.data.\*.duration | numeric |  |   0 
+action_result.data.\*.hostname | string |  `host name`  |   CB-TEST-01 
+action_result.data.\*.id | string |  `crowdstrike rtr session id`  |   c0ab8e89-edb0-485f-a8ee-b52d73453a4b 
+action_result.data.\*.logs.\*.base_command | string |  |   pwd 
+action_result.data.\*.logs.\*.cloud_request_id | string |  |   06f052a0-d7a6-431b-987f-4afd92925a19 
+action_result.data.\*.logs.\*.command_string | string |  |   pwd 
+action_result.data.\*.logs.\*.created_at | string |  |   2019-09-24T20:52:08Z 
+action_result.data.\*.logs.\*.current_directory | string |  |   C:\\ 
+action_result.data.\*.logs.\*.id | numeric |  |   2522218 
+action_result.data.\*.logs.\*.session_id | string |  |   c0ab8e89-edb0-485f-a8ee-b52d73453a4b 
+action_result.data.\*.logs.\*.updated_at | string |  |   2019-09-24T20:52:08Z 
+action_result.data.\*.offline_queued | boolean |  |   True  False 
+action_result.data.\*.origin | string |  |   source:hosts,deviceId:07c312fabcb8473454d0a16f118928ab 
+action_result.data.\*.platform_id | numeric |  |   0 
+action_result.data.\*.platform_name | string |  |  
+action_result.data.\*.pwd | string |  |  
+action_result.data.\*.updated_at | string |  |   2019-09-24T20:52:14Z 
+action_result.data.\*.user_id | string |  |   api-client-05dbdf165b474db597007c6f88780e39 
+action_result.data.\*.user_uuid | string |  |   05dbdf16-5b47-4db5-9700-7c6f88780e39 
+action_result.summary.total_sessions | numeric |  |   1 
+action_result.message | string |  |   Total sessions: 2 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'run command'
 Execute an active responder command on a single host
@@ -1018,37 +1242,37 @@ Execute an active responder command on a single host
 Type: **generic**  
 Read only: **False**
 
-The API works by first creating a cloud request to execute the command, then the results need to be retrieved using a GET with the cloud\_request\_id\. The action will attempt to retrieve the results, but in the event that a timeout occurs, execute a 'get command details' action\.
+The API works by first creating a cloud request to execute the command, then the results need to be retrieved using a GET with the cloud_request_id. The action will attempt to retrieve the results, but in the event that a timeout occurs, execute a 'get command details' action.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**device\_id** |  required  | Device ID | string |  `crowdstrike device id` 
-**session\_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
+**device_id** |  required  | Device ID | string |  `md5`  `crowdstrike device id` 
+**session_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
 **command** |  required  | RTR command to execute on host | string | 
 **data** |  optional  | Data/Arguments for the command | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.command | string | 
-action\_result\.parameter\.data | string | 
-action\_result\.parameter\.device\_id | string |  `crowdstrike device id` 
-action\_result\.parameter\.session\_id | string |  `crowdstrike rtr session id` 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.base\_command | string | 
-action\_result\.data\.\*\.resources\.\*\.complete | boolean | 
-action\_result\.data\.\*\.resources\.\*\.session\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.stderr | string | 
-action\_result\.data\.\*\.resources\.\*\.stdout | string | 
-action\_result\.data\.\*\.resources\.\*\.task\_id | string | 
-action\_result\.summary\.cloud\_request\_id | string |  `crowdstrike cloud request id` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.command | string |  |   get  ls 
+action_result.parameter.data | string |  |   C:\\Users\\testuser\\go\\src\\simulate\\DLL_KEYLOG.dll 
+action_result.parameter.device_id | string |  `md5`  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928ab 
+action_result.parameter.session_id | string |  `crowdstrike rtr session id`  |   90981f4c-f6c1-4437-b191-beae115c4929 
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.038770347 
+action_result.data.\*.meta.trace_id | string |  |   f983d1ab-97d7-4af7-8bd7-1a6b8de0c05d 
+action_result.data.\*.resources.\*.base_command | string |  |   ls 
+action_result.data.\*.resources.\*.complete | boolean |  |   True  False 
+action_result.data.\*.resources.\*.session_id | string |  |   9705111a-9928-4c10-b385-eefda32f9575 
+action_result.data.\*.resources.\*.stderr | string |  |   Check your filename. Couldn't find 'some_file.txt' 
+action_result.data.\*.resources.\*.stdout | string |  |   Directory listing for C:\\ - <br>Name 
+action_result.data.\*.resources.\*.task_id | string |  |   d901dbea-f556-4f32-921b-056bbc00b4e0 
+action_result.summary.cloud_request_id | string |  `crowdstrike cloud request id`  |   4b185028-39a3-4452-8e96-6da3729095fa 
+action_result.message | string |  |   Cloud request id: d901dbea-f556-4f32-921b-056bbc00b4e0 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'run admin command'
 Execute an RTR Admin command on a single host
@@ -1056,37 +1280,37 @@ Execute an RTR Admin command on a single host
 Type: **generic**  
 Read only: **False**
 
-This action requires a token with RTR Admin permissions\.
+This action requires a token with RTR Admin permissions.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**device\_id** |  required  | Device ID | string |  `crowdstrike device id` 
-**session\_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
+**device_id** |  required  | Device ID | string |  `crowdstrike device id` 
+**session_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
 **command** |  required  | RTR Admin command to execute on host | string | 
 **data** |  optional  | Data/Arguments for the command | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.command | string | 
-action\_result\.parameter\.data | string | 
-action\_result\.parameter\.device\_id | string |  `crowdstrike device id` 
-action\_result\.parameter\.session\_id | string |  `crowdstrike rtr session id` 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.base\_command | string | 
-action\_result\.data\.\*\.resources\.\*\.complete | boolean | 
-action\_result\.data\.\*\.resources\.\*\.session\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.stderr | string | 
-action\_result\.data\.\*\.resources\.\*\.stdout | string | 
-action\_result\.data\.\*\.resources\.\*\.task\_id | string | 
-action\_result\.summary\.cloud\_request\_id | string |  `crowdstrike cloud request id` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.command | string |  |   get  ls 
+action_result.parameter.data | string |  |   C:\\Users\\testuser\\go\\src\\simulate\\DLL_KEYLOG.dll 
+action_result.parameter.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928ab 
+action_result.parameter.session_id | string |  `crowdstrike rtr session id`  |   90981f4c-f6c1-4437-b191-beae115c4929 
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.038770347 
+action_result.data.\*.meta.trace_id | string |  |   f983d1ab-97d7-4af7-8bd7-1a6b8de0c05d 
+action_result.data.\*.resources.\*.base_command | string |  |   ls 
+action_result.data.\*.resources.\*.complete | boolean |  |   True  False 
+action_result.data.\*.resources.\*.session_id | string |  |   9705111a-9928-4c10-b385-eefda32f9575 
+action_result.data.\*.resources.\*.stderr | string |  |   Check your filename. Couldn't find 'some_file.txt' 
+action_result.data.\*.resources.\*.stdout | string |  |   Directory listing for C:\\ - <br>Name 
+action_result.data.\*.resources.\*.task_id | string |  |   d901dbea-f556-4f32-921b-056bbc00b4e0 
+action_result.summary.cloud_request_id | string |  `crowdstrike cloud request id`  |   4b185028-39a3-4452-8e96-6da3729095fa 
+action_result.message | string |  |   Cloud request id: d901dbea-f556-4f32-921b-056bbc00b4e0 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get command details'
 Retrieve results of an active responder command executed on a single host
@@ -1097,28 +1321,28 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**cloud\_request\_id** |  required  | Cloud Request ID for Command | string |  `crowdstrike cloud request id` 
-**timeout\_seconds** |  optional  | Time \(in seconds; default is 60\) to wait before timing out poll for results | numeric | 
+**cloud_request_id** |  required  | Cloud Request ID for Command | string |  `crowdstrike cloud request id` 
+**timeout_seconds** |  optional  | Time (in seconds; default is 60) to wait before timing out poll for results | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.cloud\_request\_id | string |  `crowdstrike cloud request id` 
-action\_result\.parameter\.timeout\_seconds | numeric | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.base\_command | string | 
-action\_result\.data\.\*\.resources\.\*\.complete | boolean | 
-action\_result\.data\.\*\.resources\.\*\.session\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.stderr | string | 
-action\_result\.data\.\*\.resources\.\*\.stdout | string | 
-action\_result\.data\.\*\.resources\.\*\.task\_id | string | 
-action\_result\.summary\.results | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.cloud_request_id | string |  `crowdstrike cloud request id`  |   4b185028-39a3-4452-8e96-6da3729095fa 
+action_result.parameter.timeout_seconds | numeric |  |   60 
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.038770347 
+action_result.data.\*.meta.trace_id | string |  |   f983d1ab-97d7-4af7-8bd7-1a6b8de0c05d 
+action_result.data.\*.resources.\*.base_command | string |  |   ls 
+action_result.data.\*.resources.\*.complete | boolean |  |   True  False 
+action_result.data.\*.resources.\*.session_id | string |  |   9705111a-9928-4c10-b385-eefda32f9575 
+action_result.data.\*.resources.\*.stderr | string |  |   Check your filename. Couldn't find 'some_file.txt' 
+action_result.data.\*.resources.\*.stdout | string |  |   Directory listing for C:\\ - <br>Name 
+action_result.data.\*.resources.\*.task_id | string |  |   d901dbea-f556-4f32-921b-056bbc00b4e0 
+action_result.summary.results | string |  |   Successfully executed command 
+action_result.message | string |  |   Results: Successfully executed command 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list session files'
 Get a list of files for the specified RTR session
@@ -1129,29 +1353,29 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**session\_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
+**session_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.session\_id | string |  `crowdstrike rtr session id` 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.cloud\_request\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.created\_at | string | 
-action\_result\.data\.\*\.resources\.\*\.deleted\_at | string | 
-action\_result\.data\.\*\.resources\.\*\.id | numeric | 
-action\_result\.data\.\*\.resources\.\*\.name | string |  `file name` 
-action\_result\.data\.\*\.resources\.\*\.session\_id | string |  `crowdstrike rtr session id` 
-action\_result\.data\.\*\.resources\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.resources\.\*\.size | numeric | 
-action\_result\.data\.\*\.resources\.\*\.updated\_at | string | 
-action\_result\.summary\.total\_files | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.session_id | string |  `crowdstrike rtr session id`  |   0bf3c91f-1267-4a6d-a694-d225aeac65eb 
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.060876276 
+action_result.data.\*.meta.trace_id | string |  |   ccb8edf2-fd5b-4221-81c8-0e80de3e66a6 
+action_result.data.\*.resources.\*.cloud_request_id | string |  |   292efe5f-a755-45f8-a95a-72138d21b8db 
+action_result.data.\*.resources.\*.created_at | string |  |   2019-10-08T20:12:14Z 
+action_result.data.\*.resources.\*.deleted_at | string |  |  
+action_result.data.\*.resources.\*.id | numeric |  |   104874 
+action_result.data.\*.resources.\*.name | string |  `file name`  |   \\Device\\HarddiskVolume2\\Users\\testuser\\go\\src\\simulate\\DLL_KEYLOG.dll 
+action_result.data.\*.resources.\*.session_id | string |  `crowdstrike rtr session id`  |   0bf3c91f-1267-4a6d-a694-d225aeac65eb 
+action_result.data.\*.resources.\*.sha256 | string |  `sha256`  |   53d84902e0a25be8706df19506f78799deab0082149b926b4117270f9c8673ad 
+action_result.data.\*.resources.\*.size | numeric |  |   0 
+action_result.data.\*.resources.\*.updated_at | string |  |   2019-10-08T20:12:14Z 
+action_result.summary.total_files | numeric |  |   1 
+action_result.message | string |  |   Session files listed successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get incident behaviors'
 Get details on behaviors by providing behavior IDs
@@ -1162,65 +1386,65 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ids** |  required  | List of behavior IDs\. Comma separated list allowed | string |  `crowdstrike incidentbehavior id` 
+**ids** |  required  | List of behavior IDs. Comma separated list allowed | string |  `crowdstrike incidentbehavior id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.ids | string |  `crowdstrike incidentbehavior id` 
-action\_result\.data\.\*\.aid | string | 
-action\_result\.data\.\*\.behavior\_id | string |  `crowdstrike incidentbehavior id` 
-action\_result\.data\.\*\.cid | string | 
-action\_result\.data\.\*\.cmdline | string | 
-action\_result\.data\.\*\.compound\_tto | string | 
-action\_result\.data\.\*\.detection\_ids | string |  `crowdstrike detection id` 
-action\_result\.data\.\*\.display\_name | string | 
-action\_result\.data\.\*\.domain | string | 
-action\_result\.data\.\*\.errors\.\*\.code | numeric | 
-action\_result\.data\.\*\.errors\.\*\.message | string | 
-action\_result\.data\.\*\.filepath | string | 
-action\_result\.data\.\*\.incident\_id | string |  `crowdstrike incident id` 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.objective | string | 
-action\_result\.data\.\*\.pattern\_disposition | numeric | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.blocking\_unsupported\_or\_disabled | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.bootup\_safeguard\_enabled | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.critical\_process\_disabled | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.detect | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.fs\_operation\_blocked | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.handle\_operation\_downgraded | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.inddet\_mask | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.indicator | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.kill\_action\_failed | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.kill\_parent | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.kill\_process | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.kill\_subprocess | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.operation\_blocked | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.policy\_disabled | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.process\_blocked | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.quarantine\_file | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.quarantine\_machine | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.registry\_operation\_blocked | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.rooting | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.sensor\_only | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.suspend\_parent | boolean | 
-action\_result\.data\.\*\.pattern\_disposition\_details\.suspend\_process | boolean | 
-action\_result\.data\.\*\.pattern\_id | numeric | 
-action\_result\.data\.\*\.sha256 | string | 
-action\_result\.data\.\*\.tactic | string | 
-action\_result\.data\.\*\.tactic\_id | string | 
-action\_result\.data\.\*\.technique | string | 
-action\_result\.data\.\*\.technique\_id | string | 
-action\_result\.data\.\*\.template\_instance\_id | numeric | 
-action\_result\.data\.\*\.timestamp | string | 
-action\_result\.data\.\*\.user\_name | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.ids | string |  `crowdstrike incidentbehavior id`  |   ind:9e262c00000a46916beeaef04e45bc6a:dc8e3b1300004da2a6e7b20656e3276d 
+action_result.data.\*.aid | string |  |   w6h79wgbzy4ofsa093dp2s808qe8gswr 
+action_result.data.\*.behavior_id | string |  `crowdstrike incidentbehavior id`  |   ind:9e262c00000a46916beeaef04e45bc6a:dc8e3b1300004da2a6e7b20656e3276d 
+action_result.data.\*.cid | string |  |   e6m35yiizlefbv6o4az6b46sgjipx6lg 
+action_result.data.\*.cmdline | string |  |  
+action_result.data.\*.compound_tto | string |  |  
+action_result.data.\*.detection_ids | string |  `crowdstrike detection id`  |   ldt:07c312fabcb8473454d0a16f118928ab:10548439893000 
+action_result.data.\*.display_name | string |  |   SampleTemplateDetection 
+action_result.data.\*.domain | string |  |   CB-TEST-02 
+action_result.data.\*.errors.\*.code | numeric |  |   400 
+action_result.data.\*.errors.\*.message | string |  |   invalid behavior id=test 
+action_result.data.\*.filepath | string |  |   C:\\user\\somefile.txt 
+action_result.data.\*.incident_id | string |  `crowdstrike incident id`  |   inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d 
+action_result.data.\*.meta.powered_by | string |  |   incident-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.000305451 
+action_result.data.\*.meta.trace_id | string |  |   ebb97943-be70-4acc-a2dd-c663b59761fa 
+action_result.data.\*.objective | string |  |   Keep Access 
+action_result.data.\*.pattern_disposition | numeric |  |   2048 
+action_result.data.\*.pattern_disposition_details.blocking_unsupported_or_disabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.bootup_safeguard_enabled | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.critical_process_disabled | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.detect | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.fs_operation_blocked | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.handle_operation_downgraded | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.inddet_mask | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.indicator | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.kill_action_failed | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.kill_parent | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.kill_process | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.kill_subprocess | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.operation_blocked | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.policy_disabled | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.process_blocked | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.quarantine_file | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.quarantine_machine | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.registry_operation_blocked | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.rooting | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.sensor_only | boolean |  |   True  False 
+action_result.data.\*.pattern_disposition_details.suspend_parent | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.suspend_process | boolean |  |   False 
+action_result.data.\*.pattern_id | numeric |  |   1024 
+action_result.data.\*.sha256 | string |  |   ln3g11yf8r40be90ups2q1435ybhzdopbkt103wce5ligiuhww2b4l1f7tmp1vhi 
+action_result.data.\*.tactic | string |  |   Persistance 
+action_result.data.\*.tactic_id | string |  |   CSTA0001 
+action_result.data.\*.technique | string |  |   Hidden Files and Directories 
+action_result.data.\*.technique_id | string |  |   CST0001 
+action_result.data.\*.template_instance_id | numeric |  |   102 
+action_result.data.\*.timestamp | string |  |   2020-03-04T10:00:00Z 
+action_result.data.\*.user_name | string |  |   testuser 
+action_result.summary | string |  |  
+action_result.message | string |  |   Incident behavior fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'update incident'
 Perform a set of actions on one or more incidents, such as adding tags or comments or updating the incident name or description
@@ -1231,32 +1455,32 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ids** |  required  | List of incident IDs\. Comma separated list allowed | string |  `crowdstrike incident id` 
-**add\_tag** |  optional  | Adds the associated tag to all the incident\(s\) of the ids list\. See example values for the defined list | string | 
-**delete\_tag** |  optional  | Deletes the matching tag from all the incident\(s\) in the ids list\. See example values for the defined list | string | 
-**update\_name** |  optional  | Updates the name of all the incident\(s\) in the ids list | string | 
-**update\_description** |  optional  | Updates the description of all the incident\(s\) listed in the ids | string | 
-**update\_status** |  optional  | Updates the status of all the incident\(s\) in the ids list | string | 
-**add\_comment** |  optional  | Adds a comment for all the incident\(s\) in the ids list | string | 
+**ids** |  required  | List of incident IDs. Comma separated list allowed | string |  `crowdstrike incident id` 
+**add_tag** |  optional  | Adds the associated tag to all the incident(s) of the ids list. See example values for the defined list | string | 
+**delete_tag** |  optional  | Deletes the matching tag from all the incident(s) in the ids list. See example values for the defined list | string | 
+**update_name** |  optional  | Updates the name of all the incident(s) in the ids list | string | 
+**update_description** |  optional  | Updates the description of all the incident(s) listed in the ids | string | 
+**update_status** |  optional  | Updates the status of all the incident(s) in the ids list | string | 
+**add_comment** |  optional  | Adds a comment for all the incident(s) in the ids list | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.add\_comment | string | 
-action\_result\.parameter\.add\_tag | string | 
-action\_result\.parameter\.delete\_tag | string | 
-action\_result\.parameter\.ids | string |  `crowdstrike incident id` 
-action\_result\.parameter\.update\_description | string | 
-action\_result\.parameter\.update\_name | string | 
-action\_result\.parameter\.update\_status | string | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.add_comment | string |  |   Minor Incident 
+action_result.parameter.add_tag | string |  |   test1 
+action_result.parameter.delete_tag | string |  |   test2 
+action_result.parameter.ids | string |  `crowdstrike incident id`  |   inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d 
+action_result.parameter.update_description | string |  |   IOC found at 2020-07-22T23:54:41Z 
+action_result.parameter.update_name | string |  |   IOC at 2020-07-22T23:54:41Z 
+action_result.parameter.update_status | string |  |   New 
+action_result.data.\*.meta.powered_by | string |  |   incident-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.026572641 
+action_result.data.\*.meta.trace_id | string |  |   50f7477e-587f-4175-ad0d-bdbbd8d3b1ec 
+action_result.summary | string |  |  
+action_result.message | string |  |   Incident updated successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list users'
 Get information about all users in your Customer ID
@@ -1268,21 +1492,22 @@ Read only: **True**
 No parameters are required for this action
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.cid | string |  `crowdstrike customer id` 
-action\_result\.data\.\*\.resources\.\*\.first\_name | string | 
-action\_result\.data\.\*\.resources\.\*\.last\_name | string | 
-action\_result\.data\.\*\.resources\.\*\.uid | string |  `crowdstrike user id` 
-action\_result\.data\.\*\.resources\.\*\.uuid | string |  `crowdstrike unique user id` 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.meta.powered_by | string |  |   csam 
+action_result.data.\*.meta.query_time | numeric |  |   0.267336826 
+action_result.data.\*.meta.trace_id | string |  |   b4e1392e-68ad-4738-93f9-d95cee1cfe9f 
+action_result.data.\*.resources.\*.cid | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
+action_result.data.\*.resources.\*.first_name | string |  |   Test 
+action_result.data.\*.resources.\*.last_name | string |  |   Name 
+action_result.data.\*.resources.\*.uid | string |  `crowdstrike user id`  |   test@user.com 
+action_result.data.\*.resources.\*.uuid | string |  `crowdstrike unique user id`  |   bb777249-c782-4434-b57a-f15ac742926c 
+action_result.summary | string |  |  
+action_result.message | string |  |   Users listed successfully 
+action_result.summary.total_users | numeric |  |   1 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get user roles'
 Gets the roles that are assigned to the user
@@ -1293,22 +1518,22 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**user\_uuid** |  required  | Users Unqiue ID to get the roles for | string |  `crowdstrike unique user id` 
+**user_uuid** |  required  | Users Unqiue ID to get the roles for | string |  `crowdstrike unique user id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.user\_uuid | string |  `crowdstrike unique user id` 
-action\_result\.data\.\*\.cid | string | 
-action\_result\.data\.\*\.grant\_type | string | 
-action\_result\.data\.\*\.role\_id | string | 
-action\_result\.data\.\*\.role\_name | string | 
-action\_result\.data\.\*\.uuid | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.user_uuid | string |  `crowdstrike unique user id`  |   bb777249-c782-4434-b57a-f15ac742926c 
+action_result.data.\*.cid | string |  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.grant_type | string |  |   direct 
+action_result.data.\*.role_id | string |  |   custom_ioas_manager 
+action_result.data.\*.role_name | string |  |   Custom IOAs Manager 
+action_result.data.\*.uuid | string |  |   b6330292-28e6-4198-994d-96f327c5b5bd 
+action_result.summary | string |  |  
+action_result.message | string |  |   User roles fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list roles'
 Get information about all user roles from your Customer ID
@@ -1320,20 +1545,20 @@ Read only: **True**
 No parameters are required for this action
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources\.\*\.description | string | 
-action\_result\.data\.\*\.resources\.\*\.display\_name | string | 
-action\_result\.data\.\*\.resources\.\*\.id | string |  `crowdstrike user role id` 
-action\_result\.data\.\*\.resources\.\*\.is\_global | boolean | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.meta.powered_by | string |  |   csam 
+action_result.data.\*.meta.query_time | numeric |  |   0.011271861 
+action_result.data.\*.meta.trace_id | string |  |   48a46c11-ca36-4a1e-84f6-9a5b1137b7d3 
+action_result.data.\*.resources.\*.description | string |  |   Custom IOAs Manager 
+action_result.data.\*.resources.\*.display_name | string |  |   Custom IOAs Manager 
+action_result.data.\*.resources.\*.id | string |  `crowdstrike user role id`  |   custom_ioas_manager 
+action_result.data.\*.resources.\*.is_global | boolean |  |   True  False 
+action_result.summary | string |  |  
+action_result.message | string |  |   Roles listed successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get role'
 Get information about all user roles from your Customer ID
@@ -1344,26 +1569,26 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**role\_id** |  required  | Role ID to get information about\. Comma separated list allowed | string |  `crowdstrike user role id` 
+**role_id** |  required  | Role ID to get information about. Comma separated list allowed | string |  `crowdstrike user role id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.role\_id | string |  `crowdstrike user role id` 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.display\_name | string | 
-action\_result\.data\.\*\.errors\.\*\.code | numeric | 
-action\_result\.data\.\*\.errors\.\*\.message | string | 
-action\_result\.data\.\*\.id | string |  `crowdstrike user role id` 
-action\_result\.data\.\*\.is\_global | boolean | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.role_id | string |  `crowdstrike user role id`  |   dashboard_admin 
+action_result.data.\*.description | string |  |   Can manage, create, update, and delete dashboards 
+action_result.data.\*.display_name | string |  |   Dashboard Admin 
+action_result.data.\*.errors.\*.code | numeric |  |   404 
+action_result.data.\*.errors.\*.message | string |  |   Role ID ' custom_ioas_manager' not found 
+action_result.data.\*.id | string |  `crowdstrike user role id`  |   dashboard_admin 
+action_result.data.\*.is_global | boolean |  |   True  False 
+action_result.data.\*.meta.powered_by | string |  |   csam 
+action_result.data.\*.meta.query_time | numeric |  |   0.000467839 
+action_result.data.\*.meta.trace_id | string |  |   82983d79-59d2-49e1-a471-4f1833f80c46 
+action_result.summary | string |  |  
+action_result.message | string |  |   Role fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list crowdscores'
 Query environment wide CrowdScore and return the entity data
@@ -1371,45 +1596,45 @@ Query environment wide CrowdScore and return the entity data
 Type: **investigate**  
 Read only: **True**
 
-This action fetches crowdscores using pagination logic\.
+This action fetches crowdscores using pagination logic.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **filter** |  optional  | Optional filter and sort criteria in the form of an FQL query | string | 
-**sort** |  optional  | Sort the results by a specific field and direction\. \(Example\: assigned\_to\.asc\) | string | 
-**offset** |  optional  | Starting index of overall result set from which to return ids\. \(Defaults to 0\) | numeric | 
-**limit** |  optional  | Limit the number of results to return\. \(Defaults to 50, Max 500\) | numeric | 
+**sort** |  optional  | Sort the results by a specific field and direction. (Example: assigned_to.asc) | string | 
+**offset** |  optional  | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | 
+**limit** |  optional  | Limit the number of results to return. (Defaults to 50, Max 500) | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data\.\*\.adjusted\_score | numeric | 
-action\_result\.data\.\*\.cid | string | 
-action\_result\.data\.\*\.errors\.\*\.code | numeric | 
-action\_result\.data\.\*\.errors\.\*\.message | string | 
-action\_result\.data\.\*\.id | string |  `crowdstrike crowdscore id` 
-action\_result\.data\.\*\.meta\.pagination\.limit | numeric | 
-action\_result\.data\.\*\.meta\.pagination\.offset | numeric | 
-action\_result\.data\.\*\.meta\.pagination\.total | numeric | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.pagination\.\*\.limit | numeric | 
-action\_result\.data\.\*\.pagination\.\*\.offset | numeric | 
-action\_result\.data\.\*\.pagination\.\*\.total | numeric | 
-action\_result\.data\.\*\.resources\.\*\.cid | string | 
-action\_result\.data\.\*\.score | numeric | 
-action\_result\.data\.\*\.timestamp | string | 
-action\_result\.summary\.total\_crowdscores | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   score: 0 
+action_result.parameter.limit | numeric |  |   5 
+action_result.parameter.offset | numeric |  |   100 
+action_result.parameter.sort | string |  |   assigned_to.asc 
+action_result.data.\*.adjusted_score | numeric |  |   3 
+action_result.data.\*.cid | string |  |   3061d7ff3b634e22b38274d64798 
+action_result.data.\*.errors.\*.code | numeric |  |   400 
+action_result.data.\*.errors.\*.message | string |  |   test is an invalid behavior sort parameter 
+action_result.data.\*.id | string |  `crowdstrike crowdscore id`  |   99ff72e8c9c14955ba33cbcbd4112345_2020-05-18 07:38:05.219 +0000 UTC 
+action_result.data.\*.meta.pagination.limit | numeric |  |   500 
+action_result.data.\*.meta.pagination.offset | numeric |  |   0 
+action_result.data.\*.meta.pagination.total | numeric |  |   12960 
+action_result.data.\*.meta.powered_by | string |  |   incident-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.096319664 
+action_result.data.\*.meta.trace_id | string |  |   38f293ce-587e-4ff5-8231-4e738178468a 
+action_result.data.\*.pagination.\*.limit | numeric |  |  
+action_result.data.\*.pagination.\*.offset | numeric |  |  
+action_result.data.\*.pagination.\*.total | numeric |  |  
+action_result.data.\*.resources.\*.cid | string |  |   3061c7ff3b634e22b38274d4b5865500 
+action_result.data.\*.score | numeric |  |   0 
+action_result.data.\*.timestamp | string |  |   2020-03-04T10:00:00Z 
+action_result.summary.total_crowdscores | numeric |  |   2 
+action_result.message | string |  |   Total crowdscores: 2 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get incident details'
 Get details on incidents by providing incident IDs
@@ -1420,69 +1645,69 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ids** |  required  | List of incident IDs\. Comma separated list allowed | string |  `crowdstrike incident id` 
+**ids** |  required  | List of incident IDs. Comma separated list allowed | string |  `crowdstrike incident id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.ids | string |  `crowdstrike incident id` 
-action\_result\.data\.\*\.assigned\_to | string | 
-action\_result\.data\.\*\.assigned\_to\_name | string | 
-action\_result\.data\.\*\.cid | string | 
-action\_result\.data\.\*\.created | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.end | string | 
-action\_result\.data\.\*\.errors\.\*\.code | numeric | 
-action\_result\.data\.\*\.errors\.\*\.message | string | 
-action\_result\.data\.\*\.fine\_score | numeric | 
-action\_result\.data\.\*\.host\_ids | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.hosts\.\*\.agent\_load\_flags | string | 
-action\_result\.data\.\*\.hosts\.\*\.agent\_local\_time | string | 
-action\_result\.data\.\*\.hosts\.\*\.agent\_version | string | 
-action\_result\.data\.\*\.hosts\.\*\.bios\_manufacturer | string | 
-action\_result\.data\.\*\.hosts\.\*\.bios\_version | string | 
-action\_result\.data\.\*\.hosts\.\*\.cid | string | 
-action\_result\.data\.\*\.hosts\.\*\.config\_id\_base | string | 
-action\_result\.data\.\*\.hosts\.\*\.config\_id\_build | string | 
-action\_result\.data\.\*\.hosts\.\*\.config\_id\_platform | string | 
-action\_result\.data\.\*\.hosts\.\*\.device\_id | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.hosts\.\*\.external\_ip | string | 
-action\_result\.data\.\*\.hosts\.\*\.first\_seen | string | 
-action\_result\.data\.\*\.hosts\.\*\.hostname | string | 
-action\_result\.data\.\*\.hosts\.\*\.last\_seen | string | 
-action\_result\.data\.\*\.hosts\.\*\.local\_ip | string | 
-action\_result\.data\.\*\.hosts\.\*\.mac\_address | string | 
-action\_result\.data\.\*\.hosts\.\*\.machine\_domain | string | 
-action\_result\.data\.\*\.hosts\.\*\.major\_version | string | 
-action\_result\.data\.\*\.hosts\.\*\.minor\_version | string | 
-action\_result\.data\.\*\.hosts\.\*\.modified\_timestamp | string | 
-action\_result\.data\.\*\.hosts\.\*\.os\_version | string | 
-action\_result\.data\.\*\.hosts\.\*\.ou | string | 
-action\_result\.data\.\*\.hosts\.\*\.platform\_id | string | 
-action\_result\.data\.\*\.hosts\.\*\.platform\_name | string | 
-action\_result\.data\.\*\.hosts\.\*\.product\_type | string | 
-action\_result\.data\.\*\.hosts\.\*\.product\_type\_desc | string | 
-action\_result\.data\.\*\.hosts\.\*\.site\_name | string | 
-action\_result\.data\.\*\.hosts\.\*\.status | string | 
-action\_result\.data\.\*\.hosts\.\*\.system\_manufacturer | string | 
-action\_result\.data\.\*\.hosts\.\*\.system\_product\_name | string | 
-action\_result\.data\.\*\.incident\_id | string |  `crowdstrike incident id` 
-action\_result\.data\.\*\.incident\_type | numeric | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.modified\_timestamp | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.data\.\*\.start | string | 
-action\_result\.data\.\*\.state | string | 
-action\_result\.data\.\*\.status | numeric | 
-action\_result\.data\.\*\.tags | string | 
-action\_result\.data\.\*\.users | string | 
-action\_result\.summary\.total\_incidents | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.ids | string |  `crowdstrike incident id`  |   inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d 
+action_result.data.\*.assigned_to | string |  |   b6330292-28e6-4198-994d-96f327c5b5cc 
+action_result.data.\*.assigned_to_name | string |  |   Testname 
+action_result.data.\*.cid | string |  |   ctw6caruad3lkbnnt22qzeyoxgf38zap 
+action_result.data.\*.created | string |  |   2020-03-04T10:00:00Z 
+action_result.data.\*.description | string |  |  
+action_result.data.\*.end | string |  |   2020-03-04T10:00:00Z 
+action_result.data.\*.errors.\*.code | numeric |  |   400 
+action_result.data.\*.errors.\*.message | string |  |   invalid incident id=fyughg 
+action_result.data.\*.fine_score | numeric |  |   1 
+action_result.data.\*.host_ids | string |  `crowdstrike device id`  |   c9vnt7jbugw32626p9qsq3f9dx13sdnn 
+action_result.data.\*.hosts.\*.agent_load_flags | string |  |   1 
+action_result.data.\*.hosts.\*.agent_local_time | string |  |   2020-03-04T10:00:00Z 
+action_result.data.\*.hosts.\*.agent_version | string |  |   5.23.10503.0 
+action_result.data.\*.hosts.\*.bios_manufacturer | string |  |   Phoenix Technologies LTD 
+action_result.data.\*.hosts.\*.bios_version | string |  |   6.00 
+action_result.data.\*.hosts.\*.cid | string |  |   ctw6caruad3lkbnnt22qzeyoxgf38zap 
+action_result.data.\*.hosts.\*.config_id_base | string |  |   65994753 
+action_result.data.\*.hosts.\*.config_id_build | string |  |   10503 
+action_result.data.\*.hosts.\*.config_id_platform | string |  |   3 
+action_result.data.\*.hosts.\*.device_id | string |  `crowdstrike device id`  |   c9vnt7jbugw32626p9qsq3f9dx13sdnn 
+action_result.data.\*.hosts.\*.external_ip | string |  |   1.1.1.1 
+action_result.data.\*.hosts.\*.first_seen | string |  |   2020-03-04T10:00:00Z 
+action_result.data.\*.hosts.\*.hostname | string |  |   Sever01 
+action_result.data.\*.hosts.\*.last_seen | string |  |   2020-03-04T10:00:00Z 
+action_result.data.\*.hosts.\*.local_ip | string |  |   192.168.0.0 
+action_result.data.\*.hosts.\*.mac_address | string |  |   00-00-00-00-00-00 
+action_result.data.\*.hosts.\*.machine_domain | string |  |   domain.local 
+action_result.data.\*.hosts.\*.major_version | string |  |   10 
+action_result.data.\*.hosts.\*.minor_version | string |  |   0 
+action_result.data.\*.hosts.\*.modified_timestamp | string |  |   2020-03-04T10:00:00Z 
+action_result.data.\*.hosts.\*.os_version | string |  |   Windows 7 
+action_result.data.\*.hosts.\*.ou | string |  |   DOMAIN  LOCAL 
+action_result.data.\*.hosts.\*.platform_id | string |  |   0 
+action_result.data.\*.hosts.\*.platform_name | string |  |   Windows 
+action_result.data.\*.hosts.\*.product_type | string |  |   1 
+action_result.data.\*.hosts.\*.product_type_desc | string |  |   Workstation 
+action_result.data.\*.hosts.\*.site_name | string |  |  
+action_result.data.\*.hosts.\*.status | string |  |   noraml 
+action_result.data.\*.hosts.\*.system_manufacturer | string |  |   VMware, Inc. 
+action_result.data.\*.hosts.\*.system_product_name | string |  |   VMware Virtual Platform 
+action_result.data.\*.incident_id | string |  `crowdstrike incident id`  |   inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d 
+action_result.data.\*.incident_type | numeric |  |   1 
+action_result.data.\*.meta.powered_by | string |  |   incident-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.000258709 
+action_result.data.\*.meta.trace_id | string |  |   b991aeb7-912f-45b2-abce-3759217a690c 
+action_result.data.\*.modified_timestamp | string |  |   2020-08-17T09:35:50.888512834Z 
+action_result.data.\*.name | string |  |  
+action_result.data.\*.start | string |  |   2020-03-04T10:00:00Z 
+action_result.data.\*.state | string |  |   open  closed 
+action_result.data.\*.status | numeric |  |   20 
+action_result.data.\*.tags | string |  |  
+action_result.data.\*.users | string |  |  
+action_result.summary.total_incidents | numeric |  |   1 
+action_result.message | string |  |   Incident fetched: 1 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list incident behaviors'
 Search for behaviors by providing an FQL filter, sorting, and paging details
@@ -1490,40 +1715,40 @@ Search for behaviors by providing an FQL filter, sorting, and paging details
 Type: **investigate**  
 Read only: **True**
 
-This action fetches incident behaviors using pagination logic\.
+This action fetches incident behaviors using pagination logic.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **filter** |  optional  | Optional filter and sort criteria in the form of an FQL query | string | 
-**sort** |  optional  | Sort the results by a specific field and direction\. \(Example\: assigned\_to\.asc\) | string | 
-**offset** |  optional  | Starting index of overall result set from which to return ids\. \(Defaults to 0\) | numeric | 
-**limit** |  optional  | Limit the number of results to return\. \(Defaults to 50, Max 500\) | numeric | 
+**sort** |  optional  | Sort the results by a specific field and direction. (Example: assigned_to.asc) | string | 
+**offset** |  optional  | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | 
+**limit** |  optional  | Limit the number of results to return. (Defaults to 50, Max 500) | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data\.\* | string |  `crowdstrike incidentbehavior id` 
-action\_result\.data\.\*\.errors\.\*\.code | numeric | 
-action\_result\.data\.\*\.errors\.\*\.message | string | 
-action\_result\.data\.\*\.meta\.pagination\.limit | numeric | 
-action\_result\.data\.\*\.meta\.pagination\.offset | numeric | 
-action\_result\.data\.\*\.meta\.pagination\.total | numeric | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.pagination\.\*\.limit | numeric | 
-action\_result\.data\.\*\.pagination\.\*\.offset | numeric | 
-action\_result\.data\.\*\.pagination\.\*\.total | numeric | 
-action\_result\.summary\.total\_incident\_behaviors | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   incident_ids:['inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d'] 
+action_result.parameter.limit | numeric |  |   5 
+action_result.parameter.offset | numeric |  |   100 
+action_result.parameter.sort | string |  |   assigned_to.asc 
+action_result.data.\* | string |  `crowdstrike incidentbehavior id`  |   ind:9e262c70027a46916beeaef04e45bc6a:45890386125841-10264-352683776 
+action_result.data.\*.errors.\*.code | numeric |  |   400 
+action_result.data.\*.errors.\*.message | string |  |   test is an invalid behavior sort parameter 
+action_result.data.\*.meta.pagination.limit | numeric |  |   50 
+action_result.data.\*.meta.pagination.offset | numeric |  |   0 
+action_result.data.\*.meta.pagination.total | numeric |  |   0 
+action_result.data.\*.meta.powered_by | string |  |   incident-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.002429479 
+action_result.data.\*.meta.trace_id | string |  |   202a0a0c-bcc1-4919-8932-2097213f903a 
+action_result.data.\*.pagination.\*.limit | numeric |  |  
+action_result.data.\*.pagination.\*.offset | numeric |  |  
+action_result.data.\*.pagination.\*.total | numeric |  |  
+action_result.summary.total_incident_behaviors | numeric |  |   2 
+action_result.message | string |  |   Total incident behaviors: 2 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list incidents'
 Search for incidents by providing an FQL filter, sorting, and paging details
@@ -1531,41 +1756,41 @@ Search for incidents by providing an FQL filter, sorting, and paging details
 Type: **investigate**  
 Read only: **True**
 
-This action fetches incidents using pagination logic\.
+This action fetches incidents using pagination logic.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **filter** |  optional  | Optional filter and sort criteria in the form of an FQL query | string | 
-**sort** |  optional  | Sort the results by a specific field and direction\. \(Example\: assigned\_to\.asc\) | string | 
-**offset** |  optional  | Starting index of overall result set from which to return ids\. \(Defaults to 0\) | numeric | 
-**limit** |  optional  | Limit the number of results to return\. \(Defaults to 50, Max 500\) | numeric | 
+**sort** |  optional  | Sort the results by a specific field and direction. (Example: assigned_to.asc) | string | 
+**offset** |  optional  | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | 
+**limit** |  optional  | Limit the number of results to return. (Defaults to 50, Max 500) | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data\.\* | string |  `crowdstrike incident id` 
-action\_result\.data\.\* | string |  `crowdstrike incident id` 
-action\_result\.data\.\*\.errors\.\*\.code | numeric | 
-action\_result\.data\.\*\.errors\.\*\.message | string | 
-action\_result\.data\.\*\.meta\.pagination\.limit | numeric | 
-action\_result\.data\.\*\.meta\.pagination\.offset | numeric | 
-action\_result\.data\.\*\.meta\.pagination\.total | numeric | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.pagination\.\*\.limit | numeric | 
-action\_result\.data\.\*\.pagination\.\*\.offset | numeric | 
-action\_result\.data\.\*\.pagination\.\*\.total | numeric | 
-action\_result\.summary\.total\_incidents | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   incident_ids:['inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d'] 
+action_result.parameter.limit | numeric |  |   5 
+action_result.parameter.offset | numeric |  |   100 
+action_result.parameter.sort | string |  |   assigned_to.asc 
+action_result.data.\* | string |  `crowdstrike incident id`  |   incident_ids:['inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d'] 
+action_result.data.\* | string |  `crowdstrike incident id`  |   incident_ids:['inc:9e262c70027a46916beeaef04e45bc6a:dc8e3b1325634da2a6e7b20656e3276d'] 
+action_result.data.\*.errors.\*.code | numeric |  |   400 
+action_result.data.\*.errors.\*.message | string |  |   test is an invalid incident sort parameter 
+action_result.data.\*.meta.pagination.limit | numeric |  |   50 
+action_result.data.\*.meta.pagination.offset | numeric |  |   0 
+action_result.data.\*.meta.pagination.total | numeric |  |   0 
+action_result.data.\*.meta.powered_by | string |  |   incident-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.003846595 
+action_result.data.\*.meta.trace_id | string |  |   bb02d451-d3a9-432c-b402-c08faa066264 
+action_result.data.\*.pagination.\*.limit | numeric |  |  
+action_result.data.\*.pagination.\*.offset | numeric |  |  
+action_result.data.\*.pagination.\*.total | numeric |  |  
+action_result.summary.total_incidents | numeric |  |   2 
+action_result.message | string |  |   Total incidents: 2 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get session file'
 Get RTR extracted file contents for the specified session and sha256 and add it to the vault
@@ -1576,38 +1801,38 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**session\_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
-**file\_hash** |  required  | SHA256 hash to retrieve | string |  `sha256` 
-**file\_name** |  optional  | Filename to use for the archive name and the file within the archive | string |  `filename` 
+**session_id** |  required  | RTR Session ID | string |  `crowdstrike rtr session id` 
+**file_hash** |  required  | SHA256 hash to retrieve | string |  `sha256` 
+**file_name** |  optional  | Filename to use for the archive name and the file within the archive | string |  `filename` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.file\_hash | string |  `sha256` 
-action\_result\.parameter\.file\_name | string |  `filename` 
-action\_result\.parameter\.session\_id | string |  `crowdstrike rtr session id` 
-action\_result\.data\.\*\.container | string | 
-action\_result\.data\.\*\.container\_id | numeric | 
-action\_result\.data\.\*\.create\_time | string | 
-action\_result\.data\.\*\.created\_via | string | 
-action\_result\.data\.\*\.hash | string |  `sha1` 
-action\_result\.data\.\*\.id | numeric | 
-action\_result\.data\.\*\.metadata\.md5 | string | 
-action\_result\.data\.\*\.metadata\.sha1 | string | 
-action\_result\.data\.\*\.metadata\.sha256 | string | 
-action\_result\.data\.\*\.mime\_type | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.data\.\*\.path | string | 
-action\_result\.data\.\*\.size | numeric | 
-action\_result\.data\.\*\.task | string | 
-action\_result\.data\.\*\.user | string | 
-action\_result\.data\.\*\.vault\_document | numeric | 
-action\_result\.data\.\*\.vault\_id | string |  `sha1`  `vault id` 
-action\_result\.summary\.vault\_id | string |  `sha1`  `vault id` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.file_hash | string |  `sha256`  |   53d84902e0a25be8706df19506f78799deab0082149b926b4117270f9c8673ad 
+action_result.parameter.file_name | string |  `filename`  |   test 
+action_result.parameter.session_id | string |  `crowdstrike rtr session id`  |   b2403653-1294-488e-be81-7aadb69b52f1 
+action_result.data.\*.container | string |  |   test_crowdstrike 
+action_result.data.\*.container_id | numeric |  |   2840 
+action_result.data.\*.create_time | string |  |   0 minutes ago 
+action_result.data.\*.created_via | string |  |   automation 
+action_result.data.\*.hash | string |  `sha1`  |   30c5e524e975816fbce1d958150e394efc219772 
+action_result.data.\*.id | numeric |  |   2 
+action_result.data.\*.metadata.md5 | string |  |   16723c3d039bc94e1636c0bf0c23ec26 
+action_result.data.\*.metadata.sha1 | string |  |   d43b1c57023fab4e3040dd6f2970053d690b0fab 
+action_result.data.\*.metadata.sha256 | string |  |   8a050bf93fe354d6ad03c6ba2b286f2649fb1420ae80eefac773208e5a0b7c0d 
+action_result.data.\*.mime_type | string |  |   application/x-7z-compressed 
+action_result.data.\*.name | string |  |   test.7z 
+action_result.data.\*.path | string |  |  
+action_result.data.\*.size | numeric |  |   5122 
+action_result.data.\*.task | string |  |  
+action_result.data.\*.user | string |  |   admin 
+action_result.data.\*.vault_document | numeric |  |   556 
+action_result.data.\*.vault_id | string |  `sha1`  `vault id`  |   30c5e524e975816fbce1d958150e394efc219772 
+action_result.summary.vault_id | string |  `sha1`  `vault id`  |   30c5e524e975816fbce1d958150e394efc219772 
+action_result.message | string |  |   Session file fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'set status'
 Set the state of a detection in Crowdstrike Host
@@ -1615,7 +1840,7 @@ Set the state of a detection in Crowdstrike Host
 Type: **generic**  
 Read only: **False**
 
-The detection <b>id</b> can be obtained from the Crowdstrike UI and its state can be set\.
+The detection <b>id</b> can be obtained from the Crowdstrike UI and its state can be set.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -1624,16 +1849,16 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **state** |  required  | State to set | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.id | string |  `crowdstrike detection id` 
-action\_result\.parameter\.state | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.id | string |  `crowdstrike detection id`  |   ldt:07c312fabcb8473454d0a16f118928fg:10548439893999 
+action_result.parameter.state | string |  |   in_progress 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Status set successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get system info'
 Get details of a device, given the device ID
@@ -1647,114 +1872,114 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **id** |  required  | Device ID from previous Crowdstrike IOC search | string |  `crowdstrike device id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.id | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.agent\_load\_flags | string | 
-action\_result\.data\.\*\.agent\_local\_time | string | 
-action\_result\.data\.\*\.agent\_version | string | 
-action\_result\.data\.\*\.bios\_manufacturer | string | 
-action\_result\.data\.\*\.bios\_version | string | 
-action\_result\.data\.\*\.build\_number | string | 
-action\_result\.data\.\*\.cid | string |  `md5` 
-action\_result\.data\.\*\.config\_id\_base | string | 
-action\_result\.data\.\*\.config\_id\_build | string | 
-action\_result\.data\.\*\.config\_id\_platform | string | 
-action\_result\.data\.\*\.connection\_ip | string |  `ip` 
-action\_result\.data\.\*\.connection\_mac\_address | string | 
-action\_result\.data\.\*\.cpu\_signature | string | 
-action\_result\.data\.\*\.default\_gateway\_ip | string |  `ip` 
-action\_result\.data\.\*\.device\_id | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.device\_policies\.device\_control\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.device\_control\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.device\_control\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.device\_control\.policy\_id | string | 
-action\_result\.data\.\*\.device\_policies\.device\_control\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.firewall\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.policy\_id | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.firewall\.rule\_set\_id | string | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.policy\_id | string | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.global\_config\.settings\_hash | string | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.applied | numeric | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.jumpcloud\.settings\_hash | string |  `sha256` 
-action\_result\.data\.\*\.device\_policies\.prevention\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.prevention\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.prevention\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.prevention\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.device\_policies\.prevention\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.prevention\.settings\_hash | string | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.policy\_id | string | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.remote\_response\.settings\_hash | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.applied | boolean | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.applied\_date | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.assigned\_date | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.policy\_type | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.settings\_hash | string | 
-action\_result\.data\.\*\.device\_policies\.sensor\_update\.uninstall\_protection | string | 
-action\_result\.data\.\*\.external\_ip | string |  `ip` 
-action\_result\.data\.\*\.first\_seen | string | 
-action\_result\.data\.\*\.group\_hash | string |  `sha256` 
-action\_result\.data\.\*\.groups | string |  `md5` 
-action\_result\.data\.\*\.hostname | string |  `host name` 
-action\_result\.data\.\*\.instance\_id | string | 
-action\_result\.data\.\*\.kernel\_version | string | 
-action\_result\.data\.\*\.last\_seen | string | 
-action\_result\.data\.\*\.local\_ip | string |  `ip` 
-action\_result\.data\.\*\.mac\_address | string | 
-action\_result\.data\.\*\.machine\_domain | string |  `domain` 
-action\_result\.data\.\*\.major\_version | string | 
-action\_result\.data\.\*\.meta\.version | string | 
-action\_result\.data\.\*\.minor\_version | string | 
-action\_result\.data\.\*\.modified\_timestamp | string | 
-action\_result\.data\.\*\.os\_build | string | 
-action\_result\.data\.\*\.os\_version | string | 
-action\_result\.data\.\*\.ou | string | 
-action\_result\.data\.\*\.platform\_id | string | 
-action\_result\.data\.\*\.platform\_name | string | 
-action\_result\.data\.\*\.pointer\_size | string | 
-action\_result\.data\.\*\.policies\.\*\.applied | boolean | 
-action\_result\.data\.\*\.policies\.\*\.applied\_date | string | 
-action\_result\.data\.\*\.policies\.\*\.assigned\_date | string | 
-action\_result\.data\.\*\.policies\.\*\.policy\_id | string |  `md5` 
-action\_result\.data\.\*\.policies\.\*\.policy\_type | string | 
-action\_result\.data\.\*\.policies\.\*\.settings\_hash | string | 
-action\_result\.data\.\*\.product\_type | string | 
-action\_result\.data\.\*\.product\_type\_desc | string | 
-action\_result\.data\.\*\.provision\_status | string | 
-action\_result\.data\.\*\.reduced\_functionality\_mode | string | 
-action\_result\.data\.\*\.release\_group | string | 
-action\_result\.data\.\*\.serial\_number | string | 
-action\_result\.data\.\*\.service\_pack\_major | string | 
-action\_result\.data\.\*\.service\_pack\_minor | string | 
-action\_result\.data\.\*\.service\_provider | string | 
-action\_result\.data\.\*\.service\_provider\_account\_id | string | 
-action\_result\.data\.\*\.site\_name | string | 
-action\_result\.data\.\*\.slow\_changing\_modified\_timestamp | string | 
-action\_result\.data\.\*\.status | string | 
-action\_result\.data\.\*\.system\_manufacturer | string | 
-action\_result\.data\.\*\.system\_product\_name | string | 
-action\_result\.data\.\*\.zone\_group | string | 
-action\_result\.summary\.hostname | string |  `host name` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.id | string |  `crowdstrike device id`  |   0498d1102b23481162ff846d0633e14c 
+action_result.data.\*.agent_load_flags | string |  |   3 
+action_result.data.\*.agent_local_time | string |  |   2015-07-31T14:07:42.816Z 
+action_result.data.\*.agent_version | string |  |   2.0.0010.3005 
+action_result.data.\*.bios_manufacturer | string |  |   Phoenix Technologies LTD 
+action_result.data.\*.bios_version | string |  |   6.00 
+action_result.data.\*.build_number | string |  |   17134 
+action_result.data.\*.cid | string |  `md5`  |   3f40c380adc74a3187c27252c0227cff 
+action_result.data.\*.config_id_base | string |  |   65994752 
+action_result.data.\*.config_id_build | string |  |   3005 
+action_result.data.\*.config_id_platform | string |  |   3 
+action_result.data.\*.connection_ip | string |  `ip`  |   10.1.18.205 
+action_result.data.\*.connection_mac_address | string |  |   00-50-56-12-34-56 
+action_result.data.\*.cpu_signature | string |  |   329455 
+action_result.data.\*.default_gateway_ip | string |  `ip`  |   10.1.16.1 
+action_result.data.\*.device_id | string |  `crowdstrike device id`  |   0498d1102b23481162ff846d0633e14c 
+action_result.data.\*.device_policies.device_control.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.device_control.applied_date | string |  |   2020-05-12T17:24:23.856260169Z 
+action_result.data.\*.device_policies.device_control.assigned_date | string |  |   2020-05-12T17:24:12.52970392Z 
+action_result.data.\*.device_policies.device_control.policy_id | string |  |   cb4babb273274f79a91e8a0e84164916 
+action_result.data.\*.device_policies.device_control.policy_type | string |  |   device-control 
+action_result.data.\*.device_policies.firewall.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.firewall.applied_date | string |  |   2020-07-08T03:12:30.212194872Z 
+action_result.data.\*.device_policies.firewall.assigned_date | string |  |   2020-07-08T03:07:38.48127371Z 
+action_result.data.\*.device_policies.firewall.policy_id | string |  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.data.\*.device_policies.firewall.policy_type | string |  |   firewall 
+action_result.data.\*.device_policies.firewall.rule_set_id | string |  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.data.\*.device_policies.global_config.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.global_config.applied_date | string |  |   2020-04-16T02:44:27.694202488Z 
+action_result.data.\*.device_policies.global_config.assigned_date | string |  |   2020-04-16T02:42:41.826629904Z 
+action_result.data.\*.device_policies.global_config.policy_id | string |  |   49ee9efc99164562ad89640955f372ce 
+action_result.data.\*.device_policies.global_config.policy_type | string |  |   globalconfig 
+action_result.data.\*.device_policies.global_config.settings_hash | string |  |   f48b1bd1 
+action_result.data.\*.device_policies.jumpcloud.applied | numeric |  |   True 
+action_result.data.\*.device_policies.jumpcloud.applied_date | string |  |   2022-07-13T17:41:16.271074445Z 
+action_result.data.\*.device_policies.jumpcloud.assigned_date | string |  |   2022-07-13T17:40:53.552991354Z 
+action_result.data.\*.device_policies.jumpcloud.policy_id | string |  `md5`  |   234766dcce654217babcbaa247ca31f0 
+action_result.data.\*.device_policies.jumpcloud.policy_type | string |  |   jumpcloud 
+action_result.data.\*.device_policies.jumpcloud.settings_hash | string |  `sha256`  |   0aec295a677907c6e4de672edf1f172d2cefcc5ca96ed2b5e56f4d6745289694 
+action_result.data.\*.device_policies.prevention.applied | boolean |  |   True 
+action_result.data.\*.device_policies.prevention.applied_date | string |  |   2021-12-02T07:35:26.551598833Z 
+action_result.data.\*.device_policies.prevention.assigned_date | string |  |   2018-03-10T15:39:31.220730539Z 
+action_result.data.\*.device_policies.prevention.policy_id | string |  `md5`  |   f81459e0d85b4bc7b3ad14ad40889042 
+action_result.data.\*.device_policies.prevention.policy_type | string |  |   prevention 
+action_result.data.\*.device_policies.prevention.settings_hash | string |  |   87cb8b2e 
+action_result.data.\*.device_policies.remote_response.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.remote_response.applied_date | string |  |   2019-02-08T02:39:21.726331953Z 
+action_result.data.\*.device_policies.remote_response.assigned_date | string |  |   2019-02-08T02:36:05.073298048Z 
+action_result.data.\*.device_policies.remote_response.policy_id | string |  |   6c74313d6c864180bd759c3235dbd550 
+action_result.data.\*.device_policies.remote_response.policy_type | string |  |   remote-response 
+action_result.data.\*.device_policies.remote_response.settings_hash | string |  |   f472bd8e 
+action_result.data.\*.device_policies.sensor_update.applied | boolean |  |   True  False 
+action_result.data.\*.device_policies.sensor_update.applied_date | string |  |   2023-01-10T23:39:59.53209856Z 
+action_result.data.\*.device_policies.sensor_update.assigned_date | string |  |   2018-03-10T15:39:31.220769757Z 
+action_result.data.\*.device_policies.sensor_update.policy_id | string |  `md5`  |   62a3908297584c52bdafaa7fdf3c3bdd 
+action_result.data.\*.device_policies.sensor_update.policy_type | string |  |   sensor-update 
+action_result.data.\*.device_policies.sensor_update.settings_hash | string |  |   65994753|3|2|automatic 
+action_result.data.\*.device_policies.sensor_update.uninstall_protection | string |  |   ENABLED 
+action_result.data.\*.external_ip | string |  `ip`  |   50.18.218.205 
+action_result.data.\*.first_seen | string |  |   2018-03-10T15:38:09Z 
+action_result.data.\*.group_hash | string |  `sha256`  |   e2a8b394c0e62960747ff5d64a335162b36ba4c5a54ee6499b438b94e5269ae8 
+action_result.data.\*.groups | string |  `md5`  |   873560309d1b4686a6cee666575e7a93 
+action_result.data.\*.hostname | string |  `host name`  |   TheNarrowSea  CentOS70 
+action_result.data.\*.instance_id | string |  |   i-019d8b2cc8e20bb8d 
+action_result.data.\*.kernel_version | string |  |   10.0.19044.1766 
+action_result.data.\*.last_seen | string |  |   2018-03-10T15:39:34Z 
+action_result.data.\*.local_ip | string |  `ip`  |   10.1.18.49 
+action_result.data.\*.mac_address | string |  |   00-0c-29-a0-10-27 
+action_result.data.\*.machine_domain | string |  `domain`  |   VICTIMNET.local 
+action_result.data.\*.major_version | string |  |   6 
+action_result.data.\*.meta.version | string |  |   6 
+action_result.data.\*.minor_version | string |  |   1 
+action_result.data.\*.modified_timestamp | string |  |   2018-03-10T15:40:09Z 
+action_result.data.\*.os_build | string |  |   19044 
+action_result.data.\*.os_version | string |  |   Windows Server 2008 R2 
+action_result.data.\*.ou | string |  |  
+action_result.data.\*.platform_id | string |  |   0 
+action_result.data.\*.platform_name | string |  |   Windows 
+action_result.data.\*.pointer_size | string |  |   8 
+action_result.data.\*.policies.\*.applied | boolean |  |   True 
+action_result.data.\*.policies.\*.applied_date | string |  |   2021-12-02T07:35:26.551598833Z 
+action_result.data.\*.policies.\*.assigned_date | string |  |   2018-03-10T15:39:31.220730539Z 
+action_result.data.\*.policies.\*.policy_id | string |  `md5`  |   f81459e0d85b4bc7b3ad14ad40889042 
+action_result.data.\*.policies.\*.policy_type | string |  |   prevention 
+action_result.data.\*.policies.\*.settings_hash | string |  |   87cb8b2e 
+action_result.data.\*.product_type | string |  |   3 
+action_result.data.\*.product_type_desc | string |  |   Server 
+action_result.data.\*.provision_status | string |  |   Provisioned 
+action_result.data.\*.reduced_functionality_mode | string |  |   no 
+action_result.data.\*.release_group | string |  |  
+action_result.data.\*.serial_number | string |  |   VMware-56 4d d8 11 42 ab 12 1a-b5 3d 4a e5 d1 a0 12 25 
+action_result.data.\*.service_pack_major | string |  |   0 
+action_result.data.\*.service_pack_minor | string |  |   0 
+action_result.data.\*.service_provider | string |  |   Test provider 
+action_result.data.\*.service_provider_account_id | string |  |   149665393462 
+action_result.data.\*.site_name | string |  |   Default-First-Site-Name 
+action_result.data.\*.slow_changing_modified_timestamp | string |  |   2018-04-23T22:52:27Z 
+action_result.data.\*.status | string |  |   normal 
+action_result.data.\*.system_manufacturer | string |  |   VMware, Inc. 
+action_result.data.\*.system_product_name | string |  |   VMware Virtual Platform 
+action_result.data.\*.zone_group | string |  |   us-east-1a 
+action_result.summary.hostname | string |  `host name`  |   TheNarrowSea 
+action_result.message | string |  |   Device details fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get process detail'
 Retrieve the details of a process that is running or that previously ran, given a process ID
@@ -1765,26 +1990,26 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**falcon\_process\_id** |  required  | Process ID from previous Falcon IOC search | string |  `falcon process id` 
+**falcon_process_id** |  required  | Process ID from previous Falcon IOC search | string |  `falcon process id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.falcon\_process\_id | string |  `falcon process id` 
-action\_result\.data\.\*\.command\_line | string | 
-action\_result\.data\.\*\.device\_id | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.file\_name | string |  `file name` 
-action\_result\.data\.\*\.process\_id | string |  `pid` 
-action\_result\.data\.\*\.process\_id\_local | string |  `pid` 
-action\_result\.data\.\*\.start\_timestamp | string | 
-action\_result\.data\.\*\.start\_timestamp\_raw | string | 
-action\_result\.data\.\*\.stop\_timestamp | string | 
-action\_result\.data\.\*\.stop\_timestamp\_raw | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.falcon_process_id | string |  `falcon process id`  |   pid:07c312fabcb8473454d0a16f118928fg:16716090292999 
+action_result.data.\*.command_line | string |  |   C:	est	est.exe 
+action_result.data.\*.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928fg 
+action_result.data.\*.file_name | string |  `file name`  |   	estdata	est	est	est.exe 
+action_result.data.\*.process_id | string |  `pid`  |   pid:07c312fabcb8473454d0a16f118928fg:16716090292999 
+action_result.data.\*.process_id_local | string |  `pid`  |   16716090292999 
+action_result.data.\*.start_timestamp | string |  |   2020-02-14T01:41:11Z 
+action_result.data.\*.start_timestamp_raw | string |  |   132261180718697221 
+action_result.data.\*.stop_timestamp | string |  |  
+action_result.data.\*.stop_timestamp_raw | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Process details fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'hunt file'
 Hunt for a file on the network by querying for the hash
@@ -1792,27 +2017,27 @@ Hunt for a file on the network by querying for the hash
 Type: **investigate**  
 Read only: **True**
 
-In case of count\_only set to true, keep the limit value larger to fetch count of all the devices\.
+In case of count_only set to true, keep the limit value larger to fetch count of all the devices.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **hash** |  required  | File hash to search | string |  `hash`  `sha256`  `sha1`  `md5` 
-**count\_only** |  optional  | Get endpoint count only | boolean | 
-**limit** |  optional  | Maximum device IDs to be fetched \(defaults to 100\) | numeric | 
+**count_only** |  optional  | Get endpoint count only | boolean | 
+**limit** |  optional  | Maximum device IDs to be fetched (defaults to 100) | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.count\_only | boolean | 
-action\_result\.parameter\.hash | string |  `hash`  `sha256`  `sha1`  `md5` 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.data\.\*\.device\_id | string |  `crowdstrike device id` 
-action\_result\.summary\.device\_count | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.count_only | boolean |  |   True  False 
+action_result.parameter.hash | string |  `hash`  `sha256`  `sha1`  `md5`  |   eeb27d04c5fb25f7459407c0e5394621f12100e301b22d04a6b8f78e2adbf44t 
+action_result.parameter.limit | numeric |  |   100 
+action_result.data.\*.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928fg 
+action_result.summary.device_count | numeric |  |   1 
+action_result.message | string |  |   Device count: 1 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'hunt domain'
 Get a list of device IDs on which the domain was matched
@@ -1820,60 +2045,88 @@ Get a list of device IDs on which the domain was matched
 Type: **investigate**  
 Read only: **True**
 
-In case of count\_only set to true, keep the limit value larger to fetch count of all the devices\.
+In case of count_only set to true, keep the limit value larger to fetch count of all the devices.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **domain** |  required  | Domain to search | string |  `domain` 
-**count\_only** |  optional  | Get endpoint count only | boolean | 
-**limit** |  optional  | Maximum device IDs to be fetched \(defaults to 100\) | numeric | 
+**count_only** |  optional  | Get endpoint count only | boolean | 
+**limit** |  optional  | Maximum device IDs to be fetched (defaults to 100) | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.count\_only | boolean | 
-action\_result\.parameter\.domain | string |  `domain` 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.data\.\*\.device\_id | string |  `crowdstrike device id` 
-action\_result\.summary\.device\_count | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.count_only | boolean |  |   True  False 
+action_result.parameter.domain | string |  `domain`  |   www.example.com 
+action_result.parameter.limit | numeric |  |   100 
+action_result.data.\*.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928fg 
+action_result.summary.device_count | numeric |  |   3 
+action_result.message | string |  |   Device count: 3 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
-## action: 'upload put file'
-Upload a new put\-file to use for the RTR \`put\` command
+## action: 'hunt ip'
+Get a list of device IDs on which the ip was matched
 
-Type: **generic**  
-Read only: **False**
+Type: **investigate**  
+Read only: **True**
 
-This action requires a token with RTR Admin permissions\.
+In case of count_only set to true, keep the limit value larger to fetch count of all the devices.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**vault\_id** |  required  | Vault ID of file to upload | string |  `vault id` 
+**ip** |  required  | IP address to search | string |  `ip`  `ipv6` 
+**count_only** |  optional  | Get endpoint count only | boolean | 
+**limit** |  optional  | Maximum device IDs to be fetched (defaults to 100) | numeric | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.count_only | boolean |  |   True  False 
+action_result.parameter.ip | string |  `ip`  `ipv6`  |   8.8.8.8  2001:0db8:3c4d:0015:0000:0000:1a2f:1a2b 
+action_result.parameter.limit | numeric |  |   100 
+action_result.data.\*.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928fg 
+action_result.summary.device_count | numeric |  |   1 
+action_result.message | string |  |   Device count: 1 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'upload put file'
+Upload a new put-file to use for the RTR `put` command
+
+Type: **generic**  
+Read only: **False**
+
+This action requires a token with RTR Admin permissions.
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**vault_id** |  required  | Vault ID of file to upload | string |  `vault id` 
 **description** |  required  | File description | string | 
-**file\_name** |  optional  | Filename to use \(if different than actual file name\) | string |  `filename` 
+**file_name** |  optional  | Filename to use (if different than actual file name) | string |  `filename` 
 **comment** |  optional  | Comment for the audit log | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.comment | string | 
-action\_result\.parameter\.description | string | 
-action\_result\.parameter\.file\_name | string |  `filename` 
-action\_result\.parameter\.vault\_id | string |  `vault id` 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.meta\.writes\.resources\_affected | numeric | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.comment | string |  |   Test comment 
+action_result.parameter.description | string |  |   This is a test description 
+action_result.parameter.file_name | string |  `filename`  |   blank_file 
+action_result.parameter.vault_id | string |  `vault id`  |   30c5e524e975816fbce1d958150e394efc219772 
+action_result.data.\*.meta.powered_by | string |  |   empower 
+action_result.data.\*.meta.query_time | numeric |  |   0.869312959 
+action_result.data.\*.meta.trace_id | string |  |   1e30b813-04ce-4fa4-aca0-2802dfead2f9 
+action_result.data.\*.meta.writes.resources_affected | numeric |  |   1 
+action_result.summary | string |  |  
+action_result.message | string |  |   Put file uploaded successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get indicator'
 Get the full definition of one or more indicators that are being watched
@@ -1881,58 +2134,58 @@ Get the full definition of one or more indicators that are being watched
 Type: **investigate**  
 Read only: **True**
 
-In this action, either 'indicator\_value' and 'indicator\_type' or 'resource\_id' should be provided\. The priority of 'resource\_id' is higher\. If all the parameters are provided then the indicator will be fetched based on the 'resource\_id'\.
+In this action, either 'indicator_value' and 'indicator_type' or 'resource_id' should be provided. The priority of 'resource_id' is higher. If all the parameters are provided then the indicator will be fetched based on the 'resource_id'.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**indicator\_value** |  optional  | String representation of the indicator | string |  `domain`  `md5`  `sha256`  `ip`  `ipv6` 
-**indicator\_type** |  optional  | The type of the indicator | string |  `crowdstrike indicator type` 
-**resource\_id** |  optional  | The resource id of the indicator | string |  `crowdstrike indicator id` 
+**indicator_value** |  optional  | String representation of the indicator | string |  `domain`  `md5`  `sha256`  `ip`  `ipv6` 
+**indicator_type** |  optional  | The type of the indicator | string |  `crowdstrike indicator type` 
+**resource_id** |  optional  | The resource id of the indicator | string |  `crowdstrike indicator id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.indicator\_type | string |  `crowdstrike indicator type` 
-action\_result\.parameter\.indicator\_value | string |  `domain`  `md5`  `sha256`  `ip`  `ipv6` 
-action\_result\.parameter\.resource\_id | string |  `crowdstrike indicator id` 
-action\_result\.data\.\*\.action | string |  `crowdstrike indicator action` 
-action\_result\.data\.\*\.applied\_globally | boolean | 
-action\_result\.data\.\*\.created\_by | string | 
-action\_result\.data\.\*\.created\_on | string |  `date` 
-action\_result\.data\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.deleted | boolean | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.expiration | string |  `date` 
-action\_result\.data\.\*\.expiration\_timestamp | string |  `date` 
-action\_result\.data\.\*\.expired | boolean | 
-action\_result\.data\.\*\.from\_parent | boolean | 
-action\_result\.data\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.id | string |  `crowdstrike indicator id` 
-action\_result\.data\.\*\.metadata\.av\_hits | numeric | 
-action\_result\.data\.\*\.metadata\.company\_name | string | 
-action\_result\.data\.\*\.metadata\.file\_description | string | 
-action\_result\.data\.\*\.metadata\.file\_version | string | 
-action\_result\.data\.\*\.metadata\.filename | string | 
-action\_result\.data\.\*\.metadata\.original\_filename | string | 
-action\_result\.data\.\*\.metadata\.product\_name | string | 
-action\_result\.data\.\*\.metadata\.product\_version | string | 
-action\_result\.data\.\*\.metadata\.signed | boolean | 
-action\_result\.data\.\*\.mobile\_action | string | 
-action\_result\.data\.\*\.modified\_by | string | 
-action\_result\.data\.\*\.modified\_on | string | 
-action\_result\.data\.\*\.modified\_timestamp | string |  `date` 
-action\_result\.data\.\*\.platforms\.\* | string |  `crowdstrike indicator platforms` 
-action\_result\.data\.\*\.severity | string |  `severity` 
-action\_result\.data\.\*\.source | string | 
-action\_result\.data\.\*\.tags | string | 
-action\_result\.data\.\*\.type | string |  `crowdstrike indicator type` 
-action\_result\.data\.\*\.value | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain` 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.indicator_type | string |  `crowdstrike indicator type`  |   domain 
+action_result.parameter.indicator_value | string |  `domain`  `md5`  `sha256`  `ip`  `ipv6`  |   xyz 
+action_result.parameter.resource_id | string |  `crowdstrike indicator id`  |   feaefb786fc648861779b9f906b1426b3d670ffe4c22ec7b7ff3d3e03e88dc43 
+action_result.data.\*.action | string |  `crowdstrike indicator action`  |   none 
+action_result.data.\*.applied_globally | boolean |  |   True  False 
+action_result.data.\*.created_by | string |  |   C16JJOUVVY125J3O50FF 
+action_result.data.\*.created_on | string |  `date`  |   2021-09-09T08:51:04.131068458Z 
+action_result.data.\*.created_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.deleted | boolean |  |   True  False 
+action_result.data.\*.description | string |  |   test description 
+action_result.data.\*.expiration | string |  `date`  |   2022-09-09T08:51:03Z 
+action_result.data.\*.expiration_timestamp | string |  `date`  |   2018-09-16T00:00:00Z 
+action_result.data.\*.expired | boolean |  |   True  False 
+action_result.data.\*.from_parent | boolean |  |   True  False 
+action_result.data.\*.host_groups.\* | string |  `crowdstrike host group id`  |   0491ecd214614b5ab3bca1037a15390b 
+action_result.data.\*.id | string |  `crowdstrike indicator id`  |   99cd3772bf570aebea6e58059532ac902798583d6e75e6817364da70a062673a 
+action_result.data.\*.metadata.av_hits | numeric |  |   -1 
+action_result.data.\*.metadata.company_name | string |  |   Carbon Black, Inc 
+action_result.data.\*.metadata.file_description | string |  |   CarbonBlack Sensor 
+action_result.data.\*.metadata.file_version | string |  |   6.0.2.70329 
+action_result.data.\*.metadata.filename | string |  |   test_file_name 
+action_result.data.\*.metadata.original_filename | string |  |   cb.exe 
+action_result.data.\*.metadata.product_name | string |  |   CarbonBlack Sensor 
+action_result.data.\*.metadata.product_version | string |  |   6.0.2.70329 
+action_result.data.\*.metadata.signed | boolean |  |   False  True 
+action_result.data.\*.mobile_action | string |  |   no_action 
+action_result.data.\*.modified_by | string |  |   ae2000074e144336ea1de4de9dc1bd39 
+action_result.data.\*.modified_on | string |  |   2021-09-09T08:51:04.131068458Z 
+action_result.data.\*.modified_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.platforms.\* | string |  `crowdstrike indicator platforms`  |   mac 
+action_result.data.\*.severity | string |  `severity`  |   medium 
+action_result.data.\*.source | string |  |   test source 
+action_result.data.\*.tags | string |  |   tag1 
+action_result.data.\*.type | string |  `crowdstrike indicator type`  |   domain 
+action_result.data.\*.value | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain`  |   xyz 
+action_result.summary | string |  |  
+action_result.message | string |  |   Indicator fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list custom indicators'
 Queries for custom indicators in your customer account
@@ -1943,179 +2196,179 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**indicator\_value** |  optional  | String representation of the indicator | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain` 
-**indicator\_type** |  optional  | The type of the indicator | string |  `crowdstrike indicator type` 
+**indicator_value** |  optional  | String representation of the indicator | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain` 
+**indicator_type** |  optional  | The type of the indicator | string |  `crowdstrike indicator type` 
 **action** |  optional  | Enforcement policy | string |  `crowdstrike indicator action` 
 **source** |  optional  | The source of indicators | string | 
-**from\_expiration** |  optional  | The earliest indicator expiration date \(RFC3339\) | string |  `date` 
-**to\_expiration** |  optional  | The latest indicator expiration date \(RFC3339\) | string |  `date` 
-**limit** |  optional  | The limit of indicator to be fetched \(defaults to 100\) | numeric | 
+**from_expiration** |  optional  | The earliest indicator expiration date (RFC3339) | string |  `date` 
+**to_expiration** |  optional  | The latest indicator expiration date (RFC3339) | string |  `date` 
+**limit** |  optional  | The limit of indicator to be fetched (defaults to 100) | numeric | 
 **sort** |  optional  | Property to sort by | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.action | string |  `crowdstrike indicator action` 
-action\_result\.parameter\.from\_expiration | string |  `date` 
-action\_result\.parameter\.indicator\_type | string |  `crowdstrike indicator type` 
-action\_result\.parameter\.indicator\_value | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain` 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.ph | string | 
-action\_result\.parameter\.sort | string | 
-action\_result\.parameter\.source | string | 
-action\_result\.parameter\.to\_expiration | string |  `date` 
-action\_result\.data\.\*\.domain | string |  `domain` 
-action\_result\.data\.\*\.domain\.\*\.action | string |  `crowdstrike indicator action` 
-action\_result\.data\.\*\.domain\.\*\.applied\_globally | boolean | 
-action\_result\.data\.\*\.domain\.\*\.created\_by | string |  `md5` 
-action\_result\.data\.\*\.domain\.\*\.created\_on | string |  `date` 
-action\_result\.data\.\*\.domain\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.domain\.\*\.deleted | boolean | 
-action\_result\.data\.\*\.domain\.\*\.description | string | 
-action\_result\.data\.\*\.domain\.\*\.expiration | string |  `date` 
-action\_result\.data\.\*\.domain\.\*\.expiration\_timestamp | string |  `date` 
-action\_result\.data\.\*\.domain\.\*\.expired | boolean | 
-action\_result\.data\.\*\.domain\.\*\.from\_parent | boolean | 
-action\_result\.data\.\*\.domain\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.domain\.\*\.id | string |  `crowdstrike indicator id` 
-action\_result\.data\.\*\.domain\.\*\.metadata\.filename | string | 
-action\_result\.data\.\*\.domain\.\*\.mobile\_action | string | 
-action\_result\.data\.\*\.domain\.\*\.modified\_by | string |  `md5` 
-action\_result\.data\.\*\.domain\.\*\.modified\_on | string | 
-action\_result\.data\.\*\.domain\.\*\.modified\_timestamp | string |  `date` 
-action\_result\.data\.\*\.domain\.\*\.platforms\.\* | string |  `crowdstrike indicator platforms` 
-action\_result\.data\.\*\.domain\.\*\.severity | string |  `severity` 
-action\_result\.data\.\*\.domain\.\*\.source | string | 
-action\_result\.data\.\*\.domain\.\*\.tags | string | 
-action\_result\.data\.\*\.domain\.\*\.type | string |  `crowdstrike indicator type` 
-action\_result\.data\.\*\.domain\.\*\.value | string |  `domain` 
-action\_result\.data\.\*\.ipv4 | string |  `ip` 
-action\_result\.data\.\*\.ipv4\.\*\.action | string |  `crowdstrike indicator action` 
-action\_result\.data\.\*\.ipv4\.\*\.applied\_globally | boolean | 
-action\_result\.data\.\*\.ipv4\.\*\.created\_by | string |  `md5` 
-action\_result\.data\.\*\.ipv4\.\*\.created\_on | string |  `date` 
-action\_result\.data\.\*\.ipv4\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.ipv4\.\*\.deleted | boolean | 
-action\_result\.data\.\*\.ipv4\.\*\.description | string | 
-action\_result\.data\.\*\.ipv4\.\*\.expiration | string |  `date` 
-action\_result\.data\.\*\.ipv4\.\*\.expiration\_timestamp | string |  `date` 
-action\_result\.data\.\*\.ipv4\.\*\.expired | boolean | 
-action\_result\.data\.\*\.ipv4\.\*\.from\_parent | boolean | 
-action\_result\.data\.\*\.ipv4\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.ipv4\.\*\.id | string |  `crowdstrike indicator id` 
-action\_result\.data\.\*\.ipv4\.\*\.metadata\.filename | string | 
-action\_result\.data\.\*\.ipv4\.\*\.mobile\_action | string | 
-action\_result\.data\.\*\.ipv4\.\*\.modified\_by | string |  `md5` 
-action\_result\.data\.\*\.ipv4\.\*\.modified\_on | string | 
-action\_result\.data\.\*\.ipv4\.\*\.modified\_timestamp | string |  `date` 
-action\_result\.data\.\*\.ipv4\.\*\.platforms\.\* | string |  `crowdstrike indicator platforms` 
-action\_result\.data\.\*\.ipv4\.\*\.severity | string |  `severity` 
-action\_result\.data\.\*\.ipv4\.\*\.source | string | 
-action\_result\.data\.\*\.ipv4\.\*\.tags | string | 
-action\_result\.data\.\*\.ipv4\.\*\.type | string |  `crowdstrike indicator type` 
-action\_result\.data\.\*\.ipv4\.\*\.value | string |  `ip` 
-action\_result\.data\.\*\.ipv6 | string |  `ipv6` 
-action\_result\.data\.\*\.ipv6\.\*\.action | string |  `crowdstrike indicator action` 
-action\_result\.data\.\*\.ipv6\.\*\.applied\_globally | boolean | 
-action\_result\.data\.\*\.ipv6\.\*\.created\_by | string |  `md5` 
-action\_result\.data\.\*\.ipv6\.\*\.created\_on | string |  `date` 
-action\_result\.data\.\*\.ipv6\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.ipv6\.\*\.deleted | boolean | 
-action\_result\.data\.\*\.ipv6\.\*\.description | string | 
-action\_result\.data\.\*\.ipv6\.\*\.expiration | string |  `date` 
-action\_result\.data\.\*\.ipv6\.\*\.expiration\_timestamp | string |  `date` 
-action\_result\.data\.\*\.ipv6\.\*\.expired | boolean | 
-action\_result\.data\.\*\.ipv6\.\*\.from\_parent | boolean | 
-action\_result\.data\.\*\.ipv6\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.ipv6\.\*\.id | string |  `crowdstrike indicator id` 
-action\_result\.data\.\*\.ipv6\.\*\.metadata\.filename | string | 
-action\_result\.data\.\*\.ipv6\.\*\.modified\_by | string |  `md5` 
-action\_result\.data\.\*\.ipv6\.\*\.modified\_on | string | 
-action\_result\.data\.\*\.ipv6\.\*\.modified\_timestamp | string |  `date` 
-action\_result\.data\.\*\.ipv6\.\*\.platforms\.\* | string |  `crowdstrike indicator platforms` 
-action\_result\.data\.\*\.ipv6\.\*\.severity | string |  `severity` 
-action\_result\.data\.\*\.ipv6\.\*\.source | string | 
-action\_result\.data\.\*\.ipv6\.\*\.tags | string | 
-action\_result\.data\.\*\.ipv6\.\*\.type | string |  `crowdstrike indicator type` 
-action\_result\.data\.\*\.ipv6\.\*\.value | string |  `ipv6` 
-action\_result\.data\.\*\.md5 | string |  `md5` 
-action\_result\.data\.\*\.md5\.\*\.action | string |  `crowdstrike indicator action` 
-action\_result\.data\.\*\.md5\.\*\.applied\_globally | boolean | 
-action\_result\.data\.\*\.md5\.\*\.created\_by | string |  `md5` 
-action\_result\.data\.\*\.md5\.\*\.created\_on | string |  `date` 
-action\_result\.data\.\*\.md5\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.md5\.\*\.deleted | boolean | 
-action\_result\.data\.\*\.md5\.\*\.description | string | 
-action\_result\.data\.\*\.md5\.\*\.expiration | string |  `date` 
-action\_result\.data\.\*\.md5\.\*\.expiration\_timestamp | string |  `date` 
-action\_result\.data\.\*\.md5\.\*\.expired | boolean | 
-action\_result\.data\.\*\.md5\.\*\.from\_parent | boolean | 
-action\_result\.data\.\*\.md5\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.md5\.\*\.id | string |  `crowdstrike indicator id` 
-action\_result\.data\.\*\.md5\.\*\.metadata\.av\_hits | numeric | 
-action\_result\.data\.\*\.md5\.\*\.metadata\.filename | string | 
-action\_result\.data\.\*\.md5\.\*\.metadata\.signed | boolean | 
-action\_result\.data\.\*\.md5\.\*\.mobile\_action | string | 
-action\_result\.data\.\*\.md5\.\*\.modified\_by | string |  `md5` 
-action\_result\.data\.\*\.md5\.\*\.modified\_on | string | 
-action\_result\.data\.\*\.md5\.\*\.modified\_timestamp | string |  `date` 
-action\_result\.data\.\*\.md5\.\*\.platforms\.\* | string |  `crowdstrike indicator platforms` 
-action\_result\.data\.\*\.md5\.\*\.severity | string |  `severity` 
-action\_result\.data\.\*\.md5\.\*\.source | string | 
-action\_result\.data\.\*\.md5\.\*\.tags | string | 
-action\_result\.data\.\*\.md5\.\*\.type | string |  `crowdstrike indicator type` 
-action\_result\.data\.\*\.md5\.\*\.value | string |  `md5` 
-action\_result\.data\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sha256\.\*\.action | string |  `crowdstrike indicator action` 
-action\_result\.data\.\*\.sha256\.\*\.applied\_globally | boolean | 
-action\_result\.data\.\*\.sha256\.\*\.created\_by | string |  `md5` 
-action\_result\.data\.\*\.sha256\.\*\.created\_on | string |  `date` 
-action\_result\.data\.\*\.sha256\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.sha256\.\*\.deleted | boolean | 
-action\_result\.data\.\*\.sha256\.\*\.description | string | 
-action\_result\.data\.\*\.sha256\.\*\.expiration | string |  `date` 
-action\_result\.data\.\*\.sha256\.\*\.expiration\_timestamp | string |  `date` 
-action\_result\.data\.\*\.sha256\.\*\.expired | boolean | 
-action\_result\.data\.\*\.sha256\.\*\.from\_parent | boolean | 
-action\_result\.data\.\*\.sha256\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.sha256\.\*\.id | string |  `crowdstrike indicator id` 
-action\_result\.data\.\*\.sha256\.\*\.metadata\.av\_hits | numeric | 
-action\_result\.data\.\*\.sha256\.\*\.metadata\.company\_name | string | 
-action\_result\.data\.\*\.sha256\.\*\.metadata\.file\_description | string | 
-action\_result\.data\.\*\.sha256\.\*\.metadata\.file\_version | string | 
-action\_result\.data\.\*\.sha256\.\*\.metadata\.filename | string | 
-action\_result\.data\.\*\.sha256\.\*\.metadata\.original\_filename | string | 
-action\_result\.data\.\*\.sha256\.\*\.metadata\.product\_name | string | 
-action\_result\.data\.\*\.sha256\.\*\.metadata\.product\_version | string | 
-action\_result\.data\.\*\.sha256\.\*\.metadata\.signed | boolean | 
-action\_result\.data\.\*\.sha256\.\*\.mobile\_action | string | 
-action\_result\.data\.\*\.sha256\.\*\.modified\_by | string |  `md5` 
-action\_result\.data\.\*\.sha256\.\*\.modified\_on | string | 
-action\_result\.data\.\*\.sha256\.\*\.modified\_timestamp | string |  `date` 
-action\_result\.data\.\*\.sha256\.\*\.platforms\.\* | string |  `crowdstrike indicator platforms` 
-action\_result\.data\.\*\.sha256\.\*\.severity | string |  `severity` 
-action\_result\.data\.\*\.sha256\.\*\.source | string | 
-action\_result\.data\.\*\.sha256\.\*\.tags | string | 
-action\_result\.data\.\*\.sha256\.\*\.type | string |  `crowdstrike indicator type` 
-action\_result\.data\.\*\.sha256\.\*\.value | string |  `sha256` 
-action\_result\.summary\.alerts\_found | numeric | 
-action\_result\.summary\.total\_domain | numeric | 
-action\_result\.summary\.total\_ipv4 | numeric | 
-action\_result\.summary\.total\_ipv6 | numeric | 
-action\_result\.summary\.total\_md5 | numeric | 
-action\_result\.summary\.total\_sha256 | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.action | string |  `crowdstrike indicator action`  |   detect 
+action_result.parameter.from_expiration | string |  `date`  |   2020-10-17T00:00:00Z 
+action_result.parameter.indicator_type | string |  `crowdstrike indicator type`  |   domain 
+action_result.parameter.indicator_value | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain`  |   test 
+action_result.parameter.limit | numeric |  |   200 
+action_result.parameter.ph | string |  |  
+action_result.parameter.sort | string |  |   indicator_type 
+action_result.parameter.source | string |  |   test 
+action_result.parameter.to_expiration | string |  `date`  |   2020-10-17T00:00:00Z 
+action_result.data.\*.domain | string |  `domain`  |  
+action_result.data.\*.domain.\*.action | string |  `crowdstrike indicator action`  |   no_action 
+action_result.data.\*.domain.\*.applied_globally | boolean |  |   False 
+action_result.data.\*.domain.\*.created_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.domain.\*.created_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.domain.\*.created_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.domain.\*.deleted | boolean |  |   False 
+action_result.data.\*.domain.\*.description | string |  |   Test description 
+action_result.data.\*.domain.\*.expiration | string |  `date`  |   2021-09-25T09:52:27Z 
+action_result.data.\*.domain.\*.expiration_timestamp | string |  `date`  |   2018-09-16T00:00:00Z 
+action_result.data.\*.domain.\*.expired | boolean |  |   False 
+action_result.data.\*.domain.\*.from_parent | boolean |  |   False 
+action_result.data.\*.domain.\*.host_groups.\* | string |  `crowdstrike host group id`  |   0491ecd214614b5ab3bca1037a15390b 
+action_result.data.\*.domain.\*.id | string |  `crowdstrike indicator id`  |   010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb 
+action_result.data.\*.domain.\*.metadata.filename | string |  |   EXAMPLEMETADATAvftcdrxcftvgybhhubsdgvfyuegwwiqeqTESTuifgwieugfhiugybhugvftcdrxcftvgbhubsdgvfyuegwwiqeqpdiheuifgEXAMPLE 
+action_result.data.\*.domain.\*.mobile_action | string |  |   no_action 
+action_result.data.\*.domain.\*.modified_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.domain.\*.modified_on | string |  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.domain.\*.modified_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.domain.\*.platforms.\* | string |  `crowdstrike indicator platforms`  |   mac 
+action_result.data.\*.domain.\*.severity | string |  `severity`  |   high 
+action_result.data.\*.domain.\*.source | string |  |   Test source 
+action_result.data.\*.domain.\*.tags | string |  |   test_tag 
+action_result.data.\*.domain.\*.type | string |  `crowdstrike indicator type`  |   domain 
+action_result.data.\*.domain.\*.value | string |  `domain`  |   test.domain 
+action_result.data.\*.ipv4 | string |  `ip`  |  
+action_result.data.\*.ipv4.\*.action | string |  `crowdstrike indicator action`  |   no_action 
+action_result.data.\*.ipv4.\*.applied_globally | boolean |  |   False 
+action_result.data.\*.ipv4.\*.created_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.ipv4.\*.created_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.ipv4.\*.created_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.ipv4.\*.deleted | boolean |  |   False 
+action_result.data.\*.ipv4.\*.description | string |  |   Test description 
+action_result.data.\*.ipv4.\*.expiration | string |  `date`  |   2021-09-25T09:52:27Z 
+action_result.data.\*.ipv4.\*.expiration_timestamp | string |  `date`  |   2018-09-16T00:00:00Z 
+action_result.data.\*.ipv4.\*.expired | boolean |  |   False 
+action_result.data.\*.ipv4.\*.from_parent | boolean |  |   False 
+action_result.data.\*.ipv4.\*.host_groups.\* | string |  `crowdstrike host group id`  |   0491ecd214614b5ab3bca1037a15390b 
+action_result.data.\*.ipv4.\*.id | string |  `crowdstrike indicator id`  |   010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb 
+action_result.data.\*.ipv4.\*.metadata.filename | string |  |   test 
+action_result.data.\*.ipv4.\*.mobile_action | string |  |   no_action 
+action_result.data.\*.ipv4.\*.modified_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.ipv4.\*.modified_on | string |  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.ipv4.\*.modified_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.ipv4.\*.platforms.\* | string |  `crowdstrike indicator platforms`  |   mac 
+action_result.data.\*.ipv4.\*.severity | string |  `severity`  |   high 
+action_result.data.\*.ipv4.\*.source | string |  |   Test source 
+action_result.data.\*.ipv4.\*.tags | string |  |   test_tag 
+action_result.data.\*.ipv4.\*.type | string |  `crowdstrike indicator type`  |   ipv4 
+action_result.data.\*.ipv4.\*.value | string |  `ip`  |   8.8.8.8 
+action_result.data.\*.ipv6 | string |  `ipv6`  |  
+action_result.data.\*.ipv6.\*.action | string |  `crowdstrike indicator action`  |   no_action 
+action_result.data.\*.ipv6.\*.applied_globally | boolean |  |   False 
+action_result.data.\*.ipv6.\*.created_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.ipv6.\*.created_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.ipv6.\*.created_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.ipv6.\*.deleted | boolean |  |   False 
+action_result.data.\*.ipv6.\*.description | string |  |   Test description 
+action_result.data.\*.ipv6.\*.expiration | string |  `date`  |   2021-09-25T09:52:27Z 
+action_result.data.\*.ipv6.\*.expiration_timestamp | string |  `date`  |   2018-09-16T00:00:00Z 
+action_result.data.\*.ipv6.\*.expired | boolean |  |   False 
+action_result.data.\*.ipv6.\*.from_parent | boolean |  |   False 
+action_result.data.\*.ipv6.\*.host_groups.\* | string |  `crowdstrike host group id`  |   0491ecd214614b5ab3bca1037a15390b 
+action_result.data.\*.ipv6.\*.id | string |  `crowdstrike indicator id`  |   010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb 
+action_result.data.\*.ipv6.\*.metadata.filename | string |  |   test_file_name 
+action_result.data.\*.ipv6.\*.modified_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.ipv6.\*.modified_on | string |  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.ipv6.\*.modified_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.ipv6.\*.platforms.\* | string |  `crowdstrike indicator platforms`  |   mac 
+action_result.data.\*.ipv6.\*.severity | string |  `severity`  |   high 
+action_result.data.\*.ipv6.\*.source | string |  |   Test source 
+action_result.data.\*.ipv6.\*.tags | string |  |   test_tag 
+action_result.data.\*.ipv6.\*.type | string |  `crowdstrike indicator type`  |   ipv6 
+action_result.data.\*.ipv6.\*.value | string |  `ipv6`  |   2001:db8:3333::6666:7777:8888 
+action_result.data.\*.md5 | string |  `md5`  |  
+action_result.data.\*.md5.\*.action | string |  `crowdstrike indicator action`  |   no_action 
+action_result.data.\*.md5.\*.applied_globally | boolean |  |   False 
+action_result.data.\*.md5.\*.created_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.md5.\*.created_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.md5.\*.created_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.md5.\*.deleted | boolean |  |   False 
+action_result.data.\*.md5.\*.description | string |  |   Test description 
+action_result.data.\*.md5.\*.expiration | string |  `date`  |   2021-09-25T09:52:27Z 
+action_result.data.\*.md5.\*.expiration_timestamp | string |  `date`  |   2018-09-16T00:00:00Z 
+action_result.data.\*.md5.\*.expired | boolean |  |   False 
+action_result.data.\*.md5.\*.from_parent | boolean |  |   False 
+action_result.data.\*.md5.\*.host_groups.\* | string |  `crowdstrike host group id`  |   0491ecd214614b5ab3bca1037a15390b 
+action_result.data.\*.md5.\*.id | string |  `crowdstrike indicator id`  |   010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb 
+action_result.data.\*.md5.\*.metadata.av_hits | numeric |  |   -1 
+action_result.data.\*.md5.\*.metadata.filename | string |  |   test_file_name 
+action_result.data.\*.md5.\*.metadata.signed | boolean |  |   False  True 
+action_result.data.\*.md5.\*.mobile_action | string |  |   no_action 
+action_result.data.\*.md5.\*.modified_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.md5.\*.modified_on | string |  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.md5.\*.modified_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.md5.\*.platforms.\* | string |  `crowdstrike indicator platforms`  |   mac 
+action_result.data.\*.md5.\*.severity | string |  `severity`  |   high 
+action_result.data.\*.md5.\*.source | string |  |   Test source 
+action_result.data.\*.md5.\*.tags | string |  |   test_tag 
+action_result.data.\*.md5.\*.type | string |  `crowdstrike indicator type`  |   md5 
+action_result.data.\*.md5.\*.value | string |  `md5`  |   098f6bcd4621d373cade4e832627b4f6 
+action_result.data.\*.sha256 | string |  `sha256`  |  
+action_result.data.\*.sha256.\*.action | string |  `crowdstrike indicator action`  |   no_action 
+action_result.data.\*.sha256.\*.applied_globally | boolean |  |   False 
+action_result.data.\*.sha256.\*.created_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.sha256.\*.created_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.sha256.\*.created_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.sha256.\*.deleted | boolean |  |   False 
+action_result.data.\*.sha256.\*.description | string |  |   Test description 
+action_result.data.\*.sha256.\*.expiration | string |  `date`  |   2021-09-25T09:52:27Z 
+action_result.data.\*.sha256.\*.expiration_timestamp | string |  `date`  |   2018-09-16T00:00:00Z 
+action_result.data.\*.sha256.\*.expired | boolean |  |   False 
+action_result.data.\*.sha256.\*.from_parent | boolean |  |   False 
+action_result.data.\*.sha256.\*.host_groups.\* | string |  `crowdstrike host group id`  |   0491ecd214614b5ab3bca1037a15390b 
+action_result.data.\*.sha256.\*.id | string |  `crowdstrike indicator id`  |   010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb 
+action_result.data.\*.sha256.\*.metadata.av_hits | numeric |  |   -1 
+action_result.data.\*.sha256.\*.metadata.company_name | string |  |   Test Corporation 
+action_result.data.\*.sha256.\*.metadata.file_description | string |  |   Runtime Broker 
+action_result.data.\*.sha256.\*.metadata.file_version | string |  |   10.0.19041.746 (WinBuild.160101.0800) 
+action_result.data.\*.sha256.\*.metadata.filename | string |  |   test_file_name 
+action_result.data.\*.sha256.\*.metadata.original_filename | string |  |   RuntimeBroker.exe 
+action_result.data.\*.sha256.\*.metadata.product_name | string |  |   Test® Windows® Operating System 
+action_result.data.\*.sha256.\*.metadata.product_version | string |  |   10.0.19041.746 
+action_result.data.\*.sha256.\*.metadata.signed | boolean |  |   False  True 
+action_result.data.\*.sha256.\*.mobile_action | string |  |   no_action 
+action_result.data.\*.sha256.\*.modified_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.sha256.\*.modified_on | string |  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.sha256.\*.modified_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.sha256.\*.platforms.\* | string |  `crowdstrike indicator platforms`  |   mac 
+action_result.data.\*.sha256.\*.severity | string |  `severity`  |   high 
+action_result.data.\*.sha256.\*.source | string |  |   Test source 
+action_result.data.\*.sha256.\*.tags | string |  |   test_tag 
+action_result.data.\*.sha256.\*.type | string |  `crowdstrike indicator type`  |   sha256 
+action_result.data.\*.sha256.\*.value | string |  `sha256`  |   9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08 
+action_result.summary.alerts_found | numeric |  |  
+action_result.summary.total_domain | numeric |  |  
+action_result.summary.total_ipv4 | numeric |  |  
+action_result.summary.total_ipv6 | numeric |  |  
+action_result.summary.total_md5 | numeric |  |  
+action_result.summary.total_sha256 | numeric |  |  
+action_result.message | string |  |   Total ip: 20, Total domain: 26, Total sha1: 0, Total md5: 0, Total sha256: 1, Alerts found: 47 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list put files'
-Queries for files uploaded to Crowdstrike for use with the RTR \`put\` command
+Queries for files uploaded to Crowdstrike for use with the RTR `put` command
 
 Type: **investigate**  
 Read only: **True**
 
-For additional information on FQL syntax see\: https\://falcon\.crowdstrike\.com/support/documentation/45/falcon\-query\-language\-feature\-guide\.
+For additional information on FQL syntax see: https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-feature-guide.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -2126,48 +2379,48 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **sort** |  optional  | Sort results | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | string | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data\.\*\.comments\_for\_audit\_log | string | 
-action\_result\.data\.\*\.created\_by | string | 
-action\_result\.data\.\*\.created\_by\_uuid | string | 
-action\_result\.data\.\*\.created\_timestamp | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.file\_type | string | 
-action\_result\.data\.\*\.id | string | 
-action\_result\.data\.\*\.modified\_by | string | 
-action\_result\.data\.\*\.modified\_timestamp | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.data\.\*\.permission\_type | string | 
-action\_result\.data\.\*\.run\_attempt\_count | numeric | 
-action\_result\.data\.\*\.run\_success\_count | numeric | 
-action\_result\.data\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.size | numeric | 
-action\_result\.summary\.total\_files | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   size: 292 
+action_result.parameter.limit | numeric |  |   50 
+action_result.parameter.offset | string |  |   10 
+action_result.parameter.sort | string |  |   size|asc 
+action_result.data.\*.comments_for_audit_log | string |  |   test 
+action_result.data.\*.created_by | string |  |   api-client-05dbdf165b474db597007c6f88780e39 
+action_result.data.\*.created_by_uuid | string |  |   05dbdf16-5b47-4db5-9700-7c6f88780e39 
+action_result.data.\*.created_timestamp | string |  |   2020-01-17T19:54:47.929163017Z 
+action_result.data.\*.description | string |  |   This is a test description 
+action_result.data.\*.file_type | string |  |   binary 
+action_result.data.\*.id | string |  |   37420b00396311eaa57e0662caec3daa_05dbdf165b474db597007c6f88780e39 
+action_result.data.\*.modified_by | string |  |   api-client-05d12ffasd65d12b597007c6f88780e39 
+action_result.data.\*.modified_timestamp | string |  |   2020-01-17T19:54:47.929163507Z 
+action_result.data.\*.name | string |  |   blank_file 
+action_result.data.\*.permission_type | string |  |   none 
+action_result.data.\*.run_attempt_count | numeric |  |   0 
+action_result.data.\*.run_success_count | numeric |  |   0 
+action_result.data.\*.sha256 | string |  `sha256`  |   9a9eaa1e83dbb19252ae1c0158eeefe8e4ce78736535d4e6d6a6bb5b039ff9a2 
+action_result.data.\*.size | numeric |  |   88 
+action_result.summary.total_files | numeric |  |   2 
+action_result.message | string |  |   Total files: 2 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'on poll'
-Callback action for the on\_poll ingest functionality
+Callback action for the on_poll ingest functionality
 
 Type: **ingest**  
 Read only: **True**
 
-This action remembers the last event ID that was queried for\. The next ingestion carried out will query for later event IDs\. This way, the same events are not queried for in every run\. However, in the case of 'POLL NOW' queried event IDs will not be remembered\.
+This action remembers the last event ID that was queried for. The next ingestion carried out will query for later event IDs. This way, the same events are not queried for in every run. However, in the case of 'POLL NOW' queried event IDs will not be remembered.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**start\_time** |  optional  | Parameter ignored in this app | numeric | 
-**end\_time** |  optional  | Parameter ignored in this app | numeric | 
-**container\_count** |  optional  | Parameter ignored in this app | numeric | 
-**artifact\_count** |  optional  | Parameter ignored in this app | numeric | 
+**start_time** |  optional  | Parameter ignored in this app | numeric | 
+**end_time** |  optional  | Parameter ignored in this app | numeric | 
+**container_count** |  optional  | Parameter ignored in this app | numeric | 
+**artifact_count** |  optional  | Parameter ignored in this app | numeric | 
 
 #### Action Output
 No Output  
@@ -2178,27 +2431,27 @@ List processes that have recently used the IOC on a particular device
 Type: **investigate**  
 Read only: **True**
 
-Given a file hash or domain, the action will list all the processes that have either recently connected to the domain or interacted with the file that matches the supplied hash\. Use the <b>query device</b> actions to get the device id to run the action on\.In case of count\_only set to true, keep the limit value larger to fetch count of all the devices\.
+Given a file hash or domain, the action will list all the processes that have either recently connected to the domain or interacted with the file that matches the supplied hash. Use the <b>query device</b> actions to get the device id to run the action on.In case of count_only set to true, keep the limit value larger to fetch count of all the devices.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ioc** |  required  | File Hash or Domain to use for searching | string |  `hash`  `sha256`  `sha1`  `md5`  `domain` 
 **id** |  required  | Crowdstrike Device ID to search on | string |  `crowdstrike device id` 
-**limit** |  optional  | Maximum processes to be fetched \(defaults to 100\) | numeric | 
+**limit** |  optional  | Maximum processes to be fetched (defaults to 100) | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.id | string |  `crowdstrike device id` 
-action\_result\.parameter\.ioc | string |  `hash`  `sha256`  `sha1`  `md5`  `domain` 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.data\.\*\.falcon\_process\_id | string |  `falcon process id` 
-action\_result\.summary\.process\_count | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928ab 
+action_result.parameter.ioc | string |  `hash`  `sha256`  `sha1`  `md5`  `domain`  |   eeb27d04c5fb25f7459407c0e5394621f12100e301b22d04a6b8f78e2adbf33d 
+action_result.parameter.limit | numeric |  |   100 
+action_result.data.\*.falcon_process_id | string |  `falcon process id`  |   pid:07c312fabcb8473454d0a16f118928fg:16716090292999 
+action_result.summary.process_count | numeric |  |   1 
+action_result.message | string |  |   Process count: 1 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'upload indicator'
 Upload indicator that you want CrowdStrike to watch
@@ -2206,7 +2459,7 @@ Upload indicator that you want CrowdStrike to watch
 Type: **contain**  
 Read only: **False**
 
-Valid values for the <b>action</b> parameter are\:<ul><li>no\_action<br> Save the indicator for future use, but take no action\. No severity required\.</li><li>allow<br> Applies to hashes only\. Allow the indicator and do not detect it\. Severity does not apply and should not be provided\.</li><li>prevent\_no\_ui<br> Applies to hashes only\. Block and detect the indicator, but hide it from <b>Activity &gt; Detections</b>\. Has a default severity value\.</li><li>prevent<br> Applies to hashes only\. Block the indicator and show it as a detection at the selected severity\.</li><li>detect<br> Enable detections for the indicator at the selected severity\.</li></ul>Valid values for the <b>host groups</b> parameter are\:<ul><li>Comma separated host group IDs for specific groups</li><li>Leave it blank for all the host groups</li></ul>The <b>platforms</b> parameter is the list of platforms that the indicator applies to\. You can enter multiple platform names, separated by commas\. Valid values are\: <b>mac, windows, and linux</b>\.<br>The CrowdStrike API accepts the standard timestamp format in the <b>expiration</b> parameter\. In this action, the number of days provided in the <b>expiration</b> parameter is internally converted into the timestamp format to match the API format\.<br>If the indicator with the same type and value is created again, the action will fail as duplicate type\-value combination is not allowed\.
+Valid values for the <b>action</b> parameter are:<ul><li>no_action<br> Save the indicator for future use, but take no action. No severity required.</li><li>allow<br> Applies to hashes only. Allow the indicator and do not detect it. Severity does not apply and should not be provided.</li><li>prevent_no_ui<br> Applies to hashes only. Block and detect the indicator, but hide it from <b>Activity &gt; Detections</b>. Has a default severity value.</li><li>prevent<br> Applies to hashes only. Block the indicator and show it as a detection at the selected severity.</li><li>detect<br> Enable detections for the indicator at the selected severity.</li></ul>Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>Leave it blank for all the host groups</li></ul>The <b>platforms</b> parameter is the list of platforms that the indicator applies to. You can enter multiple platform names, separated by commas. Valid values are: <b>mac, windows, and linux</b>.<br>The CrowdStrike API accepts the standard timestamp format in the <b>expiration</b> parameter. In this action, the number of days provided in the <b>expiration</b> parameter is internally converted into the timestamp format to match the API format.<br>If the indicator with the same type and value is created again, the action will fail as duplicate type-value combination is not allowed.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -2219,52 +2472,52 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **description** |  optional  | Indicator description | string | 
 **tags** |  optional  | Comma separated list of tags | string | 
 **severity** |  optional  | Severity level | string |  `severity` 
-**host\_groups** |  optional  | Comma separated list of host group IDs | string |  `crowdstrike host group id` 
+**host_groups** |  optional  | Comma separated list of host group IDs | string |  `crowdstrike host group id` 
 **filename** |  optional  | Metadata filename | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.action | string |  `crowdstrike indicator action` 
-action\_result\.parameter\.description | string | 
-action\_result\.parameter\.expiration | numeric | 
-action\_result\.parameter\.filename | string | 
-action\_result\.parameter\.host\_groups | string |  `crowdstrike host group id` 
-action\_result\.parameter\.ioc | string |  `sha256`  `md5`  `domain`  `ip`  `ipv6` 
-action\_result\.parameter\.platforms | string |  `crowdstrike indicator platforms` 
-action\_result\.parameter\.severity | string |  `severity` 
-action\_result\.parameter\.source | string | 
-action\_result\.parameter\.tags | string | 
-action\_result\.data\.\*\.action | string |  `crowdstrike indicator action` 
-action\_result\.data\.\*\.applied\_globally | boolean | 
-action\_result\.data\.\*\.created\_by | string |  `md5` 
-action\_result\.data\.\*\.created\_on | string |  `date` 
-action\_result\.data\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.deleted | boolean | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.expiration | string |  `date` 
-action\_result\.data\.\*\.expiration\_timestamp | string |  `date` 
-action\_result\.data\.\*\.expired | boolean | 
-action\_result\.data\.\*\.from\_parent | boolean | 
-action\_result\.data\.\*\.host\_groups\.\* | string |  `crowdstrike host group id` 
-action\_result\.data\.\*\.id | string |  `crowdstrike indicator id` 
-action\_result\.data\.\*\.metadata\.av\_hits | numeric | 
-action\_result\.data\.\*\.metadata\.filename | string | 
-action\_result\.data\.\*\.metadata\.signed | boolean | 
-action\_result\.data\.\*\.modified\_by | string |  `md5` 
-action\_result\.data\.\*\.modified\_on | string | 
-action\_result\.data\.\*\.modified\_timestamp | string |  `date` 
-action\_result\.data\.\*\.platforms\.\* | string |  `crowdstrike indicator platforms` 
-action\_result\.data\.\*\.severity | string |  `severity` 
-action\_result\.data\.\*\.source | string | 
-action\_result\.data\.\*\.tags | string | 
-action\_result\.data\.\*\.type | string |  `crowdstrike indicator type` 
-action\_result\.data\.\*\.value | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain` 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.action | string |  `crowdstrike indicator action`  |   detect 
+action_result.parameter.description | string |  |   test description 
+action_result.parameter.expiration | numeric |  |   10 
+action_result.parameter.filename | string |  |   filename 
+action_result.parameter.host_groups | string |  `crowdstrike host group id`  |   7f0d05b7b2fd4ddfb34069ab6e99db34 
+action_result.parameter.ioc | string |  `sha256`  `md5`  `domain`  `ip`  `ipv6`  |   8.8.8.8 
+action_result.parameter.platforms | string |  `crowdstrike indicator platforms`  |   linux 
+action_result.parameter.severity | string |  `severity`  |   low 
+action_result.parameter.source | string |  |   test source 
+action_result.parameter.tags | string |  |   test_tag 
+action_result.data.\*.action | string |  `crowdstrike indicator action`  |   no_action 
+action_result.data.\*.applied_globally | boolean |  |   False 
+action_result.data.\*.created_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.created_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.created_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.deleted | boolean |  |   False 
+action_result.data.\*.description | string |  |   Test description 
+action_result.data.\*.expiration | string |  `date`  |   2021-09-25T09:52:27Z 
+action_result.data.\*.expiration_timestamp | string |  `date`  |   2018-09-16T00:00:00Z 
+action_result.data.\*.expired | boolean |  |   False 
+action_result.data.\*.from_parent | boolean |  |   False 
+action_result.data.\*.host_groups.\* | string |  `crowdstrike host group id`  |   0491ecd214614b5ab3bca1037a15390b 
+action_result.data.\*.id | string |  `crowdstrike indicator id`  |   010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb 
+action_result.data.\*.metadata.av_hits | numeric |  |   -1 
+action_result.data.\*.metadata.filename | string |  |   test_file_name 
+action_result.data.\*.metadata.signed | boolean |  |   False  True 
+action_result.data.\*.modified_by | string |  `md5`  |   ae1690074e144356ae2de5de8dc1bd93 
+action_result.data.\*.modified_on | string |  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.modified_timestamp | string |  `date`  |   2018-08-17T15:19:31Z 
+action_result.data.\*.platforms.\* | string |  `crowdstrike indicator platforms`  |   mac 
+action_result.data.\*.severity | string |  `severity`  |   high 
+action_result.data.\*.source | string |  |   Test source 
+action_result.data.\*.tags | string |  |   test_tag 
+action_result.data.\*.type | string |  `crowdstrike indicator type`  |   ipv4 
+action_result.data.\*.value | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain`  |   8.8.8.8 
+action_result.summary | string |  |  
+action_result.message | string |  |   Indicator uploaded successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'delete indicator'
 Delete an indicator that is being watched
@@ -2272,25 +2525,25 @@ Delete an indicator that is being watched
 Type: **correct**  
 Read only: **False**
 
-In this action, either 'ioc' or 'resource\_id' should be provided\. The priority of 'resource\_id' is higher\. If both the parameters are provided then the indicator will be deleted based on the 'resource\_id'\. The CrowdStrike API returns success for the 'resource\_id' of the already deleted indicator\.
+In this action, either 'ioc' or 'resource_id' should be provided. The priority of 'resource_id' is higher. If both the parameters are provided then the indicator will be deleted based on the 'resource_id'. The CrowdStrike API returns success for the 'resource_id' of the already deleted indicator.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **ioc** |  optional  | Hash, ip or domain IOC from previous upload | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain` 
-**resource\_id** |  optional  | The resource id of the indicator | string |  `crowdstrike indicator id` 
+**resource_id** |  optional  | The resource id of the indicator | string |  `crowdstrike indicator id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.ioc | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain` 
-action\_result\.parameter\.resource\_id | string |  `crowdstrike indicator id` 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.ioc | string |  `ip`  `ipv6`  `md5`  `sha256`  `domain`  |   test 
+action_result.parameter.resource_id | string |  `crowdstrike indicator id`  |   feaefb786fc648861779b9f906b1426b3d670ffe4c22ec7b7ff3d3e03e88dc43 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Indicator deleted successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'update indicator'
 Update an indicator that has been uploaded
@@ -2298,7 +2551,7 @@ Update an indicator that has been uploaded
 Type: **generic**  
 Read only: **False**
 
-Valid values for the <b>host groups</b> parameter are\:<ul><li>Comma separated host group IDs for specific groups</li><li>The value '<b>all</b>' for all the host groups</li><li>Leave it blank if there is no change</li></ul>If no parameters are provided as input, the action would pass successfully\.
+Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>The value '<b>all</b>' for all the host groups</li><li>Leave it blank if there is no change</li></ul>If no parameters are provided as input, the action would pass successfully.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -2311,28 +2564,28 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **description** |  optional  | Indicator description | string | 
 **tags** |  optional  | Comma separated list of tags | string | 
 **severity** |  optional  | Severity level | string |  `severity` 
-**host\_groups** |  optional  | Comma separated list of host group IDs | string |  `crowdstrike host group id` 
+**host_groups** |  optional  | Comma separated list of host group IDs | string |  `crowdstrike host group id` 
 **filename** |  optional  | Metadata filename | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.action | string |  `crowdstrike indicator action` 
-action\_result\.parameter\.description | string | 
-action\_result\.parameter\.expiration | numeric | 
-action\_result\.parameter\.filename | string | 
-action\_result\.parameter\.host\_groups | string |  `crowdstrike host group id` 
-action\_result\.parameter\.ioc | string |  `ip`  `md5`  `sha256`  `domain` 
-action\_result\.parameter\.platforms | string |  `crowdstrike indicator platforms` 
-action\_result\.parameter\.severity | string |  `severity` 
-action\_result\.parameter\.source | string | 
-action\_result\.parameter\.tags | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.action | string |  `crowdstrike indicator action`  |   detect 
+action_result.parameter.description | string |  |   test description 
+action_result.parameter.expiration | numeric |  |   10 
+action_result.parameter.filename | string |  |   filename 
+action_result.parameter.host_groups | string |  `crowdstrike host group id`  |   7f0d05b7b2fd4ddfb34069ab6e99db34 
+action_result.parameter.ioc | string |  `ip`  `md5`  `sha256`  `domain`  |   8.8.8.8 
+action_result.parameter.platforms | string |  `crowdstrike indicator platforms`  |   linux 
+action_result.parameter.severity | string |  `severity`  |   low 
+action_result.parameter.source | string |  |   test source 
+action_result.parameter.tags | string |  |   test_tag 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Indicator updated successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'file reputation'
 Queries CrowdStrike for the file info given a vault ID or a SHA256 hash, vault ID has higher priority than SHA256 hash if both are provided
@@ -2343,160 +2596,160 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**vault\_id** |  optional  | Vault ID of file | string |  `vault id` 
+**vault_id** |  optional  | Vault ID of file | string |  `vault id` 
 **sha256** |  optional  | SHA256 hash of the file | string |  `sha256` 
 **limit** |  optional  | Maximum reports to be fetched | numeric | 
 **sort** |  optional  | Property to sort by | string | 
-**offset** |  optional  | Starting index of overall result set from which to return ids \(defaults to 0\) | numeric | 
-**detail\_report** |  optional  | Get the detailed report | boolean | 
+**offset** |  optional  | Starting index of overall result set from which to return ids (defaults to 0) | numeric | 
+**detail_report** |  optional  | Get the detailed report | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.detail\_report | boolean | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | numeric | 
-action\_result\.parameter\.sha256 | string |  `sha256` 
-action\_result\.parameter\.sort | string | 
-action\_result\.parameter\.vault\_id | string |  `vault id` 
-action\_result\.data\.\*\.cid | string | 
-action\_result\.data\.\*\.created\_timestamp | string | 
-action\_result\.data\.\*\.id | string |  `crowdstrike resource id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_csv\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_json\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_maec\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_stix\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_csv\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_json\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_maec\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_stix\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.malquery\.\*\.input | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.file\_type | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.first\_seen\_timestamp | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.label | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.md5 | string |  `md5` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.sha1 | string |  `sha1` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.malquery\.\*\.type | string | 
-action\_result\.data\.\*\.malquery\.\*\.verdict | string | 
-action\_result\.data\.\*\.origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.architecture | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.address | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.associated\_runtime\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.associated\_runtime\.\*\.pid | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.country | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.port | numeric |  `port` 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.protocol | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.address | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.country | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.domain | string |  `domain`  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_creation\_timestamp | string |  `date` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_name\_servers | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_organization | string | 
-action\_result\.data\.\*\.sandbox\.\*\.environment | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.environment\_description | string |  `crowdstrike environment` 
-action\_result\.data\.\*\.sandbox\.\*\.environment\_id | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_message | string | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.exact\_deep\_hash | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.md5 | string |  `md5` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.runtime\_process | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.sha1 | string |  `sha1` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.threat\_level\_readable | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.filename | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.process | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.source | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.file\_imports\.\*\.module | string | 
-action\_result\.data\.\*\.sandbox\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.file\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.header | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host | string |  `domain`  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host\_ip | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host\_port | numeric |  `port` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.method | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.url | string | 
-action\_result\.data\.\*\.sandbox\.\*\.incidents\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.memory\_strings\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.attack\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.parent\.attack\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.parent\.attack\_id\_wiki | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.parent\.technique | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.tactic | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.technique | string | 
-action\_result\.data\.\*\.sandbox\.\*\.network\_settings | string | 
-action\_result\.data\.\*\.sandbox\.\*\.packer | string | 
-action\_result\.data\.\*\.sandbox\.\*\.pcap\_report\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.command\_line | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.mask | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.id | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.icon\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.normalized\_path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.parent\_uid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.pid | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.process\_flags\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.key | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.operation | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.status | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.status\_human\_readable | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.streams\.\*\.file\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.streams\.\*\.human\_keywords | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.streams\.\*\.instructions\_artifact\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.streams\.\*\.uid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.uid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.attack\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.category | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.identifier | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.relevance | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.threat\_level | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.threat\_level\_human | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.type | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.submission\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.submit\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.threat\_score | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.verdict | string | 
-action\_result\.data\.\*\.sandbox\.\*\.version\_info\.\*\.id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.version\_info\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_bitness | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_edition | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_service\_pack | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_version | string | 
-action\_result\.data\.\*\.threat\_graph\.indicators\.\*\.customer\_prevalence | string | 
-action\_result\.data\.\*\.threat\_graph\.indicators\.\*\.global\_prevalence | string | 
-action\_result\.data\.\*\.threat\_graph\.indicators\.\*\.type | string | 
-action\_result\.data\.\*\.threat\_graph\.indicators\.\*\.value | string | 
-action\_result\.data\.\*\.user\_id | string | 
-action\_result\.data\.\*\.user\_name | string | 
-action\_result\.data\.\*\.user\_uuid | string | 
-action\_result\.data\.\*\.verdict | string | 
-action\_result\.summary\.total\_reports | numeric | 
-action\_result\.summary\.verdict | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.detail_report | boolean |  |   True  False 
+action_result.parameter.limit | numeric |  |   120 
+action_result.parameter.offset | numeric |  |   100 
+action_result.parameter.sha256 | string |  `sha256`  |   3460eb8087523e19ac486f37fc68192c2dcd087814a2a9c9ad6b668fee3e0134 
+action_result.parameter.sort | string |  |   created_timestamp.asc 
+action_result.parameter.vault_id | string |  `vault id`  |   30c5e524e975816fbce1d958150e394efc219772 
+action_result.data.\*.cid | string |  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.created_timestamp | string |  |   2020-10-26T09:26:12Z 
+action_result.data.\*.id | string |  `crowdstrike resource id`  |   3061c7ff3b634e22b38274d4b586558e_5cbc78f5cd4845fd8652896dde973397 
+action_result.data.\*.ioc_report_broad_csv_artifact_id | string |  `crowdstrike artifact id`  |   b735c285c7d4119254d7a4eac9734321cf2dee0a8925f0395df6592cce97f848 
+action_result.data.\*.ioc_report_broad_json_artifact_id | string |  `crowdstrike artifact id`  |   c4a90ac33e499f69fbccf4ca20cd8938a0e3a10055eececfefa99000a475dd7a 
+action_result.data.\*.ioc_report_broad_maec_artifact_id | string |  `crowdstrike artifact id`  |   5a9703fb4d31b4fab70948332af17711b41d06f2fe46406f8abcd810eea8ca2b 
+action_result.data.\*.ioc_report_broad_stix_artifact_id | string |  `crowdstrike artifact id`  |   2433d561ad70b9a30753bc3345bf1d9e986340e40dc59177f91e979d59b4f0f0 
+action_result.data.\*.ioc_report_strict_csv_artifact_id | string |  `crowdstrike artifact id`  |   f54d63e91cafc2aa131d90bab6a60d7dfd0db05f984ebcf9394e4a1d7934c913 
+action_result.data.\*.ioc_report_strict_json_artifact_id | string |  `crowdstrike artifact id`  |   7d80482e25d2e86867ea6b4b8c0bc9c1235f9e70dbd2a1754ffb86c950994532 
+action_result.data.\*.ioc_report_strict_maec_artifact_id | string |  `crowdstrike artifact id`  |   bf73276e6e07f6c02a242254e846f4ef8e6d12a3114ee8de0e144ee608491457 
+action_result.data.\*.ioc_report_strict_stix_artifact_id | string |  `crowdstrike artifact id`  |   1f129239876f7eb8287bf112763dada414ee8792ce1ab81eda6adcf322327696 
+action_result.data.\*.malquery.\*.input | string |  |   c619f87556667f2c1799672d36d55172597f4fed158800d5622edc8abee930e8 
+action_result.data.\*.malquery.\*.resources.\*.file_size | numeric |  |   100144 
+action_result.data.\*.malquery.\*.resources.\*.file_type | string |  |   PE32 
+action_result.data.\*.malquery.\*.resources.\*.first_seen_timestamp | string |  |   2020-01-29T00:00:00Z 
+action_result.data.\*.malquery.\*.resources.\*.label | string |  |   clean 
+action_result.data.\*.malquery.\*.resources.\*.md5 | string |  `md5`  |   b029f63374652c76e09b6443dd931774 
+action_result.data.\*.malquery.\*.resources.\*.sha1 | string |  `sha1`  |   8b50322f86d4bd5a7a5bc1d54d16ecfae8d4e693 
+action_result.data.\*.malquery.\*.resources.\*.sha256 | string |  `sha256`  |   7b982b66433e1c89d094461d3d461eab90c93f72fbe676fcfc17c3c340c9a8b4 
+action_result.data.\*.malquery.\*.type | string |  |   sha256 
+action_result.data.\*.malquery.\*.verdict | string |  |   clean 
+action_result.data.\*.origin | string |  |   quarantine 
+action_result.data.\*.sandbox.\*.architecture | string |  |   32 Bit 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.address | string |  `ip`  |   1XX.2XX.1X.6X 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.associated_runtime.\*.name | string |  |   iexplore.exe 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.associated_runtime.\*.pid | numeric |  |   7284 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.country | string |  |   Test Name 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.port | numeric |  `port`  |   80 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.protocol | string |  |   TCP 
+action_result.data.\*.sandbox.\*.dns_requests.\*.address | string |  `ip`  |   2X.7X.1XX.1XX 
+action_result.data.\*.sandbox.\*.dns_requests.\*.country | string |  |   Test Name 
+action_result.data.\*.sandbox.\*.dns_requests.\*.domain | string |  `domain`  `ip`  |   clientconfig.passport.net 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_creation_timestamp | string |  `date`  |   1994-08-01T00:00:00+00:00 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_name | string |  |   MarkMonitor, Inc. 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_name_servers | string |  |   NS1.MSFT.NET 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_organization | string |  |   Test Corporation 
+action_result.data.\*.sandbox.\*.environment | numeric |  |   100 
+action_result.data.\*.sandbox.\*.environment_description | string |  `crowdstrike environment`  |   Windows 7 32 bit 
+action_result.data.\*.sandbox.\*.environment_id | numeric |  |   100 
+action_result.data.\*.sandbox.\*.error_message | string |  |   The requested environment ID "160" and file type "python" have no available execution environment 
+action_result.data.\*.sandbox.\*.error_origin | string |  |   CLIENT 
+action_result.data.\*.sandbox.\*.error_type | string |  |   FILE_TYPE_BAD_ERROR 
+action_result.data.\*.sandbox.\*.exact_deep_hash | string |  |   026f0c002c06028e00010212000320000000fffffe06030065732078000000e0161f3a9d4755494400ffff0000e804000100e000ff0000b800c900c06f110b7b00706f0e00040d01000000120200e20033303331ffff00000011030400050001000a6f106765745f000000122c06028e0000ffff00ffff00f002a90009000000800000001109142000ffff000a280100088e69fe00ffff000bfe060750000080ffff00000080000000f002a900e000000000000007000000000011000000e80400e80400006f705f0100010000120000561934e00f1a1f6fdf007100100102150000ff2510000000302e302ee80400002e302e30000200e220696e20cf0072370106002affff0000007200460001130f49ae61f1616773000043756c7065730000e8010004effe000070007900f701b700020080fe01130e00ffff00000000000031000b720073001d08050501060a0200ffff0000ff25007e0000ec0011004366006f00446f6d6101130d114d01048000012805012571180100000165006f7003090151fe0000010000a040fe010d010000de00020e0e0300000001029f008100efbbbf002b8c1600f701b78e69fe040a110bfe666f2078150c20050000002b0000ffff006c006100008000110020f400fe010d6f6e732e00e804006be57549ffff00001e01060ade0000000100953b31007400091afe0420001d120000e000 
+action_result.data.\*.sandbox.\*.extracted_files.\*.description | string |  |   PE32 executable (DLL) (GUI) Intel 80386, for MS Windows 
+action_result.data.\*.sandbox.\*.extracted_files.\*.file_path | string |  |   %TEMP%\\329babfa-d618-4d17-a6b0-79fe02a2d94d\\AgileDotNetRT.dll 
+action_result.data.\*.sandbox.\*.extracted_files.\*.file_size | numeric |  |   137741 
+action_result.data.\*.sandbox.\*.extracted_files.\*.md5 | string |  `md5`  |   5ce220e1334193b403e937ecca0b406f 
+action_result.data.\*.sandbox.\*.extracted_files.\*.name | string |  |   AgileDotNetRT.dll 
+action_result.data.\*.sandbox.\*.extracted_files.\*.runtime_process | string |  |   789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.exe 
+action_result.data.\*.sandbox.\*.extracted_files.\*.sha1 | string |  `sha1`  |   48c1d47e4a23ebfd739aa86830842d1ead7ced59 
+action_result.data.\*.sandbox.\*.extracted_files.\*.sha256 | string |  `sha256`  |   c619f87556667f2c1799672d36d55172597f4fed158800d5622edc8abee930e8 
+action_result.data.\*.sandbox.\*.extracted_files.\*.threat_level_readable | string |  |   no specific threat 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.filename | string |  |   EXAMPLEd6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2aTEST.bin 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.process | string |  |   EXAMPLEd6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2aTEST.exe 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.source | string |  |   Memory/File Scan 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.type | string |  |   Ansi 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.value | string |  |   .http://www.digicert.com/ssl-cps-repository.htm0 
+action_result.data.\*.sandbox.\*.file_imports.\*.module | string |  |   mscoree.dll 
+action_result.data.\*.sandbox.\*.file_size | numeric |  |   224888 
+action_result.data.\*.sandbox.\*.file_type | string |  |   PE32 executable (console) Intel 80386 Mono/.Net assembly, for MS Windows 
+action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/TESTgwRjAJBgUrDgMCTESTBBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtEXAMPLEhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: \*/\*<br>User-Agent: Test-CryptoAPI/10.0<br>Host: ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.host | string |  `domain`  `ip`  |   ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.host_ip | string |  `ip`  |   1XX.2XX.1X.6X 
+action_result.data.\*.sandbox.\*.http_requests.\*.host_port | numeric |  `port`  |   80 
+action_result.data.\*.sandbox.\*.http_requests.\*.method | string |  |   GET 
+action_result.data.\*.sandbox.\*.http_requests.\*.url | string |  |   /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D 
+action_result.data.\*.sandbox.\*.incidents.\*.name | string |  |   Fingerprint 
+action_result.data.\*.sandbox.\*.memory_strings_artifact_id | string |  `crowdstrike artifact id`  |   9e5ebb7847a684fe6b9f36bb6bfb36e03b4e2f71b010c67e131652b968695a30 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.attack_id | string |  |   T1215 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.parent.attack_id | string |  |   T1027 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.parent.attack_id_wiki | string |  |   https://attack.mitre.org/techniques/T1027 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.parent.technique | string |  |   Obfuscated Files or Information 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.tactic | string |  |   Persistence 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.technique | string |  |   Kernel Modules and Extensions 
+action_result.data.\*.sandbox.\*.network_settings | string |  |   default 
+action_result.data.\*.sandbox.\*.packer | string |  |   Test visual C# v7.0 / Basic .NET 
+action_result.data.\*.sandbox.\*.pcap_report_artifact_id | string |  `crowdstrike artifact id`  |   e5521d8c988e4fd8f4bff8d90e231ac71d5bde9710382a1a2ac14e9d004eabd8 
+action_result.data.\*.sandbox.\*.processes.\*.command_line | string |  |   "C:\\dummy-pdf_2.pdf" 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.mask | string |  |   FILE_READ_DATA | FILE_EXECUTE 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.path | string |  |   %WINDIR%\\SYSTEM32\\MSCOREE.DLL 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.type | string |  |   OPEN 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.id | numeric |  |   4 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.path | string |  |   HKLM\\SYSTEM\\ControlSet001\\Control\\Session Manager 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.type | string |  |   KeyHandle 
+action_result.data.\*.sandbox.\*.processes.\*.icon_artifact_id | string |  `crowdstrike artifact id`  |   6fc9590b42ff8dcbd51c4cddf7ec83bad13f08dcfc882dfbfae326a4c4d68e8d 
+action_result.data.\*.sandbox.\*.processes.\*.name | string |  |   789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.exe 
+action_result.data.\*.sandbox.\*.processes.\*.normalized_path | string |  |   C:\\789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.exe 
+action_result.data.\*.sandbox.\*.processes.\*.parent_uid | string |  |   00079399-00003508 
+action_result.data.\*.sandbox.\*.processes.\*.pid | numeric |  |   3788 
+action_result.data.\*.sandbox.\*.processes.\*.process_flags.\*.name | string |  |   Reduced Monitoring 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.key | string |  |   COMPUTERNAME 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.operation | string |  |   Open 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.path | string |  |   HKLM\\SOFTWARE\\Test\\RPC\\ 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.status | string |  |   c0000034 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.status_human_readable | string |  |   STATUS_OBJECT_NAME_NOT_FOUND 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.value | string |  |   00000000010000002C000000160000001800000043006F006D00700075007400650072004E0061006D00650048004100500055004200570053002D00500043000000 
+action_result.data.\*.sandbox.\*.processes.\*.sha256 | string |  `sha256`  |   789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24 
+action_result.data.\*.sandbox.\*.processes.\*.streams.\*.file_name | string |  |   dc829f01c99e0cc1c3bdbcf626bc87a88c9d9d82b965545d9747b2d2292c3716.bin 
+action_result.data.\*.sandbox.\*.processes.\*.streams.\*.human_keywords | string |  |   {0},11:{0},varsim 
+action_result.data.\*.sandbox.\*.processes.\*.streams.\*.instructions_artifact_id | string |  |   ca39fdd4ec789ac3996014bb6edd4989f3b4988da13dfb69bbdd5299185e50c7 
+action_result.data.\*.sandbox.\*.processes.\*.streams.\*.uid | string |  |   272dfd975214d0f4abb93b32797f8605-6000001-Program~Main 
+action_result.data.\*.sandbox.\*.processes.\*.uid | string |  |   00064737-00003788 
+action_result.data.\*.sandbox.\*.sha256 | string |  `sha256`  |   789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24 
+action_result.data.\*.sandbox.\*.signatures.\*.attack_id | string |  |   T1116 
+action_result.data.\*.sandbox.\*.signatures.\*.category | string |  |   General 
+action_result.data.\*.sandbox.\*.signatures.\*.description | string |  |   "example_input.exe" created file "%TEMP%\\329babfa-d618-4d17-a6b0-79fe02a2d94d\\AgileDotNetRT.dll" 
+action_result.data.\*.sandbox.\*.signatures.\*.identifier | string |  |   api-4 
+action_result.data.\*.sandbox.\*.signatures.\*.name | string |  |   Creates a writable file in a temporary directory 
+action_result.data.\*.sandbox.\*.signatures.\*.origin | string |  |   API Call 
+action_result.data.\*.sandbox.\*.signatures.\*.relevance | numeric |  |   1 
+action_result.data.\*.sandbox.\*.signatures.\*.threat_level | numeric |  |   1 
+action_result.data.\*.sandbox.\*.signatures.\*.threat_level_human | string |  |   informative 
+action_result.data.\*.sandbox.\*.signatures.\*.type | numeric |  |   6 
+action_result.data.\*.sandbox.\*.submission_type | string |  |   file 
+action_result.data.\*.sandbox.\*.submit_name | string |  |   789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24 
+action_result.data.\*.sandbox.\*.threat_score | numeric |  |   41 
+action_result.data.\*.sandbox.\*.verdict | string |  |   suspicious 
+action_result.data.\*.sandbox.\*.version_info.\*.id | string |  |   Translation 
+action_result.data.\*.sandbox.\*.version_info.\*.value | string |  |   0x0000 0x04b0 
+action_result.data.\*.sandbox.\*.windows_version_bitness | numeric |  |   32 
+action_result.data.\*.sandbox.\*.windows_version_edition | string |  |   Professional 
+action_result.data.\*.sandbox.\*.windows_version_name | string |  |   Windows 7 
+action_result.data.\*.sandbox.\*.windows_version_service_pack | string |  |   Service Pack 1 
+action_result.data.\*.sandbox.\*.windows_version_version | string |  |   6.1 (build 7601) 
+action_result.data.\*.threat_graph.indicators.\*.customer_prevalence | string |  |   low 
+action_result.data.\*.threat_graph.indicators.\*.global_prevalence | string |  |   common 
+action_result.data.\*.threat_graph.indicators.\*.type | string |  |   sha256 
+action_result.data.\*.threat_graph.indicators.\*.value | string |  |   c619f87556667f2c1799672d36d55172597f4fed158800d5622edc8abee930e8 
+action_result.data.\*.user_id | string |  |   b1cab7e2bda14722aca74b8353f5f6d9 
+action_result.data.\*.user_name | string |  |   testuser@soar.us 
+action_result.data.\*.user_uuid | string |  |   b6330292-28e6-4198-994d-96f327c5b5bd 
+action_result.data.\*.verdict | string |  |   suspicious 
+action_result.summary.total_reports | numeric |  |   1 
+action_result.summary.verdict | string |  |   suspicious 
+action_result.message | string |  |   Verdict: suspicious, Total reports: 1  Total reports: 6 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'url reputation'
 Queries CrowdStrike for the url info
@@ -2510,143 +2763,143 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **url** |  required  | URL to query | string |  `url` 
 **limit** |  optional  | Maximum reports to be fetched | numeric | 
 **sort** |  optional  | Property to sort by | string | 
-**offset** |  optional  | Starting index of overall result set from which to return ids \(defaults to 0\) | numeric | 
-**detail\_report** |  optional  | Get the detailed report | boolean | 
+**offset** |  optional  | Starting index of overall result set from which to return ids (defaults to 0) | numeric | 
+**detail_report** |  optional  | Get the detailed report | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.detail\_report | boolean | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.parameter\.url | string |  `url` 
-action\_result\.data\.\*\.cid | string | 
-action\_result\.data\.\*\.created\_timestamp | string | 
-action\_result\.data\.\*\.id | string |  `crowdstrike resource id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_csv\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_json\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_maec\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_stix\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_csv\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_json\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_maec\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_stix\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.malquery\.\*\.input | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.file\_type | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.first\_seen\_timestamp | string |  `date` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.label | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.md5 | string |  `md5` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.sha1 | string |  `sha1` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.malquery\.\*\.type | string | 
-action\_result\.data\.\*\.malquery\.\*\.verdict | string | 
-action\_result\.data\.\*\.origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.architecture | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.address | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.associated\_runtime\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.associated\_runtime\.\*\.pid | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.country | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.port | numeric |  `port` 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.protocol | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.address | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.country | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.domain | string |  `domain`  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_creation\_timestamp | string |  `date` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_name\_servers | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_organization | string | 
-action\_result\.data\.\*\.sandbox\.\*\.environment | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.environment\_description | string |  `crowdstrike environment` 
-action\_result\.data\.\*\.sandbox\.\*\.environment\_id | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_message | string | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.md5 | string |  `md5` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.runtime\_process | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.sha1 | string |  `sha1` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.threat\_level\_readable | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.filename | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.process | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.source | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.file\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.header | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host\_ip | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host\_port | numeric |  `port` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.method | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.url | string | 
-action\_result\.data\.\*\.sandbox\.\*\.incidents\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.memory\_strings\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.attack\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.tactic | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.technique | string | 
-action\_result\.data\.\*\.sandbox\.\*\.network\_settings | string | 
-action\_result\.data\.\*\.sandbox\.\*\.pcap\_report\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.command\_line | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.mask | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.id | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.icon\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.normalized\_path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.parent\_uid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.pid | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.process\_flags\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.key | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.operation | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.uid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.attack\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.category | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.identifier | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.relevance | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.threat\_level | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.threat\_level\_human | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.type | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.submission\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.submit\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.submit\_url | string | 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.category | string | 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.destination\_ip | string | 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.destination\_port | numeric |  `port` 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.protocol | string | 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.sid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.threat\_score | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.verdict | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_bitness | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_edition | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_service\_pack | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_version | string | 
-action\_result\.data\.\*\.user\_id | string | 
-action\_result\.data\.\*\.user\_name | string | 
-action\_result\.data\.\*\.user\_uuid | string | 
-action\_result\.data\.\*\.verdict | string | 
-action\_result\.summary\.total\_reports | numeric | 
-action\_result\.summary\.verdict | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.detail_report | boolean |  |   True  False 
+action_result.parameter.limit | numeric |  |   5 
+action_result.parameter.offset | numeric |  |   5 
+action_result.parameter.sort | string |  |   created_timestamp.asc 
+action_result.parameter.url | string |  `url`  |   https://www.test.com 
+action_result.data.\*.cid | string |  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.created_timestamp | string |  |   2021-04-29T02:49:16Z 
+action_result.data.\*.id | string |  `crowdstrike resource id`  |   3061c7ff3b634e22b38274d4b586558e_3ab68d2aa2774ba3a35d6f17ae1a7c0b 
+action_result.data.\*.ioc_report_broad_csv_artifact_id | string |  `crowdstrike artifact id`  |   6ba1a1ab22f1c1fdea253934fd96364513f897a4f697df2058dd8a456dee2cc0 
+action_result.data.\*.ioc_report_broad_json_artifact_id | string |  `crowdstrike artifact id`  |   3ccac07c025cc4aa4ce900530fb982371d878cf8c80ceeb9247024420b540fa4 
+action_result.data.\*.ioc_report_broad_maec_artifact_id | string |  `crowdstrike artifact id`  |   0ee0e99a5a032a3c42799d01941938e5b10ed8f13e7452d930648d481af5d51e 
+action_result.data.\*.ioc_report_broad_stix_artifact_id | string |  `crowdstrike artifact id`  |   653ebf60312387e4d519dba01da938294ac607f859b671f5d55980c02732f474 
+action_result.data.\*.ioc_report_strict_csv_artifact_id | string |  `crowdstrike artifact id`  |   6ba1a1ab22f1c1fdea253934fd96364513f897a4f697df2058dd8a456dee2cc0 
+action_result.data.\*.ioc_report_strict_json_artifact_id | string |  `crowdstrike artifact id`  |   3ccac07c025cc4aa4ce900530fb982371d878cf8c80ceeb9247024420b540fa4 
+action_result.data.\*.ioc_report_strict_maec_artifact_id | string |  `crowdstrike artifact id`  |   0ee0e99a5a032a3c42799d01941938e5b10ed8f13e7452d930648d481af5d51e 
+action_result.data.\*.ioc_report_strict_stix_artifact_id | string |  `crowdstrike artifact id`  |   653ebf60312387e4d519dba01da938294ac607f859b671f5d55980c02732f474 
+action_result.data.\*.malquery.\*.input | string |  |   http://accounts.test.com 
+action_result.data.\*.malquery.\*.resources.\*.file_size | numeric |  |   466 
+action_result.data.\*.malquery.\*.resources.\*.file_type | string |  |   HTML 
+action_result.data.\*.malquery.\*.resources.\*.first_seen_timestamp | string |  `date`  |   2021-05-05T00:00:00Z 
+action_result.data.\*.malquery.\*.resources.\*.label | string |  |   unknown 
+action_result.data.\*.malquery.\*.resources.\*.md5 | string |  `md5`  |   cf83a54faef91aa5c3f9d89dba8a8b14 
+action_result.data.\*.malquery.\*.resources.\*.sha1 | string |  `sha1`  |   7fe4176691ffaf6df16090e19cbc36dc3f7ed041 
+action_result.data.\*.malquery.\*.resources.\*.sha256 | string |  `sha256`  |   80c4f85980efc903c8ae376cd6d88025465d49aec6f84901d41abcc384b99738 
+action_result.data.\*.malquery.\*.type | string |  |   url 
+action_result.data.\*.malquery.\*.verdict | string |  |   whitelisted 
+action_result.data.\*.origin | string |  |   uiproxy 
+action_result.data.\*.sandbox.\*.architecture | string |  |   WINDOWS 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.address | string |  `ip`  |   2XX.5X.1XX.6X 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.associated_runtime.\*.name | string |  |   iexplore.exe 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.associated_runtime.\*.pid | numeric |  |   3808 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.country | string |  |   Test Name 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.port | numeric |  `port`  |   443 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.protocol | string |  |   TCP 
+action_result.data.\*.sandbox.\*.dns_requests.\*.address | string |  |   2XX.5X.1XX.2XX 
+action_result.data.\*.sandbox.\*.dns_requests.\*.country | string |  |   Test Name 
+action_result.data.\*.sandbox.\*.dns_requests.\*.domain | string |  `domain`  `ip`  |   accounts.test.com 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_creation_timestamp | string |  `date`  |   2005-02-15T00:00:00+00:00 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_name | string |  |   MarkMonitor, Inc. 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_name_servers | string |  |   NS1.TEST.COM 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_organization | string |  |   Test Inc. 
+action_result.data.\*.sandbox.\*.environment | numeric |  |   100 
+action_result.data.\*.sandbox.\*.environment_description | string |  `crowdstrike environment`  |   Windows 7 32 bit 
+action_result.data.\*.sandbox.\*.environment_id | numeric |  |   160 
+action_result.data.\*.sandbox.\*.error_message | string |  |   The requested environment ID "300" and file type "url" have no available execution environment 
+action_result.data.\*.sandbox.\*.error_origin | string |  |   CLIENT 
+action_result.data.\*.sandbox.\*.error_type | string |  |   FILE_TYPE_BAD_ERROR 
+action_result.data.\*.sandbox.\*.extracted_files.\*.description | string |  |   XML 1.0 document, UTF-8 Unicode (with BOM) text, with CRLF line terminators 
+action_result.data.\*.sandbox.\*.extracted_files.\*.file_path | string |  |   %LOCALAPPDATA%\\Test\\Internet Explorer\\VersionManager\\ver2963.tmp 
+action_result.data.\*.sandbox.\*.extracted_files.\*.file_size | numeric |  |   16339 
+action_result.data.\*.sandbox.\*.extracted_files.\*.md5 | string |  `md5`  |   cbd0581678fa40f0edcbc7c59e0cad10 
+action_result.data.\*.sandbox.\*.extracted_files.\*.name | string |  |   ver2963.tmp 
+action_result.data.\*.sandbox.\*.extracted_files.\*.runtime_process | string |  |   iexplore.exe (PID: 3808) 
+action_result.data.\*.sandbox.\*.extracted_files.\*.sha1 | string |  `sha1`  |   a1463fbcc9b96a8929f8a335f75a89147b300715 
+action_result.data.\*.sandbox.\*.extracted_files.\*.sha256 | string |  `sha256`  |   159bd4343f344a08f6af3b716b6fa679859c1bd1d7030d26ff5ef0255b86e1d9 
+action_result.data.\*.sandbox.\*.extracted_files.\*.threat_level_readable | string |  |   no specific threat 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.filename | string |  |   SSL 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.process | string |  |   iexplore.exe 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.source | string |  |   Decrypted SSL Data 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.type | string |  |   Ansi 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.value | string |  |   .http://www.digicert.com/ssl-cps-repository.htm0 
+action_result.data.\*.sandbox.\*.file_type | string |  |   PE32 executable (GUI) Intel 80386, for MS Windows, UPX compressed 
+action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/EXAMPLEDBKMEgwRjAJBgUrDgMCGgTESTXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJoEXAMPLEQHjtJqhjYqpgSVpULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: \*/\*<br>User-Agent: Test-CryptoAPI/6.1<br>Host: ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.host | string |  |   ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.host_ip | string |  `ip`  |   2XX.5X.1XX.1XX 
+action_result.data.\*.sandbox.\*.http_requests.\*.host_port | numeric |  `port`  |   80 
+action_result.data.\*.sandbox.\*.http_requests.\*.method | string |  |   GET 
+action_result.data.\*.sandbox.\*.http_requests.\*.url | string |  |   /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D 
+action_result.data.\*.sandbox.\*.incidents.\*.name | string |  |   Network Behavior 
+action_result.data.\*.sandbox.\*.memory_strings_artifact_id | string |  `crowdstrike artifact id`  |   4300381ecd2f3d62648cdc01d862f4765032f071bad272164c3580b7b6fb8840 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.attack_id | string |  |   T1085 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.tactic | string |  |   Execution 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.technique | string |  |   Rundll32 
+action_result.data.\*.sandbox.\*.network_settings | string |  |   default 
+action_result.data.\*.sandbox.\*.pcap_report_artifact_id | string |  `crowdstrike artifact id`  |   04a091843e91c36357b2ec63a2a7ac8ad7d142d861759062520b0a925e9b875d 
+action_result.data.\*.sandbox.\*.processes.\*.command_line | string |  |   "%WINDIR%\\System32\\ieframe.dll",OpenURL C:\\3cfc7f2806efb5b01deb01164fa00adb46eb73a0d24871a566051fb2204094af.url 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.mask | string |  |   FILE_READ_ATTRIBUTES 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.path | string |  |   C: 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.type | string |  |   CREATE 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.id | numeric |  |   80 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.path | string |  |   HKCU\\Software\\Test\\Internet Explorer\\Main\\WindowsSearch 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.type | string |  |   KeyHandle 
+action_result.data.\*.sandbox.\*.processes.\*.icon_artifact_id | string |  `crowdstrike artifact id`  |   aa6f1a14d219555f2818f89dee06821824c872ae18279027baa0e160f61f049a 
+action_result.data.\*.sandbox.\*.processes.\*.name | string |  |   rundll32.exe 
+action_result.data.\*.sandbox.\*.processes.\*.normalized_path | string |  |   %WINDIR%\\System32\\rundll32.exe 
+action_result.data.\*.sandbox.\*.processes.\*.parent_uid | string |  |   00065605-00002148 
+action_result.data.\*.sandbox.\*.processes.\*.pid | numeric |  |   2148 
+action_result.data.\*.sandbox.\*.processes.\*.process_flags.\*.name | string |  |   Reduced Monitoring 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.key | string |  |   WPADDECISIONREASON 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.operation | string |  |   Write 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.path | string |  |   HKCU\\SOFTWARE\\Test\\WINDOWS\\CURRENTVERSION\\INTERNET SETTINGS\\WPAD\\{0C70BB6D-CFA8-4734-A158-28619E142726}\\WPADDECISIONREASON 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.value | string |  |   01000000 
+action_result.data.\*.sandbox.\*.processes.\*.sha256 | string |  `sha256`  |   3fa4912eb43fc304652d7b01f118589259861e2d628fa7c86193e54d5f987670 
+action_result.data.\*.sandbox.\*.processes.\*.uid | string |  |   00065605-00002148 
+action_result.data.\*.sandbox.\*.sha256 | string |  `sha256`  |   3cfc7f2806efb5b01deb01164fa00adb46eb73a0d24871a566051fb2204094af 
+action_result.data.\*.sandbox.\*.signatures.\*.attack_id | string |  |   T1085 
+action_result.data.\*.sandbox.\*.signatures.\*.category | string |  |   General 
+action_result.data.\*.sandbox.\*.signatures.\*.description | string |  |   "21X.5X.1XX.6X:4XX"<br> "21X.5X.1XX.1XX:8X" 
+action_result.data.\*.sandbox.\*.signatures.\*.identifier | string |  |   network-1 
+action_result.data.\*.sandbox.\*.signatures.\*.name | string |  |   Contacts server 
+action_result.data.\*.sandbox.\*.signatures.\*.origin | string |  |   Network Traffic 
+action_result.data.\*.sandbox.\*.signatures.\*.relevance | numeric |  |   1 
+action_result.data.\*.sandbox.\*.signatures.\*.threat_level | numeric |  |   1 
+action_result.data.\*.sandbox.\*.signatures.\*.threat_level_human | string |  |   informative 
+action_result.data.\*.sandbox.\*.signatures.\*.type | numeric |  |   7 
+action_result.data.\*.sandbox.\*.submission_type | string |  |   page_url 
+action_result.data.\*.sandbox.\*.submit_name | string |  |   http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8 
+action_result.data.\*.sandbox.\*.submit_url | string |  |   hxxps://www.test.com 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.category | string |  |   Unknown Traffic 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.description | string |  |   ET USER_AGENTS Test Device Metadata Retrieval Client User-Agent 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.destination_ip | string |  |   1XX.XX0.7X.X2 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.destination_port | numeric |  `port`  |   80 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.protocol | string |  |   TCP 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.sid | string |  |   2027390 
+action_result.data.\*.sandbox.\*.threat_score | numeric |  |   35 
+action_result.data.\*.sandbox.\*.verdict | string |  |   no specific threat 
+action_result.data.\*.sandbox.\*.windows_version_bitness | numeric |  |   32 
+action_result.data.\*.sandbox.\*.windows_version_edition | string |  |   Professional 
+action_result.data.\*.sandbox.\*.windows_version_name | string |  |   Windows 7 
+action_result.data.\*.sandbox.\*.windows_version_service_pack | string |  |   Service Pack 1 
+action_result.data.\*.sandbox.\*.windows_version_version | string |  |   6.1 (build 7601) 
+action_result.data.\*.user_id | string |  |   2b32e6795b344abba8925cce6782d128 
+action_result.data.\*.user_name | string |  |   testuser@soar.us 
+action_result.data.\*.user_uuid | string |  |   b6330292-28e6-4198-994d-96f327c5b5bd 
+action_result.data.\*.verdict | string |  |   no specific threat 
+action_result.summary.total_reports | numeric |  |   1 
+action_result.summary.verdict | string |  |   no specific threat 
+action_result.message | string |  |   Verdict: no specific threat, Total reports: 1 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'download report'
 To download the report of the provided artifact id
@@ -2657,20 +2910,20 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**artifact\_id** |  required  | Artifact id to be downloaded | string |  `crowdstrike artifact id` 
-**file\_name** |  optional  | Filename to use for the file added to vault | string |  `filename` 
+**artifact_id** |  required  | Artifact id to be downloaded | string |  `crowdstrike artifact id` 
+**file_name** |  optional  | Filename to use for the file added to vault | string |  `filename` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.parameter\.file\_name | string |  `filename` 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.artifact_id | string |  `crowdstrike artifact id`  |   6fc9590b42ff8dcbd51c4cddf7ec83bad13f08dcfc882dfbfae326a4c4d68e8d 
+action_result.parameter.file_name | string |  `filename`  |   test_file 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Report downloaded successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'detonate file'
 Upload a file to CrowdStrike and retrieve the analysis results
@@ -2681,173 +2934,173 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**vault\_id** |  required  | Vault ID of file | string |  `vault id` 
+**vault_id** |  required  | Vault ID of file | string |  `vault id` 
 **environment** |  required  | Sandbox environment to be used for analysis | string |  `crowdstrike environment` 
 **comment** |  optional  | A descriptive comment to identify the file | string | 
 **limit** |  optional  | Maximum reports to be fetched | numeric | 
-**offset** |  optional  | Starting index of overall result set from which to return ids \(Defaults to 0\) | numeric | 
-**command\_line** |  optional  | Command line script passed to the submitted file at runtime \(Max length\: 2048 characters\) | string | 
-**document\_password** |  optional  | Password of the document if password protected \(Max length\: 32 characters\) | string | 
-**submit\_name** |  optional  | Name of the malware sample that's used for file type detection and analysis | string | 
-**user\_tags** |  optional  | Comma seperated list of user tags \(Max length\: 100 characters per tag\) | string | 
+**offset** |  optional  | Starting index of overall result set from which to return ids (Defaults to 0) | numeric | 
+**command_line** |  optional  | Command line script passed to the submitted file at runtime (Max length: 2048 characters) | string | 
+**document_password** |  optional  | Password of the document if password protected (Max length: 32 characters) | string | 
+**submit_name** |  optional  | Name of the malware sample that's used for file type detection and analysis | string | 
+**user_tags** |  optional  | Comma seperated list of user tags (Max length: 100 characters per tag) | string | 
 **sort** |  optional  | Property to sort by | string | 
-**action\_script** |  optional  | Runtime script for sandbox analysis | string | 
-**detail\_report** |  optional  | Get the detailed report | boolean | 
-**enable\_tor** |  optional  | To route the sandbox network traffic via TOR | boolean | 
-**is\_confidential** |  optional  | Defines visibility of the file in Falcon MalQuery \(defaults to True\) | boolean | 
+**action_script** |  optional  | Runtime script for sandbox analysis | string | 
+**detail_report** |  optional  | Get the detailed report | boolean | 
+**enable_tor** |  optional  | To route the sandbox network traffic via TOR | boolean | 
+**is_confidential** |  optional  | Defines visibility of the file in Falcon MalQuery (defaults to True) | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.action\_script | string | 
-action\_result\.parameter\.command\_line | string | 
-action\_result\.parameter\.comment | string | 
-action\_result\.parameter\.detail\_report | boolean | 
-action\_result\.parameter\.document\_password | string | 
-action\_result\.parameter\.enable\_tor | boolean | 
-action\_result\.parameter\.environment | string |  `crowdstrike environment` 
-action\_result\.parameter\.is\_confidential | boolean | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.parameter\.submit\_name | string | 
-action\_result\.parameter\.user\_tags | string | 
-action\_result\.parameter\.vault\_id | string |  `vault id` 
-action\_result\.data\.\*\.cid | string | 
-action\_result\.data\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.id | string |  `crowdstrike resource id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_csv\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_json\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_maec\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_stix\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_csv\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_json\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_maec\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_stix\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.malquery\.\*\.input | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.file\_type | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.first\_seen\_timestamp | string |  `date` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.label | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.md5 | string |  `md5` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.sha1 | string |  `sha1` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.malquery\.\*\.type | string | 
-action\_result\.data\.\*\.malquery\.\*\.verdict | string | 
-action\_result\.data\.\*\.origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.architecture | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.address | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.associated\_runtime\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.associated\_runtime\.\*\.pid | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.country | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.port | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.protocol | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.address | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.country | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.domain | string |  `domain`  `url` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_creation\_timestamp | string |  `date` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_name\_servers | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_organization | string | 
-action\_result\.data\.\*\.sandbox\.\*\.environment | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.environment\_description | string |  `crowdstrike environment` 
-action\_result\.data\.\*\.sandbox\.\*\.environment\_id | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_message | string | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.md5 | string |  `md5` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.runtime\_process | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.sha1 | string |  `sha1` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.threat\_level\_readable | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.filename | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.process | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.source | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.file\_imports\.\*\.module | string | 
-action\_result\.data\.\*\.sandbox\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.file\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.header | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host | string |  `hostname` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host\_ip | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host\_port | numeric |  `port` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.method | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.url | string | 
-action\_result\.data\.\*\.sandbox\.\*\.incidents\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.memory\_strings\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.attack\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.tactic | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.technique | string | 
-action\_result\.data\.\*\.sandbox\.\*\.network\_settings | string | 
-action\_result\.data\.\*\.sandbox\.\*\.pcap\_report\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.command\_line | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.mask | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.id | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.icon\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.normalized\_path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.parent\_uid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.pid | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.process\_flags\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.key | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.operation | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.status | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.status\_human\_readable | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.uid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.attack\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.category | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.identifier | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.relevance | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.threat\_level | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.threat\_level\_human | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.type | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.submission\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.submit\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.category | string | 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.destination\_ip | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.destination\_port | numeric |  `port` 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.protocol | string | 
-action\_result\.data\.\*\.sandbox\.\*\.suricata\_alerts\.\*\.sid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.threat\_score | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.verdict | string | 
-action\_result\.data\.\*\.sandbox\.\*\.version\_info\.\*\.id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.version\_info\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_bitness | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_edition | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_service\_pack | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_version | string | 
-action\_result\.data\.\*\.threat\_graph\.indicators\.\*\.global\_prevalence | string | 
-action\_result\.data\.\*\.threat\_graph\.indicators\.\*\.type | string | 
-action\_result\.data\.\*\.threat\_graph\.indicators\.\*\.value | string | 
-action\_result\.data\.\*\.user\_id | string | 
-action\_result\.data\.\*\.user\_name | string | 
-action\_result\.data\.\*\.user\_tags | string | 
-action\_result\.data\.\*\.user\_uuid | string | 
-action\_result\.data\.\*\.verdict | string | 
-action\_result\.summary\.total\_reports | numeric | 
-action\_result\.summary\.verdict | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.action_script | string |  |   default 
+action_result.parameter.command_line | string |  |  
+action_result.parameter.comment | string |  |   This is a test comment 
+action_result.parameter.detail_report | boolean |  |   True  False 
+action_result.parameter.document_password | string |  |   test_password 
+action_result.parameter.enable_tor | boolean |  |   True  False 
+action_result.parameter.environment | string |  `crowdstrike environment`  |   Windows 10, 64-bit 
+action_result.parameter.is_confidential | boolean |  |   True  False 
+action_result.parameter.limit | numeric |  |   5 
+action_result.parameter.offset | numeric |  |   5 
+action_result.parameter.sort | string |  |   created_timestamp.asc 
+action_result.parameter.submit_name | string |  |   test_file_name 
+action_result.parameter.user_tags | string |  |   test_tag1 
+action_result.parameter.vault_id | string |  `vault id`  |   30c5e524e975816fbce1d958150e394efc219772 
+action_result.data.\*.cid | string |  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.created_timestamp | string |  `date`  |   2021-05-09T05:58:47Z 
+action_result.data.\*.id | string |  `crowdstrike resource id`  |   3061c7ff3b634e22b38274d4b586558e_ca27f64601b74c1f8a25577007987606 
+action_result.data.\*.ioc_report_broad_csv_artifact_id | string |  `crowdstrike artifact id`  |   8a06e0e6a04696b16d8bcbe3b7952c6b0b48458f1168bf70ffa97b0993b9d115 
+action_result.data.\*.ioc_report_broad_json_artifact_id | string |  `crowdstrike artifact id`  |   76dba8304fb398f192202a9dbbb39e259882ee7d9460afb4a07b8f2b8db8679a 
+action_result.data.\*.ioc_report_broad_maec_artifact_id | string |  `crowdstrike artifact id`  |   5391d132d841fe391d3132d2cab43cdf0d5a45c4f146e31cd65f51917dbf6820 
+action_result.data.\*.ioc_report_broad_stix_artifact_id | string |  `crowdstrike artifact id`  |   aaab7615a82190cabdf6086fd818a5a3a5f65072363a7fa89c73e12bf115befd 
+action_result.data.\*.ioc_report_strict_csv_artifact_id | string |  `crowdstrike artifact id`  |   3ebe2620f871109e7048bfb0c1638b8e011b5fb779d6229db7135668fc558208 
+action_result.data.\*.ioc_report_strict_json_artifact_id | string |  `crowdstrike artifact id`  |   097dc42503083de24bfb80b8964433348dfcb8b769f9abb491f5a97599666279 
+action_result.data.\*.ioc_report_strict_maec_artifact_id | string |  `crowdstrike artifact id`  |   ccbc852e586f1348d83025a98a78398ba97c78d21fd8296676ef7da40852dc9a 
+action_result.data.\*.ioc_report_strict_stix_artifact_id | string |  `crowdstrike artifact id`  |   0967fd13eea5335645e8b2be13f2da7254a8401f1536bd2b939002d69a1af7f6 
+action_result.data.\*.malquery.\*.input | string |  |   X.X.0.0 
+action_result.data.\*.malquery.\*.resources.\*.file_size | numeric |  |   25970 
+action_result.data.\*.malquery.\*.resources.\*.file_type | string |  |   TEXT 
+action_result.data.\*.malquery.\*.resources.\*.first_seen_timestamp | string |  `date`  |   2017-08-10T00:00:00Z 
+action_result.data.\*.malquery.\*.resources.\*.label | string |  |   unknown 
+action_result.data.\*.malquery.\*.resources.\*.md5 | string |  `md5`  |   c7c4bf6fc4e73a85e6ab36711bdd8a7f 
+action_result.data.\*.malquery.\*.resources.\*.sha1 | string |  `sha1`  |   a21c5fbfa596efb30180f75062794f01952cf18e 
+action_result.data.\*.malquery.\*.resources.\*.sha256 | string |  `sha256`  |   07c522146bddc664d077c2184e88e5cb17547f2501785506ce2f7b05eaf93af0 
+action_result.data.\*.malquery.\*.type | string |  |   ip 
+action_result.data.\*.malquery.\*.verdict | string |  |   whitelisted 
+action_result.data.\*.origin | string |  |   apigateway 
+action_result.data.\*.sandbox.\*.architecture | string |  |   Unknown 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.address | string |  `ip`  |   2X.3X.1XX.X1 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.associated_runtime.\*.name | string |  |   svchost.exe 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.associated_runtime.\*.pid | numeric |  |   7884 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.country | string |  |   Test Name 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.port | numeric |  |   443 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.protocol | string |  |   TCP 
+action_result.data.\*.sandbox.\*.dns_requests.\*.address | string |  `ip`  |   1X2.XX7.164.XX 
+action_result.data.\*.sandbox.\*.dns_requests.\*.country | string |  |   Test Name 
+action_result.data.\*.sandbox.\*.dns_requests.\*.domain | string |  `domain`  `url`  |   fonts.gstatic.com 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_creation_timestamp | string |  `date`  |   2008-02-11T00:00:00+00:00 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_name | string |  |   MarkMonitor, Inc. 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_name_servers | string |  |   NS1.TEST.COM 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_organization | string |  |   Test Inc. 
+action_result.data.\*.sandbox.\*.environment | numeric |  |   160 
+action_result.data.\*.sandbox.\*.environment_description | string |  `crowdstrike environment`  |   Windows 10 64 bit 
+action_result.data.\*.sandbox.\*.environment_id | numeric |  |   160 
+action_result.data.\*.sandbox.\*.error_message | string |  |   The requested environment ID "300" and file type "html" have no available execution environment 
+action_result.data.\*.sandbox.\*.error_origin | string |  |   CLIENT 
+action_result.data.\*.sandbox.\*.error_type | string |  |   FILE_TYPE_BAD_ERROR 
+action_result.data.\*.sandbox.\*.extracted_files.\*.description | string |  |   MS Windows icon resource - 1 icon, 32x32 
+action_result.data.\*.sandbox.\*.extracted_files.\*.file_path | string |  |   %APPDATA%\\Test\\Windows\\Recent\\CustomDestinations\\RB7520AO5Z28DRA0CR4G.temp 
+action_result.data.\*.sandbox.\*.extracted_files.\*.file_size | numeric |  |   4286 
+action_result.data.\*.sandbox.\*.extracted_files.\*.md5 | string |  `md5`  |   da597791be3b6e732f0bc8b20e38ee62 
+action_result.data.\*.sandbox.\*.extracted_files.\*.name | string |  |   search__0633EE93-D776-472f-A0FF-E1416B8B2E3A_.ico 
+action_result.data.\*.sandbox.\*.extracted_files.\*.runtime_process | string |  |   iexplore.exe (PID: 3508) 
+action_result.data.\*.sandbox.\*.extracted_files.\*.sha1 | string |  `sha1`  |   1125c45d285c360542027d7554a5c442288974de 
+action_result.data.\*.sandbox.\*.extracted_files.\*.sha256 | string |  `sha256`  |   5b2c34b3c4e8dd898b664dba6c3786e2ff9869eff55d673aa48361f11325ed07 
+action_result.data.\*.sandbox.\*.extracted_files.\*.threat_level_readable | string |  |   no specific threat 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.filename | string |  |   ver718B.tmp 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.process | string |  |   iexplore.exe 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.source | string |  |   Runtime Data 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.type | string |  |   Unicode 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.value | string |  |   %LOCALAPPDATA%\\Test\\Internet Explorer\\Recovery\\High\\Active\\{EAD6EFB1-2090-11E8-9BD7-0A00274B5076}.dat 
+action_result.data.\*.sandbox.\*.file_imports.\*.module | string |  |   KERNEL32.dll 
+action_result.data.\*.sandbox.\*.file_size | numeric |  |   70595 
+action_result.data.\*.sandbox.\*.file_type | string |  |   SVG Scalable Vector Graphics image 
+action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/TESTMEgwRjAJBgUrDgMCGgUABBTgXIsxbvEXAMPLEkIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqTESTULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: \*/\*<br>User-Agent: Test-CryptoAPI/10.0<br>Host: ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.host | string |  `hostname`  |   ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.host_ip | string |  `ip`  |   1X2.2X7.13.67 
+action_result.data.\*.sandbox.\*.http_requests.\*.host_port | numeric |  `port`  |   80 
+action_result.data.\*.sandbox.\*.http_requests.\*.method | string |  |   GET 
+action_result.data.\*.sandbox.\*.http_requests.\*.url | string |  |   /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D 
+action_result.data.\*.sandbox.\*.incidents.\*.name | string |  |   Network Behavior 
+action_result.data.\*.sandbox.\*.memory_strings_artifact_id | string |  `crowdstrike artifact id`  |   ba1b505d2495d9258817ae235fd12331ec1d6805543df5ff99c98168ff003af5 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.attack_id | string |  |   T1179 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.tactic | string |  |   Persistence 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.technique | string |  |   Hooking 
+action_result.data.\*.sandbox.\*.network_settings | string |  |   tor 
+action_result.data.\*.sandbox.\*.pcap_report_artifact_id | string |  `crowdstrike artifact id`  |   cce20f960ed692d8cd1e82418d98133c54eeb0e989941545a25e17c13629c9a6 
+action_result.data.\*.sandbox.\*.processes.\*.command_line | string |  |   C:\\TestName.svg 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.mask | string |  |   GENERIC_READ | FILE_READ_ATTRIBUTES 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.path | string |  |   %WINDIR%\\apppatch\\sysmain.sdb 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.type | string |  |   CREATE 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.id | numeric |  |   152 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.path | string |  |   \\Device\\CNG 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.type | string |  |   FileHandle 
+action_result.data.\*.sandbox.\*.processes.\*.icon_artifact_id | string |  `crowdstrike artifact id`  |   eed07c63db692d7cb4af1daa44bdc5b03a63050290277d1e383601de95c05775 
+action_result.data.\*.sandbox.\*.processes.\*.name | string |  |   iexplore.exe 
+action_result.data.\*.sandbox.\*.processes.\*.normalized_path | string |  |   %PROGRAMFILES%\\internet explorer\\iexplore.exe 
+action_result.data.\*.sandbox.\*.processes.\*.parent_uid | string |  |   00079399-00003508 
+action_result.data.\*.sandbox.\*.processes.\*.pid | numeric |  |   3508 
+action_result.data.\*.sandbox.\*.processes.\*.process_flags.\*.name | string |  |   Reduced Monitoring 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.key | string |  |   TYPE 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.operation | string |  |   Write 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.path | string |  |   HKCU\\SOFTWARE\\Test\\INTERNET EXPLORER\\VERSIONMANAGER\\LASTUPDATELOWDATETIME 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.status | string |  |   c0000022 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.status_human_readable | string |  |   STATUS_ACCESS_DENIED 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.value | string |  |   C4110129 
+action_result.data.\*.sandbox.\*.processes.\*.sha256 | string |  `sha256`  |   8dea16e513f70e1a98be6ec48439b5499d2c740247716f6bcb990b7c305ec0a0 
+action_result.data.\*.sandbox.\*.processes.\*.uid | string |  |   00079399-00003508 
+action_result.data.\*.sandbox.\*.sha256 | string |  `sha256`  |   43e6a1253ebd103b93d50531ee05ba9cf7d87f043b6bca96a0edec311494d875 
+action_result.data.\*.sandbox.\*.signatures.\*.attack_id | string |  |   T1010 
+action_result.data.\*.sandbox.\*.signatures.\*.category | string |  |   General 
+action_result.data.\*.sandbox.\*.signatures.\*.description | string |  |   "2XX.1XX.2XX.1X:8X" 
+action_result.data.\*.sandbox.\*.signatures.\*.identifier | string |  |   mutant-0 
+action_result.data.\*.sandbox.\*.signatures.\*.name | string |  |   Creates mutants 
+action_result.data.\*.sandbox.\*.signatures.\*.origin | string |  |   Created Mutant 
+action_result.data.\*.sandbox.\*.signatures.\*.relevance | numeric |  |   3 
+action_result.data.\*.sandbox.\*.signatures.\*.threat_level | numeric |  |   1 
+action_result.data.\*.sandbox.\*.signatures.\*.threat_level_human | string |  |   informative 
+action_result.data.\*.sandbox.\*.signatures.\*.type | numeric |  |   4 
+action_result.data.\*.sandbox.\*.submission_type | string |  |   file 
+action_result.data.\*.sandbox.\*.submit_name | string |  |   Test Name 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.category | string |  |   Unknown Traffic 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.description | string |  |   ET USER_AGENTS Test Device Metadata Retrieval Client User-Agent 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.destination_ip | string |  `ip`  |   1X4.1XX.8X.21 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.destination_port | numeric |  `port`  |   80 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.protocol | string |  |   TCP 
+action_result.data.\*.sandbox.\*.suricata_alerts.\*.sid | string |  |   2027390 
+action_result.data.\*.sandbox.\*.threat_score | numeric |  |   35 
+action_result.data.\*.sandbox.\*.verdict | string |  |   no specific threat 
+action_result.data.\*.sandbox.\*.version_info.\*.id | string |  |   LegalCopyright 
+action_result.data.\*.sandbox.\*.version_info.\*.value | string |  |   Copyright (C) Test Corp. 1981-1998 
+action_result.data.\*.sandbox.\*.windows_version_bitness | numeric |  |   64 
+action_result.data.\*.sandbox.\*.windows_version_edition | string |  |   Professional 
+action_result.data.\*.sandbox.\*.windows_version_name | string |  |   Windows 10 
+action_result.data.\*.sandbox.\*.windows_version_service_pack | string |  |   Service Pack 1 
+action_result.data.\*.sandbox.\*.windows_version_version | string |  |   10.0 (build 16299) 
+action_result.data.\*.threat_graph.indicators.\*.global_prevalence | string |  |   common 
+action_result.data.\*.threat_graph.indicators.\*.type | string |  |   sha256 
+action_result.data.\*.threat_graph.indicators.\*.value | string |  |   7ef166e82439ea3cafcb28754245325bfbf73e4eb94041bd77fd5c961924709c 
+action_result.data.\*.user_id | string |  |   b1cab7e2bda14722aca74b8353f5f6d9 
+action_result.data.\*.user_name | string |  |   testuser@soar.us 
+action_result.data.\*.user_tags | string |  |   test_tag1 
+action_result.data.\*.user_uuid | string |  |   b6330292-28e6-4198-994d-96f327c5b5bd 
+action_result.data.\*.verdict | string |  |   no specific threat 
+action_result.summary.total_reports | numeric |  |   1 
+action_result.summary.verdict | string |  |   suspicious 
+action_result.message | string |  |   Verdict: no specific threat, Total reports: 1  Total reports: 6 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'detonate url'
 Upload an url to CrowdStrike and retrieve the analysis results
@@ -2861,150 +3114,150 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **url** |  required  | URL to query | string |  `url` 
 **environment** |  required  | Sandbox environment to be used for analysis | string |  `crowdstrike environment` 
 **limit** |  optional  | Maximum reports to be fetched | numeric | 
-**offset** |  optional  | Starting index of overall result set from which to return ids \(Defaults to 0\) | numeric | 
-**document\_password** |  optional  | Password of the document if password protected \(Max length\: 32 characters\) | string | 
-**command\_line** |  optional  | Command line script passed to the submitted file at runtime \(Max length\: 2048 characters\) | string | 
-**user\_tags** |  optional  | Comma seperated list of user tags \(Max length\: 100 characters per tag\) | string | 
+**offset** |  optional  | Starting index of overall result set from which to return ids (Defaults to 0) | numeric | 
+**document_password** |  optional  | Password of the document if password protected (Max length: 32 characters) | string | 
+**command_line** |  optional  | Command line script passed to the submitted file at runtime (Max length: 2048 characters) | string | 
+**user_tags** |  optional  | Comma seperated list of user tags (Max length: 100 characters per tag) | string | 
 **sort** |  optional  | Property to sort by | string | 
-**action\_script** |  optional  | Runtime script for sandbox analysis | string | 
-**detail\_report** |  optional  | Get the detailed report | boolean | 
-**enable\_tor** |  optional  | To route the sandbox network traffic via TOR | boolean | 
+**action_script** |  optional  | Runtime script for sandbox analysis | string | 
+**detail_report** |  optional  | Get the detailed report | boolean | 
+**enable_tor** |  optional  | To route the sandbox network traffic via TOR | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.action\_script | string | 
-action\_result\.parameter\.command\_line | string | 
-action\_result\.parameter\.detail\_report | boolean | 
-action\_result\.parameter\.document\_password | string | 
-action\_result\.parameter\.enable\_tor | boolean | 
-action\_result\.parameter\.environment | string |  `crowdstrike environment` 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | numeric | 
-action\_result\.parameter\.sort | string | 
-action\_result\.parameter\.url | string |  `url` 
-action\_result\.parameter\.user\_tags | string | 
-action\_result\.data\.\*\.cid | string | 
-action\_result\.data\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.id | string |  `crowdstrike resource id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_csv\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_json\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_maec\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_broad\_stix\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_csv\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_json\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_maec\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.ioc\_report\_strict\_stix\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.malquery\.\*\.input | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.family | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.file\_type | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.first\_seen\_timestamp | string |  `date` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.label | string | 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.md5 | string |  `md5` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.sha1 | string |  `sha1` 
-action\_result\.data\.\*\.malquery\.\*\.resources\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.malquery\.\*\.type | string | 
-action\_result\.data\.\*\.malquery\.\*\.verdict | string | 
-action\_result\.data\.\*\.origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.architecture | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.address | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.associated\_runtime\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.associated\_runtime\.\*\.pid | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.country | string | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.port | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.contacted\_hosts\.\*\.protocol | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.address | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.country | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.domain | string |  `domain`  `url` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_creation\_timestamp | string |  `date` 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_name\_servers | string | 
-action\_result\.data\.\*\.sandbox\.\*\.dns\_requests\.\*\.registrar\_organization | string | 
-action\_result\.data\.\*\.sandbox\.\*\.environment | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.environment\_description | string |  `crowdstrike environment` 
-action\_result\.data\.\*\.sandbox\.\*\.environment\_id | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_message | string | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.error\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.md5 | string |  `md5` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.runtime\_process | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.sha1 | string |  `sha1` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_files\.\*\.threat\_level\_readable | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.filename | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.process | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.source | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.extracted\_interesting\_strings\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.file\_size | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.file\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.header | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host | string |  `hostname` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host\_ip | string |  `ip` 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.host\_port | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.method | string | 
-action\_result\.data\.\*\.sandbox\.\*\.http\_requests\.\*\.url | string |  `url` 
-action\_result\.data\.\*\.sandbox\.\*\.incidents\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.memory\_strings\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.attack\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.tactic | string | 
-action\_result\.data\.\*\.sandbox\.\*\.mitre\_attacks\.\*\.technique | string | 
-action\_result\.data\.\*\.sandbox\.\*\.network\_settings | string | 
-action\_result\.data\.\*\.sandbox\.\*\.pcap\_report\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.command\_line | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.mask | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.file\_accesses\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.id | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.handles\.\*\.type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.icon\_artifact\_id | string |  `crowdstrike artifact id` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.normalized\_path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.pid | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.process\_flags\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.key | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.operation | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.path | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.registry\.\*\.value | string | 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.processes\.\*\.uid | string | 
-action\_result\.data\.\*\.sandbox\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.attack\_id | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.category | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.description | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.identifier | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.relevance | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.threat\_level | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.threat\_level\_human | string | 
-action\_result\.data\.\*\.sandbox\.\*\.signatures\.\*\.type | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.submission\_type | string | 
-action\_result\.data\.\*\.sandbox\.\*\.submit\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.submit\_url | string |  `url` 
-action\_result\.data\.\*\.sandbox\.\*\.threat\_score | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.verdict | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_bitness | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_edition | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.windows\_version\_version | string | 
-action\_result\.data\.\*\.user\_id | string | 
-action\_result\.data\.\*\.user\_name | string | 
-action\_result\.data\.\*\.user\_tags | string | 
-action\_result\.data\.\*\.user\_uuid | string | 
-action\_result\.data\.\*\.verdict | string | 
-action\_result\.summary\.total\_reports | numeric | 
-action\_result\.summary\.verdict | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.action_script | string |  |   default 
+action_result.parameter.command_line | string |  |  
+action_result.parameter.detail_report | boolean |  |   True  False 
+action_result.parameter.document_password | string |  |   test_password 
+action_result.parameter.enable_tor | boolean |  |   True  False 
+action_result.parameter.environment | string |  `crowdstrike environment`  |   Windows 10, 64-bit 
+action_result.parameter.limit | numeric |  |   5 
+action_result.parameter.offset | numeric |  |   5 
+action_result.parameter.sort | string |  |   created_timestamp.asc 
+action_result.parameter.url | string |  `url`  |   https://www.test.com 
+action_result.parameter.user_tags | string |  |   test_tag1 
+action_result.data.\*.cid | string |  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.created_timestamp | string |  `date`  |   2021-05-14T10:03:35Z 
+action_result.data.\*.id | string |  `crowdstrike resource id`  |   3061c7ff3b634e22b38274d4b586558e_5e2ec86aa5e444ac93d298df547e4d40 
+action_result.data.\*.ioc_report_broad_csv_artifact_id | string |  `crowdstrike artifact id`  |   3b4ca1c6dd800fa60aaa4eb7154da76da7604067bcb3df160caa984ed7eabf3e 
+action_result.data.\*.ioc_report_broad_json_artifact_id | string |  `crowdstrike artifact id`  |   5b7554048df30cb234d11a9d4d77a64e9f033dbe53265ee9a0e74fd7f803cf59 
+action_result.data.\*.ioc_report_broad_maec_artifact_id | string |  `crowdstrike artifact id`  |   eefd76de04f16b6187d0f2b728dafec578e47cbfec140e7a6735f2f173d0cbcf 
+action_result.data.\*.ioc_report_broad_stix_artifact_id | string |  `crowdstrike artifact id`  |   bb6089f7c2da27e70eb93447a724287572d3b4cac1c91e78edc264ee30dc401d 
+action_result.data.\*.ioc_report_strict_csv_artifact_id | string |  `crowdstrike artifact id`  |   3b4ca1c6dd800fa60aaa4eb7154da76da7604067bcb3df160caa984ed7eabf3e 
+action_result.data.\*.ioc_report_strict_json_artifact_id | string |  `crowdstrike artifact id`  |   5b7554048df30cb234d11a9d4d77a64e9f033dbe53265ee9a0e74fd7f803cf59 
+action_result.data.\*.ioc_report_strict_maec_artifact_id | string |  `crowdstrike artifact id`  |   eefd76de04f16b6187d0f2b728dafec578e47cbfec140e7a6735f2f173d0cbcf 
+action_result.data.\*.ioc_report_strict_stix_artifact_id | string |  `crowdstrike artifact id`  |   bb6089f7c2da27e70eb93447a724287572d3b4cac1c91e78edc264ee30dc401d 
+action_result.data.\*.malquery.\*.input | string |  |   http://mm.test.com 
+action_result.data.\*.malquery.\*.resources.\*.family | string |  |   Coinminer 
+action_result.data.\*.malquery.\*.resources.\*.file_size | numeric |  |   2313692 
+action_result.data.\*.malquery.\*.resources.\*.file_type | string |  |   PCAP 
+action_result.data.\*.malquery.\*.resources.\*.first_seen_timestamp | string |  `date`  |   2021-05-26T00:00:00Z 
+action_result.data.\*.malquery.\*.resources.\*.label | string |  |   unknown 
+action_result.data.\*.malquery.\*.resources.\*.md5 | string |  `md5`  |   4446a961902d0094397a071d75e4abf8 
+action_result.data.\*.malquery.\*.resources.\*.sha1 | string |  `sha1`  |   cb1c5bb0d84e3efb978efede256ebec5308873c0 
+action_result.data.\*.malquery.\*.resources.\*.sha256 | string |  `sha256`  |   0091a4c5bc7bea90faadeee2ae71bd29e131d3f59f8ffb9f58ec7276953fafe5 
+action_result.data.\*.malquery.\*.type | string |  |   url 
+action_result.data.\*.malquery.\*.verdict | string |  |   unknown 
+action_result.data.\*.origin | string |  |   apigateway 
+action_result.data.\*.sandbox.\*.architecture | string |  |   WINDOWS 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.address | string |  `ip`  |   1XX.2XX.7X.1XX 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.associated_runtime.\*.name | string |  |   Testedgecp.exe 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.associated_runtime.\*.pid | numeric |  |   1600 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.country | string |  |   Test Name 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.port | numeric |  |   443 
+action_result.data.\*.sandbox.\*.contacted_hosts.\*.protocol | string |  |   TCP 
+action_result.data.\*.sandbox.\*.dns_requests.\*.address | string |  `ip`  |   1XX.2X.X.X 
+action_result.data.\*.sandbox.\*.dns_requests.\*.country | string |  |   Test Name 
+action_result.data.\*.sandbox.\*.dns_requests.\*.domain | string |  `domain`  `url`  |   www.test.com 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_creation_timestamp | string |  `date`  |   2007-11-13T00:00:00+00:00 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_name | string |  |   RegistryGate GmbH 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_name_servers | string |  |   NS-1109.AWSDNS-10.ORG 
+action_result.data.\*.sandbox.\*.dns_requests.\*.registrar_organization | string |  |   Creationes Virtuales CV GmbH 
+action_result.data.\*.sandbox.\*.environment | numeric |  |   160 
+action_result.data.\*.sandbox.\*.environment_description | string |  `crowdstrike environment`  |   Windows 10 64 bit 
+action_result.data.\*.sandbox.\*.environment_id | numeric |  |   100 
+action_result.data.\*.sandbox.\*.error_message | string |  |   The requested environment ID "300" and file type "url" have no available execution environment 
+action_result.data.\*.sandbox.\*.error_origin | string |  |   CLIENT 
+action_result.data.\*.sandbox.\*.error_type | string |  |   FILE_TYPE_BAD_ERROR 
+action_result.data.\*.sandbox.\*.extracted_files.\*.description | string |  |   data 
+action_result.data.\*.sandbox.\*.extracted_files.\*.file_path | string |  |   %APPDATA%\\Adobe\\Acrobat\\11.0\\Security\\CRLCache\\0FDED5CEB68C302B1CDB2BDDD9D0000E76539CB0.crl 
+action_result.data.\*.sandbox.\*.extracted_files.\*.file_size | numeric |  |   637 
+action_result.data.\*.sandbox.\*.extracted_files.\*.md5 | string |  `md5`  |   974e8536b8767ac5be204f35d16f73e8 
+action_result.data.\*.sandbox.\*.extracted_files.\*.name | string |  |   0FDED5CEB68C302B1CDB2BDDD9D0000E76539CB0.crl 
+action_result.data.\*.sandbox.\*.extracted_files.\*.runtime_process | string |  |   AcroRd32.exe (PID: 4084) 
+action_result.data.\*.sandbox.\*.extracted_files.\*.sha1 | string |  `sha1`  |   e847897947a3db26e35cb7d490c688e8c410dfb7 
+action_result.data.\*.sandbox.\*.extracted_files.\*.sha256 | string |  `sha256`  |   d1bb4b163fe01acc368a92b385bb0bd3a9fc2340b6d485b77a20553a713166d3 
+action_result.data.\*.sandbox.\*.extracted_files.\*.threat_level_readable | string |  |   no specific threat 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.filename | string |  |   rundll32.exe 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.process | string |  |   AcroRd32.exe 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.source | string |  |   Process Commandline 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.type | string |  |   Ansi 
+action_result.data.\*.sandbox.\*.extracted_interesting_strings.\*.value | string |  |   "%WINDIR%\\system32\\ieframe.dll",OpenURL C:\\a3d7be9b5d8f9070d96789cdf7ee5ce2f1ee827f261faa0d43d4de605ad3194c.url 
+action_result.data.\*.sandbox.\*.file_size | numeric |  |   690028 
+action_result.data.\*.sandbox.\*.file_type | string |  |   PDF document, version 1.6 
+action_result.data.\*.sandbox.\*.http_requests.\*.header | string |  |   GET /gsr2/EXAMPLEMEgwRjAJBgUrDgMCGgUABBTgXTEST2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBtTESTt39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1<br>Connection: Keep-Alive<br>Accept: \*/\*<br>User-Agent: Test-CryptoAPI/10.0<br>Host: ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.host | string |  `hostname`  |   ocsp.pki.goog 
+action_result.data.\*.sandbox.\*.http_requests.\*.host_ip | string |  `ip`  |   1XX.2XX.X.6X 
+action_result.data.\*.sandbox.\*.http_requests.\*.host_port | numeric |  |   80 
+action_result.data.\*.sandbox.\*.http_requests.\*.method | string |  |   GET 
+action_result.data.\*.sandbox.\*.http_requests.\*.url | string |  `url`  |   /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D 
+action_result.data.\*.sandbox.\*.incidents.\*.name | string |  |   Network Behavior 
+action_result.data.\*.sandbox.\*.memory_strings_artifact_id | string |  `crowdstrike artifact id`  |   84626f942fc9dffdeb6facc2fb4a337bc8f52323a6a8be3e16d0c2ea57d30820 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.attack_id | string |  |   T1085 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.tactic | string |  |   Execution 
+action_result.data.\*.sandbox.\*.mitre_attacks.\*.technique | string |  |   Rundll32 
+action_result.data.\*.sandbox.\*.network_settings | string |  |   tor 
+action_result.data.\*.sandbox.\*.pcap_report_artifact_id | string |  `crowdstrike artifact id`  |   506bc12accb770cdb032ad567ee478842a8cf1506ce9658f78f46d6b6cc65099 
+action_result.data.\*.sandbox.\*.processes.\*.command_line | string |  |   "%WINDIR%\\system32\\ieframe.dll",OpenURL C:\\a3d7be9b5d8f9070d96789cdf7ee5ce2f1ee827f261faa0d43d4de605ad3194c.url 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.mask | string |  |   GENERIC_READ | FILE_READ_ATTRIBUTES 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.path | string |  |   %WINDIR%\\apppatch\\sysmain.sdb 
+action_result.data.\*.sandbox.\*.processes.\*.file_accesses.\*.type | string |  |   CREATE 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.id | numeric |  |   176 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.path | string |  |   \\Device\\CNG 
+action_result.data.\*.sandbox.\*.processes.\*.handles.\*.type | string |  |   FileHandle 
+action_result.data.\*.sandbox.\*.processes.\*.icon_artifact_id | string |  `crowdstrike artifact id`  |   25f2b36dff5226562d05a905dae09c7e4ef627528e74dd5b95cc3575da3697dd 
+action_result.data.\*.sandbox.\*.processes.\*.name | string |  |   rundll32.exe 
+action_result.data.\*.sandbox.\*.processes.\*.normalized_path | string |  |   %WINDIR%\\System32\\rundll32.exe 
+action_result.data.\*.sandbox.\*.processes.\*.pid | numeric |  |   4340 
+action_result.data.\*.sandbox.\*.processes.\*.process_flags.\*.name | string |  |   Reduced Monitoring 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.key | string |  |   BLASTEXITNORMAL 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.operation | string |  |   Delete 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.path | string |  |   HKLM\\SYSTEM\\ACROBATVIEWERCPP473\\ 
+action_result.data.\*.sandbox.\*.processes.\*.registry.\*.value | string |  |   00000000 
+action_result.data.\*.sandbox.\*.processes.\*.sha256 | string |  `sha256`  |   b1e6a7a3e2597e51836277a32b2bc61aa781c8f681d44dfddea618b32e2bf2a6 
+action_result.data.\*.sandbox.\*.processes.\*.uid | string |  |   00177892-00004340 
+action_result.data.\*.sandbox.\*.sha256 | string |  `sha256`  |   a3d7be9b5d8f9070d96789cdf7ee5ce2f1ee827f261faa0d43d4de605ad3194c 
+action_result.data.\*.sandbox.\*.signatures.\*.attack_id | string |  |   T1085 
+action_result.data.\*.sandbox.\*.signatures.\*.category | string |  |   General 
+action_result.data.\*.sandbox.\*.signatures.\*.description | string |  |   "www.test.com" 
+action_result.data.\*.sandbox.\*.signatures.\*.identifier | string |  |   network-0 
+action_result.data.\*.sandbox.\*.signatures.\*.name | string |  |   Contacts domains 
+action_result.data.\*.sandbox.\*.signatures.\*.origin | string |  |   Network Traffic 
+action_result.data.\*.sandbox.\*.signatures.\*.relevance | numeric |  |   1 
+action_result.data.\*.sandbox.\*.signatures.\*.threat_level | numeric |  |   1 
+action_result.data.\*.sandbox.\*.signatures.\*.threat_level_human | string |  |   informative 
+action_result.data.\*.sandbox.\*.signatures.\*.type | numeric |  |   7 
+action_result.data.\*.sandbox.\*.submission_type | string |  |   page_url 
+action_result.data.\*.sandbox.\*.submit_name | string |  |   whatami 
+action_result.data.\*.sandbox.\*.submit_url | string |  `url`  |   hxxps://test.com 
+action_result.data.\*.sandbox.\*.threat_score | numeric |  |   35 
+action_result.data.\*.sandbox.\*.verdict | string |  |   no specific threat 
+action_result.data.\*.sandbox.\*.windows_version_bitness | numeric |  |   64 
+action_result.data.\*.sandbox.\*.windows_version_edition | string |  |   Professional 
+action_result.data.\*.sandbox.\*.windows_version_name | string |  |   Windows 10 
+action_result.data.\*.sandbox.\*.windows_version_version | string |  |   10.0 (build 16299) 
+action_result.data.\*.user_id | string |  |   225bf5b4490348d9a1eacddc61501c09 
+action_result.data.\*.user_name | string |  |   Test user 
+action_result.data.\*.user_tags | string |  |   test_tag1 
+action_result.data.\*.user_uuid | string |  |   b6330292-28e6-4198-994d-96f327c5b5bd 
+action_result.data.\*.verdict | string |  |   no specific threat 
+action_result.summary.total_reports | numeric |  |   5 
+action_result.summary.verdict | string |  |   suspicious 
+action_result.message | string |  |   Verdict: no specific threat, Total reports: 1  Total reports: 6 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'check status'
 To check detonation status of the provided resource id
@@ -3015,77 +3268,77 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**resource\_id** |  required  | Id of the resource | string |  `crowdstrike resource id` 
+**resource_id** |  required  | Id of the resource | string |  `crowdstrike resource id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.resource\_id | string |  `crowdstrike resource id` 
-action\_result\.data | string | 
-action\_result\.data\.\*\.cid | string | 
-action\_result\.data\.\*\.created\_timestamp | string |  `date` 
-action\_result\.data\.\*\.id | string |  `crowdstrike resource id` 
-action\_result\.data\.\*\.origin | string | 
-action\_result\.data\.\*\.sandbox\.\*\.action\_script | string | 
-action\_result\.data\.\*\.sandbox\.\*\.command\_line | string | 
-action\_result\.data\.\*\.sandbox\.\*\.enable\_tor | boolean | 
-action\_result\.data\.\*\.sandbox\.\*\.environment\_id | numeric | 
-action\_result\.data\.\*\.sandbox\.\*\.network\_settings | string | 
-action\_result\.data\.\*\.sandbox\.\*\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.sandbox\.\*\.submit\_name | string | 
-action\_result\.data\.\*\.sandbox\.\*\.url | string |  `url` 
-action\_result\.data\.\*\.state | string | 
-action\_result\.data\.\*\.user\_id | string | 
-action\_result\.data\.\*\.user\_name | string | 
-action\_result\.data\.\*\.user\_uuid | string | 
-action\_result\.summary\.state | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.resource_id | string |  `crowdstrike resource id`  |   3061c7ff3b634e22b38274d4b586558e_48004b5623af49ce9442d4bafd8e7b3d 
+action_result.data | string |  |  
+action_result.data.\*.cid | string |  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.created_timestamp | string |  `date`  |   2021-05-15T13:12:02Z 
+action_result.data.\*.id | string |  `crowdstrike resource id`  |   3061c7ff3b634e22b38274d4b586558e_48004b5623af49ce9442d4bafd8e7b3d 
+action_result.data.\*.origin | string |  |   uiproxy 
+action_result.data.\*.sandbox.\*.action_script | string |  |   default 
+action_result.data.\*.sandbox.\*.command_line | string |  |   taskkill /IM \* 
+action_result.data.\*.sandbox.\*.enable_tor | boolean |  |   True 
+action_result.data.\*.sandbox.\*.environment_id | numeric |  |   160 
+action_result.data.\*.sandbox.\*.network_settings | string |  |   default 
+action_result.data.\*.sandbox.\*.sha256 | string |  `sha256`  |   70641a2ef9a116fa7f5b1376654657926a91a2bed913837c62f5598c77a3e191 
+action_result.data.\*.sandbox.\*.submit_name | string |  |   example.csv 
+action_result.data.\*.sandbox.\*.url | string |  `url`  |   hxxps://www.test.com 
+action_result.data.\*.state | string |  |   success 
+action_result.data.\*.user_id | string |  |   225bf5b4490348d9a1eacddc61501c09 
+action_result.data.\*.user_name | string |  |   test_user 
+action_result.data.\*.user_uuid | string |  |   b6330292-28e6-4198-994d-96f327c5b5bd 
+action_result.summary.state | string |  |   success 
+action_result.message | string |  |   State: success 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get device scroll'
-Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability \(based on offset pointer which expires after 2 minutes with no maximum limit\)
+Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)
 
 Type: **investigate**  
 Read only: **True**
 
-More info can be found at <a href='https\://assets\.falcon\.crowdstrike\.com/support/api/swagger\.html\#/hosts/QueryDevicesByFilterScroll' target='\_blank'>here</a>\.
+More info can be found at <a href='https://assets.falcon.crowdstrike.com/support/api/swagger.html#/hosts/QueryDevicesByFilterScroll' target='_blank'>here</a>.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **offset** |  optional  | The offset to page from, for the next result set | string | 
-**limit** |  optional  | The maximum records to return\. \[1\-5000\] | numeric | 
-**sort** |  optional  | The property to sort by \(e\.g\. status\.desc or hostname\.asc\) | string | 
+**limit** |  optional  | The maximum records to return. [1-5000] | numeric | 
+**sort** |  optional  | The property to sort by (e.g. status.desc or hostname.asc) | string | 
 **filter** |  optional  | The offset to page from, for the next result set | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter | string | 
-action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.offset | string | 
-action\_result\.parameter\.sort | string | 
-action\_result\.data\.\*\.errors\.\*\.code | string | 
-action\_result\.data\.\*\.errors\.\*\.id | string | 
-action\_result\.data\.\*\.errors\.\*\.message | string | 
-action\_result\.data\.\*\.meta\.pagination\.expires\_at | numeric | 
-action\_result\.data\.\*\.meta\.pagination\.limit | string | 
-action\_result\.data\.\*\.meta\.pagination\.offset | string | 
-action\_result\.data\.\*\.meta\.pagination\.total | numeric | 
-action\_result\.data\.\*\.meta\.powered\_by | string | 
-action\_result\.data\.\*\.meta\.query\_time | numeric | 
-action\_result\.data\.\*\.meta\.trace\_id | string | 
-action\_result\.data\.\*\.resources | string |  `crowdstrike device id` 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter | string |  |   platform_name:'windows' 
+action_result.parameter.limit | numeric |  |   120 
+action_result.parameter.offset | string |  |  
+action_result.parameter.sort | string |  |   status.desc 
+action_result.data.\*.errors.\*.code | string |  |  
+action_result.data.\*.errors.\*.id | string |  |  
+action_result.data.\*.errors.\*.message | string |  |  
+action_result.data.\*.meta.pagination.expires_at | numeric |  |   1632462683095273200 
+action_result.data.\*.meta.pagination.limit | string |  |  
+action_result.data.\*.meta.pagination.offset | string |  |  
+action_result.data.\*.meta.pagination.total | numeric |  |   2 
+action_result.data.\*.meta.powered_by | string |  |   device-api 
+action_result.data.\*.meta.query_time | numeric |  |   0.004875208 
+action_result.data.\*.meta.trace_id | string |  |   008a2081-1ad7-4e80-a2cc-0acc1562302b 
+action_result.data.\*.resources | string |  `crowdstrike device id`  |   12e75112bdc44ac7a60b5ad1d2765303 
+action_result.summary | string |  |  
+action_result.message | string |  |   Device scroll fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get zta data'
-Get Zero Trust Assessment data for one or more hosts by providing agent IDs \(AID\)
+Get Zero Trust Assessment data for one or more hosts by providing agent IDs (AID)
 
 Type: **investigate**  
 Read only: **True**
@@ -3093,35 +3346,35 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**agent\_id** |  required  | Agent ID to get zero trust assessment data about\. Comma\-separated list allowed | string |  `crowdstrike device id` 
+**agent_id** |  required  | Agent ID to get zero trust assessment data about. Comma-separated list allowed | string |  `crowdstrike device id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.agent\_id | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.aid | string |  `crowdstrike device id` 
-action\_result\.data\.\*\.assessment\.os | numeric | 
-action\_result\.data\.\*\.assessment\.overall | numeric | 
-action\_result\.data\.\*\.assessment\.sensor\_config | numeric | 
-action\_result\.data\.\*\.assessment\.version | string | 
-action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.criteria | string | 
-action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.group\_name | string | 
-action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.meets\_criteria | string | 
-action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.signal\_id | string | 
-action\_result\.data\.\*\.assessment\_items\.os\_signals\.\*\.signal\_name | string | 
-action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.criteria | string | 
-action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.group\_name | string | 
-action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.meets\_criteria | string | 
-action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.signal\_id | string | 
-action\_result\.data\.\*\.assessment\_items\.sensor\_signals\.\*\.signal\_name | string | 
-action\_result\.data\.\*\.cid | string |  `crowdstrike customer id` 
-action\_result\.data\.\*\.event\_platform | string | 
-action\_result\.data\.\*\.modified\_time | string | 
-action\_result\.data\.\*\.product\_type\_desc | string | 
-action\_result\.data\.\*\.sensor\_file\_status | string | 
-action\_result\.data\.\*\.system\_serial\_number | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.agent_id | string |  `crowdstrike device id`  |   95969e1abbea43bdaf6cc50c9b4aec2e,46592f3d661a469eb2503d72a29afd3a 
+action_result.data.\*.aid | string |  `crowdstrike device id`  |   95969e1abbea43bdaf6cc50c9b4aec2e 
+action_result.data.\*.assessment.os | numeric |  |   38 
+action_result.data.\*.assessment.overall | numeric |  |   32 
+action_result.data.\*.assessment.sensor_config | numeric |  |   29 
+action_result.data.\*.assessment.version | string |  |   3.3.0 
+action_result.data.\*.assessment_items.os_signals.\*.criteria | string |  |   Kernel Mode Code Integrity: enabled 
+action_result.data.\*.assessment_items.os_signals.\*.group_name | string |  |   Windows 10 
+action_result.data.\*.assessment_items.os_signals.\*.meets_criteria | string |  |   no 
+action_result.data.\*.assessment_items.os_signals.\*.signal_id | string |  |   windows_os_build 
+action_result.data.\*.assessment_items.os_signals.\*.signal_name | string |  |   Windows OS Build 
+action_result.data.\*.assessment_items.sensor_signals.\*.criteria | string |  |   Spotlight: enabled 
+action_result.data.\*.assessment_items.sensor_signals.\*.group_name | string |  |   Sensor 
+action_result.data.\*.assessment_items.sensor_signals.\*.meets_criteria | string |  |   no 
+action_result.data.\*.assessment_items.sensor_signals.\*.signal_id | string |  |   spotlight_enabled 
+action_result.data.\*.assessment_items.sensor_signals.\*.signal_name | string |  |   Spotlight 
+action_result.data.\*.cid | string |  `crowdstrike customer id`  |   3061c7ff3b634e22b38274d4b586558e 
+action_result.data.\*.event_platform | string |  |   Win 
+action_result.data.\*.modified_time | string |  |   2022-03-21T23:07:13Z 
+action_result.data.\*.product_type_desc | string |  |   Server 
+action_result.data.\*.sensor_file_status | string |  |   not deployed 
+action_result.data.\*.system_serial_number | string |  |   VMware-42 2a 23 c9 7f 05 df a5-23 51 df 2c 02 ce 36 fb 
+action_result.summary | string |  |  
+action_result.message | string |  |   Zero Trust Assessment data fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 

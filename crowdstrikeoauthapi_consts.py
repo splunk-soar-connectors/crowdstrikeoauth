@@ -76,19 +76,16 @@ CROWDSTRIKE_UNSUPPORTED_HASH_TYPE_ERROR = "Unsupported hash type"
 CROWDSTRIKE_API_UNSUPPORTED_METHOD_ERROR = "Unsupported method"
 CROWDSTRIKE_SERVER_CONNECTIVITY_ERROR = "Connection failed"
 CROWDSTRIKE_JSON_PARSE_ERROR = "Unable to parse reply as a Json, raw string reply: '{raw_text}'"
-CROWDSTRIKE_FROM_SERVER_ERROR = "API failed, Status code: {status}, Detail: {detail}"
 CROWDSTRIKE_SUCC_SET_STATUS_ERROR = "Successfully set status"
 CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE = "No more feeds available"
 CROWDSTRIKE_GETTING_EVENTS_MESSAGE = "Getting maximum {max_events} events from id {lower_id} onwards (ids might not be contiguous)"
 CROWDSTRIKE_CONNECTIVITY_ERROR = "Error connecting to server"
-CROWDSTRIKE_FROM_SERVER_ERROR = "Error from Server, Status Code: {status}, Message: {message}"
 CROWDSTRIKE_USING_BASE_URL_ERROR = "Using base url: {base_url}"
 CROWDSTRIKE_META_KEY_EMPTY_ERROR = "Meta key empty or not present"
 CROWDSTRIKE_RESOURCES_KEY_EMPTY_ERROR = "Resources key empty or not present. Please try after sometime"
 CROWDSTRIKE_DATAFEED_EMPTY_ERROR = "Datafeed key empty or not present"
 CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR = "Session token, not found"
 PAYLOAD_SECURITY_SUBMITTING_FILE_MESSAGE = 'Submitting file/url to Falcon Sandbox'
-CROWDSTRIKE_UNSUPPORTED_HASH_TYPE_ERROR = "Unsupported hash type"
 CROWDSTRIKE_EVENTS_FETCH_ERROR = "Error occurred while fetching the DetectionSummaryEvents from the CrowdStrike server datafeed URL stream"
 CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE = "Please provide zero or a valid positive integer value in the {parameter} parameter"
 CROWDSTRIKE_LIMIT_VALIDATION_MESSAGE = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
@@ -106,7 +103,6 @@ CROWDSTRIKE_UNICODE_DAMMIT_TYPE_MESSAGE_ERROR = "Error occurred while connecting
     "Please check the asset configuration and|or the action parameters."
 CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
 CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE = "Error details: 404"
-CROWDSTRIKE_NO_DATA_MESSAGE = "No data found"
 CROWDSTRIKE_PULLED_EVENTS_MESSAGE = "Pulled {0} events of type 'DetectionSummaryEvent'"
 CROWDSTRIKE_NO_DATA_MESSAGE = "No data, terminating loop"
 CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE = "CR/LF received on iteration: {} - terminating loop"
@@ -128,6 +124,7 @@ CROWDSTRIKE_STATE_FILE_CORRUPT_ERROR = (
 CROWDSTRIKE_ENCRYPTION_ERROR = "Error occurred while encrypting the state file"
 CROWDSTRIKE_DECRYPTION_ERROR = "Error occurred while decrypting the state file"
 CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR = "Status Code {code}. Empty response and no information in the header"
+CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM = "Please provide a valid value in the '{key}' parameter"
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"
@@ -211,3 +208,12 @@ CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR = "Please enter valid value in '{}' paramet
 CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc",
 "last_modified.asc", "indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]
 CROWDSTRIKE_API_SUCC_CODES = [200, 202, 204]
+CROWDSTRIKE_DETECTION_STATUSES = [
+    "new",
+    "in_progress",
+    "true_positive",
+    "false_positive",
+    "ignored",
+    "closed",
+    "reopened"
+]

@@ -64,6 +64,10 @@ class CrowdstrikeConnector(BaseConnector):
         self._poll_interval = None
         self._required_detonation = False
         self._stream_file_data = False
+        self._refresh_token_url = None
+        self._start_time = time.time()
+        self._interval_poll = False
+        self._refresh_token_timeout = 1800
 
     def initialize(self):
         """ Automatically called by the BaseConnector before the calls to the handle_action function"""
@@ -87,6 +91,7 @@ class CrowdstrikeConnector(BaseConnector):
         self._asset_id = self.get_asset_id()
 
         app_id = config.get('app_id', self.get_app_id())
+        app_id = "{}{}".format(app_id, self._asset_id)
         self._parameters = {'appId': app_id.replace('-', '')}
 
         self._state = self.load_state()
@@ -2119,6 +2124,8 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_DATAFEED_EMPTY_ERROR)
 
         session_token = resources[0].get('sessionToken')
+        self._refresh_token_url = resources[0].get('refreshActiveSessionURL')
+        self._refresh_token_timeout = resources[0].get('refreshActiveSessionInterval')
         if not session_token:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR)
 
@@ -2249,6 +2256,30 @@ class CrowdstrikeConnector(BaseConnector):
 
         try:
             for stream_data in r.iter_lines(chunk_size=None):
+                # Check if it is time to refresh the stream connection and creating new barear token [after 29 Min]
+                if self._interval_poll and int(time.time() - self._start_time) > (self._refresh_token_timeout - 60):
+                    try:
+                        ret_val = self._get_token(action_result)
+                        if phantom.is_fail(ret_val):
+                            return action_result.set_status(phantom.APP_ERROR, "Failed while generating bearer token...")
+                        header = {
+                            'Authorization': 'Bearer {0}'.format(self._oauth_access_token),
+                            'Connection': 'Keep-Alive',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                        resp = requests.request("post", self._refresh_token_url, headers=header)
+                        self._start_time = (self._refresh_token_timeout - 60)
+                    except Exception as e:
+                        return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_REFRESH_TOKEN_ERROR, self._get_error_message_from_exception(e))
+                    # Handle any errors
+                    if resp.status_code != requests.codes.ok:  # pylint: disable=E1101
+                        resp_json = resp.json()
+                        try:
+                            err_message = resp_json['errors'][0]['message']
+                        except Exception as ex:
+                            err_message = "{}: {}".format('None', self._get_error_message_from_exception(ex))
+                        return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_FROM_SERVER_ERROR, status=resp.status_code, message=err_message)
                 # chunk = UnicodeDammit(chunk).unicode_markup
 
                 if stream_data is None:
@@ -3512,6 +3543,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.debug_print("action_id ", self.get_action_identifier())
 
         if self.get_action_identifier() == phantom.ACTION_ID_INGEST_ON_POLL:
+            self._interval_poll = True
             start_time = time.time()
             result = self._on_poll(param)
             end_time = time.time()

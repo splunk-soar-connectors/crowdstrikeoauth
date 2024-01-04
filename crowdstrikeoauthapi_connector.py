@@ -2267,13 +2267,14 @@ class CrowdstrikeConnector(BaseConnector):
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         }
-                        ret_val, resp = self._make_rest_call_helper_oauth2(action_result,
-                                                               self._refresh_token_url, headers=header , method="post", append=False)
+                        ret_val, resp = self._make_rest_call_helper_oauth2(
+                            action_result, self._refresh_token_url, headers=header , method="post", append=False)
                         if phantom.is_fail(ret_val):
                             return action_result.get_status()
                         self._start_time = time.time()
                     except Exception as e:
-                        return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_REFRESH_TOKEN_ERROR, self._get_error_message_from_exception(e))
+                        return action_result.set_status(
+                            phantom.APP_ERROR, CROWDSTRIKE_REFRESH_TOKEN_ERROR, self._get_error_message_from_exception(e))
 
                 if stream_data is None:
                     # Done with all the event data for now
@@ -3435,7 +3436,8 @@ class CrowdstrikeConnector(BaseConnector):
             is_download = True
         return self._process_response(r, action_result, is_download)
 
-    def _make_rest_call_helper_oauth2(self, action_result, endpoint, headers=None, params=None, data=None, json_data=None, method="get", append=True):
+    def _make_rest_call_helper_oauth2(
+            self, action_result, endpoint, headers=None, params=None, data=None, json_data=None, method="get", append=True):
         """ Function that helps setting REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address

@@ -2193,7 +2193,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return max_crlf, merge_time_interval, max_events
 
-    def _on_poll(self, param):
+    def _on_poll(self, param):   # noqa: C901
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2268,7 +2268,7 @@ class CrowdstrikeConnector(BaseConnector):
                             'Accept': 'application/json'
                         }
                         ret_val, resp = self._make_rest_call_helper_oauth2(
-                            action_result, self._refresh_token_url, headers=header , method="post", append=False)
+                            action_result, self._refresh_token_url, headers=header, method="post", append=False)
                         if phantom.is_fail(ret_val):
                             return action_result.get_status()
                         self._start_time = time.time()

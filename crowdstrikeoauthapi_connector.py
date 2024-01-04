@@ -94,7 +94,6 @@ class CrowdstrikeConnector(BaseConnector):
         if not app_id:
             app_id = self.get_app_id().replace('-', '')
             app_id = "{}{}".format(app_id[:-len(self._asset_id)], self._asset_id)
-        self.save_progress(f"APPIDDDDD:{app_id}")
         self._parameters = {'appId': app_id}
 
         self._state = self.load_state()
@@ -2123,7 +2122,6 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_RESOURCES_KEY_EMPTY_ERROR)
 
         self._data_feed_url = resources[0].get('dataFeedURL')
-        self.save_progress(f"DATAFEEDURLLLLL:{self._data_feed_url}")
         if not self._data_feed_url:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_DATAFEED_EMPTY_ERROR)
 
@@ -2132,10 +2130,8 @@ class CrowdstrikeConnector(BaseConnector):
         self._refresh_token_timeout = resources[0].get('refreshActiveSessionInterval', 1800)
         if not session_token:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR)
-        self.save_progress(f"REFRESHHHHH:{self._refresh_token_timeout}-{self._refresh_token_url}")
 
         self._token = session_token['token']
-        self.save_progress(f"TOKENNNN:{self._token}")
 
         return phantom.APP_SUCCESS
 
@@ -2262,14 +2258,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         try:
             for stream_data in r.iter_lines(chunk_size=None):
-                # self.save_progress("HELLOOOOOOOOO")
                 # Check if it is time to refresh the stream connection and creating new bearer token [after 29 Min]
                 if int(time.time() - self._start_time) > (self._refresh_token_timeout - 60):
-                    self.save_progress("HELLOOOOOOOOO")
                     try:
-                        # ret_val = self._get_token(action_result)
-                        # if phantom.is_fail(ret_val):
-                        #     return action_result.get_status()
                         header = {
                             'Authorization': 'Bearer {0}'.format(self._oauth_access_token),
                             'Connection': 'Keep-Alive',
@@ -2278,17 +2269,11 @@ class CrowdstrikeConnector(BaseConnector):
                         }
                         ret_val, resp = self._make_rest_call_helper_oauth2(action_result,
                                                                self._refresh_token_url, headers=header , method="post", append=False)
-                        # resp = requests.request("post", self._refresh_token_url, headers=header)
                         if phantom.is_fail(ret_val):
                             return action_result.get_status()
-                        self.save_progress(f"RESPONSEEEEE:{resp}")
                         self._start_time = time.time()
                     except Exception as e:
                         return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_REFRESH_TOKEN_ERROR, self._get_error_message_from_exception(e))
-                    # Handle any errors
-                    # if resp.status_code != requests.codes.ok:  # pylint: disable=E1101
-                    #     return self._parse_error(action_result, resp)
-                # chunk = UnicodeDammit(chunk).unicode_markup
 
                 if stream_data is None:
                     # Done with all the event data for now
@@ -3445,7 +3430,6 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_ERROR, "Error connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json
 
-        self.save_progress(f"DATAAAAAAA:{r.text}{r.status_code}")
         is_download = False
         if CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT in endpoint:
             is_download = True

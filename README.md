@@ -6,7 +6,7 @@ Connector Version: 4.1.0
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.0.1  
+Minimum Product Version: 6.1.1  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 

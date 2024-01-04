@@ -90,8 +90,10 @@ class CrowdstrikeConnector(BaseConnector):
         self._base_url_oauth = self._base_url_oauth.replace('\\', '/')
         self._asset_id = self.get_asset_id()
 
-        app_id = config.get('app_id', self.get_app_id()).replace('-', '')
-        app_id = "{}{}".format(app_id[:-len(self._asset_id)], self._asset_id)
+        app_id = config.get('app_id')
+        if not app_id:
+            app_id = self.get_app_id().replace('-', '')
+            app_id = "{}{}".format(app_id[:-len(self._asset_id)], self._asset_id)
         self.save_progress(f"APPIDDDDD:{app_id}")
         self._parameters = {'appId': app_id}
 

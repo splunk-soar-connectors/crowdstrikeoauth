@@ -18,6 +18,9 @@
         },
         {
             "name": "Katie Tanner"
+        },
+        {
+            "name": "Jason Meyer"
         }
     ],
     "license": "Copyright (c) 2019-2023 Splunk Inc.",
@@ -3881,6 +3884,40 @@
             "render": {
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
+            }
+        },
+        {
+            "action": "get_online_state",
+            "description": "get online state of device(s)",
+            "type": "generic",
+            "identifier": "get_online_state",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "device_id": {
+                    "description": "Device IDs to query for online state, Comma-separated list allowed",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike device_id or aid"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "online",
+                        "offline",
+                        "unknown"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
             }
         },
         {

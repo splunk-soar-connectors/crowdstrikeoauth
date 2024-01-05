@@ -718,6 +718,40 @@ class CrowdstrikeConnector(BaseConnector):
         self.debug_print('Successfully fetched device scroll with response {0}'.format(response))
         return action_result.set_status(phantom.APP_SUCCESS, "Device scroll fetched successfully")
 
+    def _handle_get_online_state(self, param):
+
+        # Add an action result to the App Run
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        fdid = param[CROWDSTRIKE_GET_ONLINE_STATE_DEVICE_ID]
+
+        api_data = {
+            "ids": fdid
+        }
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_ONLINE_STATE_ENDPOINT, params=api_data)
+
+        if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # successful request
+        try:
+            data = dict(response["resources"][0])
+        except Exception as ex:
+            return action_result.set_status(
+                phantom.APP_ERROR, "Error occurred while parsing response of 'get_online_state' action."
+                                   " Unknown response retrieved Error:{}".format(self._get_error_message_from_exception(ex)))
+
+        action_result.add_data(data)
+
+        summary = action_result.update_summary({})
+        self.debug_print('Successfully fetched device online state with response {0}'.format(response))
+        return action_result.set_status(phantom.APP_SUCCESS, "Device online state fetched successfully")
+
     def _handle_get_process_detail(self, param):
 
         # Add an action result to the App Run
@@ -3572,7 +3606,8 @@ class CrowdstrikeConnector(BaseConnector):
             'detonate_url': self._handle_detonate_url,
             'check_detonate_status': self._handle_check_detonate_status,
             'get_device_scroll': self._handle_get_device_scroll,
-            'get_zta_data': self._handle_get_zta_data
+            'get_zta_data': self._handle_get_zta_data,
+            'get_online_state': self._handle_get_online_state
         }
 
         action = self.get_action_identifier()

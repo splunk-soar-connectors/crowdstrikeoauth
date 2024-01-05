@@ -3606,7 +3606,8 @@ class CrowdstrikeConnector(BaseConnector):
             'detonate_url': self._handle_detonate_url,
             'check_detonate_status': self._handle_check_detonate_status,
             'get_device_scroll': self._handle_get_device_scroll,
-            'get_zta_data': self._handle_get_zta_data
+            'get_zta_data': self._handle_get_zta_data,
+            'get_online_state': self._handle_get_online_state
         }
 
         action = self.get_action_identifier()

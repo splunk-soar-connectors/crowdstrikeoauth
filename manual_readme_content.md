@@ -65,6 +65,7 @@
 | [check status](#action-check-status)                        | Sandbox(Falcon Intelligence)   | &check;              | &cross;              |
 | [get device scroll](#action-get-device-scroll)              | Hosts                          | &check;              | &cross;              |
 | [get zta data](#action-get-zta-data)                        | Zero Trust Assessment          | &check;              | &cross;              |
+| [get online state](#action-get-online-state)                | Hosts                          | &check;              | &cross;              |
 
 
 ## Preprocess Script

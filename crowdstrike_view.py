@@ -277,6 +277,9 @@ def display_view(provides, all_app_runs, context):
     if provides == 'get detections details':
         return 'crowdstrike_get_detections_details.html'
 
+    if provides == 'create rule group':
+        return 'crowdstrike_create_rule_group.html'
+
 
 def hunt_view(provides, all_app_runs, context):
 

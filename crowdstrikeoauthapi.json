@@ -17969,6 +17969,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.resources.*.assigned_policy_ids.*",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike prevention policy id"
+                    ],
+                    "example_values": [
+                        "2018f9894359493cb756bfa7dd3357a6"
+                    ]
+                },
+                {
                   "data_path": "action_result.summary.session_id",
                   "data_type": "string"
                 },
@@ -17994,7 +18004,12 @@
                   ]
                 }
             ],
-            "versions": "EQ(*)"
+            "versions": "EQ(*)",
+            "render": {
+                "title": "Create Rule Group",
+                "type": "custom",
+                "view": "crowdstrike_view.display_view"
+            }
         }
     ],
     "pip39_dependencies": {

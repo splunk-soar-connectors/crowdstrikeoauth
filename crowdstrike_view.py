@@ -280,6 +280,9 @@ def display_view(provides, all_app_runs, context):
     if provides == 'create rule group':
         return 'crowdstrike_create_rule_group.html'
 
+    if provides == 'update rule group':
+        return 'crowdstrike_update_rule_group.html'
+
 
 def hunt_view(provides, all_app_runs, context):
 

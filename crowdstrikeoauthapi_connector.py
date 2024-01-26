@@ -2518,6 +2518,94 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_POST_ALERT)
 
+    def _handle_update_rule_group(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        update_params = {
+            'id': param['id'],
+            'rulegroup_version': param['rulegroup_version'],
+            'name': param['name'],
+            'description': param['description'],
+            'enabled': param.get('enabled', False),
+            'comment': param['comment']
+        }
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(
+            action_result,
+            CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
+            json_data=update_params,
+            method='patch'
+        )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        rulegroup_id = resp_json['resources'][0]['id']
+
+        assign_policy_ids_str = param.get('assign_policy_id', '')
+        assign_policy_ids_list = phantom.get_list_from_string(assign_policy_ids_str)
+        for policy_id in assign_policy_ids_list:
+            assign_params = {
+                'action_parameters': [
+                    {
+                        'name': 'rule_group_id',
+                        'value': rulegroup_id
+                    }
+                ],
+                'ids': [
+                    policy_id
+                ]
+            }
+            assign_ret_val, assign_resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
+                params={
+                    'action_name': 'add-rule-group'
+                },
+                json_data=assign_params,
+                method='post'
+            )
+
+            if phantom.is_fail(assign_ret_val):
+                return action_result.get_status()
+
+        remove_policy_ids_str = param.get('remove_policy_id', '')
+        remove_policy_ids_list = phantom.get_list_from_string(remove_policy_ids_str)
+        for policy_id in remove_policy_ids_list:
+            remove_params = {
+                'action_parameters': [
+                    {
+                        'name': 'rule_group_id',
+                        'value': rulegroup_id
+                    }
+                ],
+                'ids': [
+                    policy_id
+                ]
+            }
+            remove_ret_val, remove_resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
+                params={
+                    'action_name': 'remove-rule-group'
+                },
+                json_data=remove_params,
+                method='post'
+            )
+
+            if phantom.is_fail(remove_ret_val):
+                return action_result.get_status()
+
+        resp_json['resources'][0]['assigned_policy_ids'] = assign_policy_ids_list
+        resp_json['resources'][0]['removed_policy_ids'] = remove_policy_ids_list
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'rule_group_id': rulegroup_id
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Rule group updated successfully")
+
     def _handle_update_iocs(self, param):
 
         # Add an action result to the App Run
@@ -3649,7 +3737,8 @@ class CrowdstrikeConnector(BaseConnector):
             'check_detonate_status': self._handle_check_detonate_status,
             'get_device_scroll': self._handle_get_device_scroll,
             'get_zta_data': self._handle_get_zta_data,
-            'create_rule_group': self._handle_create_rule_group
+            'create_rule_group': self._handle_create_rule_group,
+            'update_rule_group': self._handle_update_rule_group
         }
 
         action = self.get_action_identifier()

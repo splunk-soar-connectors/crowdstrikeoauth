@@ -3423,6 +3423,7 @@ action_result.data.\*.resources.\*.created_on | string |  |   2024-01-25T19:17:0
 action_result.data.\*.resources.\*.modified_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
 action_result.data.\*.resources.\*.modified_on | string |  |   2024-01-25T19:17:02.117884262Z 
 action_result.data.\*.resources.\*.committed_on | string |  |   0001-01-01T00:00:00Z 
+action_result.data.\*.resources.\*.assigned_policy_ids.\* | string |  `crowdstrike prevention policy id`  |   2018f9894359493cb756bfa7dd3357a6 
 action_result.summary.session_id | string |  |  
 action_result.message | string |  |   Zero Trust Assessment data fetched successfully 
 summary.total_objects | numeric |  |   1 

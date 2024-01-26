@@ -6,12 +6,12 @@ Connector Version: 4.1.0
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.1.1  
+Minimum Product Version: 6.1.0  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2023 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2024 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
@@ -450,7 +450,6 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [check status](#action-check-status) - To check detonation status of the provided resource id  
 [get device scroll](#action-get-device-scroll) - Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)  
 [get zta data](#action-get-zta-data) - Get Zero Trust Assessment data for one or more hosts by providing agent IDs (AID)  
-[create rule group](#action-create-rule-group) - Create an empty IOA Rule Group  
 
 ## action: 'test connectivity'
 Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials
@@ -3376,54 +3375,6 @@ action_result.data.\*.product_type_desc | string |  |   Server
 action_result.data.\*.sensor_file_status | string |  |   not deployed 
 action_result.data.\*.system_serial_number | string |  |   VMware-42 2a 23 c9 7f 05 df a5-23 51 df 2c 02 ce 36 fb 
 action_result.summary | string |  |  
-action_result.message | string |  |   Zero Trust Assessment data fetched successfully 
-summary.total_objects | numeric |  |   1 
-summary.total_objects_successful | numeric |  |   1   
-
-## action: 'create rule group'
-Create an empty IOA Rule Group
-
-Type: **contain**  
-Read only: **False**
-
-#### Action Parameters
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**name** |  required  | Name of the new Rule Group | string | 
-**description** |  required  | Longer description for the new Rule Group | string | 
-**platform** |  required  | Platform that this Rule Group applies to | string | 
-**enabled** |  optional  | Enable the new Rule Group immediately upon creation | boolean | 
-**policy_id** |  optional  | Prevention Policy ID to assign the new Rule Group to | string |  `crowdstrike prevention policy id` 
-
-#### Action Output
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string |  |   success  failed 
-action_result.parameter.name | string |  |   my_rule_group 
-action_result.parameter.description | string |  |   Custom rule group 
-action_result.parameter.platform | string |  |   windows  mac  linux 
-action_result.parameter.enabled | boolean |  |   True  False 
-action_result.parameter.policy_id | string |  `crowdstrike prevention policy id`  |   2018f9894359493cb756bfa7dd3357a6 
-action_result.data.\*.errors | string |  |  
-action_result.data.\*.meta.powered_by | string |  |   empower-api 
-action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
-action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
-action_result.data.\*.resources.\*.id | string |  `crowdstrike ioa rule group id`  |   3263801f7612424ba923f4e6e4bfe2f2 
-action_result.data.\*.resources.\*.customer_id | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
-action_result.data.\*.resources.\*.enabled | boolean |  |   True  False 
-action_result.data.\*.resources.\*.name | string |  |   my_rule_group 
-action_result.data.\*.resources.\*.description | string |  |   Custom rule group 
-action_result.data.\*.resources.\*.platform | string |  |   windows  mac  linux 
-action_result.data.\*.resources.\*.deleted | boolean |  |   True  False 
-action_result.data.\*.resources.\*.rule_ids.\* | string |  `crowdstrike ioa rule id`  |   6 
-action_result.data.\*.resources.\*.comment | string |  |   Updated description 
-action_result.data.\*.resources.\*.version | numeric |  |   1 
-action_result.data.\*.resources.\*.created_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
-action_result.data.\*.resources.\*.created_on | string |  |   2024-01-25T19:17:02.117884262Z 
-action_result.data.\*.resources.\*.modified_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
-action_result.data.\*.resources.\*.modified_on | string |  |   2024-01-25T19:17:02.117884262Z 
-action_result.data.\*.resources.\*.committed_on | string |  |   0001-01-01T00:00:00Z 
-action_result.summary.session_id | string |  |  
 action_result.message | string |  |   Zero Trust Assessment data fetched successfully 
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1 

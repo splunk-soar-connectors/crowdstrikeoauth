@@ -29,7 +29,7 @@
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "6.1.0",
+    "min_phantom_version": "6.1.1",
     "python_version": "3",
     "fips_compliant": true,
     "app_wizard_version": "1.0.0",
@@ -17719,6 +17719,282 @@
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
+        },
+        {
+            "action": "create rule group",
+            "description": "Create an empty IOA Rule Group",
+            "type": "contain",
+            "identifier": "create_rule_group",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "data_type": "string",
+                    "description": "Name of the new Rule Group",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                },
+                "description": {
+                    "data_type": "string",
+                    "description": "Longer description for the new Rule Group",
+                    "required": true,
+                    "order": 1
+                },
+                "platform": {
+                    "data_type": "string",
+                    "description": "Platform that this Rule Group applies to",
+                    "required": true,
+                    "order": 2,
+                    "value_list": [
+                        "windows",
+                        "mac",
+                        "linux"
+                    ]
+                },
+                "enabled": {
+                    "data_type": "boolean",
+                    "description": "Enable the new Rule Group immediately upon creation",
+                    "required": false,
+                    "order": 3,
+                    "default": false
+                },
+                "policy_id": {
+                    "data_type": "string",
+                    "description": "Prevention Policy ID to assign the new Rule Group to",
+                    "required": false,
+                    "order": 4,
+                    "contains": [
+                        "crowdstrike prevention policy id"
+                    ],
+                    "allow_list": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "my_rule_group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Custom rule group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "windows",
+                        "mac",
+                        "linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike prevention policy id"
+                    ],
+                    "example_values": [
+                        "2018f9894359493cb756bfa7dd3357a6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.errors",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "empower-api"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5.917429897
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6b7c63e1-0ebd-4121-90f3-cd53451be245"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike ioa rule group id"
+                    ],
+                    "example_values": [
+                        "3263801f7612424ba923f4e6e4bfe2f2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.customer_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike customer id"
+                    ],
+                    "example_values": [
+                        "4061c7ff3b634e22b38274d4b586554r"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "my_rule_group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Custom rule group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "windows",
+                        "mac",
+                        "linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rule_ids.*",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike ioa rule id"
+                    ],
+                    "example_values": [
+                        "6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updated description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.created_by",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike user id"
+                    ],
+                    "example_values": [
+                        "65f616497d0d40d4b6e7a68389323605"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-01-25T19:17:02.117884262Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.modified_by",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike user id"
+                    ],
+                    "example_values": [
+                        "65f616497d0d40d4b6e7a68389323605"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-01-25T19:17:02.117884262Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.committed_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "0001-01-01T00:00:00Z"
+                    ]
+                },
+                {
+                  "data_path": "action_result.summary.session_id",
+                  "data_type": "string"
+                },
+                {
+                  "data_path": "action_result.message",
+                  "data_type": "string",
+                  "example_values": [
+                    "Zero Trust Assessment data fetched successfully"
+                  ]
+                },
+                {
+                  "data_path": "summary.total_objects",
+                  "data_type": "numeric",
+                  "example_values": [
+                    1
+                  ]
+                },
+                {
+                  "data_path": "summary.total_objects_successful",
+                  "data_type": "numeric",
+                  "example_values": [
+                    1
+                  ]
+                }
+            ],
+            "versions": "EQ(*)"
         }
     ],
     "pip39_dependencies": {

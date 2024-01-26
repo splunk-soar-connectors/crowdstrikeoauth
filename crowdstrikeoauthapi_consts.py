@@ -217,3 +217,7 @@ CROWDSTRIKE_DETECTION_STATUSES = [
     "closed",
     "reopened"
 ]
+
+CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT = "/ioarules/entities/rule-groups/v1"
+
+CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT = "/policy/entities/prevention-actions/v1"

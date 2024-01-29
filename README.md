@@ -453,6 +453,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [create rule group](#action-create-rule-group) - Create an empty IOA Rule Group  
 [update rule group](#action-update-rule-group) - Modify an existing IOA Rule Group  
 [delete rule group](#action-delete-rule-group) - Delete an existing IOA Rule Group  
+[list rule groups](#action-list-rule-groups) - List IOA Rule Groups  
 
 ## action: 'test connectivity'
 Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials
@@ -3510,5 +3511,45 @@ action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53
 action_result.data.\*.meta.writes.resources_affected | numeric |  |   1 
 action_result.summary.resources_affected | string |  |  
 action_result.message | string |  |   Deleted 1 rule groups 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'list rule groups'
+List IOA Rule Groups
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**fql_query** |  optional  | FQL query to filter rule groups | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.fql_query | string |  |   enabled: true + platform: 'mac' 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\*.id | string |  `crowdstrike ioa rule group id`  |   3263801f7612424ba923f4e6e4bfe2f2 
+action_result.data.\*.resources.\*.customer_id | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
+action_result.data.\*.resources.\*.enabled | boolean |  |   True  False 
+action_result.data.\*.resources.\*.name | string |  |   my_rule_group 
+action_result.data.\*.resources.\*.description | string |  |   Custom rule group 
+action_result.data.\*.resources.\*.platform | string |  |   windows  mac  linux 
+action_result.data.\*.resources.\*.deleted | boolean |  |   True  False 
+action_result.data.\*.resources.\*.rule_ids.\* | string |  `crowdstrike ioa rule id`  |   6 
+action_result.data.\*.resources.\*.comment | string |  |   Updated description 
+action_result.data.\*.resources.\*.version | numeric |  |   1 
+action_result.data.\*.resources.\*.created_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
+action_result.data.\*.resources.\*.created_on | string |  |   2024-01-25T19:17:02.117884262Z 
+action_result.data.\*.resources.\*.modified_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
+action_result.data.\*.resources.\*.modified_on | string |  |   2024-01-25T19:17:02.117884262Z 
+action_result.data.\*.resources.\*.committed_on | string |  |   0001-01-01T00:00:00Z 
+action_result.summary.result_count | numeric |  |  
+action_result.message | string |  |   Found 3 rule groups 
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1 

@@ -286,6 +286,9 @@ def display_view(provides, all_app_runs, context):
     if provides == 'delete rule group':
         return 'crowdstrike_delete_rule_group.html'
 
+    if provides == 'list rule groups':
+        return 'crowdstrike_list_rule_groups.html'
+
 
 def hunt_view(provides, all_app_runs, context):
 

@@ -17979,29 +17979,29 @@
                     ]
                 },
                 {
-                  "data_path": "action_result.summary.rule_group_id",
-                  "data_type": "string"
+                    "data_path": "action_result.summary.rule_group_id",
+                    "data_type": "string"
                 },
                 {
-                  "data_path": "action_result.message",
-                  "data_type": "string",
-                  "example_values": [
-                    "Rule Group created successfully"
-                  ]
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Rule Group created successfully"
+                    ]
                 },
                 {
-                  "data_path": "summary.total_objects",
-                  "data_type": "numeric",
-                  "example_values": [
-                    1
-                  ]
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
-                  "data_path": "summary.total_objects_successful",
-                  "data_type": "numeric",
-                  "example_values": [
-                    1
-                  ]
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)",
@@ -18325,29 +18325,29 @@
                     ]
                 },
                 {
-                  "data_path": "action_result.summary.rule_group_id",
-                  "data_type": "string"
+                    "data_path": "action_result.summary.rule_group_id",
+                    "data_type": "string"
                 },
                 {
-                  "data_path": "action_result.message",
-                  "data_type": "string",
-                  "example_values": [
-                      "Rule Group updated successfully"
-                  ]
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Rule Group updated successfully"
+                    ]
                 },
                 {
-                  "data_path": "summary.total_objects",
-                  "data_type": "numeric",
-                  "example_values": [
-                    1
-                  ]
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
-                  "data_path": "summary.total_objects_successful",
-                  "data_type": "numeric",
-                  "example_values": [
-                    1
-                  ]
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)",
@@ -18428,31 +18428,30 @@
                     ]
                 },
                 {
-                  "data_path": "action_result.summary.resources_affected",
-                  "data_type": "string"
+                    "data_path": "action_result.summary.resources_affected",
+                    "data_type": "string"
                 },
                 {
-                  "data_path": "action_result.message",
-                  "data_type": "string",
-                  "example_values": [
-                      "Deleted 1 rule groups"
-                  ]
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Deleted 1 rule groups"
+                    ]
                 },
                 {
-                  "data_path": "summary.total_objects",
-                  "data_type": "numeric",
-                  "example_values": [
-                    1
-                  ]
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
-                  "data_path": "summary.total_objects_successful",
-                  "data_type": "numeric",
-                  "example_values": [
-                    1
-                  ]
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
-
             ],
             "versions": "EQ(*)",
             "render": {
@@ -18645,25 +18644,25 @@
                     "data_type": "numeric"
                 },
                 {
-                  "data_path": "action_result.message",
-                  "data_type": "string",
-                  "example_values": [
-                    "Found 3 rule groups"
-                  ]
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Found 3 rule groups"
+                    ]
                 },
                 {
-                  "data_path": "summary.total_objects",
-                  "data_type": "numeric",
-                  "example_values": [
-                    1
-                  ]
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
-                  "data_path": "summary.total_objects_successful",
-                  "data_type": "numeric",
-                  "example_values": [
-                    1
-                  ]
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)",

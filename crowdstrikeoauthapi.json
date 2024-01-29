@@ -17979,14 +17979,14 @@
                     ]
                 },
                 {
-                  "data_path": "action_result.summary.session_id",
+                  "data_path": "action_result.summary.rule_group_id",
                   "data_type": "string"
                 },
                 {
                   "data_path": "action_result.message",
                   "data_type": "string",
                   "example_values": [
-                    "Zero Trust Assessment data fetched successfully"
+                    "Rule Group created successfully"
                   ]
                 },
                 {
@@ -18325,14 +18325,14 @@
                     ]
                 },
                 {
-                  "data_path": "action_result.summary.session_id",
+                  "data_path": "action_result.summary.rule_group_id",
                   "data_type": "string"
                 },
                 {
                   "data_path": "action_result.message",
                   "data_type": "string",
                   "example_values": [
-                    "Zero Trust Assessment data fetched successfully"
+                      "Rule Group updated successfully"
                   ]
                 },
                 {
@@ -18353,6 +18353,110 @@
             "versions": "EQ(*)",
             "render": {
                 "title": "Update Rule Group",
+                "type": "custom",
+                "view": "crowdstrike_view.display_view"
+            }
+        },
+        {
+            "action": "delete rule group",
+            "description": "Delete an existing IOA Rule Group",
+            "type": "contain",
+            "identifier": "delete_rule_group",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "data_type": "string",
+                    "description": "Rule Group ID",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike ioa rule group id"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike ioa rule group id"
+                    ],
+                    "example_values": [
+                        "3263801f7612424ba923f4e6e4bfe2f2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.errors",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "empower-api"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5.917429897
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6b7c63e1-0ebd-4121-90f3-cd53451be245"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.writes.resources_affected",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                  "data_path": "action_result.summary.resources_affected",
+                  "data_type": "string"
+                },
+                {
+                  "data_path": "action_result.message",
+                  "data_type": "string",
+                  "example_values": [
+                      "Deleted 1 rule groups"
+                  ]
+                },
+                {
+                  "data_path": "summary.total_objects",
+                  "data_type": "numeric",
+                  "example_values": [
+                    1
+                  ]
+                },
+                {
+                  "data_path": "summary.total_objects_successful",
+                  "data_type": "numeric",
+                  "example_values": [
+                    1
+                  ]
+                }
+
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "title": "Delete Rule Group",
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }

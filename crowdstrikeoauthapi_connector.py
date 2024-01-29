@@ -1658,6 +1658,36 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Session created successfully")
 
+    def _handle_delete_rule_group(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ids_str = param['id']
+        ids_list = phantom.get_list_from_string(ids_str)
+        ids_param = ','.join(ids_list)
+        params = {
+            'ids': ids_param
+        }
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(
+            action_result,
+            CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
+            params=params,
+            method='delete'
+        )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+
+        resources_affected = resp_json['meta']['writes']['resources_affected']
+        action_result.update_summary({
+            'resources_affected': resources_affected
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS,
+                                        f"Deleted {resources_affected} rule groups")
+
     def _handle_delete_session(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -3738,7 +3768,8 @@ class CrowdstrikeConnector(BaseConnector):
             'get_device_scroll': self._handle_get_device_scroll,
             'get_zta_data': self._handle_get_zta_data,
             'create_rule_group': self._handle_create_rule_group,
-            'update_rule_group': self._handle_update_rule_group
+            'update_rule_group': self._handle_update_rule_group,
+            'delete_rule_group': self._handle_delete_rule_group
         }
 
         action = self.get_action_identifier()

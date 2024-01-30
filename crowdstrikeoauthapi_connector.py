@@ -1872,7 +1872,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         params = {}
         if 'fql_query' in param:
-            params['filter'] = param['fql_query']
+            # CrowdStrike allows spaces in FQL queries, but not if they are URL-encoded.
+            # So we strip them all.
+            params['filter'] = param['fql_query'].replace(' ', '')
 
         total_rows = 0
         offset = -1

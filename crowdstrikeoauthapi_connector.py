@@ -1866,6 +1866,44 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_list_ioa_platforms(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # We'll paginate here, just to be future-proof, but we probably won't ever need it.
+        # Default page size is 100, and there are currently only three supported platforms.
+        params = {}
+        total_rows = 0
+        offset = -1
+        results = []
+        while offset < total_rows:
+            if offset >= 0:
+                params['offset'] = offset
+
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_IOA_LIST_PLATFORMS_ENDPOINT,
+                params=params,
+                method='get'
+            )
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            results += resp_json['resources']
+
+            total_rows = resp_json['meta']['pagination']['total']
+            offset = resp_json['meta']['pagination']['offset']
+
+        resp_json['resources'] = results
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'result_count': total_rows
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _handle_list_rule_groups(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -3811,7 +3849,8 @@ class CrowdstrikeConnector(BaseConnector):
             'create_rule_group': self._handle_create_rule_group,
             'update_rule_group': self._handle_update_rule_group,
             'delete_rule_group': self._handle_delete_rule_group,
-            'list_rule_groups': self._handle_list_rule_groups
+            'list_rule_groups': self._handle_list_rule_groups,
+            'list_ioa_platforms': self._handle_list_ioa_platforms
         }
 
         action = self.get_action_identifier()

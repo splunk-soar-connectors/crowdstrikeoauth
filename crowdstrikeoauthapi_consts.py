@@ -220,5 +220,6 @@ CROWDSTRIKE_DETECTION_STATUSES = [
 
 CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT = "/ioarules/entities/rule-groups/v1"
 CROWDSTRIKE_IOA_QUERY_RULE_GROUPS_ENDPOINT = "/ioarules/queries/rule-groups-full/v1"
+CROWDSTRIKE_IOA_LIST_PLATFORMS_ENDPOINT = "/ioarules/queries/platforms/v1"
 
 CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT = "/policy/entities/prevention-actions/v1"

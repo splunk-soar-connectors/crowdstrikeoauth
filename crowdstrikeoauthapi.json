@@ -17744,12 +17744,7 @@
                     "data_type": "string",
                     "description": "Platform that this Rule Group applies to",
                     "required": true,
-                    "order": 2,
-                    "value_list": [
-                        "windows",
-                        "mac",
-                        "linux"
-                    ]
+                    "order": 2
                 },
                 "enabled": {
                     "data_type": "boolean",
@@ -18459,6 +18454,90 @@
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
+        },
+        {
+            "action": "list ioa platforms",
+            "description": "List valid platforms for IOA Rule Groups",
+            "type": "investigate",
+            "identifier": "list_ioa_platforms",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.errors",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "empower-api"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5.917429897
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6b7c63e1-0ebd-4121-90f3-cd53451be245"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "windows",
+                        "mac",
+                        "linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.result_count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Found 3 rule groups"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "title": "List IOA Platforms",
+                "type": "custom",
+                "view": "crowdstrike_view.display_view"
+            }
+
         },
         {
             "action": "list rule groups",

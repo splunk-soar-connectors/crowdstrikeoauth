@@ -102,15 +102,26 @@
     <h3 class="wf-h3-style">Supported Platforms for IOA Rules</h3>
     <div class="metadata_div">
         <!--Default View-->
-        <div class="panel-group" id="ioa-platform-information">
+        <div class="panel-group" id="platform-information">
             <div class="panel">
-                <ul>
-                    {% for platforms in result.data %}
-                        {% for platform in platforms.resources %}
-                            <li>{{ platform }}</li>
-                        {% endfor %}
-                    {% endfor %}
-                </ul>
+                <div id="default-view-table" class="panel-collapse collapse in">
+                    <table class="wf-table-horizontal datatable">
+                        <thead>
+                            <tr>
+                                <th>Platform</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for platform in result.data %}
+                                {% for platform_name in platform.resources %}
+                                    <tr>
+                                        <td>{{ platform_name }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

@@ -453,6 +453,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [create rule group](#action-create-rule-group) - Create an empty IOA Rule Group  
 [update rule group](#action-update-rule-group) - Modify an existing IOA Rule Group  
 [delete rule group](#action-delete-rule-group) - Delete an existing IOA Rule Group  
+[list ioa platforms](#action-list-ioa-platforms) - List valid platforms for IOA Rule Groups  
 [list rule groups](#action-list-rule-groups) - List IOA Rule Groups  
 
 ## action: 'test connectivity'
@@ -3511,6 +3512,29 @@ action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53
 action_result.data.\*.meta.writes.resources_affected | numeric |  |   1 
 action_result.summary.resources_affected | string |  |  
 action_result.message | string |  |   Deleted 1 rule groups 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'list ioa platforms'
+List valid platforms for IOA Rule Groups
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+No parameters are required for this action
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\* | string |  |   windows  mac  linux 
+action_result.summary.result_count | numeric |  |  
+action_result.message | string |  |   Found 3 rule groups 
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1   
 

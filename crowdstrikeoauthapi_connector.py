@@ -1556,7 +1556,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Host removed successfully")
 
-    def _handle_create_rule_group(self, param):
+    def _handle_create_ioa_rule_group(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1658,7 +1658,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Session created successfully")
 
-    def _handle_delete_rule_group(self, param):
+    def _handle_delete_ioa_rule_group(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1904,7 +1904,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_list_rule_groups(self, param):
+    def _handle_list_ioa_rule_groups(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2627,7 +2627,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_POST_ALERT)
 
-    def _handle_update_rule_group(self, param):
+    def _handle_update_ioa_rule_group(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3846,10 +3846,10 @@ class CrowdstrikeConnector(BaseConnector):
             'check_detonate_status': self._handle_check_detonate_status,
             'get_device_scroll': self._handle_get_device_scroll,
             'get_zta_data': self._handle_get_zta_data,
-            'create_rule_group': self._handle_create_rule_group,
-            'update_rule_group': self._handle_update_rule_group,
-            'delete_rule_group': self._handle_delete_rule_group,
-            'list_rule_groups': self._handle_list_rule_groups,
+            'create_ioa_rule_group': self._handle_create_ioa_rule_group,
+            'update_ioa_rule_group': self._handle_update_ioa_rule_group,
+            'delete_ioa_rule_group': self._handle_delete_ioa_rule_group,
+            'list_ioa_rule_groups': self._handle_list_ioa_rule_groups,
             'list_ioa_platforms': self._handle_list_ioa_platforms
         }
 

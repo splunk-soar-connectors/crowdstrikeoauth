@@ -277,17 +277,17 @@ def display_view(provides, all_app_runs, context):
     if provides == 'get detections details':
         return 'crowdstrike_get_detections_details.html'
 
-    if provides == 'create rule group':
-        return 'crowdstrike_create_rule_group.html'
+    if provides == 'create ioa rule group':
+        return 'crowdstrike_create_ioa_rule_group.html'
 
-    if provides == 'update rule group':
-        return 'crowdstrike_update_rule_group.html'
+    if provides == 'update ioa rule group':
+        return 'crowdstrike_update_ioa_rule_group.html'
 
-    if provides == 'delete rule group':
-        return 'crowdstrike_delete_rule_group.html'
+    if provides == 'delete ioa rule group':
+        return 'crowdstrike_delete_ioa_rule_group.html'
 
-    if provides == 'list rule groups':
-        return 'crowdstrike_list_rule_groups.html'
+    if provides == 'list ioa rule groups':
+        return 'crowdstrike_list_ioa_rule_groups.html'
 
     if provides == 'list ioa platforms':
         return 'crowdstrike_list_ioa_platforms.html'

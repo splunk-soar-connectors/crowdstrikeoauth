@@ -17721,10 +17721,10 @@
             }
         },
         {
-            "action": "create rule group",
+            "action": "create ioa rule group",
             "description": "Create an empty IOA Rule Group",
             "type": "contain",
-            "identifier": "create_rule_group",
+            "identifier": "create_ioa_rule_group",
             "read_only": false,
             "parameters": {
                 "name": {
@@ -18001,16 +18001,16 @@
             ],
             "versions": "EQ(*)",
             "render": {
-                "title": "Create Rule Group",
+                "title": "Create IOA Rule Group",
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
         },
         {
-            "action": "update rule group",
+            "action": "update ioa rule group",
             "description": "Modify an existing IOA Rule Group",
             "type": "contain",
-            "identifier": "update_rule_group",
+            "identifier": "update_ioa_rule_group",
             "read_only": false,
             "parameters": {
                 "id": {
@@ -18347,16 +18347,16 @@
             ],
             "versions": "EQ(*)",
             "render": {
-                "title": "Update Rule Group",
+                "title": "Update IOA Rule Group",
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
         },
         {
-            "action": "delete rule group",
+            "action": "delete ioa rule group",
             "description": "Delete an existing IOA Rule Group",
             "type": "contain",
-            "identifier": "delete_rule_group",
+            "identifier": "delete_ioa_rule_group",
             "read_only": false,
             "parameters": {
                 "id": {
@@ -18450,7 +18450,7 @@
             ],
             "versions": "EQ(*)",
             "render": {
-                "title": "Delete Rule Group",
+                "title": "Delete IOA Rule Group",
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
@@ -18540,10 +18540,10 @@
 
         },
         {
-            "action": "list rule groups",
+            "action": "list ioa rule groups",
             "description": "List IOA Rule Groups",
             "type": "investigate",
-            "identifier": "list_rule_groups",
+            "identifier": "list_ioa_rule_groups",
             "read_only": true,
             "parameters": {
                 "fql_query": {
@@ -18746,7 +18746,7 @@
             ],
             "versions": "EQ(*)",
             "render": {
-                "title": "List Rule Groups",
+                "title": "List IOA Rule Groups",
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }

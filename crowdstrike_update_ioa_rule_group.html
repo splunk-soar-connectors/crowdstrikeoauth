@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: crowdstrike_create_rule_group.html
+<!-- File: crowdstrike_update_ioa_rule_group.html
   Copyright (c) 2019-2024 Splunk Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,7 +99,7 @@
         <h4 class="wf-h4-style">No data found</h4>
 
     {% else %}
-    <h3 class="wf-h3-style">New Rule Group</h3>
+    <h3 class="wf-h3-style">Updated Rule Group</h3>
     <div class="metadata_div">
         <!--Default View-->
         <div class="panel-group" id="rule-group-information">
@@ -161,6 +161,50 @@
                             {% for rule_group in result.data %}
                                 {% for resource in rule_group.resources %}
                                     {% for policy_id in resource.assigned_policy_ids %}
+                                        <tr>
+                                            <td>
+                                                <a href="javascript:;"
+                                                onclick="context_menu(this, [{'contains': ['crowdstrike ioa rule group id'], 'value': '{{ resource.id }}' }], 0, {{ container.id }}, null, false);">
+                                                    {{ resource.id }}
+                                                    &nbsp;
+                                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:;"
+                                                onclick="context_menu(this, [{'contains': ['crowdstrike prevention policy id'], 'value': '{{ policy_id }}' }], 0, {{ container.id }}, null, false);">
+                                                    {{ policy_id }}
+                                                    &nbsp;
+                                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3 class="wf-h3-style">Prevention Policies Removed</h3>
+    <div class="metadata_div">
+        <!--Default View-->
+        <div class="panel-group" id="rule-group-information">
+            <div class="panel">
+                <div id="default-view-table" class="panel-collapse collapse in">
+                    <table class="wf-table-horizontal datatable">
+                        <thead>
+                            <tr>
+                                <th>Rule Group ID</th>
+                                <th>Prevention Policy ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rule_group in result.data %}
+                                {% for resource in rule_group.resources %}
+                                    {% for policy_id in resource.removed_policy_ids %}
                                         <tr>
                                             <td>
                                                 <a href="javascript:;"

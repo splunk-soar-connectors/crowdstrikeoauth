@@ -450,11 +450,11 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [check status](#action-check-status) - To check detonation status of the provided resource id  
 [get device scroll](#action-get-device-scroll) - Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)  
 [get zta data](#action-get-zta-data) - Get Zero Trust Assessment data for one or more hosts by providing agent IDs (AID)  
-[create rule group](#action-create-rule-group) - Create an empty IOA Rule Group  
-[update rule group](#action-update-rule-group) - Modify an existing IOA Rule Group  
-[delete rule group](#action-delete-rule-group) - Delete an existing IOA Rule Group  
+[create ioa rule group](#action-create-ioa-rule-group) - Create an empty IOA Rule Group  
+[update ioa rule group](#action-update-ioa-rule-group) - Modify an existing IOA Rule Group  
+[delete ioa rule group](#action-delete-ioa-rule-group) - Delete an existing IOA Rule Group  
 [list ioa platforms](#action-list-ioa-platforms) - List valid platforms for IOA Rule Groups  
-[list rule groups](#action-list-rule-groups) - List IOA Rule Groups  
+[list ioa rule groups](#action-list-ioa-rule-groups) - List IOA Rule Groups  
 
 ## action: 'test connectivity'
 Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials
@@ -3384,7 +3384,7 @@ action_result.message | string |  |   Zero Trust Assessment data fetched success
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1   
 
-## action: 'create rule group'
+## action: 'create ioa rule group'
 Create an empty IOA Rule Group
 
 Type: **contain**  
@@ -3433,7 +3433,7 @@ action_result.message | string |  |   Rule Group created successfully
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1   
 
-## action: 'update rule group'
+## action: 'update ioa rule group'
 Modify an existing IOA Rule Group
 
 Type: **contain**  
@@ -3489,7 +3489,7 @@ action_result.message | string |  |   Rule Group updated successfully
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1   
 
-## action: 'delete rule group'
+## action: 'delete ioa rule group'
 Delete an existing IOA Rule Group
 
 Type: **contain**  
@@ -3538,7 +3538,7 @@ action_result.message | string |  |   Found 3 rule groups
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1   
 
-## action: 'list rule groups'
+## action: 'list ioa rule groups'
 List IOA Rule Groups
 
 Type: **investigate**  

@@ -1575,8 +1575,14 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        rulegroup_id = resp_json['resources'][0]['id']
-        rulegroup_version = resp_json['resources'][0]['version']
+        rulegroup_id = resp_json['resources'][0].get('id')
+        rulegroup_version = resp_json['resources'][0].get('version')
+        if rulegroup_id is None or rulegroup_version is None:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'CrowdStrike failed to return a Rule Group ID and Version'
+            )
+
         if param.get('enabled', False):
             update_params = {
                 'id': rulegroup_id,

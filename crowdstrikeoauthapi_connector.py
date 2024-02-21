@@ -2206,6 +2206,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE)
 
         config = self.get_config()
+        is_error_occurred = False
 
         max_crlf, merge_time_interval, max_events = self._validate_on_poll_config_params(action_result, config)
 
@@ -2260,21 +2261,26 @@ class CrowdstrikeConnector(BaseConnector):
             for stream_data in r.iter_lines(chunk_size=None):
                 # Check if it is time to refresh the stream connection and creating new bearer token [after 29 Min]
                 if int(time.time() - self._start_time) > (self._refresh_token_timeout - 60):
-                    try:
-                        header = {
-                            'Authorization': 'Bearer {0}'.format(self._oauth_access_token),
-                            'Connection': 'Keep-Alive',
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        }
-                        ret_val, resp = self._make_rest_call_helper_oauth2(
-                            action_result, self._refresh_token_url, headers=header, method="post", append=False)
-                        if phantom.is_fail(ret_val):
+                    header = {
+                        'Authorization': 'Bearer {0}'.format(self._oauth_access_token),
+                        'Connection': 'Keep-Alive',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                    ret_val, resp = self._make_rest_call_helper_oauth2(
+                        action_result, self._refresh_token_url, headers=header, method="post", append=False)
+                    if phantom.is_fail(ret_val):
+                        self.debug_print(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}: {action_result.get_message()}")
+                        if self._events:
+                            self.save_progress(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}. Saving the events...")
+                            action_result.set_status(phantom.APP_ERROR,
+                                                     f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}: {action_result.get_message()}")
+                            is_error_occurred = True
+                            break
+                        else:
                             return action_result.get_status()
-                        self._start_time = time.time()
-                    except Exception as e:
-                        return action_result.set_status(
-                            phantom.APP_ERROR, CROWDSTRIKE_REFRESH_TOKEN_ERROR, self._get_error_message_from_exception(e))
+
+                    self._start_time = time.time()
 
                 if stream_data is None:
                     # Done with all the event data for now
@@ -2321,8 +2327,15 @@ class CrowdstrikeConnector(BaseConnector):
 
         except Exception as e:
             err_message = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
-                                        CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message))
+            self.debug_print(f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Error response from server: {err_message}")
+            if self._events:
+                self.save_progress(f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Saving the events...")
+                action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
+                    CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message))
+                is_error_occurred = True
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
+                    CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message))
 
         # Check if to collate the data or not
         collate = config.get('collate', True)
@@ -2347,6 +2360,9 @@ class CrowdstrikeConnector(BaseConnector):
                 last_event = self._events[-1]
                 last_offset_id = last_event['metadata']['offset']
                 self._state['last_offset_id'] = last_offset_id + 1
+
+        if is_error_occurred:
+            return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 

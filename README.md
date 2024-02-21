@@ -93,6 +93,7 @@ error.
 -   It is recommended to have a unique **App ID** for each connection to the Crowdstrike OAuth API.
     That is to say, if you are planning on having multiple assets using the Crowdstrike OAuth API at
     once, you should give them unique App IDs.
+-   Max length of an **APP ID** should be 32 characters
 
 ## On Poll
 

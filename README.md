@@ -3563,21 +3563,30 @@ action_result.data.\*.errors | string |  |
 action_result.data.\*.meta.powered_by | string |  |   empower-api 
 action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
 action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
-action_result.data.\*.resources.\*.id | string |  `crowdstrike ioa rule group id`  |   3263801f7612424ba923f4e6e4bfe2f2 
+action_result.data.\*.resources.\*.instance_id | string |  `crowdstrike ioa rule id`  |   1 
 action_result.data.\*.resources.\*.customer_id | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
+action_result.data.\*.resources.\*.ruletype_id | string |  |   5 
+action_result.data.\*.resources.\*.ruletype_name | string |  |   Process Creation 
+action_result.data.\*.resources.\*.comment | string |  |   Created rule 
 action_result.data.\*.resources.\*.enabled | boolean |  |   True  False 
-action_result.data.\*.resources.\*.name | string |  |   my_rule_group 
-action_result.data.\*.resources.\*.description | string |  |   Custom rule group 
-action_result.data.\*.resources.\*.platform | string |  |   windows  mac  linux 
 action_result.data.\*.resources.\*.deleted | boolean |  |   True  False 
-action_result.data.\*.resources.\*.rule_ids.\* | string |  `crowdstrike ioa rule id`  |   6 
-action_result.data.\*.resources.\*.comment | string |  |   Updated description 
-action_result.data.\*.resources.\*.version | numeric |  |   1 
-action_result.data.\*.resources.\*.created_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
-action_result.data.\*.resources.\*.created_on | string |  |   2024-01-25T19:17:02.117884262Z 
-action_result.data.\*.resources.\*.modified_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
-action_result.data.\*.resources.\*.modified_on | string |  |   2024-01-25T19:17:02.117884262Z 
-action_result.data.\*.resources.\*.committed_on | string |  |   0001-01-01T00:00:00Z 
+action_result.data.\*.resources.\*.magic_cookie | numeric |  |   2 
+action_result.data.\*.resources.\*.rulegroup_id | string |  `crowdstrike ioa rule group id`  |   83f596d2f8c04f36ad39182311e90e3a 
+action_result.data.\*.resources.\*.version_ids.\* | string |  |   1 
+action_result.data.\*.resources.\*.instance_version | numeric |  |   1 
+action_result.data.\*.resources.\*.name | string |  |   BugRule 
+action_result.data.\*.resources.\*.description | string |  |   Stops the bug 
+action_result.data.\*.resources.\*.pattern_id | string |  |   41005 
+action_result.data.\*.resources.\*.pattern_severity | string |  |   critical 
+action_result.data.\*.resources.\*.action_label | string |  |   Block Execution 
+action_result.data.\*.resources.\*.disposition_id | numeric |  |   30 
+action_result.data.\*.resources.\*.field_values.\*.name | string |  |   GrandparentImageFilename 
+action_result.data.\*.resources.\*.field_values.\*.value | string |  |   (?i).+bug.exe 
+action_result.data.\*.resources.\*.field_values.\*.label | string |  |   Grandparent Image Filename 
+action_result.data.\*.resources.\*.field_values.\*.type | string |  |   excludable 
+action_result.data.\*.resources.\*.field_values.\*.values.\*.label | string |  |   include 
+action_result.data.\*.resources.\*.field_values.\*.values.\*.value | string |  |   .+bug.exe 
+action_result.data.\*.resources.\*.field_values.\*.final_value | string |  |   (?i).+bug.exe 
 action_result.summary.result_count | numeric |  |  
 action_result.message | string |  |   Found 3 rule groups 
 summary.total_objects | numeric |  |   1 

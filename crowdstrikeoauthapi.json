@@ -18595,13 +18595,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_path": "action_result.data.*.resources.*.instance_id",
                     "data_type": "string",
                     "contains": [
-                        "crowdstrike ioa rule group id"
+                        "crowdstrike ioa rule id"
                     ],
                     "example_values": [
-                        "3263801f7612424ba923f4e6e4bfe2f2"
+                        "1"
                     ]
                 },
                 {
@@ -18615,34 +18615,32 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.resources.*.ruletype_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.ruletype_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Process Creation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Created rule"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.resources.*.enabled",
                     "data_type": "boolean",
                     "example_values": [
                         true,
                         false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "my_rule_group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        "Custom rule group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.platform",
-                    "data_type": "string",
-                    "example_values": [
-                        "windows",
-                        "mac",
-                        "linux"
                     ]
                 },
                 {
@@ -18654,68 +18652,125 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.rule_ids.*",
+                    "data_path": "action_result.data.*.resources.*.magic_cookie",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rulegroup_id",
                     "data_type": "string",
                     "contains": [
-                        "crowdstrike ioa rule id"
+                        "crowdstrike ioa rule group id"
                     ],
                     "example_values": [
-                        "6"
+                        "83f596d2f8c04f36ad39182311e90e3a"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.comment",
+                    "data_path": "action_result.data.*.resources.*.version_ids.*",
                     "data_type": "string",
                     "example_values": [
-                        "Updated description"
+                        "1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.version",
+                    "data_path": "action_result.data.*.resources.*.instance_version",
                     "data_type": "numeric",
                     "example_values": [
                         1
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created_by",
+                    "data_path": "action_result.data.*.resources.*.name",
                     "data_type": "string",
-                    "contains": [
-                        "crowdstrike user id"
-                    ],
                     "example_values": [
-                        "65f616497d0d40d4b6e7a68389323605"
+                        "BugRule"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created_on",
+                    "data_path": "action_result.data.*.resources.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "2024-01-25T19:17:02.117884262Z"
+                        "Stops the bug"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.modified_by",
+                    "data_path": "action_result.data.*.resources.*.pattern_id",
                     "data_type": "string",
-                    "contains": [
-                        "crowdstrike user id"
-                    ],
                     "example_values": [
-                        "65f616497d0d40d4b6e7a68389323605"
+                        "41005"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.modified_on",
+                    "data_path": "action_result.data.*.resources.*.pattern_severity",
                     "data_type": "string",
                     "example_values": [
-                        "2024-01-25T19:17:02.117884262Z"
+                        "critical"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.committed_on",
+                    "data_path": "action_result.data.*.resources.*.action_label",
                     "data_type": "string",
                     "example_values": [
-                        "0001-01-01T00:00:00Z"
+                        "Block Execution"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.disposition_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.field_values.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "GrandparentImageFilename"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.field_values.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "(?i).+bug.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.field_values.*.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "Grandparent Image Filename"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.field_values.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "excludable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.field_values.*.values.*.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "include"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.field_values.*.values.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        ".+bug.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.field_values.*.final_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "(?i).+bug.exe"
                     ]
                 },
                 {

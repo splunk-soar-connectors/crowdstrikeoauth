@@ -144,6 +144,58 @@
             </div>
         </div>
     </div>
+    <h3 class="wf-h3-style">Rules</h3>
+    <div class="metadata_div">
+        <div class="panel-group">
+            <div class="panel">
+                <div id="default-view-table" class="panel-collapse collapse in">
+                    {% for rule_group in result.data %}
+                        {% for resource in rule_group.resources %}
+                            <table class="wf-table-horizontal datatable">
+                                <thead>
+                                    <tr>
+                                        <td>Rule ID</td>
+                                        <td>Rule Version</td>
+                                        <td>Enabled</td>
+                                        <td>Name</td>
+                                        <td>Description</td>
+                                        <td>Rule Type</td>
+                                        <td>Severity</td>
+                                        <td>Action</td>
+                                        <td>Field Values</td>
+                                        <td>Comment</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rule in resource.rules %}
+                                        <tr>
+                                            <td>
+                                                <a href="javascript:;"
+                                                onclick="context_menu(this, [{'contains': ['crowdstrike ioa rule id'], 'value': '{{ rule.instance_id }}' }], 0, {{ container.id }}, null, false);">
+                                                    {{ rule.instance_id }}
+                                                    &nbsp;
+                                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                </a>
+                                            </td>
+                                            <td>{{ rule.instance_version }}</td>
+                                            <td>{{ rule.enabled }}</td>
+                                            <td>{{ rule.name }}</td>
+                                            <td>{{ rule.description }}</td>
+                                            <td>{{ rule.ruletype_name }}</td>
+                                            <td>{{ rule.pattern_severity }}</td>
+                                            <td>{{ rule.action_label }}</td>
+                                            <td>{{ rule.field_values }}</td>
+                                            <td>{{ rule.comment }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
     <br>
     {% endif %}
     {% endfor %} <!-- loop for each result end -->

@@ -19033,56 +19033,56 @@
                     "contains": [
                         "crowdstrike ioa rule group id"
                     ],
-                    "order": 1
+                    "order": 0
                 },
                 "name": {
                     "data_type": "string",
                     "description": "Rule name",
                     "required": true,
-                    "order": 2
+                    "order": 1
                 },
                 "description": {
                     "data_type": "string",
                     "description": "Rule description",
                     "required": true,
-                    "order": 3
+                    "order": 2
                 },
                 "severity": {
                     "data_type": "string",
                     "description": "Rule severity (run the \"list ioa severities\" action to find valid severities)",
                     "required": true,
-                    "order": 4
+                    "order": 3
                 },
                 "rule_type_id": {
                     "data_type": "numeric",
                     "description": "Rule type to create (run the \"list ioa types\" action to find valid types of rules and their IDs and parameters)",
                     "required": true,
-                    "order": 5
+                    "order": 4
                 },
                 "disposition_id": {
                     "data_type": "numeric",
                     "description": "The action that the rule should take when triggered (valid dispositions can be found in the \"list ioa types\" output)",
                     "required": true,
-                    "order": 6
+                    "order": 5
                 },
                 "field_values": {
                     "data_type": "string",
                     "description": "JSON list of parameters to pass to the new rule (valid fields can be found in the \"list ioa types\" output)",
                     "required": true,
-                    "order": 7
+                    "order": 6
                 },
                 "comment": {
                     "data_type": "string",
                     "description": "Comment for the audit log (optional)",
                     "required": false,
-                    "order": 8
+                    "order": 7
                 },
                 "enabled": {
                     "data_type": "boolean",
                     "description": "Enable this rule immediately",
                     "required": false,
                     "default": false,
-                    "order": 9
+                    "order": 8
                 }
             },
             "output": [
@@ -19469,32 +19469,32 @@
                     "data_type": "string",
                     "description": "Rule severity (run the \"list ioa severities\" action to find valid severities)",
                     "required": true,
-                    "order": 5
+                    "order": 6
                 },
                 "disposition_id": {
                     "data_type": "numeric",
                     "description": "The action that the rule should take when triggered (valid dispositions can be found in the \"list ioa types\" output)",
                     "required": true,
-                    "order": 6
+                    "order": 7
                 },
                 "field_values": {
                     "data_type": "string",
                     "description": "JSON list of parameters to pass to the new rule (valid fields can be found in the \"list ioa types\" output)",
                     "required": true,
-                    "order": 7
+                    "order": 8
                 },
                 "comment": {
                     "data_type": "string",
                     "description": "Comment for the audit log (optional)",
                     "required": false,
-                    "order": 8
+                    "order": 9
                 },
                 "enabled": {
                     "data_type": "boolean",
                     "description": "Enable this rule",
                     "required": false,
                     "default": false,
-                    "order": 9
+                    "order": 10
                 }
             },
             "output": [

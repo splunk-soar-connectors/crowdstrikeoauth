@@ -19671,17 +19671,81 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.instance_id",
+                    "data_path": "action_result.data.*.resources.*.id",
                     "data_type": "string",
                     "contains": [
-                        "crowdstrike ioa rule id"
+                        "crowdstrike ioa rule group id"
                     ],
                     "example_values": [
-                        "1"
+                        "83f596d2f8c04f36ad39182311e90e3a"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.customer_id",
+                    "data_path": "action_result.data.*.resources.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Bug Rule Group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "BugRule"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updated the thing"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.created_by",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike unique user id"
+                    ],
+                    "example_values": [
+                        "bb777249-c782-4434-b57a-f15ac742926c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.pattern_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "41007"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.customer_id",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike customer id"
@@ -19691,17 +19755,155 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.ruletype_id",
+                    "data_path": "action_result.data.*.resources.*.rules.*.description",
                     "data_type": "string",
                     "example_values": [
+                        "Stops the bug"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.modified_by",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike unique user id"
+                    ],
+                    "example_values": [
+                        "bb777249-c782-4434-b57a-f15ac742926c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.ruletype_id",
+                    "data_type": "string",
+                    "examples": [
                         "5"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.ruletype_name",
+                    "data_path": "action_result.data.*.resource.*.rules.*.version_ids.*",
+                    "data_type": "string",
+                    "examples": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource.*.rules.*.action_label",
+                    "data_type": "string",
+                    "examples": [
+                        "Monitor"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.committed_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.field_values.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "GrandparentImageFilename"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.field_values.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "(?i).+bug.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.field_values.*.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "Grandparent Image Filename"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.field_values.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "excludable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.field_values.*.values.*.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "include"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.field_values.*.values.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        ".+bug.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.field_values.*.final_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "(?i).+bug.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.magic_cookie",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.rulegroup_id",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "contains": [
+                        "crowdstrike ioa rule group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.ruletype_name",
                     "data_type": "string",
                     "example_values": [
                         "Process Creation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.disposition_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.instance_version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.rules.*.pattern_severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "medium"
                     ]
                 },
                 {
@@ -19728,41 +19930,59 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.magic_cookie",
+                    "data_path": "action_result.data.*.resources.*.version",
                     "data_type": "numeric",
                     "example_values": [
                         2
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.rulegroup_id",
+                    "data_path": "action_result.data.*.resources.*.platform",
                     "data_type": "string",
-                    "contains": [
-                        "crowdstrike ioa rule group id"
-                    ],
                     "example_values": [
-                        "83f596d2f8c04f36ad39182311e90e3a"
+                        "mac",
+                        "windows",
+                        "linux"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.version_ids.*",
+                    "data_path": "action_result.data.*.resources.*.rule_ids.*",
                     "data_type": "string",
                     "example_values": [
                         "1"
+                    ],
+                    "contains": [
+                        "crowdstrike ioa rule id"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.instance_version",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.resources.*.created_by",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike unique user id"
+                    ],
                     "example_values": [
-                        1
+                        "bb777249-c782-4434-b57a-f15ac742926c"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.name",
+                    "data_path": "action_result.data.*.resources.*.created_on",
                     "data_type": "string",
                     "example_values": [
-                        "BugRule"
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.customer_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike customer id"
+                    ],
+                    "example_values": [
+                        "4061c7ff3b634e22b38274d4b586554r"
                     ]
                 },
                 {
@@ -19773,80 +19993,33 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_id",
+                    "data_path": "action_result.data.*.resources.*.modified_by",
                     "data_type": "string",
+                    "contains": [
+                        "crowdstrike unique user id"
+                    ],
                     "example_values": [
-                        "41005"
+                        "bb777249-c782-4434-b57a-f15ac742926c"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.pattern_severity",
+                    "data_path": "action_result.data.*.resources.*.modified_on",
                     "data_type": "string",
                     "example_values": [
-                        "critical"
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.action_label",
+                    "data_path": "action_result.data.*.resources.*.committed_on",
                     "data_type": "string",
                     "example_values": [
-                        "Block Execution"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.disposition_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        30
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.field_values.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "GrandparentImageFilename"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.field_values.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "(?i).+bug.exe"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.field_values.*.label",
-                    "data_type": "string",
-                    "example_values": [
-                        "Grandparent Image Filename"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.field_values.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "excludable"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.field_values.*.values.*.label",
-                    "data_type": "string",
-                    "example_values": [
-                        "include"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.field_values.*.values.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        ".+bug.exe"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.field_values.*.final_value",
-                    "data_type": "string",
-                    "example_values": [
-                        "(?i).+bug.exe"
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {

@@ -89,16 +89,29 @@
         white-space:nowrap;
     }
 
-    .crowdstrike .ioa_fields {
-        max-height: 10em;
-        overflow: auto;
-        padding: 0.1em;
-        border: 1px solid lightgrey;
+    .crowdstrike .ioa-form-wrapper {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: auto;
     }
 
-    .crowdstrike .ioa_fields pre {
+    .crowdstrike .ioa-form {
+        max-height: 15em;
+        overflow: auto;
+    }
+
+    .crowdstrike .ioa-json {
+        max-height: 15em;
+        overflow: auto;
+    }
+
+    .crowdstrike .ioa-json pre {
         color: inherit;
         user-select: all;
+    }
+
+    .crowdstrike .ioa-spec {
+        display: none;
     }
 
 </style>
@@ -120,20 +133,55 @@
                     <div class="panel">
                         <h4>{{ type.name }}</h4>
                         <div id="default-view-table" class="panel-collapse collapse in">
-                            <div>ID: {{ type.id }}</div>
-                            <div>Platform: {{ type.platform }}</div>
-                            <div>{{ type.long_desc }}</div>
+                            <table class="wf-table-horizontal datatable">
+                                <thead>
+                                    <tr>
+                                        <td>Rule Type ID</td>
+                                        <td>Platform</td>
+                                        <td>Description</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ type.id }}</td>
+                                        <td>{{ type.platform }}</td>
+                                        <td>{{ type.long_desc }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="default-view-table" class="panel-collapse collapse in">
                             <h4>Valid disposition IDs</h4>
-                            <ul>
-                                {% for disposition in type.disposition_map %}
-                                    <li>{{ disposition.id }}: {{ disposition.label }}</li>
-                                {% endfor %}
-                            </ul>
-                            <h4>Field JSON (paste into "create ioa rule" action and customize to fit your needs)</h4>
-                            <div class="ioa_fields">
-                                <code>
-                                    <pre>{{ type.fields_pretty }}</pre>
-                                </code>
+                            <table class="wf-table-horizontal datatable">
+                                <thead>
+                                    <tr>
+                                        <td>Disposition ID</td>
+                                        <td>Description</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for disposition in type.disposition_map %}
+                                        <tr>
+                                            <td>{{ disposition.id }}</td>
+                                            <td>{{ disposition.label }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="ioa-builder-{{ type.id }}" class="ioa-builder panel-collapse collapse in">
+                            <h4>Rule Parameters</h4>
+                            <div>
+                                Fill in this form to generate a JSON list of fields.
+                                This list can be pasted into the "field_values" parameter when creating or updating an IOA rule.
+                            </div>
+                            <div class="ioa-spec">{{ type.fields_pretty }}</div>
+                            <div class="ioa-form-wrapper">
+                                <form class="ioa-form"></form>
+                                <div class="ioa-json">
+                                    <h2>JSON Output</h2>
+                                    <pre />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -147,6 +195,202 @@
     {% endfor %} <!-- loop for each result end -->
 </div> <!-- Main Div -->
 
+<script>
+    (function() {
+        class Field {
+          constructor(name, label, triggerUpdate) {
+            this.name = name;
+            this.label = label;
+            this.triggerUpdate = triggerUpdate;
+          }
+
+          drawForm() {
+            throw "Base class";
+          }
+
+          toJson() {
+            throw "Base class";
+          }
+        }
+
+        class SetField extends Field {
+          constructor(reference, triggerUpdate) {
+            super(reference.name, reference.label, triggerUpdate);
+
+            this.optionLabels = {};
+            this.optionsEnabled = {};
+            reference.options.forEach((o) => {
+              this.optionLabels[o.value] = o.label;
+              this.optionsEnabled[o.value] = false;
+            });
+          }
+
+          drawForm() {
+            const fieldset = document.createElement("fieldset");
+
+            const heading = document.createElement("h2");
+            heading.textContent = this.label;
+            fieldset.appendChild(heading);
+
+            Object.keys(this.optionLabels).forEach((o) => {
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.id = `check-${o}`;
+              checkbox.addEventListener("change", (e) => {
+                this.optionsEnabled[o] = e.target.checked;
+                this.triggerUpdate();
+              });
+              fieldset.appendChild(checkbox);
+
+              const label = document.createElement("label");
+              label.htmlFor = `check-${o}`;
+              label.textContent = `${this.optionLabels[o]} (${o})`;
+              fieldset.appendChild(label);
+
+              fieldset.appendChild(document.createElement("br"));
+            });
+
+            return fieldset;
+          }
+
+          toJson() {
+            const selectedOptions = Object.keys(this.optionLabels)
+              .map((o) => {
+                if (this.optionsEnabled[o]) {
+                  return {
+                    label: this.optionLabels[o],
+                    value: o
+                  };
+                }
+              })
+              .filter((o) => !!o);
+
+            if (selectedOptions.length == 0) {
+              return null;
+            }
+
+            return {
+              name: this.name,
+              label: this.label,
+              values: selectedOptions
+            };
+          }
+        }
+
+        class ExcludableField extends Field {
+          constructor(reference, triggerUpdate) {
+            super(reference.name, reference.label, triggerUpdate);
+            this.include = "";
+            this.exclude = ""
+          }
+
+          drawForm() {
+            const fieldset = document.createElement("fieldset");
+
+            const heading = document.createElement("h2");
+            heading.textContent = this.label;
+            fieldset.appendChild(heading);
+
+            const includeLabel = document.createElement("label");
+            includeLabel.textContent = "Include values matching regex:";
+            includeLabel.htmlFor = `include-${this.name}`;
+            fieldset.appendChild(includeLabel);
+
+            fieldset.appendChild(document.createElement('br'));
+
+            const includeInput = document.createElement("input");
+            includeInput.id = `include-${this.name}`;
+            includeInput.value = this.include;
+            includeInput.addEventListener("input", (e) => {
+              const v = e.target.value;
+              this.include = v;
+              this.triggerUpdate();
+            });
+            fieldset.appendChild(includeInput);
+
+            fieldset.appendChild(document.createElement("br"));
+
+            const excludeLabel = document.createElement("label");
+            excludeLabel.textContent = "Exclude values matching regex:";
+            excludeLabel.htmlFor = `exclude-${this.name}`;
+            fieldset.appendChild(excludeLabel);
+
+            fieldset.appendChild(document.createElement('br'));
+
+            const excludeInput = document.createElement("input");
+            excludeInput.id = `exclude-${this.name}`;
+            excludeInput.value = this.exclude;
+            excludeInput.addEventListener("input", (e) => {
+              const v = e.target.value;
+              this.exclude = v;
+              this.triggerUpdate();
+            });
+            fieldset.appendChild(excludeInput);
+
+            return fieldset;
+          }
+
+          toJson() {
+            if (this.include.length == 0) {
+              return null;
+            }
+
+            let json = {
+              name: this.name,
+              label: this.label,
+              type: "excludable",
+              values: [
+                {
+                  label: "include",
+                  value: this.include
+                }
+              ]
+            };
+            if (this.exclude.length > 0) {
+              json.values.push({
+                label: "exclude",
+                value: this.exclude
+              });
+            }
+            return json;
+          }
+        }
+
+        function setupIoaBuilder(index, container) {
+            const spec = JSON.parse($(container).find('.ioa-spec').text());
+            const form = $(container).find('.ioa-form');
+            const output = $(container).find('.ioa-json>pre');
+
+            const fields = [];
+
+            function updateOutput() {
+                const json = fields.map(f => f.toJson()).filter(f => !!f);
+                output.text(JSON.stringify(json, null, 4));
+            }
+
+            spec.forEach(f => {
+                switch (f.type) {
+                    case 'excludable': {
+                        const element = new ExcludableField(f, updateOutput);
+                        form.append(element.drawForm());
+                        fields.push(element);
+                        break;
+                    }
+                    case 'set': {
+                        const element = new SetField(f, updateOutput);
+                        form.append(element.drawForm());
+                        fields.push(element);
+                        break;
+                    }
+                }
+            });
+
+            updateOutput();
+        }
+
+        $('.ioa-builder').each(setupIoaBuilder);
+    })();
+</script>
 
 <script>
     $.extend(true, $.fn.dataTable.defaults, {

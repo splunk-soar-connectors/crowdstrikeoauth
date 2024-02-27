@@ -2916,7 +2916,7 @@ class CrowdstrikeConnector(BaseConnector):
             'rule_version': rule_version
         })
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Rule group updated successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, "Rule updated successfully")
 
     def _handle_update_ioa_rule_group(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))

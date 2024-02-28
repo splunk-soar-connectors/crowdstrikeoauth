@@ -219,8 +219,7 @@ def _get_ctx_result(result, provides):
     return ctx_result
 
 
-def display_view(provides, all_app_runs, context):
-
+def display_view(provides, all_app_runs, context):  # noqa: C901
     context['results'] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
@@ -291,6 +290,21 @@ def display_view(provides, all_app_runs, context):
 
     if provides == 'list ioa platforms':
         return 'crowdstrike_list_ioa_platforms.html'
+
+    if provides == 'list ioa severities':
+        return 'crowdstrike_list_ioa_severities.html'
+
+    if provides == 'list ioa types':
+        return 'crowdstrike_list_ioa_types.html'
+
+    if provides == 'create ioa rule':
+        return 'crowdstrike_create_ioa_rule.html'
+
+    if provides == 'update ioa rule':
+        return 'crowdstrike_update_ioa_rule.html'
+
+    if provides == 'delete ioa rule':
+        return 'crowdstrike_delete_ioa_rule.html'
 
 
 def hunt_view(provides, all_app_runs, context):

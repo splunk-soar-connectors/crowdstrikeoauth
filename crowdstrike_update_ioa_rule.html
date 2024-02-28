@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: crowdstrike_list_ioa_rule_groups.html
+<!-- File: crowdstrike_update_ioa_rule.html
   Copyright (c) 2019-2024 Splunk Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,28 +99,27 @@
         <h4 class="wf-h4-style">No data found</h4>
 
     {% else %}
-    <h3 class="wf-h3-style">Rule Groups</h3>
+    <h3 class="wf-h3-style">Updated Rule</h3>
     <div class="metadata_div">
         <!--Default View-->
         <div class="panel-group" id="rule-group-information">
-            {% for rule_group in result.data %}
-                {% for resource in rule_group.resources %}
-                    <div class="panel">
-                        <div id="default-view-table" class="panel-collapse collapse in">
-                            <h1>Rule Group {{ resource.name }}</h1>
-                            <table class="wf-table-horizontal datatable">
-                                <thead>
-                                    <tr>
-                                        <th>Rule Group ID</th>
-                                        <th>Version</th>
-                                        <th>Enabled</th>
-                                        <th>Name</th>
-                                        <th>Description</th>
-                                        <th>Platform</th>
-                                        <th>Comment</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+            <div class="panel">
+                <div id="default-view-table" class="panel-collapse collapse in">
+                    <table class="wf-table-horizontal datatable">
+                        <thead>
+                            <tr>
+                                <th>Rule Group ID</th>
+                                <th>Version</th>
+                                <th>Enabled</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Platform</th>
+                                <th>Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rule_group in result.data %}
+                                {% for resource in rule_group.resources %}
                                     <tr>
                                         <td>
                                             <a href="javascript:;"
@@ -137,9 +136,21 @@
                                         <td>{{ resource.platform }}</td>
                                         <td>{{ resource.comment }}</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                            <h2>Rules</h2>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3 class="wf-h3-style">Rules</h3>
+    <div class="metadata_div">
+        <div class="panel-group">
+            <div class="panel">
+                <div id="default-view-table" class="panel-collapse collapse in">
+                    {% for rule_group in result.data %}
+                        {% for resource in rule_group.resources %}
                             <table class="wf-table-horizontal datatable">
                                 <thead>
                                     <tr>
@@ -179,17 +190,17 @@
                                     {% endfor %}
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                    <hr />
-                {% endfor %}
-            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
     <br>
     {% endif %}
     {% endfor %} <!-- loop for each result end -->
 </div> <!-- Main Div -->
+
 
 <script>
     $.extend(true, $.fn.dataTable.defaults, {

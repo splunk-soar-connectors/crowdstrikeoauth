@@ -1,6 +1,6 @@
 # File: crowdstrike_view.py
 #
-# Copyright (c) 2019-2023 Splunk Inc.
+# Copyright (c) 2019-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -219,8 +219,7 @@ def _get_ctx_result(result, provides):
     return ctx_result
 
 
-def display_view(provides, all_app_runs, context):
-
+def display_view(provides, all_app_runs, context):  # noqa: C901
     context['results'] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
@@ -276,6 +275,36 @@ def display_view(provides, all_app_runs, context):
 
     if provides == 'get detections details':
         return 'crowdstrike_get_detections_details.html'
+
+    if provides == 'create ioa rule group':
+        return 'crowdstrike_create_ioa_rule_group.html'
+
+    if provides == 'update ioa rule group':
+        return 'crowdstrike_update_ioa_rule_group.html'
+
+    if provides == 'delete ioa rule group':
+        return 'crowdstrike_delete_ioa_rule_group.html'
+
+    if provides == 'list ioa rule groups':
+        return 'crowdstrike_list_ioa_rule_groups.html'
+
+    if provides == 'list ioa platforms':
+        return 'crowdstrike_list_ioa_platforms.html'
+
+    if provides == 'list ioa severities':
+        return 'crowdstrike_list_ioa_severities.html'
+
+    if provides == 'list ioa types':
+        return 'crowdstrike_list_ioa_types.html'
+
+    if provides == 'create ioa rule':
+        return 'crowdstrike_create_ioa_rule.html'
+
+    if provides == 'update ioa rule':
+        return 'crowdstrike_update_ioa_rule.html'
+
+    if provides == 'delete ioa rule':
+        return 'crowdstrike_delete_ioa_rule.html'
 
 
 def hunt_view(provides, all_app_runs, context):

@@ -2293,6 +2293,7 @@ class CrowdstrikeConnector(BaseConnector):
                         else:
                             if restart_process:
                                 self.save_progress(f"Restarting feed...")
+                                self._start_time = time.time()
                                 return self._start_data_feed(param, action_result, max_crlf, max_events,
                                                              config, lower_id)
                             return action_result.get_status()
@@ -2360,6 +2361,7 @@ class CrowdstrikeConnector(BaseConnector):
         if is_error_occurred:
             if restart_process:
                 self.save_progress(f"Restarting feed...")
+                self._start_time = time.time()
                 return self._start_data_feed(param, action_result, max_crlf, max_events, config, lower_id)
             return action_result.get_status()
 

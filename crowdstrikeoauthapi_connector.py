@@ -1564,6 +1564,179 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Host removed successfully")
 
+    def _handle_create_ioa_rule(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        try:
+            field_values = json.loads(param['field_values'])
+        except json.JSONDecodeError as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f'Failed to parse field_values: {e}'
+            )
+
+        create_comment = param.get('comment')
+
+        create_params = {
+            'rulegroup_id': param['rule_group_id'],
+            'name': param['name'],
+            'description': param['description'],
+            'pattern_severity': param['severity'],
+            'ruletype_id': str(param['rule_type_id']),
+            'disposition_id': param['disposition_id'],
+            'field_values': field_values
+        }
+        if create_comment:
+            create_params['comment'] = create_comment
+
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(
+            action_result,
+            CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,
+            json_data=create_params,
+            method='post'
+        )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        rulegroup_id = resp_json['resources'][0].get('rulegroup_id')
+        rulegroup_version = resp_json['resources'][0].get('magic_cookie')
+        rule_id = resp_json['resources'][0].get('instance_id')
+        rule_version = resp_json['resources'][0].get('instance_version')
+        if not (rulegroup_id and rulegroup_version and rule_id and rule_version):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'CrowdStrike failed to return a Rule Group ID/Version and Rule ID/Version'
+            )
+
+        if param.get('enabled', False):
+            update_params = {
+                'rulegroup_id': rulegroup_id,
+                'rulegroup_version': rulegroup_version,
+                'instance_version': rule_version,
+                'comment': 'Rule enabled via Splunk SOAR',
+                'rule_updates': [
+                    {
+                        'instance_id': rule_id,
+                        'name': param['name'],
+                        'description': param['description'],
+                        'enabled': True,
+                        'pattern_severity': param['severity'],
+                        'disposition_id': param['disposition_id'],
+                        'field_values': field_values
+                    }
+                ]
+            }
+            ret_val, update_resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,
+                json_data=update_params,
+                method='patch'
+            )
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            # For consistency, we need to find and return the updated rule
+            for resource in update_resp_json['resources']:
+                for rule in resource['rules']:
+                    if rule['instance_id'] == rule_id:
+                        resp_rule = rule
+                        rule['rulegroup_id'] = rulegroup_id
+                        resp_json['resources'] = [resp_rule]
+
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'rule_group_id': rulegroup_id,
+            'rule_id': rule_id
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Rule created successfully")
+
+    def _handle_create_ioa_rule_group(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        create_params = {
+            'name': param['name'],
+            'description': param['description'],
+            'platform': param['platform']
+        }
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(
+            action_result,
+            CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
+            json_data=create_params,
+            method='post'
+        )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        rulegroup_id = resp_json['resources'][0].get('id')
+        rulegroup_version = resp_json['resources'][0].get('version')
+        if rulegroup_id is None or rulegroup_version is None:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'CrowdStrike failed to return a Rule Group ID and Version'
+            )
+
+        if param.get('enabled', False):
+            update_params = {
+                'id': rulegroup_id,
+                'rulegroup_version': rulegroup_version,
+                'name': param['name'],
+                'description': param['description'],
+                'enabled': True,
+                'comment': 'Rule Group enabled via Splunk SOAR'
+            }
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
+                json_data=update_params,
+                method='patch'
+            )
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+        policy_ids_str = param.get('policy_id', '')
+        policy_ids_list = phantom.get_list_from_string(policy_ids_str)
+        for policy_id in policy_ids_list:
+            assign_params = {
+                'action_parameters': [
+                    {
+                        'name': 'rule_group_id',
+                        'value': rulegroup_id
+                    }
+                ],
+                'ids': [
+                    policy_id
+                ]
+            }
+            assign_ret_val, assign_resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
+                params={
+                    'action_name': 'add-rule-group'
+                },
+                json_data=assign_params,
+                method='post'
+            )
+
+            if phantom.is_fail(assign_ret_val):
+                return action_result.get_status()
+
+        resp_json['resources'][0]['assigned_policy_ids'] = policy_ids_list
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'rule_group_id': rulegroup_id
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Rule group created successfully")
+
     def _handle_create_session(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1589,6 +1762,68 @@ class CrowdstrikeConnector(BaseConnector):
                 "Unexpected response retrieved, {}".format(self._get_error_message_from_exception(ex)))
 
         return action_result.set_status(phantom.APP_SUCCESS, "Session created successfully")
+
+    def _handle_delete_ioa_rule(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        group_id = param['rule_group_id']
+        ids_str = param['rule_id']
+        ids_list = phantom.get_list_from_string(ids_str)
+        ids_param = ','.join(ids_list)
+        params = {
+            'rule_group_id': group_id,
+            'ids': ids_param
+        }
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(
+            action_result,
+            CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,
+            params=params,
+            method='delete'
+        )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+
+        resources_affected = resp_json['meta']['writes']['resources_affected']
+        action_result.update_summary({
+            'resources_affected': resources_affected
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS,
+                                        f"Deleted {resources_affected} rules")
+
+    def _handle_delete_ioa_rule_group(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ids_str = param['id']
+        ids_list = phantom.get_list_from_string(ids_str)
+        ids_param = ','.join(ids_list)
+        params = {
+            'ids': ids_param
+        }
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(
+            action_result,
+            CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
+            params=params,
+            method='delete'
+        )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+
+        resources_affected = resp_json['meta']['writes']['resources_affected']
+        action_result.update_summary({
+            'resources_affected': resources_affected
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS,
+                                        f"Deleted {resources_affected} rule groups")
 
     def _handle_delete_session(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -1765,6 +2000,184 @@ class CrowdstrikeConnector(BaseConnector):
 
         summary = action_result.update_summary({})
         summary['detections_affected'] = len(ids)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_ioa_platforms(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # We'll paginate here, just to be future-proof, but we probably won't ever need it.
+        # Default page size is 100, and there are currently only three supported platforms.
+        params = {}
+        total_rows = 0
+        offset = -1
+        results = []
+        while offset < total_rows:
+            if offset >= 0:
+                params['offset'] = offset
+
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_IOA_LIST_PLATFORMS_ENDPOINT,
+                params=params,
+                method='get'
+            )
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            results += resp_json['resources']
+
+            total_rows = resp_json['meta']['pagination']['total']
+            offset = resp_json['meta']['pagination']['offset']
+
+        resp_json['resources'] = results
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'result_count': total_rows
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_ioa_rule_groups(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        params = {}
+        if 'fql_query' in param:
+            # CrowdStrike allows spaces in FQL queries, but not if they are URL-encoded.
+            # So we strip them all.
+            params['filter'] = param['fql_query'].replace(' ', '')
+
+        total_rows = 0
+        offset = -1
+        results = []
+        while offset < total_rows:
+            if offset >= 0:
+                params['offset'] = offset
+
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_IOA_QUERY_RULE_GROUPS_ENDPOINT,
+                params=params,
+                method='get'
+            )
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            results += resp_json['resources']
+
+            total_rows = resp_json['meta']['pagination']['total']
+            offset = resp_json['meta']['pagination']['offset']
+
+        resp_json['resources'] = results
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'result_count': total_rows
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_ioa_severities(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # We'll paginate here, just to be future-proof, but we probably won't ever need it.
+        # Default page size is 100, and there are currently only five values.
+        params = {}
+        total_rows = 0
+        offset = -1
+        results = []
+        while offset < total_rows:
+            if offset >= 0:
+                params['offset'] = offset
+
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_IOA_LIST_SEVERITIES_ENDPOINT,
+                params=params,
+                method='get'
+            )
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            results += resp_json['resources']
+
+            total_rows = resp_json['meta']['pagination']['total']
+            offset = resp_json['meta']['pagination']['offset']
+
+        resp_json['resources'] = results
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'result_count': total_rows
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_ioa_types(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        platform_filter = param.get('platform')
+
+        # We'll paginate here, just to be future-proof, but we probably won't ever need it.
+        # Default page size is 100, and there are currently only a dozen values or so.
+        params = {}
+        total_rows = 0
+        offset = -1
+        results = []
+        while offset < total_rows:
+            if offset >= 0:
+                params['offset'] = offset
+
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_IOA_LIST_TYPES_ENDPOINT,
+                params=params,
+                method='get'
+            )
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            next_ret_val, next_resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_IOA_GET_TYPE_ENDPOINT,
+                params={'ids': resp_json['resources']},
+                method='get'
+            )
+
+            if phantom.is_fail(next_ret_val):
+                return action_result.get_status()
+
+            for resource in next_resp_json['resources']:
+                resource['fields_pretty'] = json.dumps(resource['fields'], indent=2)
+
+            if platform_filter:
+                results += [
+                    resource for resource in next_resp_json['resources']
+                    if resource['platform'] == platform_filter
+                ]
+            else:
+                results += next_resp_json['resources']
+
+            total_rows = resp_json['meta']['pagination']['total']
+            offset = resp_json['meta']['pagination']['offset']
+
+        resp_json['resources'] = results
+        total_rows = len(results)
+        resp_json['meta']['pagination']['total'] = total_rows
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'result_count': total_rows
+        })
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -2512,6 +2925,157 @@ class CrowdstrikeConnector(BaseConnector):
             action_result.add_data(indicator_data)
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_POST_ALERT)
+
+    def _handle_update_ioa_rule(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        try:
+            field_values = json.loads(param['field_values'])
+        except json.JSONDecodeError as e:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f'Failed to parse field_values: {e}'
+            )
+
+        update_params = {
+            'rulegroup_id': param['rule_group_id'],
+            'rulegroup_version': param['rule_group_version'],
+            'instance_version': param['rule_version'],
+            'rule_updates': [
+                {
+                    'instance_id': param['rule_id'],
+                    'pattern_severity': param['severity'],
+                    'enabled': param.get('enabled', False),
+                    'name': param['name'],
+                    'description': param['description'],
+                    'disposition_id': param['disposition_id'],
+                    'field_values': field_values
+                }
+            ]
+        }
+        update_comment = param.get('comment')
+        if update_comment:
+            update_params['comment'] = update_comment
+
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(
+            action_result,
+            CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,
+            json_data=update_params,
+            method='patch'
+        )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        rulegroup_id = resp_json['resources'][0]['id']
+        rulegroup_version = 0
+        rule_id = param['rule_id']
+        rule_version = 0
+
+        for rule in resp_json['resources'][0]['rules']:
+            if rule['instance_id'] == rule_id:
+                rulegroup_version = rule['magic_cookie']
+                rule_version = rule['instance_version']
+
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'rule_group_id': rulegroup_id,
+            'rule_group_version': rulegroup_version,
+            'rule_id': rule_id,
+            'rule_version': rule_version
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Rule updated successfully")
+
+    def _handle_update_ioa_rule_group(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        update_params = {
+            'id': param['id'],
+            'rulegroup_version': param['version'],
+            'name': param['name'],
+            'description': param['description'],
+            'enabled': param.get('enabled', False),
+            'comment': param['comment']
+        }
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(
+            action_result,
+            CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
+            json_data=update_params,
+            method='patch'
+        )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        rulegroup_id = resp_json['resources'][0]['id']
+
+        assign_policy_ids_str = param.get('assign_policy_id', '')
+        assign_policy_ids_list = phantom.get_list_from_string(assign_policy_ids_str)
+        for policy_id in assign_policy_ids_list:
+            assign_params = {
+                'action_parameters': [
+                    {
+                        'name': 'rule_group_id',
+                        'value': rulegroup_id
+                    }
+                ],
+                'ids': [
+                    policy_id
+                ]
+            }
+            assign_ret_val, assign_resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
+                params={
+                    'action_name': 'add-rule-group'
+                },
+                json_data=assign_params,
+                method='post'
+            )
+
+            if phantom.is_fail(assign_ret_val):
+                return action_result.get_status()
+
+        remove_policy_ids_str = param.get('remove_policy_id', '')
+        remove_policy_ids_list = phantom.get_list_from_string(remove_policy_ids_str)
+        for policy_id in remove_policy_ids_list:
+            remove_params = {
+                'action_parameters': [
+                    {
+                        'name': 'rule_group_id',
+                        'value': rulegroup_id
+                    }
+                ],
+                'ids': [
+                    policy_id
+                ]
+            }
+            remove_ret_val, remove_resp_json = self._make_rest_call_helper_oauth2(
+                action_result,
+                CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
+                params={
+                    'action_name': 'remove-rule-group'
+                },
+                json_data=remove_params,
+                method='post'
+            )
+
+            if phantom.is_fail(remove_ret_val):
+                return action_result.get_status()
+
+        resp_json['resources'][0]['assigned_policy_ids'] = assign_policy_ids_list
+        resp_json['resources'][0]['removed_policy_ids'] = remove_policy_ids_list
+        action_result.add_data(resp_json)
+
+        action_result.update_summary({
+            'rule_group_id': rulegroup_id
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Rule group updated successfully")
 
     def _handle_update_iocs(self, param):
 
@@ -3645,7 +4209,17 @@ class CrowdstrikeConnector(BaseConnector):
             'detonate_url': self._handle_detonate_url,
             'check_detonate_status': self._handle_check_detonate_status,
             'get_device_scroll': self._handle_get_device_scroll,
-            'get_zta_data': self._handle_get_zta_data
+            'get_zta_data': self._handle_get_zta_data,
+            'create_ioa_rule_group': self._handle_create_ioa_rule_group,
+            'update_ioa_rule_group': self._handle_update_ioa_rule_group,
+            'delete_ioa_rule_group': self._handle_delete_ioa_rule_group,
+            'list_ioa_rule_groups': self._handle_list_ioa_rule_groups,
+            'list_ioa_platforms': self._handle_list_ioa_platforms,
+            'list_ioa_severities': self._handle_list_ioa_severities,
+            'list_ioa_types': self._handle_list_ioa_types,
+            'create_ioa_rule': self._handle_create_ioa_rule,
+            'update_ioa_rule': self._handle_update_ioa_rule,
+            'delete_ioa_rule': self._handle_delete_ioa_rule
         }
 
         action = self.get_action_identifier()

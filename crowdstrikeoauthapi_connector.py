@@ -2581,7 +2581,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.debug_print("Validating 'max_crlf' asset configuration parameter")
 
         if "max_crlf" in config:
-            max_crlf = self._validate_integers(action_result, config.get("max_crlf"),"max_crlf")
+            max_crlf = self._validate_integers(action_result, config.get("max_crlf"), "max_crlf")
         else:
             max_crlf = None
 
@@ -2693,9 +2693,9 @@ class CrowdstrikeConnector(BaseConnector):
                         action_result, self._refresh_token_url, headers=header, method="post", append=False)
 
                     if phantom.is_fail(ret_val):
-                        err_msg = action_result.get_message()
-                        self.debug_print(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}: {err_msg}")
-                        if "no active stream session found" in err_msg:
+                        err_message = action_result.get_message()
+                        self.debug_print(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}: {err_message}")
+                        if "no active stream session found" in err_message:
                             restart_process = True
                         if self._events:
                             self.save_progress(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}. Saving the events...")
@@ -2705,7 +2705,7 @@ class CrowdstrikeConnector(BaseConnector):
                             break
                         else:
                             if restart_process:
-                                self.save_progress(f"Restarting feed...")
+                                self.save_progress("Restarting feed...")
                                 self._start_time = time.time()
                                 return self._start_data_feed(param, action_result, max_crlf, max_events,
                                                              config, lower_id)
@@ -2773,7 +2773,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         if is_error_occurred:
             if restart_process:
-                self.save_progress(f"Restarting feed...")
+                self.save_progress("Restarting feed...")
                 self._start_time = time.time()
                 return self._start_data_feed(param, action_result, max_crlf, max_events, config, lower_id)
             return action_result.get_status()

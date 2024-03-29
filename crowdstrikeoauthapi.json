@@ -18537,7 +18537,6 @@
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
-
         },
         {
             "action": "list ioa rule groups",

@@ -64,6 +64,11 @@ class CrowdstrikeConnector(BaseConnector):
         self._poll_interval = None
         self._required_detonation = False
         self._stream_file_data = False
+        self._refresh_token_url = None
+        self._start_time = time.time()
+        self._interval_poll = False
+        self._refresh_token_timeout = None
+        self._total_events = 0
 
     def initialize(self):
         """ Automatically called by the BaseConnector before the calls to the handle_action function"""
@@ -86,8 +91,11 @@ class CrowdstrikeConnector(BaseConnector):
         self._base_url_oauth = self._base_url_oauth.replace('\\', '/')
         self._asset_id = self.get_asset_id()
 
-        app_id = config.get('app_id', self.get_app_id())
-        self._parameters = {'appId': app_id.replace('-', '')}
+        app_id = config.get('app_id')
+        if not app_id:
+            app_id = self.get_app_id().replace('-', '')
+            app_id = "{}{}".format(app_id[:-len(self._asset_id)], self._asset_id)
+        self._parameters = {'appId': app_id}
 
         self._state = self.load_state()
         if not isinstance(self._state, dict):
@@ -2532,6 +2540,8 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_DATAFEED_EMPTY_ERROR)
 
         session_token = resources[0].get('sessionToken')
+        self._refresh_token_url = resources[0].get('refreshActiveSessionURL')
+        self._refresh_token_timeout = resources[0].get('refreshActiveSessionInterval', 1800)
         if not session_token:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR)
 
@@ -2569,8 +2579,11 @@ class CrowdstrikeConnector(BaseConnector):
 
     def _validate_on_poll_config_params(self, action_result, config):
         self.debug_print("Validating 'max_crlf' asset configuration parameter")
-        max_crlf = self._validate_integers(action_result, config.get("max_crlf", DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT),
-                                           "max_crlf")
+
+        if "max_crlf" in config:
+            max_crlf = self._validate_integers(action_result, config.get("max_crlf"), "max_crlf")
+        else:
+            max_crlf = None
 
         self.debug_print("Validating 'merge_time_interval' asset configuration parameter")
         merge_time_interval = self._validate_integers(action_result, config.get('merge_time_interval', 0),
@@ -2597,23 +2610,16 @@ class CrowdstrikeConnector(BaseConnector):
 
         return max_crlf, merge_time_interval, max_events
 
-    def _on_poll(self, param):
+    def _on_poll(self, param):   # noqa: C901
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Connect to the server
-        if phantom.is_fail(self._get_stream(action_result)):
-            return action_result.get_status()
-
-        if self._data_feed_url is None:
-            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE)
 
         config = self.get_config()
 
         max_crlf, merge_time_interval, max_events = self._validate_on_poll_config_params(action_result, config)
 
-        if max_crlf is None or merge_time_interval is None or max_events is None:
+        if merge_time_interval is None or max_events is None:
             return action_result.get_status()
 
         lower_id = 0
@@ -2635,6 +2641,17 @@ class CrowdstrikeConnector(BaseConnector):
             lower_id = 0
 
         self.save_progress(CROWDSTRIKE_GETTING_EVENTS_MESSAGE.format(lower_id=lower_id, max_events=max_events))
+
+        return self._start_data_feed(param, action_result, max_crlf, max_events, config, lower_id)
+
+    def _start_data_feed(self, param, action_result, max_crlf, max_events, config, lower_id):
+
+        # Connect to the server
+        if phantom.is_fail(self._get_stream(action_result)):
+            return action_result.get_status()
+
+        if self._data_feed_url is None:
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE)
 
         # Query for the events
         try:
@@ -2659,10 +2676,45 @@ class CrowdstrikeConnector(BaseConnector):
         # Parse the events
         counter = 0   # counter for continuous blank lines
         total_blank_lines_count = 0    # counter for total number of blank lines
+        is_error_occurred = False
+        restart_process = False
 
         try:
             for stream_data in r.iter_lines(chunk_size=None):
-                # chunk = UnicodeDammit(chunk).unicode_markup
+                # Check if it is time to refresh the stream connection and creating new bearer token [after 29 Min]
+                if int(time.time() - self._start_time) > (self._refresh_token_timeout - 60):
+                    header = {
+                        'Authorization': 'Bearer {0}'.format(self._oauth_access_token),
+                        'Connection': 'Keep-Alive',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                    ret_val, resp = self._make_rest_call_helper_oauth2(
+                        action_result, self._refresh_token_url, headers=header, method="post", append=False)
+
+                    if phantom.is_fail(ret_val):
+                        err_message = action_result.get_message()
+                        self.debug_print(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}: {err_message}")
+                        if "no active stream session found" in err_message:
+                            restart_process = True
+                        if self._events:
+                            self.save_progress(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}. Saving the events...")
+                            action_result.set_status(phantom.APP_ERROR,
+                                                     f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}: {action_result.get_message()}")
+                            is_error_occurred = True
+                            break
+                        else:
+                            if restart_process:
+                                self.save_progress("Restarting feed...")
+                                self._start_time = time.time()
+                                return self._start_data_feed(param, action_result, max_crlf, max_events,
+                                                             config, lower_id)
+                            return action_result.get_status()
+                    elif max_crlf is None:
+                        # Save events after refreshing the token
+                        self._save_events_on_poll(config, total_blank_lines_count, param)
+
+                    self._start_time = time.time()
 
                 if stream_data is None:
                     # Done with all the event data for now
@@ -2675,7 +2727,7 @@ class CrowdstrikeConnector(BaseConnector):
                     counter += 1
                     total_blank_lines_count += 1
 
-                    if counter > max_crlf:
+                    if max_crlf and counter > max_crlf:
                         self.debug_print(CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter))
                         self.save_progress(CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter))
                         break
@@ -2695,12 +2747,10 @@ class CrowdstrikeConnector(BaseConnector):
 
                 if stream_data and stream_data.get('metadata', {}).get('eventType') == 'DetectionSummaryEvent':
                     self._events.append(stream_data)
+                    self._total_events += 1
                     counter = 0   # reset the continuous blank lines counter as we received a valid data in between
 
-                # Calculate length of DetectionSummaryEvents until now
-                len_events = len(self._events)
-
-                if max_events and len_events >= max_events:
+                if max_events and self._total_events >= max_events:
                     self._events = self._events[:max_events]
                     break
 
@@ -2709,9 +2759,28 @@ class CrowdstrikeConnector(BaseConnector):
 
         except Exception as e:
             err_message = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
-                                        CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message))
+            self.debug_print(f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Error response from server: {err_message}")
+            if self._events:
+                self.save_progress(f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Saving the events...")
+                action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
+                    CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message))
+                is_error_occurred = True
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(
+                    CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message))
 
+        self._save_events_on_poll(config, total_blank_lines_count, param)
+
+        if is_error_occurred:
+            if restart_process:
+                self.save_progress("Restarting feed...")
+                self._start_time = time.time()
+                return self._start_data_feed(param, action_result, max_crlf, max_events, config, lower_id)
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _save_events_on_poll(self, config, total_blank_lines_count, param):
         # Check if to collate the data or not
         collate = config.get('collate', True)
 
@@ -2719,24 +2788,26 @@ class CrowdstrikeConnector(BaseConnector):
 
         self.debug_print(CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE.format(total_blank_lines_count))
         self.save_progress(CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE.format(total_blank_lines_count))
-        self.debug_print(CROWDSTRIKE_GOT_EVENTS_MESSAGE.format(len(self._events)))   # total events count
+        self.debug_print(CROWDSTRIKE_GOT_EVENTS_MESSAGE.format(len(self._events)))  # total events count
         self.save_progress(CROWDSTRIKE_GOT_EVENTS_MESSAGE.format(len(self._events)))
 
         if self._events:
             self.send_progress("Parsing the fetched DetectionSummaryEvents...")
             results = events_parser.parse_events(self._events, self, collate)
-            self.save_progress("Created {0} relevant results from the fetched DetectionSummaryEvents".format(len(results)))
+            self.save_progress(
+                "Created {0} relevant results from the fetched DetectionSummaryEvents".format(len(results)))
             if results:
                 self.save_progress("Adding {0} event artifact{1}. Empty containers will be skipped.".format(
                     len(results), 's' if len(results) > 1 else ''))
                 self._save_results(results, param)
-                self.send_progress("Done")
+                self.send_progress("Events have been stored")
             if not self.is_poll_now():
                 last_event = self._events[-1]
                 last_offset_id = last_event['metadata']['offset']
                 self._state['last_offset_id'] = last_offset_id + 1
+                self.save_state(self._state)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+            self._events = []
 
     def _handle_list_processes(self, param):
 
@@ -3975,7 +4046,8 @@ class CrowdstrikeConnector(BaseConnector):
             is_download = True
         return self._process_response(r, action_result, is_download)
 
-    def _make_rest_call_helper_oauth2(self, action_result, endpoint, headers=None, params=None, data=None, json_data=None, method="get"):
+    def _make_rest_call_helper_oauth2(
+            self, action_result, endpoint, headers=None, params=None, data=None, json_data=None, method="get", append=True):
         """ Function that helps setting REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -3988,7 +4060,7 @@ class CrowdstrikeConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
-        url = "{0}{1}".format(self._base_url_oauth, endpoint)
+        url = "{0}{1}".format(self._base_url_oauth, endpoint) if append else endpoint
         if headers is None:
             headers = {}
 
@@ -4076,6 +4148,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.debug_print("action_id ", self.get_action_identifier())
 
         if self.get_action_identifier() == phantom.ACTION_ID_INGEST_ON_POLL:
+            self._interval_poll = True
             start_time = time.time()
             result = self._on_poll(param)
             end_time = time.time()

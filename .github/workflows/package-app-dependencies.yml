@@ -1,0 +1,18 @@
+name: Generate Readme Doc
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'requirements.txt'
+    tags-ignore:
+      - '**'
+    branches-ignore:
+      - next
+      - main
+jobs:
+  package-app-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: 'phantomcyber/dev-cicd-tools/github-actions/package-app-dependencies@sodle/PAPP-33717'
+       with:
+         GITHUB_TOKEN: ${{ secrets.SOAR_APPS_TOKEN }}

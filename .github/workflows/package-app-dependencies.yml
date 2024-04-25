@@ -19,4 +19,5 @@ jobs:
     steps:
      - uses: 'phantomcyber/dev-cicd-tools/github-actions/package-app-dependencies@sodle/PAPP-33717'
        with:
-         GITHUB_TOKEN: ${{ secrets.SOAR_APPS_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.SOAR_APPS_TOKEN }}
+        python-version: ${{ matrix.python-version }}

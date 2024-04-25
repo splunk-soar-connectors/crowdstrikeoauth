@@ -12,6 +12,10 @@ on:
 jobs:
   package-app-dependencies:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        python-version: ['3.6', '3.9']
     steps:
      - uses: 'phantomcyber/dev-cicd-tools/github-actions/package-app-dependencies@sodle/PAPP-33717'
        with:

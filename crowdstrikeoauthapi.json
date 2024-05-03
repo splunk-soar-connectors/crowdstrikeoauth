@@ -18537,7 +18537,6 @@
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
-
         },
         {
             "action": "list ioa rule groups",
@@ -20202,27 +20201,19 @@
             }
         }
     ],
-    "pip39_dependencies": {
+    "pip_dependencies": {
         "wheel": [
             {
-                "module": "beautifulsoup4",
-                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
-            },
-            {
                 "module": "pytz",
-                "input_file": "wheels/shared/pytz-2021.1-py2.py3-none-any.whl"
+                "input_file": "wheels/pytz-2021.1-py2.py3-none-any.whl"
             },
             {
-                "module": "requests_toolbelt",
-                "input_file": "wheels/shared/requests_toolbelt-0.9.1-py2.py3-none-any.whl"
+                "module": "requests-toolbelt",
+                "input_file": "wheels/requests_toolbelt-0.9.1-py2.py3-none-any.whl"
             },
             {
                 "module": "simplejson",
-                "input_file": "wheels/py39/simplejson-3.17.2-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-            },
-            {
-                "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.5-py3-none-any.whl"
+                "input_file": "wheels/simplejson-3.17.3-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
             }
         ]
     }

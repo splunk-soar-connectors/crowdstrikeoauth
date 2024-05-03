@@ -11,13 +11,9 @@ on:
       - main
 jobs:
   package-app-dependencies:
-    runs-on: ubuntu-20.04
-    strategy:
-      max-parallel: 1
-      matrix:
-        python-version: ['3.6', '3.9']
+    runs-on: ubuntu-22.04
     steps:
      - uses: 'phantomcyber/dev-cicd-tools/github-actions/package-app-dependencies@sodle/PAPP-33717'
        with:
         GITHUB_TOKEN: ${{ secrets.SOAR_APPS_TOKEN }}
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.9

@@ -1,11 +1,9 @@
 name: Package App Dependencies
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     paths:
-      - 'requirements.txt'
-    tags-ignore:
-      - '**'
+      - "requirements.txt"
     branches-ignore:
       - next
       - main
@@ -13,7 +11,7 @@ jobs:
   package-app-dependencies:
     runs-on: ubuntu-22.04
     steps:
-     - uses: 'phantomcyber/dev-cicd-tools/github-actions/package-app-dependencies@sodle/PAPP-33717'
-       with:
-        GITHUB_TOKEN: ${{ secrets.SOAR_APPS_TOKEN }}
-        python-version: 3.9
+      - uses: "phantomcyber/dev-cicd-tools/github-actions/package-app-dependencies@sodle/PAPP-33717"
+        with:
+          GITHUB_TOKEN: ${{ secrets.SOAR_APPS_TOKEN }}
+          python-version: 3.9

@@ -2,8 +2,11 @@ name: Package App Dependencies
 on:
   workflow_dispatch:
   pull_request:
+  push:
     paths:
       - "requirements.txt"
+    tags-ignore:
+      - "**"
     branches-ignore:
       - next
       - main

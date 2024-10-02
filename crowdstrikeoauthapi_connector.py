@@ -512,7 +512,10 @@ class CrowdstrikeConnector(BaseConnector):
         list_ids_details = list()
 
         while list_ids:
-            param = {"ids": list_ids[:min(100, len(list_ids))]}
+            if endpoint == CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT:
+                param = {"composite_ids": list_ids[:min(100, len(list_ids))]}
+            else:
+                param = {"ids": list_ids[:min(100, len(list_ids))]}
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, json_data=param, method=method)
             if phantom.is_fail(ret_val):
                 return None
@@ -1846,15 +1849,29 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        alert_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_ALERTS_ENDPOINT, param)
+        params = dict()
+
+        params['limit'] = param.get('limit')
+
+        filter = param.get('filter')
+        sort = param.get('sort')
+
+        if filter:
+            params['filter'] = filter
+        if sort:
+            params['sort'] = sort
+
+        params['include_hidden'] = param.get('include_hidden', False)
+
+        alert_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_ALERTS_ENDPOINT, params)
         if alert_id_list is None:
             return action_result.get_status()
 
         alert_id_data = list()
         alert_id_data.extend(alert_id_list)
-        param.update({"ids": alert_id_list})
+        params.update({"ids": alert_id_list})
 
-        alert_details_list = self._get_details(action_result, CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT, param, method='post')
+        alert_details_list = self._get_details(action_result, CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT, params, method='post')
 
         if alert_details_list is None:
             return action_result.get_status()

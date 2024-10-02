@@ -144,8 +144,8 @@ CROWDSTRIKE_RTR_ADMIN_PUT_FILES = "/real-time-response/entities/put-files/v1"
 CROWDSTRIKE_ADMIN_COMMAND_ENDPOINT = "/real-time-response/entities/admin-command/v1"
 CROWDSTRIKE_RUN_COMMAND_ENDPOINT = "/real-time-response/entities/command/v1"
 
-CROWDSTRIKE_LIST_ALERTS_ENDPOINT = "/alerts/queries/alerts/v1"
-CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v1"
+CROWDSTRIKE_LIST_ALERTS_ENDPOINT = "/alerts/queries/alerts/v2"
+CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v2"
 
 CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT = "/detects/queries/detects/v1"
 CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT = "/detects/entities/summaries/GET/v1"

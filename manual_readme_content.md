@@ -225,6 +225,24 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
 
 ## Notes
 
+
+-   **Action -** List Alerts
+
+<!-- -->
+
+-   The filter parameter values follow the [FQL
+    Syntax](https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-fql-reference)
+    .
+-   The sort parameter value has to be provided in the format property_name.asc for ascending and
+    property_name.desc for descending order.
+
+-   The include_hidden parameter has been added to the action as it's behavior in the API has changed. In the
+    previous version, the default behavior of the include_hidden parameter was either not supported or defaulted
+    to `false`. The latest version of the API now defaults `include_hidden` to `true` if it is not included in
+    the API call. Therefore, we have included this parameter in the action configuration and set it to `false` by
+    default in order to keep the action behavior consistent with the previous app version. Hidden alerts can be
+    identified by the `show_in_ui` field of an alert object.
+
 -   **Action -** List Groups
 
 <!-- -->

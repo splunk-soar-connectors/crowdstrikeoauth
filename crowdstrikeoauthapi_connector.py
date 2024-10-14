@@ -783,7 +783,7 @@ class CrowdstrikeConnector(BaseConnector):
             "status.desc",
         ]
 
-        params = {k: param[k] for k in param.keys() if k in ["filter", "limit", "offset", "sort"]}
+        params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_OFFSET, CROWDSTRIKE_SORT]}
 
         resp = self._check_data(action_result, params, max_limit, sort_data)
         if phantom.is_fail(resp):
@@ -814,7 +814,7 @@ class CrowdstrikeConnector(BaseConnector):
         max_limit = None
         sort_data = ["--", "timestamp.asc", "timestamp.desc"]
 
-        params = {k: param[k] for k in param.keys() if k in ["filter", "limit", "offset", "sort"]}
+        params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_OFFSET, CROWDSTRIKE_SORT]}
 
         resp = self._check_data(action_result, params, max_limit, sort_data)
         if phantom.is_fail(resp):
@@ -897,7 +897,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = {k: param[k] for k in param.keys() if k in ["filter", "limit", "offset", "sort"]}
+        params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_OFFSET, CROWDSTRIKE_SORT]}
 
         max_limit = None
         sort_data = ["--", "score.asc", "score.desc", "timestamp.asc", "timestamp.desc"]
@@ -1088,7 +1088,7 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         max_limit = 5000
 
-        params = {k: param[k] for k in param.keys() if k in ["filter", "limit", "offset", "sort"]}
+        params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_OFFSET, CROWDSTRIKE_SORT]}
 
         resp = self._check_data(action_result, params, max_limit)
         if phantom.is_fail(resp):
@@ -1136,7 +1136,7 @@ class CrowdstrikeConnector(BaseConnector):
             "name.desc",
         ]
 
-        params = {k: param[k] for k in param.keys() if k in ["filter", "limit", "sort"]}
+        params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_SORT]}
 
         resp = self._check_data(action_result, params, max_limit, sort_data)
 
@@ -1336,7 +1336,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = {k: param[k] for k in param.keys() if k in ["filter", "limit", "offset", "sort"]}
+        params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_OFFSET, CROWDSTRIKE_SORT]}
 
         resp = self._check_data(action_result, params)
 
@@ -1828,7 +1828,9 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        params = {k: param[k] for k in param.keys() if k in ["limit", "filter", "sort", "include_hidden"]}
+        params = {
+            k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_SORT, CROWDSTRIKE_INCLUDE_HIDDEN]
+        }
 
         if "include_hidden" not in params:
             params["include_hidden"] = False
@@ -1873,7 +1875,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = {k: param[k] for k in param.keys() if k in ["limit", "filter", "sort"]}
+        params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_SORT]}
 
         resp = self._check_data(action_result, params)
 
@@ -2138,7 +2140,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = {k: param[k] for k in param.keys() if k in ["limit", "filter", "sort"]}
+        params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_SORT]}
 
         resp = self._check_data(action_result, params)
 

@@ -1136,7 +1136,7 @@ class CrowdstrikeConnector(BaseConnector):
             "name.desc",
         ]
 
-        params = {k: param[k] for k in param.keys() if k in ["filter", "limit", "sort"] and param.get(k)}
+        params = {k: param[k] for k in param.keys() if k in ["filter", "limit", "sort"]}
 
         resp = self._check_data(action_result, params, max_limit, sort_data)
 

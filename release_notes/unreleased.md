@@ -1,1 +1,4 @@
 **Unreleased**
+
+- Updated deprecated "list alerts" and "alert details" endpoints [PAPP-34356]
+- Added "include_hidden" parameter to "list alerts" action due to API behavior change. See note in documentation [PAPP-34356]

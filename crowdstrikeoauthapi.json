@@ -21,15 +21,15 @@
         }
     ],
     "license": "Copyright (c) 2019-2024 Splunk Inc.",
-    "app_version": "4.2.0",
+    "app_version": "4.3.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, November 28th 2023, API versions: v1, v2"
+        "Cloud, API api.crowdstrike.com, October 1st 2024, API versions: v1, v2"
     ],
     "utctime_updated": "2022-05-04T23:15:36.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "6.1.1",
+    "min_phantom_version": "6.2.1",
     "python_version": "3",
     "fips_compliant": true,
     "app_wizard_version": "1.0.0",
@@ -4078,6 +4078,12 @@
                     "data_type": "string",
                     "description": "Property to sort by",
                     "order": 2
+                },
+                "include_hidden": {
+                    "data_type": "boolean",
+                    "description": "Include hidden alerts",
+                    "order": 3,
+                    "default": false
                 }
             },
             "output": [
@@ -4376,6 +4382,13 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.include_hidden",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
                     ]
                 }
             ],
@@ -18537,7 +18550,6 @@
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
-
         },
         {
             "action": "list ioa rule groups",
@@ -20205,10 +20217,6 @@
     "pip39_dependencies": {
         "wheel": [
             {
-                "module": "beautifulsoup4",
-                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
-            },
-            {
                 "module": "pytz",
                 "input_file": "wheels/shared/pytz-2021.1-py2.py3-none-any.whl"
             },
@@ -20219,10 +20227,22 @@
             {
                 "module": "simplejson",
                 "input_file": "wheels/py39/simplejson-3.17.2-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            }
+        ]
+    },
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "pytz",
+                "input_file": "wheels/shared/pytz-2021.1-py2.py3-none-any.whl"
             },
             {
-                "module": "soupsieve",
-                "input_file": "wheels/py3/soupsieve-2.5-py3-none-any.whl"
+                "module": "requests_toolbelt",
+                "input_file": "wheels/shared/requests_toolbelt-0.9.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "simplejson",
+                "input_file": "wheels/py36/simplejson-3.17.2-cp36-cp36m-manylinux2010_x86_64.manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_28_x86_64.whl"
             }
         ]
     }

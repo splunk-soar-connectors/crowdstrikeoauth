@@ -26,7 +26,7 @@ CROWDSTRIKE_GET_PROCESS_DETAIL_FALCON_PROCESS_ID = "falcon_process_id"
 CROWDSTRIKE_GET_DEVICE_DETAIL_DEVICE_ID = "id"
 CROWDSTRIKE_JSON_ID = "id"
 CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE = "state"
-PAYLOAD_SECURITY_API_KEY = 'api_key'  # pragma: allowlist secret
+PAYLOAD_SECURITY_API_KEY = "api_key"  # pragma: allowlist secret
 CROWDSTRIKE_JSON_IOC = "ioc"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID = "id"
 CROWDSTRIKE_IOCS_EXPIRATION = "expiration"
@@ -56,6 +56,13 @@ CROWDSTRIKE_JSON_LIST_IOC = "indicator_value"
 CROWDSTRIKE_POLL_INTERVAL = "detonate_timeout"
 CROWDSTRIKE_RESOURCE_ID = "resource_id"
 
+# general parameters
+CROWDSTRIKE_FILTER = "filter"
+CROWDSTRIKE_INCLUDE_HIDDEN = "include_hidden"
+CROWDSTRIKE_LIMIT = "limit"
+CROWDSTRIKE_OFFSET = "offset"
+CROWDSTRIKE_SORT = "sort"
+
 DEFAULT_POLLNOW_EVENTS_COUNT = 2000
 DEFAULT_EVENTS_COUNT = 10000
 DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT = 50
@@ -65,8 +72,8 @@ CROWDSTRIKE_SUCC_CONNECTIVITY_TEST = "Test connectivity passed"
 CROWDSTRIKE_CONNECTIVITY_TEST_ERROR = "Test connectivity failed"
 CROWDSTRIKE_FROM_SERVER_ERROR = "Error from Server, Status Code: {status}, Message: {message}"
 CROWDSTRIKE_END_TIME_LT_START_TIME_ERROR = "End time less than start time"
-CROWDSTRIKE_INVALID_LIMIT = 'Please provide non-zero positive integer in limit parameter'
-CROWDSTRIKE_HTML_ERROR = 'Bad Request - Invalid URL HTTP Error 400. The request URL is invalid'
+CROWDSTRIKE_INVALID_LIMIT = "Please provide non-zero positive integer in limit parameter"
+CROWDSTRIKE_HTML_ERROR = "Bad Request - Invalid URL HTTP Error 400. The request URL is invalid"
 CROWDSTRIKE_NO_PARAMETER_ERROR = "One of the parameters (device_id or hostname) must be provided"
 CROWDSTRIKE_INVALID_INPUT_ERROR = "Please provide valid inputs"
 CROWDSTRIKE_INVALID_DEVICE_ID_AND_HOSTNAME_ERROR = "Please provide valid device_id and hostname parameters"
@@ -85,7 +92,7 @@ CROWDSTRIKE_META_KEY_EMPTY_ERROR = "Meta key empty or not present"
 CROWDSTRIKE_RESOURCES_KEY_EMPTY_ERROR = "Resources key empty or not present. Please try after sometime"
 CROWDSTRIKE_DATAFEED_EMPTY_ERROR = "Datafeed key empty or not present"
 CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR = "Session token, not found"
-PAYLOAD_SECURITY_SUBMITTING_FILE_MESSAGE = 'Submitting file/url to Falcon Sandbox'
+PAYLOAD_SECURITY_SUBMITTING_FILE_MESSAGE = "Submitting file/url to Falcon Sandbox"
 CROWDSTRIKE_EVENTS_FETCH_ERROR = "Error occurred while fetching the DetectionSummaryEvents from the CrowdStrike server datafeed URL stream"
 CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MESSAGE = "Please provide zero or a valid positive integer value in the {parameter} parameter"
 CROWDSTRIKE_LIMIT_VALIDATION_MESSAGE = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
@@ -99,8 +106,9 @@ CROWDSTRIKE_MISSING_INDICATOR_TYPE_MESSAGE_ERROR = "Please provide indicator typ
 CROWDSTRIKE_COMPLETED = "Completed {0:.0%}"
 CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in the {key} parameter"
 CROWDSTRIKE_UNAVAILABLE_MESSAGE_ERROR = "Error message unavailable. Please check the asset configuration and|or action parameters"
-CROWDSTRIKE_UNICODE_DAMMIT_TYPE_MESSAGE_ERROR = "Error occurred while connecting to the Crowdstrike server. "\
-    "Please check the asset configuration and|or the action parameters."
+CROWDSTRIKE_UNICODE_DAMMIT_TYPE_MESSAGE_ERROR = (
+    "Error occurred while connecting to the Crowdstrike server. " "Please check the asset configuration and|or the action parameters."
+)
 CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
 CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE = "Error details: 404"
 CROWDSTRIKE_PULLED_EVENTS_MESSAGE = "Pulled {0} events of type 'DetectionSummaryEvent'"
@@ -110,10 +118,9 @@ CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE = "CR/LF received on iteration {} - continuin
 CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE = "Total blank lines count: {}"
 CROWDSTRIKE_GOT_EVENTS_MESSAGE = "Got {0} events of type 'DetectionSummaryEvent'"
 
-CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
-                                 '&_filter_asset={1}'\
-                                 '&_filter_name__contains="{2}"'\
-                                 '&_filter_start_time__gte="{3}"'
+CROWDSTRIKE_FILTER_REQUEST_STR = (
+    "{0}rest/container?page_size=0" "&_filter_asset={1}" '&_filter_name__contains="{2}"' '&_filter_start_time__gte="{3}"'
+)
 CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "(type:'{}' + value:'{}') + (deleted:'true', deleted: 'false')"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID = "id:'{}' + (deleted:'true', deleted: 'false')"
@@ -144,8 +151,8 @@ CROWDSTRIKE_RTR_ADMIN_PUT_FILES = "/real-time-response/entities/put-files/v1"
 CROWDSTRIKE_ADMIN_COMMAND_ENDPOINT = "/real-time-response/entities/admin-command/v1"
 CROWDSTRIKE_RUN_COMMAND_ENDPOINT = "/real-time-response/entities/command/v1"
 
-CROWDSTRIKE_LIST_ALERTS_ENDPOINT = "/alerts/queries/alerts/v1"
-CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v1"
+CROWDSTRIKE_LIST_ALERTS_ENDPOINT = "/alerts/queries/alerts/v2"
+CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v2"
 
 CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT = "/detects/queries/detects/v1"
 CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT = "/detects/entities/summaries/GET/v1"
@@ -183,40 +190,44 @@ CROWDSTRIKE_GET_ZERO_TRUST_ASSESSMENT_ENDPOINT = "/zero-trust-assessment/entitie
 CROWDSTRIKE_BASE_ENDPOINT = "/sensors/entities/datafeed/v2"
 CROWDSTRIKE_FALCONX_API_LIMIT = 5000
 CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
-    'linux ubuntu 16.04, 64-bit': 300,
-    'android (static analysis)': 200,
-    'windows 10, 64-bit': 160,
-    'windows 7, 64-bit': 110,
-    'windows 7, 32-bit': 100
+    "linux ubuntu 16.04, 64-bit": 300,
+    "android (static analysis)": 200,
+    "windows 10, 64-bit": 160,
+    "windows 7, 64-bit": 110,
+    "windows 7, 32-bit": 100,
 }
 
 CROWDSTRIKE_SORT_FOR_CRITERIA_IOC_DICT = {
-    CROWDSTRIKE_SEARCH_IOCS_TYPE: 'type',
-    CROWDSTRIKE_JSON_LIST_IOC: 'value',
-    CROWDSTRIKE_IOCS_ACTION: 'action',
-    CROWDSTRIKE_IOCS_SEVERITY: 'severity',
-    CROWDSTRIKE_IOC_DATE_ADDED: 'created_on',
-    CROWDSTRIKE_IOC_LAST_MODIFIED: 'modified_on'
+    CROWDSTRIKE_SEARCH_IOCS_TYPE: "type",
+    CROWDSTRIKE_JSON_LIST_IOC: "value",
+    CROWDSTRIKE_IOCS_ACTION: "action",
+    CROWDSTRIKE_IOCS_SEVERITY: "severity",
+    CROWDSTRIKE_IOC_DATE_ADDED: "created_on",
+    CROWDSTRIKE_IOC_LAST_MODIFIED: "modified_on",
 }
 
 CROWDSTRIKE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
 
-CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not found'
-CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Indicator not found'
-CROWDSTRIKE_MISSING_PARAMETER_MESSAGE_DELETE_IOC_ERROR = 'Please provide at least one of the parameter'
+CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = "Failed to delete resource. Resource not found"
+CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = "Indicator not found"
+CROWDSTRIKE_MISSING_PARAMETER_MESSAGE_DELETE_IOC_ERROR = "Please provide at least one of the parameter"
 CROWDSTRIKE_VALUE_LIST_MESSAGE_ERROR = "Please enter valid value in '{}' parameter"
-CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc",
-"last_modified.asc", "indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]
-CROWDSTRIKE_API_SUCC_CODES = [200, 202, 204]
-CROWDSTRIKE_DETECTION_STATUSES = [
-    "new",
-    "in_progress",
-    "true_positive",
-    "false_positive",
-    "ignored",
-    "closed",
-    "reopened"
+CROWDSTRIKE_SORT_CRITERIA_LIST = [
+    "indicator_type.asc",
+    "indicator_value.asc",
+    "action.asc",
+    "severity.asc",
+    "date_added.asc",
+    "last_modified.asc",
+    "indicator_type.desc",
+    "indicator_value.desc",
+    "action.desc",
+    "severity.desc",
+    "date_added.desc",
+    "last_modified.desc",
 ]
+CROWDSTRIKE_API_SUCC_CODES = [200, 202, 204]
+CROWDSTRIKE_DETECTION_STATUSES = ["new", "in_progress", "true_positive", "false_positive", "ignored", "closed", "reopened"]
 
 CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT = "/ioarules/entities/rule-groups/v1"
 CROWDSTRIKE_IOA_QUERY_RULE_GROUPS_ENDPOINT = "/ioarules/queries/rule-groups-full/v1"

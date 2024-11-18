@@ -2451,18 +2451,6 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_GET_ALERT)
 
-    def _parse_resp_data(self, data):
-
-        event = None
-        try:
-            event = json.loads(data)
-        except Exception as e:
-            self.debug_print(traceback.format_exc())
-            self.debug_print("Exception while parsing data: ", self._get_error_message_from_exception(e))
-            return (phantom.APP_ERROR, data)
-
-        return (phantom.APP_SUCCESS, event)
-
     def _get_stream(self, action_result):
 
         # Progress
@@ -2599,7 +2587,8 @@ class CrowdstrikeConnector(BaseConnector):
 
         # Query for the events
         try:
-            self._data_feed_url = self._data_feed_url + "&offset={0}&eventType=DetectionSummaryEvent".format(lower_id)
+            # Need to check both event types
+            self._data_feed_url = self._data_feed_url + "&offset={0}&eventType=DetectionSummaryEvent,EppDetectionSummaryEvent".format(lower_id)
             kwargs = {"headers": {"Authorization": "Token {0}".format(self._token), "Connection": "Keep-Alive"}, "stream": True}
             r = requests.request("get", self._data_feed_url, **kwargs)
         except Exception as e:
@@ -2619,44 +2608,36 @@ class CrowdstrikeConnector(BaseConnector):
         total_blank_lines_count = 0  # counter for total number of blank lines
 
         try:
+            event_count = 0
+
             for stream_data in r.iter_lines(chunk_size=None):
-                # chunk = UnicodeDammit(chunk).unicode_markup
-
-                if stream_data is None:
-                    # Done with all the event data for now
-                    self.debug_print(CROWDSTRIKE_NO_DATA_MESSAGE)
-                    self.save_progress(CROWDSTRIKE_NO_DATA_MESSAGE)
-                    break
-
-                if not stream_data.strip():
-                    # increment counter for counting of the continuous as well as total blank lines
+                if not stream_data:
                     counter += 1
-                    total_blank_lines_count += 1
-
-                    if counter > max_crlf:
+                    if counter >= DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT:
                         self.debug_print(CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter))
-                        self.save_progress(CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter))
                         break
-                    else:
-                        self.debug_print(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
-                        self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
-                        continue
-
-                ret_val, stream_data = self._parse_resp_data(stream_data)
-
-                if phantom.is_fail(ret_val):
-                    self.save_progress(
-                        "Failed to parse the stream_data. Find stream_data details in logs. Error Message: {}".format(
-                            action_result.get_status_message()
-                        )
-                    )
-                    self.save_progress("Continuing with next event.")
-                    self.debug_print("Failed to parse the stream_data: {}".format(stream_data))
+                    self.debug_print(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
+                    self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
                     continue
 
-                if stream_data and stream_data.get("metadata", {}).get("eventType") == "DetectionSummaryEvent":
+                try:
+                    stream_data = UnicodeDammit(stream_data).unicode_markup
+                    stream_data = json.loads(stream_data)
+                except Exception as e:
+                    self.debug_print("Error while parsing stream data: {}".format(self._get_error_message_from_exception(e)))
+                    continue
+
+                # Need to check both event types
+                event_type = stream_data.get("metadata", {}).get("eventType")
+                if stream_data and event_type in ["DetectionSummaryEvent", "EppDetectionSummaryEvent"]:
                     self._events.append(stream_data)
-                    counter = 0  # reset the continuous blank lines counter as we received a valid data in between
+                    counter = 0  # Reset blank lines counter
+                    event_count += 1
+                    self.send_progress("Ingested {} {}(s)".format(event_count, event_type))
+
+                    if event_count >= max_events:
+                        self.debug_print("Reached max events limit {}".format(max_events))
+                        break
 
                 # Calculate length of DetectionSummaryEvents until now
                 len_events = len(self._events)
@@ -2685,9 +2666,10 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress(CROWDSTRIKE_GOT_EVENTS_MESSAGE.format(len(self._events)))
 
         if self._events:
-            self.send_progress("Parsing the fetched DetectionSummaryEvents...")
+            # Update messages to reference both event types
+            self.send_progress("Parsing the fetched Detection Events...")
             results = events_parser.parse_events(self._events, self, collate)
-            self.save_progress("Created {0} relevant results from the fetched DetectionSummaryEvents".format(len(results)))
+            self.save_progress("Created {0} relevant results from the fetched Detection Events".format(len(results)))
             if results:
                 self.save_progress(
                     "Adding {0} event artifact{1}. Empty containers will be skipped.".format(len(results), "s" if len(results) > 1 else "")

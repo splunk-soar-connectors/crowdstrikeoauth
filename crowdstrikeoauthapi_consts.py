@@ -111,12 +111,12 @@ CROWDSTRIKE_UNICODE_DAMMIT_TYPE_MESSAGE_ERROR = (
 )
 CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
 CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE = "Error details: 404"
-CROWDSTRIKE_PULLED_EVENTS_MESSAGE = "Pulled {0} events of type 'DetectionSummaryEvent'"
+CROWDSTRIKE_PULLED_EVENTS_MESSAGE = "Pulled {0} detection events"
 CROWDSTRIKE_NO_DATA_MESSAGE = "No data, terminating loop"
 CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE = "CR/LF received on iteration: {} - terminating loop"
 CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE = "CR/LF received on iteration {} - continuing"
 CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE = "Total blank lines count: {}"
-CROWDSTRIKE_GOT_EVENTS_MESSAGE = "Got {0} events of type 'DetectionSummaryEvent'"
+CROWDSTRIKE_GOT_EVENTS_MESSAGE = "Got {0} detection events"
 
 CROWDSTRIKE_FILTER_REQUEST_STR = (
     "{0}rest/container?page_size=0" "&_filter_asset={1}" '&_filter_name__contains="{2}"' '&_filter_start_time__gte="{3}"'
@@ -228,6 +228,7 @@ CROWDSTRIKE_SORT_CRITERIA_LIST = [
 ]
 CROWDSTRIKE_API_SUCC_CODES = [200, 202, 204]
 CROWDSTRIKE_DETECTION_STATUSES = ["new", "in_progress", "true_positive", "false_positive", "ignored", "closed", "reopened"]
+CROWDSTRIKE_EVENT_TYPES = ["DetectionSummaryEvent", "EppDetectionSummaryEvent"]
 
 CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT = "/ioarules/entities/rule-groups/v1"
 CROWDSTRIKE_IOA_QUERY_RULE_GROUPS_ENDPOINT = "/ioarules/queries/rule-groups-full/v1"

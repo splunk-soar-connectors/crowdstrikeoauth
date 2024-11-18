@@ -21,6 +21,9 @@ from datetime import datetime
 from bs4 import UnicodeDammit
 from phantom import utils as ph_utils
 
+from crowdstrikeoauthapi_consts import CROWDSTRIKE_EVENT_TYPES
+
+
 _container_common = {
     "description": "Container added by Phantom",
     "run_automation": False,  # Don't run any playbooks, when this container is added
@@ -374,56 +377,91 @@ def _get_str_from_epoch(epoch_milli):
     return datetime.fromtimestamp(int(epoch_milli) / 1000).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def parse_events(events, base_connector, collate):
-
+def parse_events(events, connector, collate=True):
     results = []
+    for event in events:
+        event_type = event.get("metadata", {}).get("eventType")
+        # Parse both DetectionSummaryEvent and EppDetectionSummaryEvent types now
+        if event_type not in CROWDSTRIKE_EVENT_TYPES:
+            continue
 
-    base_connector.save_progress("Extracting Detection events")
+        event_data = event.get("event", {})
 
-    # extract the type == 'DetectionSummaryEvent' events
-    detection_events = [x for x in events if x["metadata"]["eventType"] == "DetectionSummaryEvent"]
+        # Common fields for both event types
+        cef = {
+            "agentId": event_data.get("AgentId") or event_data.get("SensorId"),
+            "compositeId": event_data.get("CompositeId"),
+            "commandLine": event_data.get("CommandLine"), 
+            "fileName": event_data.get("FileName"),
+            "filePath": event_data.get("FilePath"),
+            "hostname": event_data.get("ComputerName"),
+            "localIP": event_data.get("LocalIP"),
+            "macAddress": event_data.get("MACAddress"),
+            "md5": event_data.get("MD5String"),
+            "sha256": event_data.get("SHA256String"),
+            "parentProcessId": event_data.get("ParentProcessId"),
+            "processId": event_data.get("ProcessId"),
+            "severity": event_data.get("Severity"),
+            "severityName": event_data.get("SeverityName"),
+            "userName": event_data.get("UserName"),
+            "eventType": event_type,
+            "falconHostLink": event_data.get("FalconHostLink"),
+            "description": event_data.get("Description"),
+            "name": event_data.get("Name"),
+            "tactic": event_data.get("Tactic"),
+            "technique": event_data.get("Technique"),
+            "objective": event_data.get("Objective"),
+            "patternDispositionDescription": event_data.get("PatternDispositionDescription"),
+            "patternDispositionValue": event_data.get("PatternDispositionValue")
+        }
 
-    if not detection_events:
-        base_connector.save_progress("Did not match any events of type: DetectionSummaryEvent")
-        return results
+        # EppDetectionSummaryEvent specific fields
+        if event_type == "EppDetectionSummaryEvent":
+            epp_fields = {
+                "aggregateId": event_data.get("AggregateId"),
+                "dataDomains": event_data.get("DataDomains"),
+                "hostGroups": event_data.get("HostGroups"),
+                "tags": event_data.get("Tags"),
+                "associatedFile": event_data.get("AssociatedFile")
+            }
+            cef.update(epp_fields)
 
-    base_connector.save_progress("Got {0} events of type DetectionSummaryEvent".format(len(detection_events)))
+            nested_objects = [
+                "DnsRequests",
+                "FilesAccessed", 
+                "FilesWritten",
+                "NetworkAccesses",
+                "QuarantineFiles"
+            ]
+
+            for obj in nested_objects:
+                if event_data.get(obj):
+                    cef[obj.lower()] = event_data.get(obj)
+
+        # Container
+        container = {
+            "name": f"{event_type} - {cef['name']}",
+            "description": cef["description"],
+            "source_data_identifier": cef["compositeId"],
+            "severity": cef["severityName"].lower()
+        }
+
+        # Artifact
+        artifact = {
+            "name": f"{event_type} Artifact",
+            "container_id": container["source_data_identifier"],
+            "source_data_identifier": cef["compositeId"],
+            "cef": cef,
+            "severity": cef["severityName"].lower(),
+            "label": "event"
+        }
+
+        results.append({
+            "container": container,
+            "artifacts": [artifact]
+        })
 
     if collate:
-        return _collate_results(base_connector, detection_events)
-
-    for i, curr_event in enumerate(detection_events):
-
-        artifacts_ret = _create_artifacts_from_event(base_connector, curr_event)
-
-        event_details = curr_event["event"]
-        detection_name = event_details.get("DetectName", "Unknown Detection")
-        hostname = event_details.get("ComputerName", "Unknown Host")
-        creation_time = curr_event.get("metadata").get("eventCreationTime", "")
-
-        ingest_event = dict()
-        results.append(ingest_event)
-
-        if creation_time:
-            creation_time = _get_str_from_epoch(creation_time)
-
-        # Create the container
-        container = dict()
-        ingest_event["container"] = container
-        container.update(_container_common)
-        if sys.version_info[0] == 2:
-            container["name"] = "{0} on {1} at {2}".format(
-                UnicodeDammit(detection_name).unicode_markup.encode("utf-8"),
-                UnicodeDammit(hostname).unicode_markup.encode("utf-8"),
-                creation_time,
-            )
-        else:
-            container["name"] = "{0} on {1} at {2}".format(detection_name, hostname, creation_time)
-        container["severity"] = _severity_map.get(str(event_details.get("Severity", 3)), "medium")
-        container["source_data_identifier"] = _create_dict_hash(base_connector, container)
-
-        # now the artifacts, will just be one
-        ingest_event["artifacts"] = artifacts = []
-        artifacts.extend(artifacts_ret)
+        results = _collate_results(results)
 
     return results

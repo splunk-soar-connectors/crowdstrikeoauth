@@ -239,3 +239,6 @@ CROWDSTRIKE_IOA_GET_TYPE_ENDPOINT = "/ioarules/entities/rule-types/v1"
 CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT = "/ioarules/entities/rules/v1"
 
 CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT = "/policy/entities/prevention-actions/v1"
+
+CROWDSTRIKE_UPDATE_ALERT_ENDPOINT = "/alerts/entities/alerts/v3"
+CROWDSTRIKE_GET_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v2"

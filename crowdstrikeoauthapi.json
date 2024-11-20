@@ -3077,6 +3077,151 @@
             }
         },
         {
+            "action": "list epp alerts",
+            "description": "Get a list of epp alerts",
+            "verbose": "This action retrieves Endpoint Protection alerts, replacing the legacy Detects API (deprecated April 30, 2025).",
+            "type": "investigate",
+            "identifier": "list_app_alerts",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Maximum alerts to be fetched",
+                    "order": 0,
+                    "default": 100
+                },
+                "filter": {
+                    "data_type": "string",
+                    "description": "Filter expression used to limit the fetched alerts (FQL Syntax)",
+                    "order": 1
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Property to sort by",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.alleged_filetype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.cmdline",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.control_graph_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.device_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.filename",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.filepath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.pattern_disposition",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.scenario",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.tactic",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.technique",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.composite_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "new",
+                        "in_progress",
+                        "closed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_alerts",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "custom",
+                "view": "crowdstrike_view.display_view"
+            }
+        },
+        {
             "action": "get detections details",
             "description": "Get a list of detections details by providing detection IDs",
             "type": "investigate",
@@ -3884,6 +4029,165 @@
             }
         },
         {
+            "action": "get alerts details",
+            "description": "Get details for EPP alerts by providing their composite IDs",
+            "verbose": "Retrieves detailed information for EPP alerts using the new alerts API that replaces the legacy Detects API (being deprecated April 30, 2025).",
+            "type": "investigate",
+            "identifier": "get_alerts_details",
+            "read_only": true,
+            "parameters": {
+                "alert_ids": {
+                    "data_type": "string",
+                    "description": "List of alert composite_ids. Comma-separated list allowed",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "crowdstrike alert id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_ids",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregate_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "aggind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx6384"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assigned_to_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assigned_to_uid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.alleged_filetype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.cmdline",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.control_graph_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.device_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.filename",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.filepath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.pattern_disposition",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.scenario",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.tactic",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.technique",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviors.*.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.composite_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "new",
+                        "in_progress",
+                        "closed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_alerts",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total alerts: 44"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "custom",
+                "view": "crowdstrike_view.display_view"
+            }
+        },
+        {
             "action": "update detections",
             "description": "Update detections in crowdstrike host",
             "type": "generic",
@@ -4034,6 +4338,193 @@
                     "data_type": "string",
                     "example_values": [
                         "Detections affected: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "update alerts",
+            "description": "Update EPP alerts in CrowdStrike",
+            "verbose": "Update properties of EPP alerts including status, assignment, visibility, and comments. Uses the new alerts API that replaces the legacy Detects API (being deprecated April 30, 2025).",
+            "type": "generic",
+            "identifier": "update_alerts",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "alert_ids": {
+                    "description": "List of Alert composite_ids to update (comma-separated list allowed)",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike alert id"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "comment": {
+                    "description": "Comment to add to the alert (Maximum 2048 bytes)",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "assigned_to_user": {
+                    "description": "User to assign (can be email, UUID, or username)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike unique user id",
+                        "email"
+                    ],
+                    "order": 2
+                },
+                "show_in_ui": {
+                    "description": "Control whether this alert is displayed in Falcon UI",
+                    "data_type": "boolean",
+                    "default": true,
+                    "example_values": [
+                        false,
+                        true
+                    ],
+                    "order": 3
+                },
+                "add_tags": {
+                    "description": "Tags to add to the alert (comma-separated list)",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "remove_tags": {
+                    "description": "Tags to remove from the alert (comma-separated list)",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "remove_tags_by_prefix": {
+                    "description": "Remove all tags with this prefix",
+                    "data_type": "string",
+                    "order": 7
+                },
+                "status": {
+                    "description": "Status to set",
+                    "data_type": "string",
+                    "value_list": [
+                        "new",
+                        "in_progress",
+                        "closed",
+                        "reopened"
+                    ],
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.assigned_to_user",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike unique user id",
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "update status of alert"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_ids",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike alert id"
+                    ],
+                    "example_values": [
+                        "d615xxxxxxxx2158:ind:9a8dxxxxxxxxc74c:1336xxxxxxxx1294-32-7878xxxxxxxx1122"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.show_in_ui",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "in_progress"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "detectsapi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "a30c7b54-ae00-4a87-8324-0a575ba7dcb4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.writes.resources_affected",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ],
+                    "column_name": "Alerts Affected",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.alerts_affected",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Alerts affected: 1"
                     ]
                 },
                 {
@@ -7921,6 +8412,100 @@
                     "data_type": "string",
                     "example_values": [
                         "Status set successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "update alert status",
+            "description": "Update the status of an EPP alert in CrowdStrike",
+            "verbose": "The alert composite_id can be obtained from the list_epp_alerts action. Multiple IDs can be provided as a comma-separated list.",
+            "type": "generic",
+            "identifier": "resolve_alert",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "id": {
+                    "description": "Alert composite_id(s) to update. Multiple IDs can be comma-separated",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike alert id"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "state": {
+                    "description": "Status to set",
+                    "data_type": "string",
+                    "value_list": [
+                        "new",
+                        "in_progress",
+                        "closed",
+                        "reopened"
+                    ],
+                    "required": true,
+                    "order": 1
+                }
+            },
+            "render": {
+                "title": "Update Alert Status",
+                "type": "custom",
+                "view": "crowdstrike_view.set_status_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike alert id"
+                    ],
+                    "example_values": [
+                        "d615xxxxxxxx2158:ind:9a8dxxxxxxxxc74c:1336xxxxxxxx1294-32-7878xxxxxxxx1122"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "in_progress"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status updated successfully"
                     ]
                 },
                 {

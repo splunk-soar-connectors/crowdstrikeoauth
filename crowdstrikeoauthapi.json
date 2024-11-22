@@ -3079,9 +3079,9 @@
         {
             "action": "list epp alerts",
             "description": "Get a list of epp alerts",
-            "verbose": "This action retrieves Endpoint Protection alerts, replacing the legacy Detects API (deprecated April 30, 2025).",
+            "verbose": "This action retrieves Endpoint Protection (epp) alerts, replacing legacy Detects API (deprecated April 30, 2025).",
             "type": "investigate",
-            "identifier": "list_app_alerts",
+            "identifier": "list_epp_alerts",
             "read_only": true,
             "parameters": {
                 "limit": {
@@ -3103,11 +3103,10 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.alert_ids",
                     "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
+                    "contains": [
+                        "crowdstrike alert id"
                     ]
                 },
                 {
@@ -3115,104 +3114,1071 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric"
-                },
-                {
                     "data_path": "action_result.parameter.sort",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.alleged_filetype",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.cmdline",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.control_graph_id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.device_id",
+                    "data_path": "action_result.data.*.agent_id",
                     "data_type": "string",
+                    "example_values": [
+                        "9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aggregate_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "aggind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx6384"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alleged_filetype",
+                    "data_type": "string",
+                    "example_values": [
+                        "exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.charlotte.can_triage",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.charlotte.triage_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "open"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.child_process_ids.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx2640"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "d615xxxxxxxx2158"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cmdline",
+                    "data_type": "string",
+                    "example_values": [
+                        "cmd /c echo MZ>log1.txt && cmd /c copy /b log1.txt+fabc.scr abc.scr && cmd /c abc.scr && cmd /c del log1.txt && cmd /c del fabc.scr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.composite_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "d615xxxxxxxx2158:ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122"
+                    ],
+                    "contains": [
+                        "crowdstrike alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.control_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ctg:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx6384"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.crawled_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:35:06.103126166Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:31:04.705194419Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data_domains.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "Endpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "A productivity app launched a process from an executable stack."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.agent_load_flags",
+                    "data_type": "string",
+                    "example_values": [
+                        "3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.agent_local_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-04-28T14:33:47.302Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.agent_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "5.25.10701.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.bios_manufacturer",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phoenix Technologies LTD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.bios_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "d615xxxxxxxx2158"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.config_id_base",
+                    "data_type": "string",
+                    "example_values": [
+                        "65994755"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.config_id_build",
+                    "data_type": "string",
+                    "example_values": [
+                        "10701"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.config_id_platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c"
+                    ],
                     "contains": [
                         "crowdstrike device id"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.filename",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.device.external_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "4x.xxx.xxx.xxx"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.filepath",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.device.first_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:04Z"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.pattern_disposition",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.device.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "example-host"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.scenario",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.device.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.severity",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.device.major_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.sha256",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.device.minor_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.tactic",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.device.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:13Z"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.technique",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.device.os_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 7"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.timestamp",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.device.platform_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.composite_id",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.device.platform_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.created_timestamp",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.device.product_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.product_type_desc",
+                    "data_type": "string",
+                    "example_values": [
+                        "Workstation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "normal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.system_manufacturer",
+                    "data_type": "string",
+                    "example_values": [
+                        "VMware, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.system_product_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "VMware Virtual Platform"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "SpearPhishExecutableStack"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_sent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.external",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.falcon_host_link",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://falcon.crowdstrike.com/activity-v2/detections/d615xxxxxxxx2158:ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122?_cid=g01000co2vxxxxxxxxxxxxu5f72jzjfu"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "cmd.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.filepath",
+                    "data_type": "string",
+                    "example_values": [
+                        "\\Device\\HarddiskVolume1\\Windows\\SysWOW64\\cmd.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.global_prevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "common"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.cmdline",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\Windows\\Explorer.EXE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "explorer.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.filepath",
+                    "data_type": "string",
+                    "example_values": [
+                        "\\Device\\HarddiskVolume1\\Windows\\explorer.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.local_process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1260"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "ac4c51eb24aaxxxxxxxxxxb159189e24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.process_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx0581"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx0581"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "6a67xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx576a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.user_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "uid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testusername"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.end",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "inc:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:7e90xxxxxxxxxxxxxxxxxxxxxxxx399c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.score",
+                    "data_type": "string",
+                    "example_values": [
+                        "77.2905584547083"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.start",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicator_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_context.*",
+                    "data_type": "string",
+                    "example_values": [
+                        []
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_values.*",
+                    "data_type": "string",
+                    "example_values": [
+                        []
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.local_prevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "common"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.local_process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2956"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logon_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "WIN-ABCDEFG"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "ad7b9c14xxxxxxxxxxxxxxxxxxxx2b98"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "SpearPhishExecutableStack"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objective",
+                    "data_type": "string",
+                    "example_values": [
+                        "Follow Through"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.cmdline",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"C:\\Program Files (x86)\\Microsoft Office\\OFFICE11\\WINWORD.EXE\" /n /dde"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "WINWORD.EXE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.filepath",
+                    "data_type": "string",
+                    "example_values": [
+                        "\\Device\\HarddiskVolume1\\Program Files (x86)\\Microsoft Office\\OFFICE11\\WINWORD.EXE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.local_process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2756"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "10ff86bcxxxxxxxxxxxxxxxxxxxxfd507"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.process_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx4664"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx4664"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "b38bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx958d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.user_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "uid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testusername"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx4664"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Detection, standard detection."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.blocking_unsupported_or_disabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.bootup_safeguard_enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.containment_file_system",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.critical_process_disabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.detect",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.fs_operation_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.handle_operation_downgraded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.inddet_mask",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.indicator",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_action_failed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_process",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_subprocess",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.mfa_required",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.operation_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.policy_disabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.prevention_provisioning_enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.process_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.quarantine_file",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.quarantine_machine",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.registry_operation_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.response_action_already_applied",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.response_action_failed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.response_action_triggered",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.rooting",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.sensor_only",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.suspend_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.suspend_process",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.process_end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "1724351403"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx1294"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.process_start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "1724351403"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.product",
+                    "data_type": "string",
+                    "example_values": [
+                        "epp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scenario",
+                    "data_type": "string",
+                    "example_values": [
+                        "malicious_document"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.seconds_to_resolved",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.seconds_to_triaged",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "ee8cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx20b5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "17f7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx02ae"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.show_in_ui",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_products.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "Falcon Insight"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_vendors.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "CrowdStrike"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "new",
-                        "in_progress",
-                        "closed"
+                        "in_progress"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_alerts",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.tactic",
+                    "data_type": "string",
+                    "example_values": [
+                        "Execution"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tactic_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TA0002"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technique",
+                    "data_type": "string",
+                    "example_values": [
+                        "Exploitation for Client Execution"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technique_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "T1203"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03.238Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tree_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx6384"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tree_root",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx4664"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.triggering_process_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ldt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updated_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:35:06.102982431Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testusername"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)",
@@ -4029,11 +4995,10 @@
             }
         },
         {
-            "action": "get alerts details",
-            "description": "Get details for EPP alerts by providing their composite IDs",
-            "verbose": "Retrieves detailed information for EPP alerts using the new alerts API that replaces the legacy Detects API (being deprecated April 30, 2025).",
+            "action": "get epp alerts details",
+            "description": "Get list of alert details for EPP alerts by providing composite IDs, replacing legacy Detects API (deprecated April 30, 2025)",
             "type": "investigate",
-            "identifier": "get_alerts_details",
+            "identifier": "get_epp_alerts_details",
             "read_only": true,
             "parameters": {
                 "alert_ids": {
@@ -4049,18 +5014,17 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.alert_ids",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agent_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c"
                     ]
                 },
                 {
@@ -4071,114 +5035,1053 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assigned_to_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.assigned_to_uid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.alleged_filetype",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.cmdline",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.control_graph_id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.device_id",
+                    "data_path": "action_result.data.*.alleged_filetype",
                     "data_type": "string",
-                    "contains": [
-                        "crowdstrike device id"
+                    "example_values": [
+                        "exe"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.filename",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.charlotte.can_triage",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.filepath",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.charlotte.triage_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "open"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.pattern_disposition",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.child_process_ids.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx2640"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.scenario",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "d615xxxxxxxx2158"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.behaviors.*.severity",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.sha256",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.tactic",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.technique",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.behaviors.*.timestamp",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.cmdline",
+                    "data_type": "string",
+                    "example_values": [
+                        "cmd /c echo MZ>log1.txt && cmd /c copy /b log1.txt+fabc.scr abc.scr && cmd /c abc.scr && cmd /c del log1.txt && cmd /c del fabc.scr"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.composite_id",
                     "data_type": "string",
+                    "example_values": [
+                        "d615xxxxxxxx2158:ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122"
+                    ],
                     "contains": [
                         "crowdstrike alert id"
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.control_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ctg:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx6384"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.crawled_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:35:06.103126166Z"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.created_timestamp",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:31:04.705194419Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data_domains.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "Endpoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "A productivity app launched a process from an executable stack."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.agent_load_flags",
+                    "data_type": "string",
+                    "example_values": [
+                        "3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.agent_local_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-04-28T14:33:47.302Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.agent_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "5.25.10701.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.bios_manufacturer",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phoenix Technologies LTD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.bios_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "d615xxxxxxxx2158"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.config_id_base",
+                    "data_type": "string",
+                    "example_values": [
+                        "65994755"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.config_id_build",
+                    "data_type": "string",
+                    "example_values": [
+                        "10701"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.config_id_platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c"
+                    ],
+                    "contains": [
+                        "crowdstrike device id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.external_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "4x.xxx.xxx.xxx"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.first_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:04Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "example-host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.major_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.minor_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:13Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.os_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.platform_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.platform_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.product_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.product_type_desc",
+                    "data_type": "string",
+                    "example_values": [
+                        "Workstation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "normal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.system_manufacturer",
+                    "data_type": "string",
+                    "example_values": [
+                        "VMware, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.device.system_product_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "VMware Virtual Platform"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "SpearPhishExecutableStack"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_sent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.external",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.falcon_host_link",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://falcon.crowdstrike.com/activity-v2/detections/d615xxxxxxxx2158:ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122?_cid=g01000co2vxxxxxxxxxxxxu5f72jzjfu"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "cmd.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.filepath",
+                    "data_type": "string",
+                    "example_values": [
+                        "\\Device\\HarddiskVolume1\\Windows\\SysWOW64\\cmd.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.global_prevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "common"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.cmdline",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\Windows\\Explorer.EXE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "explorer.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.filepath",
+                    "data_type": "string",
+                    "example_values": [
+                        "\\Device\\HarddiskVolume1\\Windows\\explorer.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.local_process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1260"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "ac4c51eb24aaxxxxxxxxxxb159189e24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.process_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx0581"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx0581"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "6a67xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx576a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.user_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "uid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.grandparent_details.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testusername"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.end",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "inc:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:7e90xxxxxxxxxxxxxxxxxxxxxxxx399c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.score",
+                    "data_type": "string",
+                    "example_values": [
+                        "77.2905584547083"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incident.start",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicator_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_context.*",
+                    "data_type": "string",
+                    "example_values": [
+                        []
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_values.*",
+                    "data_type": "string",
+                    "example_values": [
+                        []
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.local_prevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "common"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.local_process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2956"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logon_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "WIN-ABCDEFG"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "ad7b9c14xxxxxxxxxxxxxxxxxxxx2b98"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "SpearPhishExecutableStack"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objective",
+                    "data_type": "string",
+                    "example_values": [
+                        "Follow Through"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.cmdline",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"C:\\Program Files (x86)\\Microsoft Office\\OFFICE11\\WINWORD.EXE\" /n /dde"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "WINWORD.EXE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.filepath",
+                    "data_type": "string",
+                    "example_values": [
+                        "\\Device\\HarddiskVolume1\\Program Files (x86)\\Microsoft Office\\OFFICE11\\WINWORD.EXE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.local_process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2756"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "10ff86bcxxxxxxxxxxxxxxxxxxxxfd507"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.process_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx4664"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx4664"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "b38bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx958d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.user_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "uid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_details.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testusername"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent_process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx4664"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Detection, standard detection."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.blocking_unsupported_or_disabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.bootup_safeguard_enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.containment_file_system",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.critical_process_disabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.detect",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.fs_operation_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.handle_operation_downgraded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.inddet_mask",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.indicator",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_action_failed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_process",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.kill_subprocess",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.mfa_required",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.operation_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.policy_disabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.prevention_provisioning_enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.process_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.quarantine_file",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.quarantine_machine",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.registry_operation_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.response_action_already_applied",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.response_action_failed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.response_action_triggered",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.rooting",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.sensor_only",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.suspend_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.suspend_process",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.process_end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "1724351403"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.process_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx1294"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.process_start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "1724351403"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.product",
+                    "data_type": "string",
+                    "example_values": [
+                        "epp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scenario",
+                    "data_type": "string",
+                    "example_values": [
+                        "malicious_document"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.seconds_to_resolved",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.seconds_to_triaged",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "ee8cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx20b5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "17f7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx02ae"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.show_in_ui",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_products.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "Falcon Insight"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_vendors.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "CrowdStrike"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "new",
-                        "in_progress",
-                        "closed"
+                        "in_progress"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.tags",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.tactic",
+                    "data_type": "string",
+                    "example_values": [
+                        "Execution"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary.total_alerts",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.tactic_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TA0002"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technique",
+                    "data_type": "string",
+                    "example_values": [
+                        "Exploitation for Client Execution"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technique_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "T1203"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:30:03.238Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tree_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx6384"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tree_root",
+                    "data_type": "string",
+                    "example_values": [
+                        "1336xxxxxxxxxx4664"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.triggering_process_graph_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ldt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updated_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2024-08-22T18:35:06.102982431Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testusername"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Total alerts: 44"
+                        "Success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
                     ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)",
@@ -4360,16 +6263,15 @@
             }
         },
         {
-            "action": "update alerts",
-            "description": "Update EPP alerts in CrowdStrike",
-            "verbose": "Update properties of EPP alerts including status, assignment, visibility, and comments. Uses the new alerts API that replaces the legacy Detects API (being deprecated April 30, 2025).",
+            "action": "update epp alerts",
+            "description": "Update EPP alerts in CrowdStrike, replacing the legacy Detects API (deprecated April 30, 2025)",
             "type": "generic",
-            "identifier": "update_alerts",
+            "identifier": "update_epp_alerts",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
                 "alert_ids": {
-                    "description": "List of Alert composite_ids to update (comma-separated list allowed)",
+                    "description": "List of alert composite_ids to update, Comma-separated list allowed",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike alert id"
@@ -4393,6 +6295,11 @@
                     ],
                     "order": 2
                 },
+                "unassign": {
+                    "description": "If there are any users currently assigned to specified alerts, unassign them",
+                    "data_type": "string",
+                    "order": 3
+                },
                 "show_in_ui": {
                     "description": "Control whether this alert is displayed in Falcon UI",
                     "data_type": "boolean",
@@ -4401,22 +6308,7 @@
                         false,
                         true
                     ],
-                    "order": 3
-                },
-                "add_tags": {
-                    "description": "Tags to add to the alert (comma-separated list)",
-                    "data_type": "string",
-                    "order": 5
-                },
-                "remove_tags": {
-                    "description": "Tags to remove from the alert (comma-separated list)",
-                    "data_type": "string",
-                    "order": 6
-                },
-                "remove_tags_by_prefix": {
-                    "description": "Remove all tags with this prefix",
-                    "data_type": "string",
-                    "order": 7
+                    "order": 4
                 },
                 "status": {
                     "description": "Status to set",
@@ -4427,16 +6319,30 @@
                         "closed",
                         "reopened"
                     ],
-                    "order": 4
+                    "order": 5
+                },
+                "add_tags": {
+                    "description": "Tags to add to the alert, Comma-separated list allowed",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "remove_tags": {
+                    "description": "Tags to remove from the alert, Comma-separated list allowed",
+                    "data_type": "string",
+                    "order": 7
+                },
+                "remove_tags_by_prefix": {
+                    "description": "Remove all tags with this prefix",
+                    "data_type": "string",
+                    "order": 8
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.alert_ids",
                     "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
+                    "contains": [
+                        "crowdstrike alert id"
                     ]
                 },
                 {
@@ -4448,35 +6354,55 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.comment",
-                    "data_type": "string",
-                    "example_values": [
-                        "update status of alert"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.alert_ids",
-                    "data_type": "string",
-                    "contains": [
-                        "crowdstrike alert id"
-                    ],
-                    "example_values": [
-                        "d615xxxxxxxx2158:ind:9a8dxxxxxxxxc74c:1336xxxxxxxx1294-32-7878xxxxxxxx1122"
-                    ]
+                    "data_path": "action_result.parameter.unassign",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.show_in_ui",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.parameter.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.add_tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.remove_tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.remove_tags_by_prefix",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.errors.*",
                     "data_type": "string",
                     "example_values": [
-                        "in_progress"
+                        []
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10000
                     ]
                 },
                 {
@@ -4490,41 +6416,44 @@
                     "data_path": "action_result.data.*.meta.query_time",
                     "data_type": "numeric",
                     "example_values": [
-                        0
+                        0.044395707
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.trace_id",
                     "data_type": "string",
                     "example_values": [
-                        "a30c7b54-ae00-4a87-8324-0a575ba7dcb4"
+                        "f755297a-e287-4012-b5e3-ff88691e95e9"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.meta.writes.resources_affected",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        0
                     ],
                     "column_name": "Alerts Affected",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.alerts_affected",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.resources.*",
+                    "data_type": "string",
                     "example_values": [
-                        1
+                        "d615xxxxxxxx2158:ind:9a8dxxxxxxxxc74c:1336xxxxxxxx1294-32-7878xxxxxxxx1122"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Alerts affected: 1"
+                        "Success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
                     ]
                 },
                 {
@@ -8431,16 +10360,15 @@
             ]
         },
         {
-            "action": "update alert status",
-            "description": "Update the status of an EPP alert in CrowdStrike",
-            "verbose": "The alert composite_id can be obtained from the list_epp_alerts action. Multiple IDs can be provided as a comma-separated list.",
+            "action": "resolve epp alerts",
+            "description": "Update the status of an EPP alert in CrowdStrike, replacing legacy Detects API (deprecated April 30, 2025)",
             "type": "generic",
-            "identifier": "resolve_alert",
+            "identifier": "resolve_epp_alerts",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
                 "id": {
-                    "description": "Alert composite_id(s) to update. Multiple IDs can be comma-separated",
+                    "description": "Alert composite_id(s) to update, Comma-separated list allowed",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike alert id"
@@ -8462,50 +10390,93 @@
                     "order": 1
                 }
             },
-            "render": {
-                "title": "Update Alert Status",
-                "type": "custom",
-                "view": "crowdstrike_view.set_status_view"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike alert id"
-                    ],
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.errors.*",
+                    "data_type": "string",
+                    "example_values": [
+                        []
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "detectsapi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.044395707
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "f755297a-e287-4012-b5e3-ff88691e95e9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.writes.resources_affected",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*",
+                    "data_type": "string",
                     "example_values": [
                         "d615xxxxxxxx2158:ind:9a8dxxxxxxxxc74c:1336xxxxxxxx1294-32-7878xxxxxxxx1122"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.state",
-                    "data_type": "string",
-                    "example_values": [
-                        "in_progress"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status updated successfully"
+                        "Success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
                     ]
                 },
                 {
@@ -8522,7 +10493,12 @@
                         1
                     ]
                 }
-            ]
+            ],
+            "render": {
+                "title": "Update Alert Status",
+                "type": "custom",
+                "view": "crowdstrike_view.set_status_view"
+            }
         },
         {
             "action": "get system info",

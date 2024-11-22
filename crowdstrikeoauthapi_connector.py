@@ -580,7 +580,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Status set successfully")
 
-    def _handle_resolve_alert(self, param):
+    def _handle_resolve_epp_alerts(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         alert_id = param[CROWDSTRIKE_JSON_ID]
@@ -2024,7 +2024,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_get_alerts_details(self, param):
+    def _handle_get_epp_alerts_details(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2096,7 +2096,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_update_alerts(self, param):
+    def _handle_update_epp_alerts(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -4239,9 +4239,9 @@ class CrowdstrikeConnector(BaseConnector):
             "list_epp_alerts": self._handle_list_epp_alerts,
             "list_detections": self._handle_list_detections,
             "get_detections_details": self._handle_get_detections_details,
-            "get_alerts_details": self._handle_get_alerts_details,
+            "get_epp_alerts_details": self._handle_get_epp_alerts_details,
             "update_detections": self._handle_update_detections,
-            "update_alerts": self._handle_update_alerts,
+            "update_epp_alerts": self._handle_update_epp_alerts,
             "list_sessions": self._handle_list_sessions,
             "run_command": self._handle_run_command,
             "run_admin_command": self._handle_run_admin_command,
@@ -4258,7 +4258,7 @@ class CrowdstrikeConnector(BaseConnector):
             "get_process_detail": self._handle_get_process_detail,
             "get_device_detail": self._handle_get_device_detail,
             "resolve_detection": self._handle_resolve_detection,
-            "resolve_alert": self._handle_resolve_alert,
+            "resolve_epp_alerts": self._handle_resolve_epp_alerts,
             "list_incidents": self._handle_list_incidents,
             "list_incident_behaviors": self._handle_list_incident_behaviors,
             "get_incident_details": self._handle_get_incident_details,

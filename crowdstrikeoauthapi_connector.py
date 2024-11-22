@@ -583,14 +583,17 @@ class CrowdstrikeConnector(BaseConnector):
     def _handle_resolve_epp_alerts(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        alert_id = param[CROWDSTRIKE_JSON_ID]
+        composite_ids = param[CROWDSTRIKE_JSON_ID]
         to_state = param[CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE]
 
-        alert_ids = [x.strip() for x in alert_id.split(",")]
-        alert_ids = list(filter(None, alert_ids))
+        if to_state not in CROWDSTRIKE_EPP_ALERT_STATUSES:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="state"))
+
+        composite_ids = [x.strip() for x in composite_ids.split(",")]
+        composite_ids = list(filter(None, composite_ids))
 
         api_data = {
-            "composite_ids": alert_ids,
+            "composite_ids": composite_ids,
             "action_parameters": [{
                 "name": "update_status",
                 "value": to_state
@@ -1972,15 +1975,15 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        alert_ids = response.get("resources", [])
+        composite_ids = response.get("resources", [])
 
-        if not alert_ids:
+        if not composite_ids:
             return action_result.set_status(phantom.APP_SUCCESS, "No alerts found")
 
         all_alerts = []
 
-        for i in range(0, len(alert_ids), 100):
-            batch = alert_ids[i:i + 100]
+        for i in range(0, len(composite_ids), 100):
+            batch = composite_ids[i:i + 100]
             ret_val, response = self._make_rest_call_helper_oauth2(
                 action_result,
                 CROWDSTRIKE_GET_ALERT_DETAILS_ENDPOINT,
@@ -2031,8 +2034,6 @@ class CrowdstrikeConnector(BaseConnector):
         composite_ids = self.validate_comma_seperated_values(param.get("alert_ids"))
         if not composite_ids:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="alert_ids"))
-
-        self.save_progress(f"Retrieving details for {composite_ids} alerts")
 
         ret_val, response = self._make_rest_call_helper_oauth2(
             action_result,
@@ -2118,7 +2119,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         status = param.get("status")
         if status:
-            if status not in ["new", "in_progress", "closed", "reopened"]:
+            if status not in CROWDSTRIKE_EPP_ALERT_STATUSES:
                 return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="status"))
             data["action_parameters"].append({
                 "name": "update_status",
@@ -2150,7 +2151,7 @@ class CrowdstrikeConnector(BaseConnector):
         if add_tags:
             tags = [tag.strip() for tag in add_tags.split(",")]
             for tag in tags:
-                if tag:  # Skip empty tags
+                if tag:
                     data["action_parameters"].append({
                         "name": "add_tag",
                         "value": tag
@@ -2160,7 +2161,7 @@ class CrowdstrikeConnector(BaseConnector):
         if remove_tags:
             tags = [tag.strip() for tag in remove_tags.split(",")]
             for tag in tags:
-                if tag:  # Skip empty tags
+                if tag:
                     data["action_parameters"].append({
                         "name": "remove_tag",
                         "value": tag
@@ -2851,7 +2852,7 @@ class CrowdstrikeConnector(BaseConnector):
 
                 # Need to check both event types
                 event_type = stream_data.get("metadata", {}).get("eventType")
-                if stream_data and event_type in ["DetectionSummaryEvent", "EppDetectionSummaryEvent"]:
+                if stream_data and event_type in CROWDSTRIKE_EVENT_TYPES:
                     self._events.append(stream_data)
                     counter = 0  # Reset blank lines counter
                     event_count += 1

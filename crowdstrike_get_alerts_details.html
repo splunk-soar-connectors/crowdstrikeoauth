@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: crowdstrike_get_alerts_details.html
+<!-- File: crowdstrike_get_epp_alerts_details.html
   Copyright (c) 2019-2024 Splunk Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -157,7 +157,7 @@
                                     <td>{{data.device.hostname}}</td>
                                     <td>{{data.device.platform_name}}</td>
                                     <td>{{data.status}}</td>
-                                    <td>{{data.max_severity_displayname}}</td>
+                                    <td>{{data.severity}}</td>
                                     <td>{{data.device.modified_timestamp}}</td>
                                     <td>{{data.created_timestamp}}</td>
                                   </tr>

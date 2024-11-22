@@ -26,6 +26,10 @@
 | [get detections details](#action-get-detections-details)    | Detections                     | &check;              | &cross;              |
 | [update detections](#action-update-detections)              | Detections                     | &cross;              | &check;              |
 | [list alerts](#action-list-alerts)                          | Alerts                         | &check;              | &cross;              |
+| [list epp alerts](#action-list-epp-alerts)                  | Alerts                         | &check;              | &cross;              |
+| [get epp alerts details](#action-get-epp-alerts-details)    | Alerts                         | &check;              | &cross;              |
+| [update epp alerts](#action-update-epp-alerts)              | Alerts                         | &cross;              | &check;              |
+| [resolve epp alerts](#action-resolve-epp-alerts)            | Alerts                         | &cross;              | &check;              |
 | [list sessions](#action-list-sessions)                      | Real time response(RTR)        | &check;              | &cross;              |
 | [run command](#action-run-command)                          | Real time response(RTR)        | &check;              | &cross;              |
 | [run admin command](#action-run-admin-command)              | Real time response(admin)      | &cross;              | &check;              |
@@ -91,9 +95,9 @@ error.
         parameters \[Maximum events to get while POLL NOW\] (default 2000 if not specified) and
         \[Maximum events to get while scheduled and interval polling\] (default 10,000 if not
         specified). For ingestion, the events are fetched after filtering them based on the event
-        type - **DetectionSummaryEvent** . The app will exit from the polling cycle in the
+        types - **DetectionSummaryEvent** and **EppDetectionSummaryEvent**. The app will exit from the polling cycle in the
         below-mentioned 2 cases whichever is earlier.
-        -   If the total DetectionSummaryEvents fetched equals the value provided in the \[Maximum
+        -   If the total events fetched equals the value provided in the \[Maximum
             events to get while POLL NOW\] (for manual polling) or \[Maximum events to get while
             scheduled and interval polling\] (for scheduled | interval polling) parameters
         -   If the total number of continuous blank lines encountered while streaming the data
@@ -105,17 +109,15 @@ error.
         specified seconds\], all events which are of the same type and on the same host will be put
         into one container, as long as the time between those two events is less than the interval.
     -   The \[Maximum allowed continuous blank lines\] asset configuration parameter will be used to
-        indicate the allowed number of continuous blank lines while fetching
-        **DetectionSummaryEvents** . For example, of the entire data of the DetectionSummaryEvents,
-        some of the 'DetectionSummaryEvents' exists after 100 continuous blank lines and if you've
+        indicate the allowed number of continuous blank lines while fetching events. For example, if some events exist after 100 continuous blank lines and you've
         set the \[Maximum allowed continues blank lines\] parameter value to 500, it will keep on
-        ingesting all the 'DetectionSummaryEvents' until the code gets 500 continuous blank lines
-        and hence, it will be able to cover the DetectionSummaryEvents successfully even after the
+        ingesting all events until the code gets 500 continuous blank lines
+        and hence, it will be able to cover the events successfully even after the
         100 blank lines. If you set it to 50, it will break after the 50th blank line is
         encountered. Hence, it won't be able to ingest the events which exist after the 100
         continuous blank lines because the code considers that after the configured value in the
         \[Maximum allowed continuous blank lines\] configuration parameter (here 50), there is no
-        data available for the 'DetectionSummaryEvents'.
+        data available.
 -   Manual Polling
     -   During manual poll now, the app starts from the first event that it can query up to the
         value configured in the configuration parameter \[Maximum events to get while POLL NOW\] and

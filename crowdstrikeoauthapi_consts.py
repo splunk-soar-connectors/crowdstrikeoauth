@@ -235,7 +235,15 @@ CROWDSTRIKE_SORT_CRITERIA_LIST = [
     "last_modified.desc",
 ]
 CROWDSTRIKE_API_SUCC_CODES = [200, 202, 204]
-CROWDSTRIKE_DETECTION_STATUSES = ["new", "in_progress", "true_positive", "false_positive", "ignored", "closed", "reopened"]
+CROWDSTRIKE_DETECTION_STATUSES = [
+    "new",
+    "in_progress",
+    "true_positive",
+    "false_positive",
+    "ignored",
+    "closed",
+    "reopened",
+]
 CROWDSTRIKE_EPP_ALERT_STATUSES = ["new", "in_progress", "closed", "reopened"]
 CROWDSTRIKE_EVENT_TYPES = ["DetectionSummaryEvent", "EppDetectionSummaryEvent"]
 

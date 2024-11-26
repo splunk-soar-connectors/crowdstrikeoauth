@@ -23,7 +23,6 @@ from phantom import utils as ph_utils
 
 from crowdstrikeoauthapi_consts import CROWDSTRIKE_EVENT_TYPES
 
-
 _container_common = {
     "description": "Container added by Phantom",
     "run_automation": False,  # Don't run any playbooks, when this container is added
@@ -41,7 +40,14 @@ _sub_artifact_common = {
     "description": "Artifact added by Phantom",
     "run_automation": False,  # Don't run any playbooks, when this artifact is added
 }
-_severity_map = {"0": "low", "1": "low", "2": "low", "3": "medium", "4": "high", "5": "high"}
+_severity_map = {
+    "0": "low",
+    "1": "low",
+    "2": "low",
+    "3": "medium",
+    "4": "high",
+    "5": "high",
+}
 
 IGNORE_CONTAINS_VALIDATORS = ["domain", "host name"]
 key_to_name = dict()
@@ -158,12 +164,16 @@ def _collate_results(base_connector, detection_events):
                     (
                         "at {0}".format(creation_time)
                         if (not machine_name)
-                        else "on {0} at {1}".format(UnicodeDammit(machine_name).unicode_markup.encode("utf-8"), creation_time)
+                        else "on {0} at {1}".format(
+                            UnicodeDammit(machine_name).unicode_markup.encode("utf-8"),
+                            creation_time,
+                        )
                     ),
                 )
             else:
                 container["name"] = "{0} {1}".format(
-                    detection_name, "at {0}".format(creation_time) if (not machine_name) else "on {0} at {1}".format(machine_name, creation_time)
+                    detection_name,
+                    ("at {0}".format(creation_time) if (not machine_name) else "on {0} at {1}".format(machine_name, creation_time)),
                 )
             container["source_data_identifier"] = _create_dict_hash(base_connector, container)
 
@@ -391,7 +401,7 @@ def parse_events(events, connector, collate=True):
         cef = {
             "agentId": event_data.get("AgentId") or event_data.get("SensorId"),
             "compositeId": event_data.get("CompositeId"),
-            "commandLine": event_data.get("CommandLine"), 
+            "commandLine": event_data.get("CommandLine"),
             "fileName": event_data.get("FileName"),
             "filePath": event_data.get("FilePath"),
             "hostname": event_data.get("ComputerName"),
@@ -412,7 +422,7 @@ def parse_events(events, connector, collate=True):
             "technique": event_data.get("Technique"),
             "objective": event_data.get("Objective"),
             "patternDispositionDescription": event_data.get("PatternDispositionDescription"),
-            "patternDispositionValue": event_data.get("PatternDispositionValue")
+            "patternDispositionValue": event_data.get("PatternDispositionValue"),
         }
 
         # EppDetectionSummaryEvent specific fields
@@ -422,16 +432,16 @@ def parse_events(events, connector, collate=True):
                 "dataDomains": event_data.get("DataDomains"),
                 "hostGroups": event_data.get("HostGroups"),
                 "tags": event_data.get("Tags"),
-                "associatedFile": event_data.get("AssociatedFile")
+                "associatedFile": event_data.get("AssociatedFile"),
             }
             cef.update(epp_fields)
 
             nested_objects = [
                 "DnsRequests",
-                "FilesAccessed", 
+                "FilesAccessed",
                 "FilesWritten",
                 "NetworkAccesses",
-                "QuarantineFiles"
+                "QuarantineFiles",
             ]
 
             for obj in nested_objects:
@@ -443,7 +453,7 @@ def parse_events(events, connector, collate=True):
             "name": f"{event_type} - {cef['name']}",
             "description": cef["description"],
             "source_data_identifier": cef["compositeId"],
-            "severity": cef["severityName"].lower()
+            "severity": cef["severityName"].lower(),
         }
 
         # Artifact
@@ -453,13 +463,10 @@ def parse_events(events, connector, collate=True):
             "source_data_identifier": cef["compositeId"],
             "cef": cef,
             "severity": cef["severityName"].lower(),
-            "label": "event"
+            "label": "event",
         }
 
-        results.append({
-            "container": container,
-            "artifacts": [artifact]
-        })
+        results.append({"container": container, "artifacts": [artifact]})
 
     if collate:
         results = _collate_results(results)

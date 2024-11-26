@@ -583,14 +583,13 @@ class CrowdstrikeConnector(BaseConnector):
     def _handle_resolve_epp_alerts(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        composite_ids = param[CROWDSTRIKE_JSON_ID]
-        to_state = param[CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE]
+        composite_ids = self.validate_comma_seperated_values(param.get(CROWDSTRIKE_ALERT_IDS))
+        if not composite_ids:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key=CROWDSTRIKE_ALERT_IDS))
 
+        to_state = param[CROWDSTRIKE_STATUS]
         if to_state not in CROWDSTRIKE_EPP_ALERT_STATUSES:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="state"))
-
-        composite_ids = [x.strip() for x in composite_ids.split(",")]
-        composite_ids = list(filter(None, composite_ids))
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key=CROWDSTRIKE_STATUS))
 
         api_data = {
             "composite_ids": composite_ids,
@@ -610,7 +609,20 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Status set successfully")
+        action_result.add_data(response)
+
+        resources_affected = response.get("meta", {}).get("writes", {}).get("resources_affected", 0)
+        if resources_affected != len(composite_ids):
+            errors = [error.get("message") for error in response.get("errors", [])]
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Errors occurred while updating alerts: {}".format("\r\n".join(errors))
+            )
+
+        summary = action_result.update_summary({})
+        summary["alerts_affected"] = resources_affected
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _paginate_get_endpoint(self, action_result, resource_id_list, endpoint, check_message=None, resource_data=None):
         id_list = list()
@@ -2031,9 +2043,9 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        composite_ids = self.validate_comma_seperated_values(param.get("alert_ids"))
+        composite_ids = self.validate_comma_seperated_values(param.get(CROWDSTRIKE_ALERT_IDS))
         if not composite_ids:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="alert_ids"))
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key=CROWDSTRIKE_ALERT_IDS))
 
         ret_val, response = self._make_rest_call_helper_oauth2(
             action_result,
@@ -2101,32 +2113,32 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        composite_ids = self.validate_comma_seperated_values(param.get("alert_ids"))
+        composite_ids = self.validate_comma_seperated_values(param.get(CROWDSTRIKE_ALERT_IDS))
         if not composite_ids:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="alert_ids"))
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key=CROWDSTRIKE_ALERT_IDS))
 
         data = {
             "composite_ids": composite_ids,
             "action_parameters": []
         }
 
-        show_in_ui = param.get("show_in_ui")
+        show_in_ui = param.get(CROWDSTRIKE_SHOW_IN_UI)
         if show_in_ui is not None:
             data["action_parameters"].append({
                 "name": "show_in_ui",
                 "value": str(show_in_ui).lower()
             })
 
-        status = param.get("status")
+        status = param.get(CROWDSTRIKE_STATUS)
         if status:
             if status not in CROWDSTRIKE_EPP_ALERT_STATUSES:
-                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="status"))
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key=CROWDSTRIKE_STATUS))
             data["action_parameters"].append({
                 "name": "update_status",
                 "value": status
             })
 
-        assigned_to_user = param.get("assigned_to_user")
+        assigned_to_user = param.get(CROWDSTRIKE_ASSIGNED_TO_USER)
         unassign = param.get("unassign", False)
 
         if unassign:
@@ -2147,7 +2159,7 @@ class CrowdstrikeConnector(BaseConnector):
                 "value": assigned_to_user
             })
 
-        add_tags = param.get("add_tags")
+        add_tags = param.get(CROWDSTRIKE_ADD_TAGS)
         if add_tags:
             tags = [tag.strip() for tag in add_tags.split(",")]
             for tag in tags:
@@ -2157,7 +2169,7 @@ class CrowdstrikeConnector(BaseConnector):
                         "value": tag
                     })
 
-        remove_tags = param.get("remove_tags")
+        remove_tags = param.get(CROWDSTRIKE_REMOVE_TAGS)
         if remove_tags:
             tags = [tag.strip() for tag in remove_tags.split(",")]
             for tag in tags:
@@ -2167,14 +2179,14 @@ class CrowdstrikeConnector(BaseConnector):
                         "value": tag
                     })
 
-        remove_tags_prefix = param.get("remove_tags_by_prefix")
+        remove_tags_prefix = param.get(CROWDSTRIKE_REMOVE_TAGS_BY_PREFIX)
         if remove_tags_prefix:
             data["action_parameters"].append({
                 "name": "remove_tags_by_prefix",
                 "value": remove_tags_prefix.strip()
             })
 
-        comment = param.get("comment")
+        comment = param.get(CROWDSTRIKE_COMMENT)
         if comment:
             data["action_parameters"].append({
                 "name": "append_comment",

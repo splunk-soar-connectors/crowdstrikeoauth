@@ -29,7 +29,7 @@
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "6.2.2",
+    "min_phantom_version": "6.3.0",
     "python_version": "3",
     "fips_compliant": true,
     "app_wizard_version": "1.0.0",
@@ -3103,13 +3103,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.alert_ids",
-                    "data_type": "string",
-                    "contains": [
-                        "crowdstrike alert id"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.filter",
                     "data_type": "string"
                 },
@@ -4995,7 +4988,7 @@
             }
         },
         {
-            "action": "get epp alerts details",
+            "action": "get epp details",
             "description": "Get list of alert details for EPP alerts by providing composite IDs, replacing legacy Detects API (deprecated April 30, 2025)",
             "type": "investigate",
             "identifier": "get_epp_alerts_details",
@@ -10367,8 +10360,8 @@
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
-                "id": {
-                    "description": "Alert composite_id(s) to update, Comma-separated list allowed",
+                "alert_ids": {
+                    "description": "List of alert composite_ids to update, Comma-separated list allowed",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike alert id"
@@ -10377,7 +10370,7 @@
                     "required": true,
                     "order": 0
                 },
-                "state": {
+                "status": {
                     "description": "Status to set",
                     "data_type": "string",
                     "value_list": [
@@ -10392,14 +10385,14 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.id",
+                    "data_path": "action_result.parameter.alert_ids",
                     "data_type": "string",
                     "contains": [
                         "crowdstrike alert id"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.state",
+                    "data_path": "action_result.parameter.status",
                     "data_type": "string"
                 },
                 {
@@ -10456,7 +10449,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         0
-                    ]
+                    ],
+                    "column_name": "Alerts Affected",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.resources.*",
@@ -10495,9 +10490,7 @@
                 }
             ],
             "render": {
-                "title": "Update Alert Status",
-                "type": "custom",
-                "view": "crowdstrike_view.set_status_view"
+                "type": "table"
             }
         },
         {

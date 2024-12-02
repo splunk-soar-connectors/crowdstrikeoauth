@@ -147,6 +147,20 @@ The **DetectionSummaryEvent** is parsed to extract the following values into an 
 | cef.hash           | SHA256STring    |
 | cef.cs1            | cmdLine         |
 
+The **EppDetectionSummaryEvent** is parsed to extract the following values into an Artifact.  
+
+| **Artifact Field** | **Event Field**  |
+|--------------------|------------------|
+| cef.sourceUserName | UserName         |
+| cef.fileName       | FileName         |
+| cef.filePath       | FilePath         |
+| cef.sourceHostName | Hostname         |
+| cef.sourceNtDomain | LogonDomain      |
+| cef.hash           | MD5String        |
+| cef.hash           | SHA1String       |
+| cef.hash           | SHA256String     |
+| cef.cs1            | cmdLine          |
+
 The app also parses the following **sub-events** into their own artifacts.  
 
 -   Documents Accessed
@@ -389,3 +403,4 @@ default ports used by Splunk SOAR.
         -   Updated name from 'customer' to 'cid'
         -   Updated name from 'firstName' to 'first_name'
         -   Updated name from 'lastName' to 'last_name'
+

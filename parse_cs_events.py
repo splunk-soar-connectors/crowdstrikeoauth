@@ -56,7 +56,7 @@ _severity_name_map = {
     "low": "low",
     "medium": "medium",
     "high": "high",
-    "critical": "high"
+    "critical": "high",
 }
 
 IGNORE_CONTAINS_VALIDATORS = ["domain", "host name"]
@@ -157,9 +157,7 @@ def _collate_results(base_connector, detection_events):
     for detection_name in detection_names:
         # Update the filter to handle both event types
         per_detection_events = [
-            x for x in detection_events 
-            if (x["event"].get("DetectName") == detection_name or 
-                x["event"].get("Name") == detection_name)
+            x for x in detection_events if (x["event"].get("DetectName") == detection_name or x["event"].get("Name") == detection_name)
         ]
 
         # Get the set of unique machine names, handling both event types
@@ -175,9 +173,7 @@ def _collate_results(base_connector, detection_events):
         for machine_name in machine_names:
             # Update filter to check for both ComputerName and Hostname
             per_detection_machine_events = [
-                x for x in per_detection_events 
-                if (x["event"].get("ComputerName") == machine_name or 
-                    x["event"].get("Hostname") == machine_name)
+                x for x in per_detection_events if (x["event"].get("ComputerName") == machine_name or x["event"].get("Hostname") == machine_name)
             ]
 
             ingest_event = dict()
@@ -425,7 +421,7 @@ def _create_artifacts_from_event(base_connector, event):
     _parse_sub_events(base_connector, artifacts, cef, "quarantineFiles", artifact)
     _parse_sub_events(base_connector, artifacts, cef, "dnsRequests", artifact)
     _parse_sub_events(base_connector, artifacts, cef, "filesAccessed", artifact)  # EPP format
-    _parse_sub_events(base_connector, artifacts, cef, "filesWritten", artifact)   # EPP format
+    _parse_sub_events(base_connector, artifacts, cef, "filesWritten", artifact)  # EPP format
 
     return artifacts
 

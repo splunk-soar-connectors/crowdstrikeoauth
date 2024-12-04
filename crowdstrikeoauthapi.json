@@ -2264,7 +2264,7 @@
         },
         {
             "action": "list detections",
-            "description": "Get a list of detections",
+            "description": "Get a list of detections *The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead*",
             "verbose": "This action supports filtering in order to retrieve a particular set of detections.",
             "type": "investigate",
             "identifier": "list_detections",
@@ -3078,8 +3078,7 @@
         },
         {
             "action": "list epp alerts",
-            "description": "Get a list of epp alerts",
-            "verbose": "This action retrieves Endpoint Protection (epp) alerts, replacing legacy Detects API (deprecated April 30, 2025).",
+            "description": "Get a list of epp alerts, replaces legacy Detects API",
             "type": "investigate",
             "identifier": "list_epp_alerts",
             "read_only": true,
@@ -4182,7 +4181,7 @@
         },
         {
             "action": "get detections details",
-            "description": "Get a list of detections details by providing detection IDs",
+            "description": "Get a list of detections details by providing detection IDs *The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead*",
             "type": "investigate",
             "identifier": "get_detections_details",
             "read_only": true,
@@ -4989,7 +4988,7 @@
         },
         {
             "action": "get epp details",
-            "description": "Get list of alert details for EPP alerts by providing composite IDs, replacing legacy Detects API (deprecated April 30, 2025)",
+            "description": "Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API",
             "type": "investigate",
             "identifier": "get_epp_alerts_details",
             "read_only": true,
@@ -6085,7 +6084,7 @@
         },
         {
             "action": "update detections",
-            "description": "Update detections in crowdstrike host",
+            "description": "Update detections in crowdstrike host *The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead*",
             "type": "generic",
             "identifier": "update_detections",
             "read_only": false,
@@ -6257,7 +6256,7 @@
         },
         {
             "action": "update epp alerts",
-            "description": "Update EPP alerts in CrowdStrike, replacing the legacy Detects API (deprecated April 30, 2025)",
+            "description": "Update EPP alerts in CrowdStrike, replaces legacy Detects API",
             "type": "generic",
             "identifier": "update_epp_alerts",
             "read_only": false,
@@ -10259,7 +10258,7 @@
         },
         {
             "action": "set status",
-            "description": "Set the state of a detection in Crowdstrike Host",
+            "description": "Set the state of a detection in Crowdstrike Host *The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead*",
             "verbose": "The detection <b>id</b> can be obtained from the Crowdstrike UI and its state can be set.",
             "type": "generic",
             "identifier": "resolve_detection",
@@ -10354,7 +10353,7 @@
         },
         {
             "action": "resolve epp alerts",
-            "description": "Update the status of an EPP alert in CrowdStrike, replacing legacy Detects API (deprecated April 30, 2025)",
+            "description": "Update the status of an EPP alert in CrowdStrike, replaces legacy Detects API",
             "type": "generic",
             "identifier": "resolve_epp_alerts",
             "read_only": false,

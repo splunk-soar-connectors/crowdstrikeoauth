@@ -1779,6 +1779,12 @@
                     "contains": [
                         "crowdstrike device id"
                     ]
+                },
+                "queue_offline": {
+                    "data_type": "boolean",
+                    "description": "Queue commands for offline devices, will execute when system comes back online",
+                    "default": false,
+                    "order": 1
                 }
             },
             "output": [
@@ -1799,6 +1805,10 @@
                     "contains": [
                         "crowdstrike device id"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.queue_offline",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.errors",

@@ -1977,7 +1977,11 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = {"device_id": param["device_id"], "origin": "phantom"}
+        params = {
+            "device_id": param["device_id"],
+            "origin": "phantom",
+            "queue_offline": param.get("queue_offline", False)  # default to False to maintain original behavior
+        }
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(
             action_result,

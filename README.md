@@ -446,12 +446,12 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [remove hosts](#action-remove-hosts) - Remove one or more hosts from the static host group  
 [create session](#action-create-session) - Initialize a new session with the Real Time Response cloud  
 [delete session](#action-delete-session) - Deletes a Real Time Response session  
-[list detections](#action-list-detections) - Get a list of detections  
-[list epp alerts](#action-list-epp-alerts) - Get a list of epp alerts  
-[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection IDs  
-[get epp details](#action-get-epp-details) - Get list of alert details for EPP alerts by providing composite IDs, replacing legacy Detects API (deprecated April 30, 2025)  
-[update detections](#action-update-detections) - Update detections in crowdstrike host  
-[update epp alerts](#action-update-epp-alerts) - Update EPP alerts in CrowdStrike, replacing the legacy Detects API (deprecated April 30, 2025)  
+[list detections](#action-list-detections) - Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\*  
+[list epp alerts](#action-list-epp-alerts) - Get a list of epp alerts, replaces legacy Detects API  
+[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection IDs \*The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead\*  
+[get epp details](#action-get-epp-details) - Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API  
+[update detections](#action-update-detections) - Update detections in crowdstrike host \*The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead\*  
+[update epp alerts](#action-update-epp-alerts) - Update EPP alerts in CrowdStrike, replaces legacy Detects API  
 [list alerts](#action-list-alerts) - Get a list of alerts  
 [list sessions](#action-list-sessions) - Lists Real Time Response sessions  
 [run command](#action-run-command) - Execute an active responder command on a single host  
@@ -469,8 +469,8 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [list incident behaviors](#action-list-incident-behaviors) - Search for behaviors by providing an FQL filter, sorting, and paging details  
 [list incidents](#action-list-incidents) - Search for incidents by providing an FQL filter, sorting, and paging details  
 [get session file](#action-get-session-file) - Get RTR extracted file contents for the specified session and sha256 and add it to the vault  
-[set status](#action-set-status) - Set the state of a detection in Crowdstrike Host  
-[resolve epp alerts](#action-resolve-epp-alerts) - Update the status of an EPP alert in CrowdStrike, replacing legacy Detects API (deprecated April 30, 2025)  
+[set status](#action-set-status) - Set the state of a detection in Crowdstrike Host \*The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead\*  
+[resolve epp alerts](#action-resolve-epp-alerts) - Update the status of an EPP alert in CrowdStrike, replaces legacy Detects API  
 [get system info](#action-get-system-info) - Get details of a device, given the device ID  
 [get process detail](#action-get-process-detail) - Retrieve the details of a process that is running or that previously ran, given a process ID  
 [hunt file](#action-hunt-file) - Hunt for a file on the network by querying for the hash  
@@ -892,7 +892,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list detections'
-Get a list of detections
+Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\*
 
 Type: **investigate**  
 Read only: **True**
@@ -1019,12 +1019,10 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list epp alerts'
-Get a list of epp alerts
+Get a list of epp alerts, replaces legacy Detects API
 
 Type: **investigate**  
 Read only: **True**
-
-This action retrieves Endpoint Protection (epp) alerts, replacing legacy Detects API (deprecated April 30, 2025).
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -1191,7 +1189,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get detections details'
-Get a list of detections details by providing detection IDs
+Get a list of detections details by providing detection IDs \*The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead\*
 
 Type: **investigate**  
 Read only: **True**
@@ -1314,7 +1312,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get epp details'
-Get list of alert details for EPP alerts by providing composite IDs, replacing legacy Detects API (deprecated April 30, 2025)
+Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API
 
 Type: **investigate**  
 Read only: **True**
@@ -1481,7 +1479,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'update detections'
-Update detections in crowdstrike host
+Update detections in crowdstrike host \*The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead\*
 
 Type: **generic**  
 Read only: **False**
@@ -1515,7 +1513,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'update epp alerts'
-Update EPP alerts in CrowdStrike, replacing the legacy Detects API (deprecated April 30, 2025)
+Update EPP alerts in CrowdStrike, replaces legacy Detects API
 
 Type: **generic**  
 Read only: **False**
@@ -2273,7 +2271,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'set status'
-Set the state of a detection in Crowdstrike Host
+Set the state of a detection in Crowdstrike Host \*The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead\*
 
 Type: **generic**  
 Read only: **False**
@@ -2299,7 +2297,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'resolve epp alerts'
-Update the status of an EPP alert in CrowdStrike, replacing legacy Detects API (deprecated April 30, 2025)
+Update the status of an EPP alert in CrowdStrike, replaces legacy Detects API
 
 Type: **generic**  
 Read only: **False**

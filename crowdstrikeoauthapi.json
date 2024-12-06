@@ -75,33 +75,39 @@
             "description": "Maximum events to get while POLL NOW",
             "default": 2000
         },
-        "collate": {
+        "ingest_incidents": {
             "data_type": "boolean",
             "order": 7,
+            "description": "Should ingest incidents in addition to detections during scheduled and interval polling",
+            "default": false
+        },
+        "collate": {
+            "data_type": "boolean",
+            "order": 8,
             "description": "Merge containers for hostname and eventname",
             "default": true
         },
         "merge_time_interval": {
             "data_type": "numeric",
-            "order": 8,
+            "order": 9,
             "description": "Merge same containers within specified seconds",
             "default": 0
         },
         "max_crlf": {
             "data_type": "numeric",
-            "order": 9,
+            "order": 10,
             "default": 50,
             "description": "Maximum allowed continuous blank lines"
         },
         "preprocess_script": {
             "data_type": "file",
             "description": "Script with functions to preprocess containers and artifacts",
-            "order": 10
+            "order": 11
         },
         "detonate_timeout": {
             "data_type": "numeric",
             "description": "Timeout for detonation result in minutes (Default: 15 minutes)",
-            "order": 11,
+            "order": 12,
             "default": 15
         }
     },

@@ -37,6 +37,7 @@ from phantom_common import paths
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 import parse_cs_events as events_parser
+import parse_cs_incidents as incidents_parser
 
 # THIS Connector imports
 from crowdstrikeoauthapi_consts import *
@@ -1980,7 +1981,7 @@ class CrowdstrikeConnector(BaseConnector):
         params = {
             "device_id": param["device_id"],
             "origin": "phantom",
-            "queue_offline": param.get("queue_offline", False)  # default to False to maintain original behavior
+            "queue_offline": param.get("queue_offline", False),  # default to False to maintain original behavior
         }
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(
@@ -3088,6 +3089,8 @@ class CrowdstrikeConnector(BaseConnector):
             allow_zero=True,
         )
 
+        ingest_incidents = config.get("ingest_incidents", False)
+
         if self.is_poll_now():
             # Manual Poll Now
             try:
@@ -3115,7 +3118,7 @@ class CrowdstrikeConnector(BaseConnector):
             except Exception as ex:
                 max_events = "{}: {}".format(DEFAULT_EVENTS_COUNT, self._get_error_message_from_exception(ex))
 
-        return max_crlf, merge_time_interval, max_events
+        return max_crlf, merge_time_interval, max_events, ingest_incidents
 
     def _on_poll(self, param):
 
@@ -3131,7 +3134,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         config = self.get_config()
 
-        max_crlf, merge_time_interval, max_events = self._validate_on_poll_config_params(action_result, config)
+        max_crlf, merge_time_interval, max_events, ingest_incidents = self._validate_on_poll_config_params(action_result, config)
 
         if max_crlf is None or merge_time_interval is None or max_events is None:
             return action_result.get_status()
@@ -3275,6 +3278,60 @@ class CrowdstrikeConnector(BaseConnector):
                 last_event = self._events[-1]
                 last_offset_id = last_event["metadata"]["offset"]
                 self._state["last_offset_id"] = last_offset_id + 1
+
+        # Handle incident ingestion if enabled
+        if ingest_incidents:
+            self.save_progress("Starting incident ingestion...")
+            try:
+                # Get incidents
+                params = {"limit": max_events, "sort": "modified_timestamp.asc"}
+
+                if not self.is_poll_now():
+                    try:
+                        last_ingestion_time = self._state.get("last_incident_timestamp", "")
+                        params["filter"] = f"modified_timestamp:>'{last_ingestion_time}'"
+                    except Exception as e:
+                        self.debug_print(f"Error getting last incident timestamp, starting from epoch: {str(e)}")
+
+                self.send_progress(f"Fetching incidents with filter: {params}")
+
+                # Get incident IDs
+                incident_ids = self._get_ids(action_result, CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT, params)
+                if incident_ids is None:
+                    return action_result.get_status()
+
+                if not incident_ids:
+                    self.save_progress("No incidents found")
+                    return phantom.APP_SUCCESS
+
+                # Get incident details
+                ret_val, response = self._make_rest_call_helper_oauth2(
+                    action_result, CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT, json_data={"ids": incident_ids}, method="post"
+                )
+
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+
+                incidents = response.get("resources", [])
+
+                if incidents:
+                    # Update timestamp for next poll if not poll_now
+                    if not self.is_poll_now():
+                        latest_timestamp = max(incident.get("modified_timestamp", 0) for incident in incidents)
+                        self._state["last_incident_timestamp"] = latest_timestamp
+
+                    # Process incidents through parser
+                    self.save_progress(f"Processing {len(incidents)} incidents...")
+                    incident_results = incidents_parser.process_incidents(incidents)
+                    self._save_results(incident_results, param)
+                    self.save_progress("Successfully processed incidents")
+                else:
+                    self.save_progress("No incidents found in response")
+
+            except Exception as e:
+                error_message = self._get_error_message_from_exception(e)
+                self.save_progress(f"Error ingesting incidents: {error_message}")
+                return action_result.set_status(phantom.APP_ERROR, f"Error ingesting incidents: {error_message}")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 

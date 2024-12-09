@@ -26,6 +26,7 @@ This app integrates with CrowdStrike OAuth2 authentication standard to implement
 | **Action**                                                  | **Required Scope(s)**          | **Read**             | **Write**            |
 |-------------------------------------------------------------|--------------------------------|----------------------|----------------------|
 | [test connectivity](#action-test-connectivity)              | Hosts                          | &check;              | &cross;              |
+| [run query](#action-run-query)                              | Hosts                          | &check;              | &cross;              |
 | [query device](#action-query-device)                        | Hosts                          | &check;              | &cross;              |
 | [list groups](#action-list-groups)                          | Host Groups                    | &check;              | &cross;              |
 | [quarantine device](#action-quarantine-device)              | Hosts                          | &check;              | &check;              |
@@ -412,7 +413,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **app_id** |  optional  | string | App ID
 **max_events** |  optional  | numeric | Maximum events to get for scheduled and interval polling
 **max_events_poll_now** |  optional  | numeric | Maximum events to get while POLL NOW
-**ingest_incidents** |  optional  | boolean | Should ingest incidents in addition to detections during scheduled and interval polling
+**max_incidents** |  optional  | numeric | Maximum incidents to get for scheduled and interval polling
+**max_incidents_poll_now** |  optional  | numeric | Maximum incidents to get while POLL NOW
+**ingest_incidents** |  optional  | boolean | Should ingest incidents during polling
 **collate** |  optional  | boolean | Merge containers for hostname and eventname
 **merge_time_interval** |  optional  | numeric | Merge same containers within specified seconds
 **max_crlf** |  optional  | numeric | Maximum allowed continuous blank lines
@@ -528,6 +531,8 @@ action_result.summary.limit | numeric |  |
 action_result.summary.query_time | numeric |  |  
 action_result.summary.powered_by | string |  |  
 action_result.summary.trace_id | string |  |  
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 
 action_result.message | string |  |    
 
 ## action: 'query device'

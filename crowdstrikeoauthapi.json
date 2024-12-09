@@ -123,6 +123,111 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "run query",
+            "description": "Run a query against CrowdStrike API",
+            "type": "investigate",
+            "identifier": "run_query",
+            "read_only": true,
+            "parameters": {
+                "endpoint": {
+                    "data_type": "string",
+                    "description": "API endpoint path in the format: /<service>/queries/<resource>/<version> (ex: /devices/queries/devices/v1)",
+                    "required": true,
+                    "order": 0
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of results to return",
+                    "order": 1,
+                    "default": 50
+                },
+                "filter": {
+                    "data_type": "string",
+                    "description": "Filter expression (FQL Syntax)",
+                    "order": 2
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Property to sort by",
+                    "order": 3
+                },
+                "offset": {
+                    "data_type": "numeric",
+                    "description": "Starting index for results",
+                    "order": 4,
+                    "default": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.endpoint",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_id",
+                    "data_type": "string",
+                    "column_name": "Resource ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.query_time",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.powered_by",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.trace_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
             "action": "query device",
             "description": "Fetch the device details based on the provided query",
             "type": "investigate",

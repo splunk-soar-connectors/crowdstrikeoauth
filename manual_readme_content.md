@@ -14,6 +14,7 @@
 | **Action**                                                  | **Required Scope(s)**          | **Read**             | **Write**            |
 |-------------------------------------------------------------|--------------------------------|----------------------|----------------------|
 | [test connectivity](#action-test-connectivity)              | Hosts                          | &check;              | &cross;              |
+| [run query](#action-run-query)                              | Hosts                          | &check;              | &cross;              |
 | [query device](#action-query-device)                        | Hosts                          | &check;              | &cross;              |
 | [list groups](#action-list-groups)                          | Host Groups                    | &check;              | &cross;              |
 | [quarantine device](#action-quarantine-device)              | Hosts                          | &check;              | &check;              |

@@ -128,7 +128,7 @@ def process_incidents(incidents):
                 incident.get("start", "Unknown Time"),
             )
 
-        # Set container properties
+        # Container properties
         container["description"] = incident.get("description", "No description available")
         container["source_data_identifier"] = incident.get("incident_id")
         container["severity"] = _get_incident_severity(incident.get("fine_score", 0))

@@ -39,7 +39,7 @@ This app integrates with CrowdStrike OAuth2 authentication standard to implement
 | [update detections](#action-update-detections)              | Detections                     | &cross;              | &check;              |
 | [list alerts](#action-list-alerts)                          | Alerts                         | &check;              | &cross;              |
 | [list epp alerts](#action-list-epp-alerts)                  | Alerts                         | &check;              | &cross;              |
-| [get epp alerts details](#action-get-epp-alerts-details)    | Alerts                         | &check;              | &cross;              |
+| [get epp details](#action-get-epp-details)                  | Alerts                         | &check;              | &cross;              |
 | [update epp alerts](#action-update-epp-alerts)              | Alerts                         | &cross;              | &check;              |
 | [resolve epp alerts](#action-resolve-epp-alerts)            | Alerts                         | &cross;              | &check;              |
 | [list sessions](#action-list-sessions)                      | Real time response(RTR)        | &check;              | &cross;              |
@@ -418,13 +418,12 @@ default ports used by Splunk SOAR.
 
 
 
-### Configuration Variables
-The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a CrowdStrike asset in SOAR.
+### Configuration variables
+This table lists the configuration variables required to operate CrowdStrike OAuth API. These variables are specified when configuring a CrowdStrike asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **url** |  required  | string | Base URL
-**place_holder** |  optional  | ph | Placeholder
 **client_id** |  required  | password | Client ID
 **client_secret** |  required  | password | Client Secret
 **app_id** |  optional  | string | App ID
@@ -1523,7 +1522,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **alert_ids** |  required  | List of alert composite_ids to update, Comma-separated list allowed | string |  `crowdstrike alert id` 
 **comment** |  optional  | Comment to add to the alert (Maximum 2048 bytes) | string | 
-**assigned_to_user** |  optional  | User to assign (can be email, UUID, or username) | string |  `crowdstrike unique user id`  `email` 
+**assigned_to_user** |  optional  | User to assign (can be email, UUID, or username) | string |  `crowdstrike user id`  `email` 
 **unassign** |  optional  | If there are any users currently assigned to specified alerts, unassign them | string | 
 **show_in_ui** |  optional  | Control whether this alert is displayed in Falcon UI | boolean | 
 **status** |  optional  | Status to set | string | 
@@ -1535,7 +1534,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.parameter.alert_ids | string |  `crowdstrike alert id`  |  
-action_result.parameter.assigned_to_user | string |  `crowdstrike unique user id`  `email`  |  
+action_result.parameter.assigned_to_user | string |  `crowdstrike user id`  `email`  |  
 action_result.parameter.unassign | string |  |  
 action_result.parameter.show_in_ui | boolean |  |  
 action_result.parameter.status | string |  |  

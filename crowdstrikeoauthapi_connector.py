@@ -318,14 +318,13 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _save_results(self, results, param):
-
+    def _save_results(self, results, param, is_incident=False):
         reused_containers = 0
-
         containers_processed = 0
-        for i, result in enumerate(results):
+        artifact_type = 'incident' if is_incident else 'event'
 
-            self.send_progress("Adding event artifact # {0}".format(i))
+        for i, result in enumerate(results):
+            self.send_progress("Adding {} artifact # {}".format(artifact_type, i))
             # result is a dictionary of a single container and artifacts
             if "container" not in result:
                 self.debug_print("Skipping empty container # {0}".format(i))
@@ -3145,25 +3144,26 @@ class CrowdstrikeConnector(BaseConnector):
                     config.get("max_events_poll_now", DEFAULT_POLLNOW_EVENTS_COUNT),
                     "max_events_poll_now",
                 )
-            except Exception as ex:
-                self.debug_print("Error occurred while validating 'max_events_poll_now' asset configuration parameter")
-                max_events = "{}: {}".format(
-                    DEFAULT_POLLNOW_EVENTS_COUNT,
-                    self._get_error_message_from_exception(ex),
+                self.debug_print("Validating 'max_incidents_poll_now' asset configuration parameter")
+                max_incidents = self._validate_integers(
+                    action_result, config.get("max_incidents_poll_now", DEFAULT_POLLNOW_INCIDENTS_COUNT), "max_incidents_poll_now"
                 )
+            except Exception as ex:
+                self.debug_print("Error occurred while validating poll now parameters")
+                max_events = "{}: {}".format(DEFAULT_POLLNOW_EVENTS_COUNT, self._get_error_message_from_exception(ex))
+                max_incidents = "{}: {}".format(DEFAULT_POLLNOW_INCIDENTS_COUNT, self._get_error_message_from_exception(ex))
         else:
             # Scheduled and Interval Polling
             try:
                 self.debug_print("Validating 'max_events' asset configuration parameter")
-                max_events = self._validate_integers(
-                    action_result,
-                    config.get("max_events", DEFAULT_EVENTS_COUNT),
-                    "max_events",
-                )
+                max_events = self._validate_integers(action_result, config.get("max_events", DEFAULT_EVENTS_COUNT), "max_events")
+                self.debug_print("Validating 'max_incidents' asset configuration parameter")
+                max_incidents = self._validate_integers(action_result, config.get("max_incidents", DEFAULT_INCIDENTS_COUNT), "max_incidents")
             except Exception as ex:
                 max_events = "{}: {}".format(DEFAULT_EVENTS_COUNT, self._get_error_message_from_exception(ex))
+                max_incidents = "{}: {}".format(DEFAULT_INCIDENTS_COUNT, self._get_error_message_from_exception(ex))
 
-        return max_crlf, merge_time_interval, max_events, ingest_incidents
+        return max_crlf, merge_time_interval, max_events, max_incidents, ingest_incidents
 
     def _on_poll(self, param):
 
@@ -3179,7 +3179,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         config = self.get_config()
 
-        max_crlf, merge_time_interval, max_events, ingest_incidents = self._validate_on_poll_config_params(action_result, config)
+        max_crlf, merge_time_interval, max_events, max_incidents, ingest_incidents = self._validate_on_poll_config_params(action_result, config)
 
         if max_crlf is None or merge_time_interval is None or max_events is None:
             return action_result.get_status()
@@ -3191,7 +3191,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         # Handle incident ingestion if enabled
         if ingest_incidents:
-            ret_val = self._poll_incidents(action_result, param, max_events)
+            ret_val = self._poll_incidents(action_result, param, max_incidents)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
@@ -3340,11 +3340,11 @@ class CrowdstrikeConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _poll_incidents(self, action_result, param, max_events):
+    def _poll_incidents(self, action_result, param, max_incidents):
         self.save_progress("Starting incident ingestion...")
         try:
             # Get incidents
-            params = {"limit": max_events, "sort": "modified_timestamp.asc"}
+            params = {"limit": max_incidents, "sort": "modified_timestamp.asc"}
 
             if not self.is_poll_now():
                 try:
@@ -3384,7 +3384,7 @@ class CrowdstrikeConnector(BaseConnector):
                 # Process incidents through parser
                 self.save_progress(f"Processing {len(incidents)} incidents...")
                 incident_results = incidents_parser.process_incidents(incidents)
-                self._save_results(incident_results, param)
+                self._save_results(incident_results, param, True)
                 self.save_progress("Successfully processed incidents")
             else:
                 self.save_progress("No incidents found in response")

@@ -6282,7 +6282,7 @@
                     "data_type": "string",
                     "primary": true,
                     "contains": [
-                        "crowdstrike unique user id",
+                        "crowdstrike user id",
                         "email"
                     ],
                     "order": 2
@@ -6341,7 +6341,7 @@
                     "data_path": "action_result.parameter.assigned_to_user",
                     "data_type": "string",
                     "contains": [
-                        "crowdstrike unique user id",
+                        "crowdstrike user id",
                         "email"
                     ]
                 },

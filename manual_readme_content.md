@@ -27,7 +27,7 @@
 | [update detections](#action-update-detections)              | Detections                     | &cross;              | &check;              |
 | [list alerts](#action-list-alerts)                          | Alerts                         | &check;              | &cross;              |
 | [list epp alerts](#action-list-epp-alerts)                  | Alerts                         | &check;              | &cross;              |
-| [get epp alerts details](#action-get-epp-alerts-details)    | Alerts                         | &check;              | &cross;              |
+| [get epp details](#action-get-epp-details)                  | Alerts                         | &check;              | &cross;              |
 | [update epp alerts](#action-update-epp-alerts)              | Alerts                         | &cross;              | &check;              |
 | [resolve epp alerts](#action-resolve-epp-alerts)            | Alerts                         | &cross;              | &check;              |
 | [list sessions](#action-list-sessions)                      | Real time response(RTR)        | &check;              | &cross;              |

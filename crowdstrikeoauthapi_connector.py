@@ -2222,8 +2222,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         all_alerts = []
 
-        for i in range(0, len(composite_ids), 100):
-            batch = composite_ids[i : i + 100]
+        # Batch size to 5000 (get alert details can take max of 5000, list alerts can return 10000)
+        for i in range(0, len(composite_ids), 5000):
+            batch = composite_ids[i : i + 5000]
             ret_val, response = self._make_rest_call_helper_oauth2(
                 action_result,
                 CROWDSTRIKE_GET_ALERT_DETAILS_ENDPOINT,

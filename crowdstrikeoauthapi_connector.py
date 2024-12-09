@@ -539,12 +539,11 @@ class CrowdstrikeConnector(BaseConnector):
                 CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR
             )
 
-        params = {"limit": param.get("limit", 50), "offset": param.get("offset", 0)}
-
-        if param.get("filter"):
-            params["filter"] = param["filter"]
-        if param.get("sort"):
-            params["sort"] = param["sort"]
+        params = {
+            "limit": param.get("limit", 50),
+            "offset": param.get("offset", 0)
+        }
+        params.update({k: param[k] for k in ['filter', 'sort'] if param.get(k)})
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
@@ -3185,6 +3184,20 @@ class CrowdstrikeConnector(BaseConnector):
         if max_crlf is None or merge_time_interval is None or max_events is None:
             return action_result.get_status()
 
+        # Handle detection events
+        ret_val = self._poll_detection_events(action_result, param, config, max_crlf, max_events)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Handle incident ingestion if enabled
+        if ingest_incidents:
+            ret_val = self._poll_incidents(action_result, param, max_events)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _poll_detection_events(self, action_result, param, config, max_crlf, max_events):
         lower_id = 0
         if not self.is_poll_now():
             # we only mange the ids in case of on_poll on the interval
@@ -3325,62 +3338,63 @@ class CrowdstrikeConnector(BaseConnector):
                 last_offset_id = last_event["metadata"]["offset"]
                 self._state["last_offset_id"] = last_offset_id + 1
 
-        # Handle incident ingestion if enabled
-        if ingest_incidents:
-            self.save_progress("Starting incident ingestion...")
-            try:
-                # Get incidents
-                params = {"limit": max_events, "sort": "modified_timestamp.asc"}
+        return phantom.APP_SUCCESS
 
+    def _poll_incidents(self, action_result, param, max_events):
+        self.save_progress("Starting incident ingestion...")
+        try:
+            # Get incidents
+            params = {"limit": max_events, "sort": "modified_timestamp.asc"}
+
+            if not self.is_poll_now():
+                try:
+                    # Track timestamps to ensure ingesting new incidents
+                    last_ingestion_time = self._state.get("last_incident_timestamp", "")
+                    params["filter"] = f"modified_timestamp:>'{last_ingestion_time}'"
+                except Exception as e:
+                    self.debug_print(f"Error getting last incident timestamp, starting from epoch: {str(e)}")
+
+            self.send_progress(f"Fetching incidents with filter: {params}")
+
+            # Get incident IDs
+            incident_ids = self._get_ids(action_result, CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT, params)
+            if incident_ids is None:
+                return action_result.get_status()
+
+            if not incident_ids:
+                self.save_progress("No incidents found")
+                return phantom.APP_SUCCESS
+
+            # Get incident details
+            ret_val, response = self._make_rest_call_helper_oauth2(
+                action_result, CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT, json_data={"ids": incident_ids}, method="post"
+            )
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            incidents = response.get("resources", [])
+
+            if incidents:
+                # Update timestamp for next poll if not poll_now
                 if not self.is_poll_now():
-                    try:
-                        # Track timestamps to ensure ingesting new incidents
-                        last_ingestion_time = self._state.get("last_incident_timestamp", "")
-                        params["filter"] = f"modified_timestamp:>'{last_ingestion_time}'"
-                    except Exception as e:
-                        self.debug_print(f"Error getting last incident timestamp, starting from epoch: {str(e)}")
+                    latest_timestamp = max(incident.get("modified_timestamp", 0) for incident in incidents)
+                    self._state["last_incident_timestamp"] = latest_timestamp
 
-                self.send_progress(f"Fetching incidents with filter: {params}")
+                # Process incidents through parser
+                self.save_progress(f"Processing {len(incidents)} incidents...")
+                incident_results = incidents_parser.process_incidents(incidents)
+                self._save_results(incident_results, param)
+                self.save_progress("Successfully processed incidents")
+            else:
+                self.save_progress("No incidents found in response")
 
-                # Get incident IDs
-                incident_ids = self._get_ids(action_result, CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT, params)
-                if incident_ids is None:
-                    return action_result.get_status()
+            return phantom.APP_SUCCESS
 
-                if not incident_ids:
-                    self.save_progress("No incidents found")
-                    return phantom.APP_SUCCESS
-
-                # Get incident details
-                ret_val, response = self._make_rest_call_helper_oauth2(
-                    action_result, CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT, json_data={"ids": incident_ids}, method="post"
-                )
-
-                if phantom.is_fail(ret_val):
-                    return action_result.get_status()
-
-                incidents = response.get("resources", [])
-
-                if incidents:
-                    # Update timestamp for next poll if not poll_now
-                    if not self.is_poll_now():
-                        latest_timestamp = max(incident.get("modified_timestamp", 0) for incident in incidents)
-                        self._state["last_incident_timestamp"] = latest_timestamp
-
-                    # Process incidents through parser
-                    self.save_progress(f"Processing {len(incidents)} incidents...")
-                    incident_results = incidents_parser.process_incidents(incidents)
-                    self._save_results(incident_results, param)
-                    self.save_progress("Successfully processed incidents")
-                else:
-                    self.save_progress("No incidents found in response")
-
-            except Exception as e:
-                error_message = self._get_error_message_from_exception(e)
-                self.save_progress(f"Error ingesting incidents: {error_message}")
-                return action_result.set_status(phantom.APP_ERROR, f"Error ingesting incidents: {error_message}")
-
-        return action_result.set_status(phantom.APP_SUCCESS)
+        except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
+            self.save_progress(f"Error ingesting incidents: {error_message}")
+            return action_result.set_status(phantom.APP_ERROR, f"Error ingesting incidents: {error_message}")
 
     def _handle_list_processes(self, param):
 

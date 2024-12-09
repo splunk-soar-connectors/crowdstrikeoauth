@@ -524,6 +524,52 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_CONNECTIVITY_TEST)
 
+    def _handle_run_query(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        endpoint = param.get("endpoint")
+        if not endpoint:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide endpoint path")
+
+        # Ensure using query endpoint
+        if '/queries/' not in endpoint.lower():
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR
+            )
+
+        params = {"limit": param.get("limit", 50), "offset": param.get("offset", 0)}
+
+        if param.get("filter"):
+            params["filter"] = param["filter"]
+        if param.get("sort"):
+            params["sort"] = param["sort"]
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Add data items
+        resources = response.get("resources", [])
+        for resource in resources:
+            action_result.add_data({"resource_id": resource})
+
+        summary = action_result.update_summary({})
+        meta = response.get("meta", {})
+        pagination = meta.get("pagination", {})
+
+        summary.update({
+            "total_objects": len(resources),
+            "total_count": pagination.get("total", 0),
+            "query_time": meta.get("query_time", 0),
+            "powered_by": meta.get("powered_by", ""),
+            "trace_id": meta.get("trace_id", "")
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Query completed successfully")
+
     def _get_ids(self, action_result, endpoint, param, is_str=True):
 
         id_list = self._paginator(action_result, endpoint, param)
@@ -4890,6 +4936,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_mapping = {
             "test_asset_connectivity": self._handle_test_connectivity,
+            "run_query": self._handle_run_query,
             "query_device": self._handle_query_device,
             "list_groups": self._handle_list_groups,
             "quarantine_device": self._handle_quarantine_device,

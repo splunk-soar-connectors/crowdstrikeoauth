@@ -3334,6 +3334,7 @@ class CrowdstrikeConnector(BaseConnector):
 
                 if not self.is_poll_now():
                     try:
+                        # Track timestamps to ensure ingesting new incidents
                         last_ingestion_time = self._state.get("last_incident_timestamp", "")
                         params["filter"] = f"modified_timestamp:>'{last_ingestion_time}'"
                     except Exception as e:

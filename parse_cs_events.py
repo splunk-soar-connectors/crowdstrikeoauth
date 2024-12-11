@@ -21,6 +21,8 @@ from datetime import datetime
 from bs4 import UnicodeDammit
 from phantom import utils as ph_utils
 
+from crowdstrikeoauthapi_consts import CROWDSTRIKE_EVENT_TYPES
+
 _container_common = {
     "description": "Container added by Phantom",
     "run_automation": False,  # Don't run any playbooks, when this container is added
@@ -38,7 +40,24 @@ _sub_artifact_common = {
     "description": "Artifact added by Phantom",
     "run_automation": False,  # Don't run any playbooks, when this artifact is added
 }
-_severity_map = {"0": "low", "1": "low", "2": "low", "3": "medium", "4": "high", "5": "high"}
+_severity_map = {
+    # Old severity ranges
+    "0": "low",
+    "1": "low",
+    "2": "low",
+    "3": "medium",
+    "4": "high",
+    "5": "high",
+}
+
+_severity_name_map = {
+    # EPP severity ranges
+    "informational": "low",
+    "low": "low",
+    "medium": "medium",
+    "high": "high",
+    "critical": "high",
+}
 
 IGNORE_CONTAINS_VALIDATORS = ["domain", "host name"]
 key_to_name = dict()
@@ -78,12 +97,18 @@ def _set_cef_key(src_dict, src_key, dst_dict, dst_key, move=False):
     return True
 
 
-def _set_cef_key_list(event_details, cef):
+def _set_cef_key_list(event_details, cef, event_type):
+    if event_type == "DetectionSummaryEvent":
+        _set_cef_key(event_details, "ComputerName", cef, "sourceHostName", move=True)
+        _set_cef_key(event_details, "MachineDomain", cef, "sourceNtDomain", move=True)
+    else:  # EppDetectionSummaryEvent
+        _set_cef_key(event_details, "Hostname", cef, "sourceHostName", move=True)
+        _set_cef_key(event_details, "LogonDomain", cef, "sourceNtDomain", move=True)
+
+    # Common fields for both event types
     _set_cef_key(event_details, "UserName", cef, "sourceUserName", move=True)
     _set_cef_key(event_details, "FileName", cef, "fileName", move=True)
     _set_cef_key(event_details, "FilePath", cef, "filePath", move=True)
-    _set_cef_key(event_details, "ComputerName", cef, "sourceHostName", move=True)
-    _set_cef_key(event_details, "MachineDomain", cef, "sourceNtDomain", move=True)
     _set_cef_key(event_details, "MD5String", cef, "fileHash")
     _set_cef_key(event_details, "MD5String", cef, "hash")
     _set_cef_key(event_details, "MD5String", cef, "fileHashMd5", move=True)
@@ -102,6 +127,10 @@ def _set_cef_key_list(event_details, cef):
         _set_cef_key(event_details, "CommandLine", cef, "cs1")
         _set_cef_key(event_details, "CommandLine", cef, "cmdLine", move=True)
 
+    # EPP specific fields
+    _set_cef_key(event_details, "CompositeId", cef, "compositeId", move=True)
+    _set_cef_key(event_details, "AggregateId", cef, "aggregateId", move=True)
+
 
 def _get_event_types(events):
 
@@ -112,22 +141,40 @@ def _get_event_types(events):
 
 
 def _collate_results(base_connector, detection_events):
-
     results = []
 
-    # Get the set of unique detection name, these will be the containers
-    detection_names = set([x["event"].get("DetectName") for x in detection_events])
+    # Get the set of unique detection names, handling both event types
+    detection_names = set()
+    for event in detection_events:
+        event_type = event.get("metadata", {}).get("eventType", "")
+        if event_type == "DetectionSummaryEvent":
+            name = event["event"].get("DetectName")
+        else:  # EppDetectionSummaryEvent
+            name = event["event"].get("Name")
+        if name:
+            detection_names.add(name)
 
-    for i, detection_name in enumerate(detection_names):
+    for detection_name in detection_names:
+        # Update the filter to handle both event types
+        per_detection_events = [
+            x for x in detection_events if (x["event"].get("DetectName") == detection_name or x["event"].get("Name") == detection_name)
+        ]
 
-        per_detection_events = [x for x in detection_events if x["event"].get("DetectName") == detection_name]
+        # Get the set of unique machine names, handling both event types
+        machine_names = set()
+        for event in per_detection_events:
+            event_type = event.get("metadata", {}).get("eventType", "")
+            if event_type == "DetectionSummaryEvent":
+                machine_name = event["event"].get("ComputerName", "")
+            else:  # EppDetectionSummaryEvent
+                machine_name = event["event"].get("Hostname", "")
+            machine_names.add(machine_name)
 
-        # Get the set of unique machine names
-        machine_names = set([x["event"].get("ComputerName", "") for x in per_detection_events])
-
-        for j, machine_name in enumerate(machine_names):
-
-            per_detection_machine_events = [x for x in per_detection_events if x["event"].get("ComputerName") == machine_name]
+        for machine_name in machine_names:
+            # Update filter to check for both ComputerName and Hostname
+            per_detection_machine_events = [
+                x for x in per_detection_events if (x["event"].get("ComputerName") == machine_name or x["event"].get("Hostname") == machine_name)
+            ]
 
             ingest_event = dict()
             results.append(ingest_event)
@@ -155,12 +202,16 @@ def _collate_results(base_connector, detection_events):
                     (
                         "at {0}".format(creation_time)
                         if (not machine_name)
-                        else "on {0} at {1}".format(UnicodeDammit(machine_name).unicode_markup.encode("utf-8"), creation_time)
+                        else "on {0} at {1}".format(
+                            UnicodeDammit(machine_name).unicode_markup.encode("utf-8"),
+                            creation_time,
+                        )
                     ),
                 )
             else:
                 container["name"] = "{0} {1}".format(
-                    detection_name, "at {0}".format(creation_time) if (not machine_name) else "on {0} at {1}".format(machine_name, creation_time)
+                    detection_name,
+                    ("at {0}".format(creation_time) if (not machine_name) else "on {0} at {1}".format(machine_name, creation_time)),
                 )
             container["source_data_identifier"] = _create_dict_hash(base_connector, container)
 
@@ -326,6 +377,7 @@ def _create_artifacts_from_event(base_connector, event):
     # Make a copy, since the dictionary will be modified
     event_details = dict(event["event"])
     event_metadata = event.get("metadata", {})
+    event_type = event_metadata.get("eventType", "")
 
     artifact = dict()
     cef = dict()
@@ -334,10 +386,17 @@ def _create_artifacts_from_event(base_connector, event):
     # so this artifact needs to be added
     artifact.update(_artifact_common)
     artifact["source_data_identifier"] = event_metadata["offset"]
-    artifact["name"] = event_details.get("DetectDescription", "Detection Artifact")
-    artifact["severity"] = _severity_map.get(str(event_details.get("Severity", 3)), "medium")
 
-    _set_cef_key_list(event_details, cef)
+    # Handle both event types for description/name and severity
+    if event_type == "DetectionSummaryEvent":
+        artifact["name"] = event_details.get("DetectDescription", "Detection Artifact")
+        artifact["severity"] = _severity_map.get(str(event_details.get("Severity", 3)), "medium")
+    else:  # EppDetectionSummaryEvent
+        artifact["name"] = event_details.get("Description", "Detection Artifact")
+        severity_name = event_details.get("SeverityName", "").lower()
+        artifact["severity"] = _severity_name_map.get(severity_name, "medium")
+
+    _set_cef_key_list(event_details, cef, event_type)
 
     # convert any remaining keys in the event_details to follow the cef naming conventions
     _convert_to_cef_dict(cef, event_details)
@@ -361,6 +420,8 @@ def _create_artifacts_from_event(base_connector, event):
     _parse_sub_events(base_connector, artifacts, cef, "executablesWritten", artifact)
     _parse_sub_events(base_connector, artifacts, cef, "quarantineFiles", artifact)
     _parse_sub_events(base_connector, artifacts, cef, "dnsRequests", artifact)
+    _parse_sub_events(base_connector, artifacts, cef, "filesAccessed", artifact)  # EPP format
+    _parse_sub_events(base_connector, artifacts, cef, "filesWritten", artifact)  # EPP format
 
     return artifacts
 
@@ -375,31 +436,38 @@ def _get_str_from_epoch(epoch_milli):
 
 
 def parse_events(events, base_connector, collate):
-
     results = []
 
     base_connector.save_progress("Extracting Detection events")
 
-    # extract the type == 'DetectionSummaryEvent' events
-    detection_events = [x for x in events if x["metadata"]["eventType"] == "DetectionSummaryEvent"]
+    # Extract both DetectionSummaryEvent and EppDetectionSummaryEvent events
+    detection_events = [x for x in events if x["metadata"]["eventType"] in CROWDSTRIKE_EVENT_TYPES]
 
     if not detection_events:
-        base_connector.save_progress("Did not match any events of type: DetectionSummaryEvent")
+        base_connector.save_progress("Did not match any events of supported types")
         return results
 
-    base_connector.save_progress("Got {0} events of type DetectionSummaryEvent".format(len(detection_events)))
+    base_connector.save_progress("Got {0} detection events".format(len(detection_events)))
 
     if collate:
         return _collate_results(base_connector, detection_events)
 
-    for i, curr_event in enumerate(detection_events):
-
-        artifacts_ret = _create_artifacts_from_event(base_connector, curr_event)
-
+    for curr_event in detection_events:
+        event_type = curr_event["metadata"]["eventType"]
         event_details = curr_event["event"]
-        detection_name = event_details.get("DetectName", "Unknown Detection")
-        hostname = event_details.get("ComputerName", "Unknown Host")
-        creation_time = curr_event.get("metadata").get("eventCreationTime", "")
+
+        # Handle both detection types
+        if event_type == "DetectionSummaryEvent":
+            detection_name = event_details.get("DetectName", "Unknown Detection")
+            container_severity = _severity_map.get(str(event_details.get("Severity", 3)), "medium")
+            hostname = event_details.get("ComputerName", "Unknown Host")
+        else:  # EppDetectionSummaryEvent
+            detection_name = event_details.get("Name", "Unknown Detection")
+            severity_name = event_details.get("SeverityName", "").lower()
+            container_severity = _severity_name_map.get(severity_name, "medium")
+            hostname = event_details.get("Hostname", "Unknown Host")
+
+        creation_time = curr_event.get("metadata", {}).get("eventCreationTime", "")
 
         ingest_event = dict()
         results.append(ingest_event)
@@ -419,10 +487,11 @@ def parse_events(events, base_connector, collate):
             )
         else:
             container["name"] = "{0} on {1} at {2}".format(detection_name, hostname, creation_time)
-        container["severity"] = _severity_map.get(str(event_details.get("Severity", 3)), "medium")
+        container["severity"] = container_severity
         container["source_data_identifier"] = _create_dict_hash(base_connector, container)
 
-        # now the artifacts, will just be one
+        # Create artifacts
+        artifacts_ret = _create_artifacts_from_event(base_connector, curr_event)
         ingest_event["artifacts"] = artifacts = []
         artifacts.extend(artifacts_ret)
 

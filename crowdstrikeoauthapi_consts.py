@@ -55,7 +55,15 @@ CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION = "to_expiration"
 CROWDSTRIKE_JSON_LIST_IOC = "indicator_value"
 CROWDSTRIKE_POLL_INTERVAL = "detonate_timeout"
 CROWDSTRIKE_RESOURCE_ID = "resource_id"
-
+CROWDSTRIKE_ALERT_IDS = "alert_ids"
+CROWDSTRIKE_STATUS = "status"
+CROWDSTRIKE_COMMENT = "comment"
+CROWDSTRIKE_ASSIGNED_TO_USER = "assigned_to_user"
+CROWDSTRIKE_UNASSIGN = "unassign"
+CROWDSTRIKE_SHOW_IN_UI = "show_in_ui"
+CROWDSTRIKE_ADD_TAGS = "add_tags"
+CROWDSTRIKE_REMOVE_TAGS = "remove_tags"
+CROWDSTRIKE_REMOVE_TAGS_BY_PREFIX = "remove_tags_by_prefix"
 # general parameters
 CROWDSTRIKE_FILTER = "filter"
 CROWDSTRIKE_INCLUDE_HIDDEN = "include_hidden"
@@ -111,12 +119,12 @@ CROWDSTRIKE_UNICODE_DAMMIT_TYPE_MESSAGE_ERROR = (
 )
 CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
 CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE = "Error details: 404"
-CROWDSTRIKE_PULLED_EVENTS_MESSAGE = "Pulled {0} events of type 'DetectionSummaryEvent'"
+CROWDSTRIKE_PULLED_EVENTS_MESSAGE = "Pulled {0} detection events"
 CROWDSTRIKE_NO_DATA_MESSAGE = "No data, terminating loop"
 CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE = "CR/LF received on iteration: {} - terminating loop"
 CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE = "CR/LF received on iteration {} - continuing"
 CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE = "Total blank lines count: {}"
-CROWDSTRIKE_GOT_EVENTS_MESSAGE = "Got {0} events of type 'DetectionSummaryEvent'"
+CROWDSTRIKE_GOT_EVENTS_MESSAGE = "Got {0} detection events"
 
 CROWDSTRIKE_FILTER_REQUEST_STR = (
     "{0}rest/container?page_size=0" "&_filter_asset={1}" '&_filter_name__contains="{2}"' '&_filter_start_time__gte="{3}"'
@@ -227,7 +235,17 @@ CROWDSTRIKE_SORT_CRITERIA_LIST = [
     "last_modified.desc",
 ]
 CROWDSTRIKE_API_SUCC_CODES = [200, 202, 204]
-CROWDSTRIKE_DETECTION_STATUSES = ["new", "in_progress", "true_positive", "false_positive", "ignored", "closed", "reopened"]
+CROWDSTRIKE_DETECTION_STATUSES = [
+    "new",
+    "in_progress",
+    "true_positive",
+    "false_positive",
+    "ignored",
+    "closed",
+    "reopened",
+]
+CROWDSTRIKE_EPP_ALERT_STATUSES = ["new", "in_progress", "closed", "reopened"]
+CROWDSTRIKE_EVENT_TYPES = ["DetectionSummaryEvent", "EppDetectionSummaryEvent"]
 
 CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT = "/ioarules/entities/rule-groups/v1"
 CROWDSTRIKE_IOA_QUERY_RULE_GROUPS_ENDPOINT = "/ioarules/queries/rule-groups-full/v1"
@@ -238,3 +256,6 @@ CROWDSTRIKE_IOA_GET_TYPE_ENDPOINT = "/ioarules/entities/rule-types/v1"
 CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT = "/ioarules/entities/rules/v1"
 
 CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT = "/policy/entities/prevention-actions/v1"
+
+CROWDSTRIKE_UPDATE_ALERT_ENDPOINT = "/alerts/entities/alerts/v3"
+CROWDSTRIKE_GET_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v2"

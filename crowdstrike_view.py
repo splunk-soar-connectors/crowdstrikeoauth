@@ -273,8 +273,14 @@ def display_view(provides, all_app_runs, context):  # noqa: C901
     if provides == "list detections":
         return "crowdstrike_list_detections.html"
 
+    if provides == "list epp alerts":
+        return "crowdstrike_list_epp_alerts.html"
+
     if provides == "get detections details":
         return "crowdstrike_get_detections_details.html"
+
+    if provides == "get epp alerts details":
+        return "crowdstrike_get_alerts_details.html"
 
     if provides == "create ioa rule group":
         return "crowdstrike_create_ioa_rule_group.html"

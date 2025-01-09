@@ -26,6 +26,10 @@
 | [get detections details](#action-get-detections-details)    | Detections                     | &check;              | &cross;              |
 | [update detections](#action-update-detections)              | Detections                     | &cross;              | &check;              |
 | [list alerts](#action-list-alerts)                          | Alerts                         | &check;              | &cross;              |
+| [list epp alerts](#action-list-epp-alerts)                  | Alerts                         | &check;              | &cross;              |
+| [get epp details](#action-get-epp-details)                  | Alerts                         | &check;              | &cross;              |
+| [update epp alerts](#action-update-epp-alerts)              | Alerts                         | &cross;              | &check;              |
+| [resolve epp alerts](#action-resolve-epp-alerts)            | Alerts                         | &cross;              | &check;              |
 | [list sessions](#action-list-sessions)                      | Real time response(RTR)        | &check;              | &cross;              |
 | [run command](#action-run-command)                          | Real time response(RTR)        | &check;              | &cross;              |
 | [run admin command](#action-run-admin-command)              | Real time response(admin)      | &cross;              | &check;              |
@@ -92,9 +96,9 @@ error.
         parameters \[Maximum events to get while POLL NOW\] (default 2000 if not specified) and
         \[Maximum events to get while scheduled and interval polling\] (default 10,000 if not
         specified). For ingestion, the events are fetched after filtering them based on the event
-        type - **DetectionSummaryEvent** . The app will exit from the polling cycle in the
+        types - **DetectionSummaryEvent** and **EppDetectionSummaryEvent**. The app will exit from the polling cycle in the
         below-mentioned 2 cases whichever is earlier.
-        -   If the total DetectionSummaryEvents fetched equals the value provided in the \[Maximum
+        -   If the total events fetched equals the value provided in the \[Maximum
             events to get while POLL NOW\] (for manual polling) or \[Maximum events to get while
             scheduled and interval polling\] (for scheduled | interval polling) parameters
         -   If the total number of continuous blank lines encountered while streaming the data
@@ -106,17 +110,15 @@ error.
         specified seconds\], all events which are of the same type and on the same host will be put
         into one container, as long as the time between those two events is less than the interval.
     -   The \[Maximum allowed continuous blank lines\] asset configuration parameter will be used to
-        indicate the allowed number of continuous blank lines while fetching
-        **DetectionSummaryEvents** . For example, of the entire data of the DetectionSummaryEvents,
-        some of the 'DetectionSummaryEvents' exists after 100 continuous blank lines and if you've
+        indicate the allowed number of continuous blank lines while fetching events. For example, if some events exist after 100 continuous blank lines and you've
         set the \[Maximum allowed continues blank lines\] parameter value to 500, it will keep on
-        ingesting all the 'DetectionSummaryEvents' until the code gets 500 continuous blank lines
-        and hence, it will be able to cover the DetectionSummaryEvents successfully even after the
+        ingesting all events until the code gets 500 continuous blank lines
+        and hence, it will be able to cover the events successfully even after the
         100 blank lines. If you set it to 50, it will break after the 50th blank line is
         encountered. Hence, it won't be able to ingest the events which exist after the 100
         continuous blank lines because the code considers that after the configured value in the
         \[Maximum allowed continuous blank lines\] configuration parameter (here 50), there is no
-        data available for the 'DetectionSummaryEvents'.
+        data available.
 -   Manual Polling
     -   During manual poll now, the app starts from the first event that it can query up to the
         value configured in the configuration parameter \[Maximum events to get while POLL NOW\] and
@@ -145,6 +147,20 @@ The **DetectionSummaryEvent** is parsed to extract the following values into an 
 | cef.hash           | SHA1String      |
 | cef.hash           | SHA256STring    |
 | cef.cs1            | cmdLine         |
+
+The **EppDetectionSummaryEvent** is parsed to extract the following values into an Artifact.  
+
+| **Artifact Field** | **Event Field**  |
+|--------------------|------------------|
+| cef.sourceUserName | UserName         |
+| cef.fileName       | FileName         |
+| cef.filePath       | FilePath         |
+| cef.sourceHostName | Hostname         |
+| cef.sourceNtDomain | LogonDomain      |
+| cef.hash           | MD5String        |
+| cef.hash           | SHA1String       |
+| cef.hash           | SHA256String     |
+| cef.cs1            | cmdLine          |
 
 The app also parses the following **sub-events** into their own artifacts.  
 
@@ -225,6 +241,28 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
     and detonate URL actions.
 
 ## Notes
+
+
+-   **Action -** List Alerts
+
+<!-- -->
+
+-   The filter parameter values follow the [FQL
+    Syntax](https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-fql-reference)
+    .
+-   The sort parameter value has to be provided in the format property_name.asc for ascending and
+    property_name.desc for descending order.
+
+-   The `include_hidden` parameter has been added to the action as it's behavior in the API has changed. In the
+    prior API version, the default behavior of the `include_hidden` parameter was either not supported or defaulted
+    to `false`. The latest version of the API now defaults `include_hidden` to `true` if it is not included in
+    the API call. Therefore, we have included this parameter in the action configuration and set it to `false` by
+    default in order to keep the action behavior consistent with the previous app version. Hidden alerts can be
+    identified by the `show_in_ui` field of an alert object.
+
+    If you experience any `list alerts` action failures in an existing playbook that passed in the previous version
+    of the app, you may need to edit the action in the playbook and then save. This will then add the `include_hidden`
+    field to the playbook action.
 
 -   **Action -** List Groups
 
@@ -366,3 +404,4 @@ default ports used by Splunk SOAR.
         -   Updated name from 'customer' to 'cid'
         -   Updated name from 'firstName' to 'first_name'
         -   Updated name from 'lastName' to 'last_name'
+

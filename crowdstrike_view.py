@@ -38,24 +38,24 @@ def get_ctx_result_ps(result):
 
     param = result.get_param()
 
-    if ('ioc' in param):
-        ioc = param.get('ioc')
-        ret_val, param['ioc_type'] = _get_ioc_type(ioc)
+    if "ioc" in param:
+        ioc = param.get("ioc")
+        ret_val, param["ioc_type"] = _get_ioc_type(ioc)
 
-    ctx_result['param'] = param
+    ctx_result["param"] = param
 
     message = result.get_message()
-    ctx_result['message'] = message
+    ctx_result["message"] = message
 
     summary = result.get_summary()
-    ctx_result['summary'] = summary
+    ctx_result["summary"] = summary
 
     data = result.get_data()
 
-    if (not data):
+    if not data:
         return ctx_result
 
-    ctx_result['data'] = data
+    ctx_result["data"] = data
 
     return ctx_result
 
@@ -83,15 +83,15 @@ def _get_ioc_type(ioc):
 
 def _trim_results(data, key):
 
-    if (key not in data):
+    if key not in data:
         return
 
-    if (len(data[key]) <= 100):
+    if len(data[key]) <= 100:
         return
 
     data[key] = data[key][:101]
 
-    data[key][-1] = '...'
+    data[key][-1] = "..."
 
 
 def get_ctx_result_hunt(result):
@@ -100,30 +100,30 @@ def get_ctx_result_hunt(result):
 
     param = result.get_param()
 
-    if 'hash' in param:
-        hunt_object = param.get('hash')
-    elif 'domain' in param:
-        hunt_object = param.get('domain')
+    if "hash" in param:
+        hunt_object = param.get("hash")
+    elif "domain" in param:
+        hunt_object = param.get("domain")
     else:
-        hunt_object = param.get('ip')
+        hunt_object = param.get("ip")
 
-    param['ioc'] = hunt_object
-    ret_val, param['ioc_type'] = _get_ioc_type(hunt_object)
+    param["ioc"] = hunt_object
+    ret_val, param["ioc_type"] = _get_ioc_type(hunt_object)
 
-    ctx_result['param'] = param
+    ctx_result["param"] = param
 
     message = result.get_message()
-    ctx_result['message'] = message
+    ctx_result["message"] = message
 
     summary = result.get_summary()
-    ctx_result['summary'] = summary
+    ctx_result["summary"] = summary
 
     data = result.get_data()
 
-    if (not data):
+    if not data:
         return ctx_result
 
-    ctx_result['data'] = data
+    ctx_result["data"] = data
 
     return ctx_result
 
@@ -134,35 +134,35 @@ def get_ctx_result(result):
 
     param = result.get_param()
 
-    if ('ioc' in param):
-        ioc = param.get('ioc')
-        ret_val, param['ioc_type'] = _get_ioc_type(ioc)
+    if "ioc" in param:
+        ioc = param.get("ioc")
+        ret_val, param["ioc_type"] = _get_ioc_type(ioc)
 
-    ctx_result['param'] = param
+    ctx_result["param"] = param
 
     message = result.get_message()
-    ctx_result['message'] = message
+    ctx_result["message"] = message
 
     summary = result.get_summary()
-    ctx_result['summary'] = summary
+    ctx_result["summary"] = summary
 
     data = result.get_data()
 
-    if (not data):
+    if not data:
         return ctx_result
 
     data = data[0]
 
-    if (not data):
+    if not data:
         return ctx_result
 
-    _trim_results(data, 'ip')
-    _trim_results(data, 'domain')
-    _trim_results(data, 'sha256')
-    _trim_results(data, 'sha1')
-    _trim_results(data, 'md5')
+    _trim_results(data, "ip")
+    _trim_results(data, "domain")
+    _trim_results(data, "sha256")
+    _trim_results(data, "sha1")
+    _trim_results(data, "md5")
 
-    ctx_result['data'] = data
+    ctx_result["data"] = data
 
     return ctx_result
 
@@ -173,21 +173,21 @@ def get_ctx_result_indicator(result):
 
     param = result.get_param()
 
-    if 'ioc' in param:
-        ioc = param.get('ioc')
-        ret_val, param['ioc_type'] = _get_ioc_type(ioc)
+    if "ioc" in param:
+        ioc = param.get("ioc")
+        ret_val, param["ioc_type"] = _get_ioc_type(ioc)
 
-    if 'indicator_value' in param:
-        ioc = param.get('indicator_value')
-        ret_val, param['ioc_type'] = _get_ioc_type(ioc)
+    if "indicator_value" in param:
+        ioc = param.get("indicator_value")
+        ret_val, param["ioc_type"] = _get_ioc_type(ioc)
 
-    ctx_result['param'] = param
+    ctx_result["param"] = param
 
     data = result.get_data()
     if not data:
         return ctx_result
 
-    ctx_result['data'] = data
+    ctx_result["data"] = data
 
     return ctx_result
 
@@ -205,22 +205,22 @@ def _get_ctx_result(result, provides):
     if len(list(param.keys())) > 1:
         ctx_result["check_param"] = True
 
-    ctx_result['param'] = param
+    ctx_result["param"] = param
     ctx_result["action_name"] = provides
     if summary:
-        ctx_result['summary'] = summary
+        ctx_result["summary"] = summary
 
     if not data:
-        ctx_result['data'] = {}
+        ctx_result["data"] = {}
         return ctx_result
 
-    ctx_result['data'] = data
+    ctx_result["data"] = data
 
     return ctx_result
 
 
 def display_view(provides, all_app_runs, context):  # noqa: C901
-    context['results'] = results = []
+    context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
             ctx_result = _get_ctx_result(result, provides)
@@ -228,103 +228,109 @@ def display_view(provides, all_app_runs, context):  # noqa: C901
                 continue
             results.append(ctx_result)
 
-    if provides == 'assign hosts':
-        return 'crowdstrike_assign_hosts.html'
+    if provides == "assign hosts":
+        return "crowdstrike_assign_hosts.html"
 
-    if provides == 'remove hosts':
-        return 'crowdstrike_remove_hosts.html'
+    if provides == "remove hosts":
+        return "crowdstrike_remove_hosts.html"
 
-    if provides == 'create session':
-        return 'crowdstrike_create_session.html'
+    if provides == "create session":
+        return "crowdstrike_create_session.html"
 
-    if provides == 'list incidents':
-        return 'crowdstrike_list_incidents.html'
+    if provides == "list incidents":
+        return "crowdstrike_list_incidents.html"
 
-    if provides == 'list incident behaviors':
-        return 'crowdstrike_list_incident_behaviors.html'
+    if provides == "list incident behaviors":
+        return "crowdstrike_list_incident_behaviors.html"
 
-    if provides == 'list custom indicators':
-        return 'crowdstrike_list_custom_indicators.html'
+    if provides == "list custom indicators":
+        return "crowdstrike_list_custom_indicators.html"
 
-    if provides == 'get user roles':
-        return 'crowdstrike_get_user_roles.html'
+    if provides == "get user roles":
+        return "crowdstrike_get_user_roles.html"
 
-    if provides == 'file reputation':
-        return 'crowdstrike_file_reputation.html'
+    if provides == "file reputation":
+        return "crowdstrike_file_reputation.html"
 
-    if provides == 'url reputation':
-        return 'crowdstrike_url_reputation.html'
+    if provides == "url reputation":
+        return "crowdstrike_url_reputation.html"
 
-    if provides == 'detonate file':
-        return 'crowdstrike_detonate_file.html'
+    if provides == "detonate file":
+        return "crowdstrike_detonate_file.html"
 
-    if provides == 'detonate url':
-        return 'crowdstrike_detonate_url.html'
+    if provides == "detonate url":
+        return "crowdstrike_detonate_url.html"
 
-    if provides == 'get zta data':
-        return 'crowdstrike_get_zta_data.html'
+    if provides == "get zta data":
+        return "crowdstrike_get_zta_data.html"
 
-    if provides == 'get device scroll':
-        return 'crowdstrike_get_device_scroll.html'
+    if provides == "get device scroll":
+        return "crowdstrike_get_device_scroll.html"
 
-    if provides == 'list users':
-        return 'crowdstrike_list_users.html'
+    if provides == "list users":
+        return "crowdstrike_list_users.html"
 
-    if provides == 'list detections':
-        return 'crowdstrike_list_detections.html'
+    if provides == "list detections":
+        return "crowdstrike_list_detections.html"
 
-    if provides == 'get detections details':
-        return 'crowdstrike_get_detections_details.html'
+    if provides == "list epp alerts":
+        return "crowdstrike_list_epp_alerts.html"
 
-    if provides == 'create ioa rule group':
-        return 'crowdstrike_create_ioa_rule_group.html'
+    if provides == "get detections details":
+        return "crowdstrike_get_detections_details.html"
 
-    if provides == 'update ioa rule group':
-        return 'crowdstrike_update_ioa_rule_group.html'
+    if provides == "get epp alerts details":
+        return "crowdstrike_get_alerts_details.html"
 
-    if provides == 'delete ioa rule group':
-        return 'crowdstrike_delete_ioa_rule_group.html'
+    if provides == "create ioa rule group":
+        return "crowdstrike_create_ioa_rule_group.html"
 
-    if provides == 'list ioa rule groups':
-        return 'crowdstrike_list_ioa_rule_groups.html'
+    if provides == "update ioa rule group":
+        return "crowdstrike_update_ioa_rule_group.html"
 
-    if provides == 'list ioa platforms':
-        return 'crowdstrike_list_ioa_platforms.html'
+    if provides == "delete ioa rule group":
+        return "crowdstrike_delete_ioa_rule_group.html"
 
-    if provides == 'list ioa severities':
-        return 'crowdstrike_list_ioa_severities.html'
+    if provides == "list ioa rule groups":
+        return "crowdstrike_list_ioa_rule_groups.html"
 
-    if provides == 'list ioa types':
-        return 'crowdstrike_list_ioa_types.html'
+    if provides == "list ioa platforms":
+        return "crowdstrike_list_ioa_platforms.html"
 
-    if provides == 'create ioa rule':
-        return 'crowdstrike_create_ioa_rule.html'
+    if provides == "list ioa severities":
+        return "crowdstrike_list_ioa_severities.html"
 
-    if provides == 'update ioa rule':
-        return 'crowdstrike_update_ioa_rule.html'
+    if provides == "list ioa types":
+        return "crowdstrike_list_ioa_types.html"
 
-    if provides == 'delete ioa rule':
-        return 'crowdstrike_delete_ioa_rule.html'
+    if provides == "create ioa rule":
+        return "crowdstrike_create_ioa_rule.html"
+
+    if provides == "update ioa rule":
+        return "crowdstrike_update_ioa_rule.html"
+
+    if provides == "delete ioa rule":
+        return "crowdstrike_delete_ioa_rule.html"
 
 
 def hunt_view(provides, all_app_runs, context):
 
-    context['results'] = results = []
+    context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
 
             ctx_result = get_ctx_result_hunt(result)
-            if (not ctx_result):
+            if not ctx_result:
                 continue
             results.append(ctx_result)
 
     # print context
-    return 'crowdstrike_hunt_view.html'
+    return "crowdstrike_hunt_view.html"
 
 
 def indicator_view(provides, all_app_runs, context):
 
-    context['results'] = results = []
+    context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
 
@@ -333,55 +339,55 @@ def indicator_view(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    if provides == 'update indicator':
-        return 'crowdstrike_update_indicator.html'
+    if provides == "update indicator":
+        return "crowdstrike_update_indicator.html"
 
-    if provides == 'delete indicator':
-        return 'crowdstrike_delete_indicator.html'
+    if provides == "delete indicator":
+        return "crowdstrike_delete_indicator.html"
 
-    return 'crowdstrike_get_indicator.html'
+    return "crowdstrike_get_indicator.html"
 
 
 def set_status_view(provides, all_app_runs, context):
 
-    context['results'] = results = []
+    context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
 
             ctx_result = get_ctx_result(result)
-            if (not ctx_result):
+            if not ctx_result:
                 continue
             results.append(ctx_result)
 
     # print context
-    return 'crowdstrike_set_status_view.html'
+    return "crowdstrike_set_status_view.html"
 
 
 def process_list_view(provides, all_app_runs, context):
 
-    context['results'] = results = []
+    context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
 
             ctx_result = get_ctx_result_ps(result)
-            if (not ctx_result):
+            if not ctx_result:
                 continue
             results.append(ctx_result)
 
     # print context
-    return 'crowdstrike_process_list_view.html'
+    return "crowdstrike_process_list_view.html"
 
 
 def command_view(provides, all_app_runs, context):
 
-    context['results'] = results = []
+    context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
 
             ctx_result = get_ctx_result_ps(result)
-            if (not ctx_result):
+            if not ctx_result:
                 continue
             results.append(ctx_result)
 
     # print context
-    return 'crowdstrike_command_output.html'
+    return "crowdstrike_command_output.html"

@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: crowdstrike_create_session.html
+<!-- File: crowdstrike_update_ioa_rule.html
   Copyright (c) 2019-2024 Splunk Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,59 +99,99 @@
         <h4 class="wf-h4-style">No data found</h4>
 
     {% else %}
-    <h3 class="wf-h3-style">Info</h3>
-    <table class="wf-table-vertical">
-        <tr>
-            <td>Device ID</td>
-            <td><a href="javascript:;"
-                onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id }}' }], 0, {{ container.id }}, null, false);">
-                {{ result.param.device_id }}
-                &nbsp;
-                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                </a>
-            </td>
-        </tr>
-    </table>
-    <h3 class="wf-h3-style">Session Info</h3>
+    <h3 class="wf-h3-style">Updated Rule</h3>
     <div class="metadata_div">
         <!--Default View-->
-        <div class="panel-group" id="server-information">
+        <div class="panel-group" id="rule-group-information">
             <div class="panel">
                 <div id="default-view-table" class="panel-collapse collapse in">
                     <table class="wf-table-horizontal datatable">
                         <thead>
                             <tr>
-                                <th>Session ID</th>
-                                <th>Created At</th>
-                                <th>File Path</th>
+                                <th>Rule Group ID</th>
+                                <th>Version</th>
+                                <th>Enabled</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Platform</th>
+                                <th>Comment</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for session in result.data %}
-                                {% for resource in session.resources %}
+                            {% for rule_group in result.data %}
+                                {% for resource in rule_group.resources %}
                                     <tr>
                                         <td>
                                             <a href="javascript:;"
-                                            onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ resource.session_id }}' }], 0, {{ container.id }}, null, false);">
-                                                {{ resource.session_id }}
+                                            onclick="context_menu(this, [{'contains': ['crowdstrike ioa rule group id'], 'value': '{{ resource.id }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ resource.id }}
                                                 &nbsp;
                                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                             </a>
                                         </td>
-                                        <td>{{ resource.created_at }}</td>
-                                        <td>
-                                            <a href="javascript:;"
-                                            onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ resource.pwd }}' }], 0, {{ container.id }}, null, false);">
-                                                {{ resource.pwd }}
-                                                &nbsp;
-                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                            </a>
-                                        </td>
+                                        <td>{{ resource.version }}</td>
+                                        <td>{{ resource.enabled }}</td>
+                                        <td>{{ resource.name }}</td>
+                                        <td>{{ resource.description }}</td>
+                                        <td>{{ resource.platform }}</td>
+                                        <td>{{ resource.comment }}</td>
                                     </tr>
                                 {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3 class="wf-h3-style">Rules</h3>
+    <div class="metadata_div">
+        <div class="panel-group">
+            <div class="panel">
+                <div id="default-view-table" class="panel-collapse collapse in">
+                    {% for rule_group in result.data %}
+                        {% for resource in rule_group.resources %}
+                            <table class="wf-table-horizontal datatable">
+                                <thead>
+                                    <tr>
+                                        <td>Rule ID</td>
+                                        <td>Rule Version</td>
+                                        <td>Enabled</td>
+                                        <td>Name</td>
+                                        <td>Description</td>
+                                        <td>Rule Type</td>
+                                        <td>Severity</td>
+                                        <td>Action</td>
+                                        <td>Field Values</td>
+                                        <td>Comment</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rule in resource.rules %}
+                                        <tr>
+                                            <td>
+                                                <a href="javascript:;"
+                                                onclick="context_menu(this, [{'contains': ['crowdstrike ioa rule id'], 'value': '{{ rule.instance_id }}' }], 0, {{ container.id }}, null, false);">
+                                                    {{ rule.instance_id }}
+                                                    &nbsp;
+                                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                </a>
+                                            </td>
+                                            <td>{{ rule.instance_version }}</td>
+                                            <td>{{ rule.enabled }}</td>
+                                            <td>{{ rule.name }}</td>
+                                            <td>{{ rule.description }}</td>
+                                            <td>{{ rule.ruletype_name }}</td>
+                                            <td>{{ rule.pattern_severity }}</td>
+                                            <td>{{ rule.action_label }}</td>
+                                            <td>{{ rule.field_values }}</td>
+                                            <td>{{ rule.comment }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endfor %}
+                    {% endfor %}
                 </div>
             </div>
         </div>

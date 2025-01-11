@@ -2,16 +2,16 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 4.1.0  
+Connector Version: 5.0.0  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.1.0  
+Minimum Product Version: 6.3.0  
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2023 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2024 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
@@ -38,6 +38,10 @@ This app integrates with CrowdStrike OAuth2 authentication standard to implement
 | [get detections details](#action-get-detections-details)    | Detections                     | &check;              | &cross;              |
 | [update detections](#action-update-detections)              | Detections                     | &cross;              | &check;              |
 | [list alerts](#action-list-alerts)                          | Alerts                         | &check;              | &cross;              |
+| [list epp alerts](#action-list-epp-alerts)                  | Alerts                         | &check;              | &cross;              |
+| [get epp details](#action-get-epp-details)                  | Alerts                         | &check;              | &cross;              |
+| [update epp alerts](#action-update-epp-alerts)              | Alerts                         | &cross;              | &check;              |
+| [resolve epp alerts](#action-resolve-epp-alerts)            | Alerts                         | &cross;              | &check;              |
 | [list sessions](#action-list-sessions)                      | Real time response(RTR)        | &check;              | &cross;              |
 | [run command](#action-run-command)                          | Real time response(RTR)        | &check;              | &cross;              |
 | [run admin command](#action-run-admin-command)              | Real time response(admin)      | &cross;              | &check;              |
@@ -103,9 +107,9 @@ error.
         parameters \[Maximum events to get while POLL NOW\] (default 2000 if not specified) and
         \[Maximum events to get while scheduled and interval polling\] (default 10,000 if not
         specified). For ingestion, the events are fetched after filtering them based on the event
-        type - **DetectionSummaryEvent** . The app will exit from the polling cycle in the
+        types - **DetectionSummaryEvent** and **EppDetectionSummaryEvent**. The app will exit from the polling cycle in the
         below-mentioned 2 cases whichever is earlier.
-        -   If the total DetectionSummaryEvents fetched equals the value provided in the \[Maximum
+        -   If the total events fetched equals the value provided in the \[Maximum
             events to get while POLL NOW\] (for manual polling) or \[Maximum events to get while
             scheduled and interval polling\] (for scheduled | interval polling) parameters
         -   If the total number of continuous blank lines encountered while streaming the data
@@ -117,17 +121,15 @@ error.
         specified seconds\], all events which are of the same type and on the same host will be put
         into one container, as long as the time between those two events is less than the interval.
     -   The \[Maximum allowed continuous blank lines\] asset configuration parameter will be used to
-        indicate the allowed number of continuous blank lines while fetching
-        **DetectionSummaryEvents** . For example, of the entire data of the DetectionSummaryEvents,
-        some of the 'DetectionSummaryEvents' exists after 100 continuous blank lines and if you've
+        indicate the allowed number of continuous blank lines while fetching events. For example, if some events exist after 100 continuous blank lines and you've
         set the \[Maximum allowed continues blank lines\] parameter value to 500, it will keep on
-        ingesting all the 'DetectionSummaryEvents' until the code gets 500 continuous blank lines
-        and hence, it will be able to cover the DetectionSummaryEvents successfully even after the
+        ingesting all events until the code gets 500 continuous blank lines
+        and hence, it will be able to cover the events successfully even after the
         100 blank lines. If you set it to 50, it will break after the 50th blank line is
         encountered. Hence, it won't be able to ingest the events which exist after the 100
         continuous blank lines because the code considers that after the configured value in the
         \[Maximum allowed continuous blank lines\] configuration parameter (here 50), there is no
-        data available for the 'DetectionSummaryEvents'.
+        data available.
 -   Manual Polling
     -   During manual poll now, the app starts from the first event that it can query up to the
         value configured in the configuration parameter \[Maximum events to get while POLL NOW\] and
@@ -156,6 +158,20 @@ The **DetectionSummaryEvent** is parsed to extract the following values into an 
 | cef.hash           | SHA1String      |
 | cef.hash           | SHA256STring    |
 | cef.cs1            | cmdLine         |
+
+The **EppDetectionSummaryEvent** is parsed to extract the following values into an Artifact.  
+
+| **Artifact Field** | **Event Field**  |
+|--------------------|------------------|
+| cef.sourceUserName | UserName         |
+| cef.fileName       | FileName         |
+| cef.filePath       | FilePath         |
+| cef.sourceHostName | Hostname         |
+| cef.sourceNtDomain | LogonDomain      |
+| cef.hash           | MD5String        |
+| cef.hash           | SHA1String       |
+| cef.hash           | SHA256String     |
+| cef.cs1            | cmdLine          |
 
 The app also parses the following **sub-events** into their own artifacts.  
 
@@ -236,6 +252,28 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
     and detonate URL actions.
 
 ## Notes
+
+
+-   **Action -** List Alerts
+
+<!-- -->
+
+-   The filter parameter values follow the [FQL
+    Syntax](https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-fql-reference)
+    .
+-   The sort parameter value has to be provided in the format property_name.asc for ascending and
+    property_name.desc for descending order.
+
+-   The `include_hidden` parameter has been added to the action as it's behavior in the API has changed. In the
+    prior API version, the default behavior of the `include_hidden` parameter was either not supported or defaulted
+    to `false`. The latest version of the API now defaults `include_hidden` to `true` if it is not included in
+    the API call. Therefore, we have included this parameter in the action configuration and set it to `false` by
+    default in order to keep the action behavior consistent with the previous app version. Hidden alerts can be
+    identified by the `show_in_ui` field of an alert object.
+
+    If you experience any `list alerts` action failures in an existing playbook that passed in the previous version
+    of the app, you may need to edit the action in the playbook and then save. This will then add the `include_hidden`
+    field to the playbook action.
 
 -   **Action -** List Groups
 
@@ -379,13 +417,13 @@ default ports used by Splunk SOAR.
         -   Updated name from 'lastName' to 'last_name'
 
 
-### Configuration Variables
-The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a CrowdStrike asset in SOAR.
+
+### Configuration variables
+This table lists the configuration variables required to operate CrowdStrike OAuth API. These variables are specified when configuring a CrowdStrike asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **url** |  required  | string | Base URL
-**place_holder** |  optional  | ph | Placeholder
 **client_id** |  required  | password | Client ID
 **client_secret** |  required  | password | Client Secret
 **app_id** |  optional  | string | App ID
@@ -407,9 +445,12 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [remove hosts](#action-remove-hosts) - Remove one or more hosts from the static host group  
 [create session](#action-create-session) - Initialize a new session with the Real Time Response cloud  
 [delete session](#action-delete-session) - Deletes a Real Time Response session  
-[list detections](#action-list-detections) - Get a list of detections  
-[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection IDs  
-[update detections](#action-update-detections) - Update detections in crowdstrike host  
+[list detections](#action-list-detections) - Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\*  
+[list epp alerts](#action-list-epp-alerts) - Get a list of epp alerts, replaces legacy Detects API  
+[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection IDs \*The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead\*  
+[get epp details](#action-get-epp-details) - Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API  
+[update detections](#action-update-detections) - Update detections in crowdstrike host \*The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead\*  
+[update epp alerts](#action-update-epp-alerts) - Update EPP alerts in CrowdStrike, replaces legacy Detects API  
 [list alerts](#action-list-alerts) - Get a list of alerts  
 [list sessions](#action-list-sessions) - Lists Real Time Response sessions  
 [run command](#action-run-command) - Execute an active responder command on a single host  
@@ -427,7 +468,8 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [list incident behaviors](#action-list-incident-behaviors) - Search for behaviors by providing an FQL filter, sorting, and paging details  
 [list incidents](#action-list-incidents) - Search for incidents by providing an FQL filter, sorting, and paging details  
 [get session file](#action-get-session-file) - Get RTR extracted file contents for the specified session and sha256 and add it to the vault  
-[set status](#action-set-status) - Set the state of a detection in Crowdstrike Host  
+[set status](#action-set-status) - Set the state of a detection in Crowdstrike Host \*The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead\*  
+[resolve epp alerts](#action-resolve-epp-alerts) - Update the status of an EPP alert in CrowdStrike, replaces legacy Detects API  
 [get system info](#action-get-system-info) - Get details of a device, given the device ID  
 [get process detail](#action-get-process-detail) - Retrieve the details of a process that is running or that previously ran, given a process ID  
 [hunt file](#action-hunt-file) - Hunt for a file on the network by querying for the hash  
@@ -450,6 +492,16 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [check status](#action-check-status) - To check detonation status of the provided resource id  
 [get device scroll](#action-get-device-scroll) - Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)  
 [get zta data](#action-get-zta-data) - Get Zero Trust Assessment data for one or more hosts by providing agent IDs (AID)  
+[create ioa rule group](#action-create-ioa-rule-group) - Create an empty IOA Rule Group  
+[update ioa rule group](#action-update-ioa-rule-group) - Modify an existing IOA Rule Group  
+[delete ioa rule group](#action-delete-ioa-rule-group) - Delete an existing IOA Rule Group  
+[list ioa platforms](#action-list-ioa-platforms) - List valid platforms for IOA Rule Groups  
+[list ioa rule groups](#action-list-ioa-rule-groups) - List IOA Rule Groups  
+[list ioa severities](#action-list-ioa-severities) - List valid severity values for IOA rules  
+[list ioa types](#action-list-ioa-types) - List valid types of IOA rules  
+[create ioa rule](#action-create-ioa-rule) - Create a new IOA Rule  
+[update ioa rule](#action-update-ioa-rule) - Update an existing IOA Rule  
+[delete ioa rule](#action-delete-ioa-rule) - Delete an existing IOA Rule  
 
 ## action: 'test connectivity'
 Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials
@@ -839,7 +891,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list detections'
-Get a list of detections
+Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\*
 
 Type: **investigate**  
 Read only: **True**
@@ -965,8 +1017,178 @@ action_result.message | string |  |   Total detections: 44
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1   
 
+## action: 'list epp alerts'
+Get a list of epp alerts, replaces legacy Detects API
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**limit** |  optional  | Maximum alerts to be fetched | numeric | 
+**filter** |  optional  | Filter expression used to limit the fetched alerts (FQL Syntax) | string | 
+**sort** |  optional  | Property to sort by | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.parameter.filter | string |  |  
+action_result.parameter.sort | string |  |  
+action_result.data.\*.agent_id | string |  |   9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c 
+action_result.data.\*.aggregate_id | string |  |   aggind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx6384 
+action_result.data.\*.alleged_filetype | string |  |   exe 
+action_result.data.\*.charlotte.can_triage | boolean |  |   False 
+action_result.data.\*.charlotte.triage_status | string |  |   open 
+action_result.data.\*.child_process_ids.\* | string |  |   pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx2640 
+action_result.data.\*.cid | string |  |   d615xxxxxxxx2158 
+action_result.data.\*.cmdline | string |  |   cmd /c echo MZ>log1.txt && cmd /c copy /b log1.txt+fabc.scr abc.scr && cmd /c abc.scr && cmd /c del log1.txt && cmd /c del fabc.scr 
+action_result.data.\*.composite_id | string |  `crowdstrike alert id`  |   d615xxxxxxxx2158:ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122 
+action_result.data.\*.confidence | numeric |  |   50 
+action_result.data.\*.context_timestamp | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.control_graph_id | string |  |   ctg:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx6384 
+action_result.data.\*.crawled_timestamp | string |  |   2024-08-22T18:35:06.103126166Z 
+action_result.data.\*.created_timestamp | string |  |   2024-08-22T18:31:04.705194419Z 
+action_result.data.\*.data_domains.\* | string |  |   Endpoint 
+action_result.data.\*.description | string |  |   A productivity app launched a process from an executable stack. 
+action_result.data.\*.device.agent_load_flags | string |  |   3 
+action_result.data.\*.device.agent_local_time | string |  |   2016-04-28T14:33:47.302Z 
+action_result.data.\*.device.agent_version | string |  |   5.25.10701.0 
+action_result.data.\*.device.bios_manufacturer | string |  |   Phoenix Technologies LTD 
+action_result.data.\*.device.bios_version | string |  |   6.00 
+action_result.data.\*.device.cid | string |  |   d615xxxxxxxx2158 
+action_result.data.\*.device.config_id_base | string |  |   65994755 
+action_result.data.\*.device.config_id_build | string |  |   10701 
+action_result.data.\*.device.config_id_platform | string |  |   3 
+action_result.data.\*.device.device_id | string |  `crowdstrike device id`  |   9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c 
+action_result.data.\*.device.external_ip | string |  |   4x.xxx.xxx.xxx 
+action_result.data.\*.device.first_seen | string |  |   2024-08-22T18:30:04Z 
+action_result.data.\*.device.hostname | string |  |   example-host 
+action_result.data.\*.device.last_seen | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.device.major_version | string |  |   6 
+action_result.data.\*.device.minor_version | string |  |   1 
+action_result.data.\*.device.modified_timestamp | string |  |   2024-08-22T18:30:13Z 
+action_result.data.\*.device.os_version | string |  |   Windows 7 
+action_result.data.\*.device.platform_id | string |  |   0 
+action_result.data.\*.device.platform_name | string |  |   Windows 
+action_result.data.\*.device.product_type | string |  |   1 
+action_result.data.\*.device.product_type_desc | string |  |   Workstation 
+action_result.data.\*.device.status | string |  |   normal 
+action_result.data.\*.device.system_manufacturer | string |  |   VMware, Inc. 
+action_result.data.\*.device.system_product_name | string |  |   VMware Virtual Platform 
+action_result.data.\*.display_name | string |  |   SpearPhishExecutableStack 
+action_result.data.\*.email_sent | boolean |  |   True 
+action_result.data.\*.external | boolean |  |   False 
+action_result.data.\*.falcon_host_link | string |  |   https://falcon.crowdstrike.com/activity-v2/detections/d615xxxxxxxx2158:ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122?_cid=g01000co2vxxxxxxxxxxxxu5f72jzjfu 
+action_result.data.\*.filename | string |  |   cmd.exe 
+action_result.data.\*.filepath | string |  |   \\Device\\HarddiskVolume1\\Windows\\SysWOW64\\cmd.exe 
+action_result.data.\*.global_prevalence | string |  |   common 
+action_result.data.\*.grandparent_details.cmdline | string |  |   C:\\Windows\\Explorer.EXE 
+action_result.data.\*.grandparent_details.filename | string |  |   explorer.exe 
+action_result.data.\*.grandparent_details.filepath | string |  |   \\Device\\HarddiskVolume1\\Windows\\explorer.exe 
+action_result.data.\*.grandparent_details.local_process_id | string |  |   1260 
+action_result.data.\*.grandparent_details.md5 | string |  |   ac4c51eb24aaxxxxxxxxxxb159189e24 
+action_result.data.\*.grandparent_details.process_graph_id | string |  |   pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx0581 
+action_result.data.\*.grandparent_details.process_id | string |  |   1336xxxxxxxxxx0581 
+action_result.data.\*.grandparent_details.sha256 | string |  |   6a67xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx576a 
+action_result.data.\*.grandparent_details.timestamp | string |  |   2024-08-22T18:30:03.000Z 
+action_result.data.\*.grandparent_details.user_graph_id | string |  |   uid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.grandparent_details.user_id | string |  |   S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.grandparent_details.user_name | string |  |   testusername 
+action_result.data.\*.id | string |  |   ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122 
+action_result.data.\*.incident.created | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.incident.end | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.incident.id | string |  |   inc:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:7e90xxxxxxxxxxxxxxxxxxxxxxxx399c 
+action_result.data.\*.incident.score | string |  |   77.2905584547083 
+action_result.data.\*.incident.start | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.indicator_id | string |  |   ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122 
+action_result.data.\*.ioc_context.\* | string |  |   [] 
+action_result.data.\*.ioc_values.\* | string |  |   [] 
+action_result.data.\*.local_prevalence | string |  |   common 
+action_result.data.\*.local_process_id | string |  |   2956 
+action_result.data.\*.logon_domain | string |  |   WIN-ABCDEFG 
+action_result.data.\*.md5 | string |  |   ad7b9c14xxxxxxxxxxxxxxxxxxxx2b98 
+action_result.data.\*.name | string |  |   SpearPhishExecutableStack 
+action_result.data.\*.objective | string |  |   Follow Through 
+action_result.data.\*.parent_details.cmdline | string |  |   "C:\\Program Files (x86)\\Microsoft Office\\OFFICE11\\WINWORD.EXE" /n /dde 
+action_result.data.\*.parent_details.filename | string |  |   WINWORD.EXE 
+action_result.data.\*.parent_details.filepath | string |  |   \\Device\\HarddiskVolume1\\Program Files (x86)\\Microsoft Office\\OFFICE11\\WINWORD.EXE 
+action_result.data.\*.parent_details.local_process_id | string |  |   2756 
+action_result.data.\*.parent_details.md5 | string |  |   10ff86bcxxxxxxxxxxxxxxxxxxxxfd507 
+action_result.data.\*.parent_details.process_graph_id | string |  |   pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx4664 
+action_result.data.\*.parent_details.process_id | string |  |   1336xxxxxxxxxx4664 
+action_result.data.\*.parent_details.sha256 | string |  |   b38bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx958d 
+action_result.data.\*.parent_details.timestamp | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.parent_details.user_graph_id | string |  |   uid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.parent_details.user_id | string |  |   S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.parent_details.user_name | string |  |   testusername 
+action_result.data.\*.parent_process_id | string |  |   1336xxxxxxxxxx4664 
+action_result.data.\*.pattern_disposition | numeric |  |   0 
+action_result.data.\*.pattern_disposition_description | string |  |   Detection, standard detection. 
+action_result.data.\*.pattern_disposition_details.blocking_unsupported_or_disabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.bootup_safeguard_enabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.containment_file_system | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.critical_process_disabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.detect | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.fs_operation_blocked | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.handle_operation_downgraded | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.inddet_mask | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.indicator | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.kill_action_failed | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.kill_parent | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.kill_process | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.kill_subprocess | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.mfa_required | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.operation_blocked | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.policy_disabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.prevention_provisioning_enabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.process_blocked | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.quarantine_file | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.quarantine_machine | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.registry_operation_blocked | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.response_action_already_applied | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.response_action_failed | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.response_action_triggered | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.rooting | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.sensor_only | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.suspend_parent | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.suspend_process | boolean |  |   False 
+action_result.data.\*.pattern_id | numeric |  |   32 
+action_result.data.\*.platform | string |  |   Windows 
+action_result.data.\*.process_end_time | string |  |   1724351403 
+action_result.data.\*.process_id | string |  |   1336xxxxxxxxxx1294 
+action_result.data.\*.process_start_time | string |  |   1724351403 
+action_result.data.\*.product | string |  |   epp 
+action_result.data.\*.scenario | string |  |   malicious_document 
+action_result.data.\*.seconds_to_resolved | numeric |  |   0 
+action_result.data.\*.seconds_to_triaged | numeric |  |   0 
+action_result.data.\*.severity | numeric |  |   50 
+action_result.data.\*.severity_name | string |  |   Medium 
+action_result.data.\*.sha1 | string |  |   ee8cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx20b5 
+action_result.data.\*.sha256 | string |  |   17f7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx02ae 
+action_result.data.\*.show_in_ui | boolean |  |   True 
+action_result.data.\*.source_products.\* | string |  |   Falcon Insight 
+action_result.data.\*.source_vendors.\* | string |  |   CrowdStrike 
+action_result.data.\*.status | string |  |   in_progress 
+action_result.data.\*.tactic | string |  |   Execution 
+action_result.data.\*.tactic_id | string |  |   TA0002 
+action_result.data.\*.technique | string |  |   Exploitation for Client Execution 
+action_result.data.\*.technique_id | string |  |   T1203 
+action_result.data.\*.timestamp | string |  |   2024-08-22T18:30:03.238Z 
+action_result.data.\*.tree_id | string |  |   1336xxxxxxxxxx6384 
+action_result.data.\*.tree_root | string |  |   1336xxxxxxxxxx4664 
+action_result.data.\*.triggering_process_graph_id | string |  |   pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294 
+action_result.data.\*.type | string |  |   ldt 
+action_result.data.\*.updated_timestamp | string |  |   2024-08-22T18:35:06.102982431Z 
+action_result.data.\*.user_id | string |  |   S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.user_name | string |  |   testusername 
+action_result.message | string |  |   Success 
+action_result.status | string |  |   success 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
 ## action: 'get detections details'
-Get a list of detections details by providing detection IDs
+Get a list of detections details by providing detection IDs \*The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead\*
 
 Type: **investigate**  
 Read only: **True**
@@ -1088,8 +1310,175 @@ action_result.message | string |  |   Total detections: 44
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1   
 
+## action: 'get epp details'
+Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**alert_ids** |  required  | List of alert composite_ids. Comma-separated list allowed | string |  `crowdstrike alert id` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.parameter.alert_ids | string |  `crowdstrike alert id`  |  
+action_result.data.\*.agent_id | string |  |   9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c 
+action_result.data.\*.aggregate_id | string |  |   aggind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx6384 
+action_result.data.\*.alleged_filetype | string |  |   exe 
+action_result.data.\*.charlotte.can_triage | boolean |  |   False 
+action_result.data.\*.charlotte.triage_status | string |  |   open 
+action_result.data.\*.child_process_ids.\* | string |  |   pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx2640 
+action_result.data.\*.cid | string |  |   d615xxxxxxxx2158 
+action_result.data.\*.cmdline | string |  |   cmd /c echo MZ>log1.txt && cmd /c copy /b log1.txt+fabc.scr abc.scr && cmd /c abc.scr && cmd /c del log1.txt && cmd /c del fabc.scr 
+action_result.data.\*.composite_id | string |  `crowdstrike alert id`  |   d615xxxxxxxx2158:ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122 
+action_result.data.\*.confidence | numeric |  |   50 
+action_result.data.\*.context_timestamp | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.control_graph_id | string |  |   ctg:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx6384 
+action_result.data.\*.crawled_timestamp | string |  |   2024-08-22T18:35:06.103126166Z 
+action_result.data.\*.created_timestamp | string |  |   2024-08-22T18:31:04.705194419Z 
+action_result.data.\*.data_domains.\* | string |  |   Endpoint 
+action_result.data.\*.description | string |  |   A productivity app launched a process from an executable stack. 
+action_result.data.\*.device.agent_load_flags | string |  |   3 
+action_result.data.\*.device.agent_local_time | string |  |   2016-04-28T14:33:47.302Z 
+action_result.data.\*.device.agent_version | string |  |   5.25.10701.0 
+action_result.data.\*.device.bios_manufacturer | string |  |   Phoenix Technologies LTD 
+action_result.data.\*.device.bios_version | string |  |   6.00 
+action_result.data.\*.device.cid | string |  |   d615xxxxxxxx2158 
+action_result.data.\*.device.config_id_base | string |  |   65994755 
+action_result.data.\*.device.config_id_build | string |  |   10701 
+action_result.data.\*.device.config_id_platform | string |  |   3 
+action_result.data.\*.device.device_id | string |  `crowdstrike device id`  |   9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c 
+action_result.data.\*.device.external_ip | string |  |   4x.xxx.xxx.xxx 
+action_result.data.\*.device.first_seen | string |  |   2024-08-22T18:30:04Z 
+action_result.data.\*.device.hostname | string |  |   example-host 
+action_result.data.\*.device.last_seen | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.device.major_version | string |  |   6 
+action_result.data.\*.device.minor_version | string |  |   1 
+action_result.data.\*.device.modified_timestamp | string |  |   2024-08-22T18:30:13Z 
+action_result.data.\*.device.os_version | string |  |   Windows 7 
+action_result.data.\*.device.platform_id | string |  |   0 
+action_result.data.\*.device.platform_name | string |  |   Windows 
+action_result.data.\*.device.product_type | string |  |   1 
+action_result.data.\*.device.product_type_desc | string |  |   Workstation 
+action_result.data.\*.device.status | string |  |   normal 
+action_result.data.\*.device.system_manufacturer | string |  |   VMware, Inc. 
+action_result.data.\*.device.system_product_name | string |  |   VMware Virtual Platform 
+action_result.data.\*.display_name | string |  |   SpearPhishExecutableStack 
+action_result.data.\*.email_sent | boolean |  |   True 
+action_result.data.\*.external | boolean |  |   False 
+action_result.data.\*.falcon_host_link | string |  |   https://falcon.crowdstrike.com/activity-v2/detections/d615xxxxxxxx2158:ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122?_cid=g01000co2vxxxxxxxxxxxxu5f72jzjfu 
+action_result.data.\*.filename | string |  |   cmd.exe 
+action_result.data.\*.filepath | string |  |   \\Device\\HarddiskVolume1\\Windows\\SysWOW64\\cmd.exe 
+action_result.data.\*.global_prevalence | string |  |   common 
+action_result.data.\*.grandparent_details.cmdline | string |  |   C:\\Windows\\Explorer.EXE 
+action_result.data.\*.grandparent_details.filename | string |  |   explorer.exe 
+action_result.data.\*.grandparent_details.filepath | string |  |   \\Device\\HarddiskVolume1\\Windows\\explorer.exe 
+action_result.data.\*.grandparent_details.local_process_id | string |  |   1260 
+action_result.data.\*.grandparent_details.md5 | string |  |   ac4c51eb24aaxxxxxxxxxxb159189e24 
+action_result.data.\*.grandparent_details.process_graph_id | string |  |   pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx0581 
+action_result.data.\*.grandparent_details.process_id | string |  |   1336xxxxxxxxxx0581 
+action_result.data.\*.grandparent_details.sha256 | string |  |   6a67xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx576a 
+action_result.data.\*.grandparent_details.timestamp | string |  |   2024-08-22T18:30:03.000Z 
+action_result.data.\*.grandparent_details.user_graph_id | string |  |   uid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.grandparent_details.user_id | string |  |   S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.grandparent_details.user_name | string |  |   testusername 
+action_result.data.\*.id | string |  |   ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122 
+action_result.data.\*.incident.created | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.incident.end | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.incident.id | string |  |   inc:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:7e90xxxxxxxxxxxxxxxxxxxxxxxx399c 
+action_result.data.\*.incident.score | string |  |   77.2905584547083 
+action_result.data.\*.incident.start | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.indicator_id | string |  |   ind:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294-32-7878xxxxxxxxxxx1122 
+action_result.data.\*.ioc_context.\* | string |  |   [] 
+action_result.data.\*.ioc_values.\* | string |  |   [] 
+action_result.data.\*.local_prevalence | string |  |   common 
+action_result.data.\*.local_process_id | string |  |   2956 
+action_result.data.\*.logon_domain | string |  |   WIN-ABCDEFG 
+action_result.data.\*.md5 | string |  |   ad7b9c14xxxxxxxxxxxxxxxxxxxx2b98 
+action_result.data.\*.name | string |  |   SpearPhishExecutableStack 
+action_result.data.\*.objective | string |  |   Follow Through 
+action_result.data.\*.parent_details.cmdline | string |  |   "C:\\Program Files (x86)\\Microsoft Office\\OFFICE11\\WINWORD.EXE" /n /dde 
+action_result.data.\*.parent_details.filename | string |  |   WINWORD.EXE 
+action_result.data.\*.parent_details.filepath | string |  |   \\Device\\HarddiskVolume1\\Program Files (x86)\\Microsoft Office\\OFFICE11\\WINWORD.EXE 
+action_result.data.\*.parent_details.local_process_id | string |  |   2756 
+action_result.data.\*.parent_details.md5 | string |  |   10ff86bcxxxxxxxxxxxxxxxxxxxxfd507 
+action_result.data.\*.parent_details.process_graph_id | string |  |   pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx4664 
+action_result.data.\*.parent_details.process_id | string |  |   1336xxxxxxxxxx4664 
+action_result.data.\*.parent_details.sha256 | string |  |   b38bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx958d 
+action_result.data.\*.parent_details.timestamp | string |  |   2024-08-22T18:30:03Z 
+action_result.data.\*.parent_details.user_graph_id | string |  |   uid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.parent_details.user_id | string |  |   S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.parent_details.user_name | string |  |   testusername 
+action_result.data.\*.parent_process_id | string |  |   1336xxxxxxxxxx4664 
+action_result.data.\*.pattern_disposition | numeric |  |   0 
+action_result.data.\*.pattern_disposition_description | string |  |   Detection, standard detection. 
+action_result.data.\*.pattern_disposition_details.blocking_unsupported_or_disabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.bootup_safeguard_enabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.containment_file_system | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.critical_process_disabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.detect | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.fs_operation_blocked | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.handle_operation_downgraded | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.inddet_mask | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.indicator | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.kill_action_failed | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.kill_parent | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.kill_process | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.kill_subprocess | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.mfa_required | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.operation_blocked | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.policy_disabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.prevention_provisioning_enabled | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.process_blocked | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.quarantine_file | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.quarantine_machine | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.registry_operation_blocked | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.response_action_already_applied | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.response_action_failed | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.response_action_triggered | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.rooting | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.sensor_only | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.suspend_parent | boolean |  |   False 
+action_result.data.\*.pattern_disposition_details.suspend_process | boolean |  |   False 
+action_result.data.\*.pattern_id | numeric |  |   32 
+action_result.data.\*.platform | string |  |   Windows 
+action_result.data.\*.process_end_time | string |  |   1724351403 
+action_result.data.\*.process_id | string |  |   1336xxxxxxxxxx1294 
+action_result.data.\*.process_start_time | string |  |   1724351403 
+action_result.data.\*.product | string |  |   epp 
+action_result.data.\*.scenario | string |  |   malicious_document 
+action_result.data.\*.seconds_to_resolved | numeric |  |   0 
+action_result.data.\*.seconds_to_triaged | numeric |  |   0 
+action_result.data.\*.severity | numeric |  |   50 
+action_result.data.\*.severity_name | string |  |   Medium 
+action_result.data.\*.sha1 | string |  |   ee8cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx20b5 
+action_result.data.\*.sha256 | string |  |   17f7xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx02ae 
+action_result.data.\*.show_in_ui | boolean |  |   True 
+action_result.data.\*.source_products.\* | string |  |   Falcon Insight 
+action_result.data.\*.source_vendors.\* | string |  |   CrowdStrike 
+action_result.data.\*.status | string |  |   in_progress 
+action_result.data.\*.tactic | string |  |   Execution 
+action_result.data.\*.tactic_id | string |  |   TA0002 
+action_result.data.\*.technique | string |  |   Exploitation for Client Execution 
+action_result.data.\*.technique_id | string |  |   T1203 
+action_result.data.\*.timestamp | string |  |   2024-08-22T18:30:03.238Z 
+action_result.data.\*.tree_id | string |  |   1336xxxxxxxxxx6384 
+action_result.data.\*.tree_root | string |  |   1336xxxxxxxxxx4664 
+action_result.data.\*.triggering_process_graph_id | string |  |   pid:9a8d0d2fe0xxxxxxxxxxxxxxxxxxc74c:1336xxxxxxxxxx1294 
+action_result.data.\*.type | string |  |   ldt 
+action_result.data.\*.updated_timestamp | string |  |   2024-08-22T18:35:06.102982431Z 
+action_result.data.\*.user_id | string |  |   S-1-5-21-246xxxx873-120xxxx372-215xxxx746-1000 
+action_result.data.\*.user_name | string |  |   testusername 
+action_result.message | string |  |   Success 
+action_result.status | string |  |   success 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
 ## action: 'update detections'
-Update detections in crowdstrike host
+Update detections in crowdstrike host \*The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead\*
 
 Type: **generic**  
 Read only: **False**
@@ -1122,6 +1511,50 @@ action_result.message | string |  |   Detections affected: 1
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1   
 
+## action: 'update epp alerts'
+Update EPP alerts in CrowdStrike, replaces legacy Detects API
+
+Type: **generic**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**alert_ids** |  required  | List of alert composite_ids to update, Comma-separated list allowed | string |  `crowdstrike alert id` 
+**comment** |  optional  | Comment to add to the alert (Maximum 2048 bytes) | string | 
+**assigned_to_user** |  optional  | User to assign (can be email, UUID, or username) | string |  `crowdstrike user id`  `email` 
+**unassign** |  optional  | If there are any users currently assigned to specified alerts, unassign them | string | 
+**show_in_ui** |  optional  | Control whether this alert is displayed in Falcon UI | boolean | 
+**status** |  optional  | Status to set | string | 
+**add_tags** |  optional  | Tags to add to the alert, Comma-separated list allowed | string | 
+**remove_tags** |  optional  | Tags to remove from the alert, Comma-separated list allowed | string | 
+**remove_tags_by_prefix** |  optional  | Remove all tags with this prefix | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.parameter.alert_ids | string |  `crowdstrike alert id`  |  
+action_result.parameter.assigned_to_user | string |  `crowdstrike user id`  `email`  |  
+action_result.parameter.unassign | string |  |  
+action_result.parameter.show_in_ui | boolean |  |  
+action_result.parameter.status | string |  |  
+action_result.parameter.add_tags | string |  |  
+action_result.parameter.remove_tags | string |  |  
+action_result.parameter.remove_tags_by_prefix | string |  |  
+action_result.data.\*.errors.\* | string |  |   [] 
+action_result.data.\*.meta.pagination.limit | numeric |  |   5 
+action_result.data.\*.meta.pagination.offset | numeric |  |   0 
+action_result.data.\*.meta.pagination.total | numeric |  |   10000 
+action_result.data.\*.meta.powered_by | string |  |   detectsapi 
+action_result.data.\*.meta.query_time | numeric |  |   0.044395707 
+action_result.data.\*.meta.trace_id | string |  |   f755297a-e287-4012-b5e3-ff88691e95e9 
+action_result.data.\*.meta.writes.resources_affected | numeric |  |   0 
+action_result.data.\*.resources.\* | string |  |   d615xxxxxxxx2158:ind:9a8dxxxxxxxxc74c:1336xxxxxxxx1294-32-7878xxxxxxxx1122 
+action_result.message | string |  |   Success 
+action_result.status | string |  |   success 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
 ## action: 'list alerts'
 Get a list of alerts
 
@@ -1136,6 +1569,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **limit** |  optional  | Maximum alerts to be fetched | numeric | 
 **filter** |  optional  | Filter expression used to limit the fetched alerts (FQL Syntax) | string | 
 **sort** |  optional  | Property to sort by | string | 
+**include_hidden** |  optional  | Include hidden alerts | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -1180,7 +1614,8 @@ action_result.data.\*.updated_timestamp | string |  |   2022-11-16T09:47:26.5611
 action_result.summary.total_alerts | numeric |  |   50 
 action_result.message | string |  |   Total alerts: 50 
 summary.total_objects | numeric |  |   1 
-summary.total_objects_successful | numeric |  |   1   
+summary.total_objects_successful | numeric |  |   1 
+action_result.parameter.include_hidden | numeric |  |   True   
 
 ## action: 'list sessions'
 Lists Real Time Response sessions
@@ -1835,7 +2270,7 @@ summary.total_objects | numeric |  |   1
 summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'set status'
-Set the state of a detection in Crowdstrike Host
+Set the state of a detection in Crowdstrike Host \*The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead\*
 
 Type: **generic**  
 Read only: **False**
@@ -1857,6 +2292,37 @@ action_result.parameter.state | string |  |   in_progress
 action_result.data | string |  |  
 action_result.summary | string |  |  
 action_result.message | string |  |   Status set successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'resolve epp alerts'
+Update the status of an EPP alert in CrowdStrike, replaces legacy Detects API
+
+Type: **generic**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**alert_ids** |  required  | List of alert composite_ids to update, Comma-separated list allowed | string |  `crowdstrike alert id` 
+**status** |  required  | Status to set | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.parameter.alert_ids | string |  `crowdstrike alert id`  |  
+action_result.parameter.status | string |  |  
+action_result.data.\*.errors.\* | string |  |   [] 
+action_result.data.\*.meta.pagination.limit | numeric |  |   5 
+action_result.data.\*.meta.pagination.offset | numeric |  |   0 
+action_result.data.\*.meta.pagination.total | numeric |  |   10000 
+action_result.data.\*.meta.powered_by | string |  |   detectsapi 
+action_result.data.\*.meta.query_time | numeric |  |   0.044395707 
+action_result.data.\*.meta.trace_id | string |  |   f755297a-e287-4012-b5e3-ff88691e95e9 
+action_result.data.\*.meta.writes.resources_affected | numeric |  |   0 
+action_result.data.\*.resources.\* | string |  |   d615xxxxxxxx2158:ind:9a8dxxxxxxxxc74c:1336xxxxxxxx1294-32-7878xxxxxxxx1122 
+action_result.message | string |  |   Success 
+action_result.status | string |  |   success 
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1   
 
@@ -3376,5 +3842,453 @@ action_result.data.\*.sensor_file_status | string |  |   not deployed
 action_result.data.\*.system_serial_number | string |  |   VMware-42 2a 23 c9 7f 05 df a5-23 51 df 2c 02 ce 36 fb 
 action_result.summary | string |  |  
 action_result.message | string |  |   Zero Trust Assessment data fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'create ioa rule group'
+Create an empty IOA Rule Group
+
+Type: **contain**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**name** |  required  | Name of the new Rule Group | string | 
+**description** |  required  | Longer description for the new Rule Group | string | 
+**platform** |  required  | Platform that this Rule Group applies to | string | 
+**enabled** |  optional  | Enable the new Rule Group immediately upon creation | boolean | 
+**policy_id** |  optional  | Prevention Policy ID to assign the new Rule Group to | string |  `crowdstrike prevention policy id` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.name | string |  |   my_rule_group 
+action_result.parameter.description | string |  |   Custom rule group 
+action_result.parameter.platform | string |  |   windows  mac  linux 
+action_result.parameter.enabled | boolean |  |   True  False 
+action_result.parameter.policy_id | string |  `crowdstrike prevention policy id`  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\*.id | string |  `crowdstrike ioa rule group id`  |   3263801f7612424ba923f4e6e4bfe2f2 
+action_result.data.\*.resources.\*.customer_id | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
+action_result.data.\*.resources.\*.enabled | boolean |  |   True  False 
+action_result.data.\*.resources.\*.name | string |  |   my_rule_group 
+action_result.data.\*.resources.\*.description | string |  |   Custom rule group 
+action_result.data.\*.resources.\*.platform | string |  |   windows  mac  linux 
+action_result.data.\*.resources.\*.deleted | boolean |  |   True  False 
+action_result.data.\*.resources.\*.rule_ids.\* | string |  `crowdstrike ioa rule id`  |   6 
+action_result.data.\*.resources.\*.comment | string |  |   Updated description 
+action_result.data.\*.resources.\*.version | numeric |  |   1 
+action_result.data.\*.resources.\*.created_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
+action_result.data.\*.resources.\*.created_on | string |  |   2024-01-25T19:17:02.117884262Z 
+action_result.data.\*.resources.\*.modified_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
+action_result.data.\*.resources.\*.modified_on | string |  |   2024-01-25T19:17:02.117884262Z 
+action_result.data.\*.resources.\*.committed_on | string |  |   0001-01-01T00:00:00Z 
+action_result.data.\*.resources.\*.assigned_policy_ids.\* | string |  `crowdstrike prevention policy id`  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.summary.rule_group_id | string |  |  
+action_result.message | string |  |   Rule Group created successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'update ioa rule group'
+Modify an existing IOA Rule Group
+
+Type: **contain**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**id** |  required  | Rule Group ID | string |  `crowdstrike ioa rule group id` 
+**version** |  required  | Latest version of this Rule Group | numeric | 
+**name** |  required  | Name of the Rule Group | string | 
+**description** |  required  | Longer description for the Rule Group | string | 
+**enabled** |  optional  | Enable or disable the Rule Group | boolean | 
+**comment** |  required  | Comment for the audit log | string | 
+**assign_policy_id** |  optional  | Prevention Policy ID to assign the Rule Group to | string |  `crowdstrike prevention policy id` 
+**remove_policy_id** |  optional  | Prevention Policy ID to remove the Rule Group from | string |  `crowdstrike prevention policy id` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.id | string |  `crowdstrike ioa rule group id`  |   3263801f7612424ba923f4e6e4bfe2f2 
+action_result.parameter.version | numeric |  |   1 
+action_result.parameter.name | string |  |   my_rule_group 
+action_result.parameter.description | string |  |   Custom rule group 
+action_result.parameter.enabled | boolean |  |   True  False 
+action_result.parameter.comment | boolean |  |   Updated rule description 
+action_result.parameter.assign_policy_id | string |  `crowdstrike prevention policy id`  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.parameter.remove_policy_id | string |  `crowdstrike prevention policy id`  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\*.id | string |  `crowdstrike ioa rule group id`  |   3263801f7612424ba923f4e6e4bfe2f2 
+action_result.data.\*.resources.\*.customer_id | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
+action_result.data.\*.resources.\*.enabled | boolean |  |   True  False 
+action_result.data.\*.resources.\*.name | string |  |   my_rule_group 
+action_result.data.\*.resources.\*.description | string |  |   Custom rule group 
+action_result.data.\*.resources.\*.platform | string |  |   windows  mac  linux 
+action_result.data.\*.resources.\*.deleted | boolean |  |   True  False 
+action_result.data.\*.resources.\*.rule_ids.\* | string |  `crowdstrike ioa rule id`  |   6 
+action_result.data.\*.resources.\*.comment | string |  |   Updated description 
+action_result.data.\*.resources.\*.version | numeric |  |   1 
+action_result.data.\*.resources.\*.created_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
+action_result.data.\*.resources.\*.created_on | string |  |   2024-01-25T19:17:02.117884262Z 
+action_result.data.\*.resources.\*.modified_by | string |  `crowdstrike user id`  |   65f616497d0d40d4b6e7a68389323605 
+action_result.data.\*.resources.\*.modified_on | string |  |   2024-01-25T19:17:02.117884262Z 
+action_result.data.\*.resources.\*.committed_on | string |  |   0001-01-01T00:00:00Z 
+action_result.data.\*.resources.\*.assigned_policy_ids.\* | string |  `crowdstrike prevention policy id`  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.data.\*.resources.\*.removed_policy_ids.\* | string |  `crowdstrike prevention policy id`  |   2018f9894359493cb756bfa7dd3357a6 
+action_result.summary.rule_group_id | string |  |  
+action_result.message | string |  |   Rule Group updated successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'delete ioa rule group'
+Delete an existing IOA Rule Group
+
+Type: **contain**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**id** |  required  | Rule Group ID | string |  `crowdstrike ioa rule group id` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.id | string |  `crowdstrike ioa rule group id`  |   3263801f7612424ba923f4e6e4bfe2f2 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.meta.writes.resources_affected | numeric |  |   1 
+action_result.summary.resources_affected | string |  |  
+action_result.message | string |  |   Deleted 1 rule groups 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'list ioa platforms'
+List valid platforms for IOA Rule Groups
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+No parameters are required for this action
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\* | string |  |   windows  mac  linux 
+action_result.summary.result_count | numeric |  |  
+action_result.message | string |  |   Found 3 rule groups 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'list ioa rule groups'
+List IOA Rule Groups
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**fql_query** |  optional  | FQL query to filter rule groups | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.fql_query | string |  |   enabled: true + platform: 'mac' 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\*.instance_id | string |  `crowdstrike ioa rule id`  |   1 
+action_result.data.\*.resources.\*.customer_id | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
+action_result.data.\*.resources.\*.ruletype_id | string |  |   5 
+action_result.data.\*.resources.\*.ruletype_name | string |  |   Process Creation 
+action_result.data.\*.resources.\*.comment | string |  |   Created rule 
+action_result.data.\*.resources.\*.enabled | boolean |  |   True  False 
+action_result.data.\*.resources.\*.deleted | boolean |  |   True  False 
+action_result.data.\*.resources.\*.magic_cookie | numeric |  |   2 
+action_result.data.\*.resources.\*.rulegroup_id | string |  `crowdstrike ioa rule group id`  |   83f596d2f8c04f36ad39182311e90e3a 
+action_result.data.\*.resources.\*.version_ids.\* | string |  |   1 
+action_result.data.\*.resources.\*.instance_version | numeric |  |   1 
+action_result.data.\*.resources.\*.name | string |  |   BugRule 
+action_result.data.\*.resources.\*.description | string |  |   Stops the bug 
+action_result.data.\*.resources.\*.pattern_id | string |  |   41005 
+action_result.data.\*.resources.\*.pattern_severity | string |  |   critical 
+action_result.data.\*.resources.\*.action_label | string |  |   Block Execution 
+action_result.data.\*.resources.\*.disposition_id | numeric |  |   30 
+action_result.data.\*.resources.\*.field_values.\*.name | string |  |   GrandparentImageFilename 
+action_result.data.\*.resources.\*.field_values.\*.value | string |  |   (?i).+bug.exe 
+action_result.data.\*.resources.\*.field_values.\*.label | string |  |   Grandparent Image Filename 
+action_result.data.\*.resources.\*.field_values.\*.type | string |  |   excludable 
+action_result.data.\*.resources.\*.field_values.\*.values.\*.label | string |  |   include 
+action_result.data.\*.resources.\*.field_values.\*.values.\*.value | string |  |   .+bug.exe 
+action_result.data.\*.resources.\*.field_values.\*.final_value | string |  |   (?i).+bug.exe 
+action_result.summary.result_count | numeric |  |  
+action_result.message | string |  |   Found 3 rule groups 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'list ioa severities'
+List valid severity values for IOA rules
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+No parameters are required for this action
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\* | string |  |   informational  low  medium  high  critical 
+action_result.summary.result_count | numeric |  |  
+action_result.message | string |  |   Found 3 supported platforms 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'list ioa types'
+List valid types of IOA rules
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**platform** |  optional  | Show only IOA types supported by the given platform | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.platform | string |  |   mac  linux  windows 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\*.id | string |  |   1 
+action_result.data.\*.resources.\*.name | string |  |   Process Creation 
+action_result.data.\*.resources.\*.channel | numeric |  |   501 
+action_result.data.\*.resources.\*.long_desc | string |  |   Mac basic process custom template. Triggered off of CreateProcessPreventionQueryMac. 
+action_result.data.\*.resources.\*.released | boolean |  |   True  False 
+action_result.data.\*.resources.\*.fields.\*.name | string |  |   GrandparentImageFilename 
+action_result.data.\*.resources.\*.fields.\*.label | string |  |   Grandparent Image Filename 
+action_result.data.\*.resources.\*.fields.\*.type | string |  |   excludable 
+action_result.data.\*.resources.\*.fields.\*.type.\*.label | string |  |   include 
+action_result.data.\*.resources.\*.fields.\*.type.\*.value | string |  |    
+action_result.data.\*.resources.\*.disposition_map.\*.id | numeric |  |   10 
+action_result.data.\*.resources.\*.disposition_map.\*.label | string |  |   Monitor 
+action_result.data.\*.resources.\*.fields_pretty | string |  |   {} 
+action_result.summary.result_count | numeric |  |  
+action_result.message | string |  |   Found 3 rule types 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'create ioa rule'
+Create a new IOA Rule
+
+Type: **contain**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**rule_group_id** |  required  | Rule Group ID in which to create this rule | string |  `crowdstrike ioa rule group id` 
+**name** |  required  | Rule name | string | 
+**description** |  required  | Rule description | string | 
+**severity** |  required  | Rule severity (run the "list ioa severities" action to find valid severities) | string | 
+**rule_type_id** |  required  | Rule type to create (run the "list ioa types" action to find valid types of rules and their IDs and parameters) | numeric | 
+**disposition_id** |  required  | The action that the rule should take when triggered (valid dispositions can be found in the "list ioa types" output) | numeric | 
+**field_values** |  required  | JSON list of parameters to pass to the new rule (valid fields can be found in the "list ioa types" output) | string | 
+**comment** |  optional  | Comment for the audit log (optional) | string | 
+**enabled** |  optional  | Enable this rule immediately | boolean | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.rule_group_id | string |  `crowdstrike ioa rule group id`  |   83f596d2f8c04f36ad39182311e90e3a 
+action_result.parameter.name | string |  |   BugRule 
+action_result.parameter.description | string |  |   Stops the bug 
+action_result.parameter.severity | string |  |   critical 
+action_result.parameter.rule_type_id | numeric |  |   5 
+action_result.parameter.disposition_id | numeric |  |   30 
+action_result.parameter.field_values | string |  |   {"label":"Grandparent Image Filename","name":"GrandparentImageFilename","type":"excludable","values":[{"label":"include","value":".+bug.exe"}]}] 
+action_result.parameter.comment | string |  |   Example comment 
+action_result.parameter.enabled | boolean |  |   True  False 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\*.instance_id | string |  `crowdstrike ioa rule id`  |   1 
+action_result.data.\*.resources.\*.customer_id | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
+action_result.data.\*.resources.\*.ruletype_id | string |  |   5 
+action_result.data.\*.resources.\*.ruletype_name | string |  |   Process Creation 
+action_result.data.\*.resources.\*.comment | string |  |   Created rule 
+action_result.data.\*.resources.\*.enabled | boolean |  |   True  False 
+action_result.data.\*.resources.\*.deleted | boolean |  |   True  False 
+action_result.data.\*.resources.\*.magic_cookie | numeric |  |   2 
+action_result.data.\*.resources.\*.rulegroup_id | string |  `crowdstrike ioa rule group id`  |   83f596d2f8c04f36ad39182311e90e3a 
+action_result.data.\*.resources.\*.version_ids.\* | string |  |   1 
+action_result.data.\*.resources.\*.instance_version | numeric |  |   1 
+action_result.data.\*.resources.\*.name | string |  |   BugRule 
+action_result.data.\*.resources.\*.description | string |  |   Stops the bug 
+action_result.data.\*.resources.\*.pattern_id | string |  |   41005 
+action_result.data.\*.resources.\*.pattern_severity | string |  |   critical 
+action_result.data.\*.resources.\*.action_label | string |  |   Block Execution 
+action_result.data.\*.resources.\*.disposition_id | numeric |  |   30 
+action_result.data.\*.resources.\*.field_values.\*.name | string |  |   GrandparentImageFilename 
+action_result.data.\*.resources.\*.field_values.\*.value | string |  |   (?i).+bug.exe 
+action_result.data.\*.resources.\*.field_values.\*.label | string |  |   Grandparent Image Filename 
+action_result.data.\*.resources.\*.field_values.\*.type | string |  |   excludable 
+action_result.data.\*.resources.\*.field_values.\*.values.\*.label | string |  |   include 
+action_result.data.\*.resources.\*.field_values.\*.values.\*.value | string |  |   .+bug.exe 
+action_result.data.\*.resources.\*.field_values.\*.final_value | string |  |   (?i).+bug.exe 
+action_result.summary.rule_group_id | string |  `crowdstrike ioa rule group id`  |   83f596d2f8c04f36ad39182311e90e3a 
+action_result.summary.rule_id | string |  `crowdstrike ioa rule id`  |   1 
+action_result.message | string |  |   Rule created successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'update ioa rule'
+Update an existing IOA Rule
+
+Type: **contain**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**rule_group_id** |  required  | Rule Group ID containing the rule | string |  `crowdstrike ioa rule group id` 
+**rule_group_version** |  required  | Latest version of Rule Group | numeric | 
+**rule_id** |  required  | Rule ID to update | string |  `crowdstrike ioa rule id` 
+**rule_version** |  required  | Latest version of Rule | numeric | 
+**name** |  required  | Rule name | string | 
+**description** |  required  | Rule description | string | 
+**severity** |  required  | Rule severity (run the "list ioa severities" action to find valid severities) | string | 
+**disposition_id** |  required  | The action that the rule should take when triggered (valid dispositions can be found in the "list ioa types" output) | numeric | 
+**field_values** |  required  | JSON list of parameters to pass to the new rule (valid fields can be found in the "list ioa types" output) | string | 
+**comment** |  optional  | Comment for the audit log (optional) | string | 
+**enabled** |  optional  | Enable this rule | boolean | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.rule_group_id | string |  `crowdstrike ioa rule group id`  |   83f596d2f8c04f36ad39182311e90e3a 
+action_result.parameter.rule_group_version | numeric |  |   2 
+action_result.parameter.rule_id | string |  `crowdstrike ioa rule id`  |   1 
+action_result.parameter.rule_version | numeric |  |   1 
+action_result.parameter.name | string |  |   BugRule 
+action_result.parameter.description | string |  |   Stops the bug 
+action_result.parameter.severity | string |  |   critical 
+action_result.parameter.disposition_id | numeric |  |   30 
+action_result.parameter.field_values | string |  |   {"label":"Grandparent Image Filename","name":"GrandparentImageFilename","type":"excludable","values":[{"label":"include","value":".+bug.exe"}]}] 
+action_result.parameter.comment | string |  |   Example comment 
+action_result.parameter.enabled | boolean |  |   True  False 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.data.\*.resources.\*.id | string |  `crowdstrike ioa rule group id`  |   83f596d2f8c04f36ad39182311e90e3a 
+action_result.data.\*.resources.\*.name | string |  |   Bug Rule Group 
+action_result.data.\*.resources.\*.rules.\*.name | string |  |   BugRule 
+action_result.data.\*.resources.\*.rules.\*.comment | string |  |   Updated the thing 
+action_result.data.\*.resources.\*.rules.\*.deleted | boolean |  |   True  False 
+action_result.data.\*.resources.\*.rules.\*.enabled | boolean |  |   True  False 
+action_result.data.\*.resources.\*.rules.\*.created_by | string |  `crowdstrike unique user id`  |   bb777249-c782-4434-b57a-f15ac742926c 
+action_result.data.\*.resources.\*.rules.\*.created_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.resources.\*.rules.\*.pattern_id | string |  |   41007 
+action_result.data.\*.resources.\*.rules.\*.customer_id | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
+action_result.data.\*.resources.\*.rules.\*.description | string |  |   Stops the bug 
+action_result.data.\*.resources.\*.rules.\*.modified_by | string |  `crowdstrike unique user id`  |   bb777249-c782-4434-b57a-f15ac742926c 
+action_result.data.\*.resources.\*.rules.\*.modified_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.resources.\*.rules.\*.ruletype_id | string |  |  
+action_result.data.\*.resource.\*.rules.\*.version_ids.\* | string |  |  
+action_result.data.\*.resource.\*.rules.\*.action_label | string |  |  
+action_result.data.\*.resources.\*.rules.\*.committed_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.resources.\*.rules.\*.field_values.\*.name | string |  |   GrandparentImageFilename 
+action_result.data.\*.resources.\*.rules.\*.field_values.\*.value | string |  |   (?i).+bug.exe 
+action_result.data.\*.resources.\*.rules.\*.field_values.\*.label | string |  |   Grandparent Image Filename 
+action_result.data.\*.resources.\*.rules.\*.field_values.\*.type | string |  |   excludable 
+action_result.data.\*.resources.\*.rules.\*.field_values.\*.values.\*.label | string |  |   include 
+action_result.data.\*.resources.\*.rules.\*.field_values.\*.values.\*.value | string |  |   .+bug.exe 
+action_result.data.\*.resources.\*.rules.\*.field_values.\*.final_value | string |  |   (?i).+bug.exe 
+action_result.data.\*.resources.\*.rules.\*.magic_cookie | numeric |  |   6 
+action_result.data.\*.resources.\*.rules.\*.rulegroup_id | string |  `crowdstrike ioa rule group id`  |    
+action_result.data.\*.resources.\*.rules.\*.ruletype_name | string |  |   Process Creation 
+action_result.data.\*.resources.\*.rules.\*.disposition_id | numeric |  |   10 
+action_result.data.\*.resources.\*.rules.\*.instance_version | numeric |  |   3 
+action_result.data.\*.resources.\*.rules.\*.pattern_severity | string |  |   medium 
+action_result.data.\*.resources.\*.comment | string |  |   Created rule 
+action_result.data.\*.resources.\*.enabled | boolean |  |   True  False 
+action_result.data.\*.resources.\*.deleted | boolean |  |   True  False 
+action_result.data.\*.resources.\*.version | numeric |  |   2 
+action_result.data.\*.resources.\*.platform | string |  |   mac  windows  linux 
+action_result.data.\*.resources.\*.rule_ids.\* | string |  `crowdstrike ioa rule id`  |   1 
+action_result.data.\*.resources.\*.created_by | string |  `crowdstrike unique user id`  |   bb777249-c782-4434-b57a-f15ac742926c 
+action_result.data.\*.resources.\*.created_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.resources.\*.customer_id | string |  `crowdstrike customer id`  |   4061c7ff3b634e22b38274d4b586554r 
+action_result.data.\*.resources.\*.description | string |  |   Stops the bug 
+action_result.data.\*.resources.\*.modified_by | string |  `crowdstrike unique user id`  |   bb777249-c782-4434-b57a-f15ac742926c 
+action_result.data.\*.resources.\*.modified_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.data.\*.resources.\*.committed_on | string |  `date`  |   2021-09-15T09:52:27.651770437Z 
+action_result.summary.rule_group_id | string |  `crowdstrike ioa rule group id`  |   83f596d2f8c04f36ad39182311e90e3a 
+action_result.summary.rule_group_version | numeric |  |   1 
+action_result.summary.rule_id | string |  `crowdstrike ioa rule id`  |   1 
+action_result.summary.rule_version | numeric |  |   1 
+action_result.message | string |  |   Rule updated successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
+
+## action: 'delete ioa rule'
+Delete an existing IOA Rule
+
+Type: **contain**  
+Read only: **False**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**rule_group_id** |  required  | Rule Group ID containing the rule | string |  `crowdstrike ioa rule group id` 
+**rule_id** |  required  | Rule ID to delete | string |  `crowdstrike ioa rule id` 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.rule_group_id | string |  `crowdstrike ioa rule group id`  |   83f596d2f8c04f36ad39182311e90e3a 
+action_result.parameter.rule_id | string |  `crowdstrike ioa rule id`  |   1 
+action_result.data.\*.errors | string |  |  
+action_result.data.\*.meta.powered_by | string |  |   empower-api 
+action_result.data.\*.meta.query_time | numeric |  |   5.917429897 
+action_result.data.\*.meta.trace_id | string |  |   6b7c63e1-0ebd-4121-90f3-cd53451be245 
+action_result.summary.resources_affected | string |  |  
+action_result.message | string |  |   Rule deleted successfully 
 summary.total_objects | numeric |  |   1 
 summary.total_objects_successful | numeric |  |   1 

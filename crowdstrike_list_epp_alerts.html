@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: crowdstrike_list_detections.html
+<!-- File: crowdstrike_list_epp_alerts.html
   Copyright (c) 2019-2024 Splunk Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,7 +118,7 @@
     {% if not result.data %}
         <h4 class="wf-h4-style">No data found</h4>
     {% else %}
-    <h3 class="wf-h3-style">Detection Info</h3>
+    <h3 class="wf-h3-style">Alert Info</h3>
     <div class="metadata_div">
         <!--Default View-->
         <div class="panel-group" id="server-information">
@@ -127,7 +127,7 @@
                     <table class="wf-table-horizontal datatable">
                         <thead>
                             <tr>
-                                <th>Detection ID</th>
+                                <th>Alert ID</th>
                                 <th>Device ID</th>
                                 <th>Status</th>
                                 <th>Created Timestamp</th>
@@ -138,7 +138,7 @@
                                 <tr>
                                     <td>
                                       <a href="javascript:;"
-                                        onclick="context_menu(this, [{'contains': ['crowdstrike detection id'], 'value': '{{ data.detection_id }}' }], 0, {{ container.id }}, null, false);">{{data.detection_id}}
+                                        onclick="context_menu(this, [{'contains': ['crowdstrike alert id'], 'value': '{{ data.composite_id }}' }], 0, {{ container.id }}, null, false);">{{data.composite_id}}
                                             &nbsp;
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>

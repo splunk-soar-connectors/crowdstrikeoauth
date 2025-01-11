@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_connector.py
 #
-# Copyright (c) 2019-2024 Splunk Inc.
+# Copyright (c) 2019-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -815,9 +815,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         fdid = param[CROWDSTRIKE_GET_ONLINE_STATE_DEVICE_ID]
 
-        api_data = {
-            "ids": fdid
-        }
+        api_data = {"ids": fdid}
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_ONLINE_STATE_ENDPOINT, params=api_data)
 
@@ -832,13 +830,15 @@ class CrowdstrikeConnector(BaseConnector):
             data = dict(response["resources"][0])
         except Exception as ex:
             return action_result.set_status(
-                phantom.APP_ERROR, "Error occurred while parsing response of 'get_online_state' action."
-                                   " Unknown response retrieved Error:{}".format(self._get_error_message_from_exception(ex)))
+                phantom.APP_ERROR,
+                "Error occurred while parsing response of 'get online state' action."
+                " Unknown response retrieved Error:{}".format(self._get_error_message_from_exception(ex)),
+            )
 
         action_result.add_data(data)
 
-        summary = action_result.update_summary({})
-        self.debug_print('Successfully fetched device online state with response {0}'.format(response))
+        action_result.update_summary({})
+        self.debug_print("Successfully fetched device online state with response {0}".format(response))
         return action_result.set_status(phantom.APP_SUCCESS, "Device online state fetched successfully")
 
     def _handle_get_process_detail(self, param):

@@ -120,7 +120,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get_online_state",
+            "action": "get online state",
             "description": "get online state of device(s)",
             "type": "generic",
             "identifier": "get_online_state",
@@ -131,7 +131,7 @@
                     "description": "Device IDs to query for online state, Comma-separated list allowed",
                     "data_type": "string",
                     "contains": [
-                        "crowdstrike device_id or aid"
+                        "crowdstrike device id"
                     ],
                     "primary": true,
                     "required": true,

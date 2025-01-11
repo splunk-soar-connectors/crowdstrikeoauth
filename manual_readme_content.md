@@ -1,5 +1,5 @@
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2024 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2025 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
@@ -134,7 +134,7 @@ error.
         from the stored offset ID in the state file and will fetch the maximum events as configured
         in the \[Maximum events to get while scheduled and interval polling\] parameter.
 
-The **DetectionSummaryEvent** is parsed to extract the following values into an Artifact.  
+The **DetectionSummaryEvent** is parsed to extract the following values into an Artifact.
 
 | **Artifact Field** | **Event Field** |
 |--------------------|-----------------|
@@ -148,7 +148,7 @@ The **DetectionSummaryEvent** is parsed to extract the following values into an 
 | cef.hash           | SHA256STring    |
 | cef.cs1            | cmdLine         |
 
-The **EppDetectionSummaryEvent** is parsed to extract the following values into an Artifact.  
+The **EppDetectionSummaryEvent** is parsed to extract the following values into an Artifact.
 
 | **Artifact Field** | **Event Field**  |
 |--------------------|------------------|
@@ -162,7 +162,7 @@ The **EppDetectionSummaryEvent** is parsed to extract the following values into 
 | cef.hash           | SHA256String     |
 | cef.cs1            | cmdLine          |
 
-The app also parses the following **sub-events** into their own artifacts.  
+The app also parses the following **sub-events** into their own artifacts.
 
 -   Documents Accessed
 -   Executables Written
@@ -274,7 +274,7 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
 -   The sort parameter value has to be provided in the format property_name.asc for ascending and
     property_name.desc for descending order.
 
-  
+
 
 -   **Action -** Query Device
 
@@ -283,7 +283,7 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
 -   Both the filter and sort parameters follow the same concepts as mentioned above for the list
     groups action.
 
-  
+
 
 -   **Action -** Assign Hosts, Remove Hosts, Quarantine Device, and Unquarantine Device
 
@@ -304,7 +304,7 @@ Identifier. This is the value of the SDI of the main event that the sub-events w
     Session action needs to be created. Also, the user can delete the session using the Delete
     Session action.
 
-  
+
 
 -   **Action -** Run Command
 
@@ -395,11 +395,11 @@ default ports used by Splunk SOAR.
     update existing playbooks created in the earlier versions of the app by re-inserting |
     modifying | deleting the corresponding action blocks.
 
-      
+
 
     -   list users - Below output data-paths have been updated.
 
-          
+
 
         -   Updated name from 'customer' to 'cid'
         -   Updated name from 'firstName' to 'first_name'

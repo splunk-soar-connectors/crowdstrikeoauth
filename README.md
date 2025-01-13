@@ -2,7 +2,7 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk  
-Connector Version: 5.0.0  
+Connector Version: 5.1.0  
 Product Vendor: CrowdStrike  
 Product Name: CrowdStrike  
 Product Version Supported (regex): ".\*"  
@@ -438,7 +438,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials  
-[get online state](#action-get-online-state) - get online state of device(s)  
+[get online state](#action-get-online-state) - Get online state of device(s)  
 [query device](#action-query-device) - Fetch the device details based on the provided query  
 [list groups](#action-list-groups) - Fetch the details of the host groups  
 [quarantine device](#action-quarantine-device) - Block the device  
@@ -518,7 +518,7 @@ No parameters are required for this action
 No Output  
 
 ## action: 'get online state'
-get online state of device(s)
+Get online state of device(s)
 
 Type: **generic**  
 Read only: **False**
@@ -531,7 +531,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.state | string |  |   online  offline  unknown   
+action_result.status | string |  |   success  failed 
+action_result.state | string |  |   online  offline  unknown 
+action_result.summary | string |  |  
+action_result.message | string |  |   Process details fetched successfully 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 
+action_result.parameter.device_id | string |  `crowdstrike device id`  |   07c312fabcb8473454d0a16f118928ab   
 
 ## action: 'query device'
 Fetch the device details based on the provided query

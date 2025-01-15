@@ -57,6 +57,7 @@ CROWDSTRIKE_POLL_INTERVAL = "detonate_timeout"
 CROWDSTRIKE_RESOURCE_ID = "resource_id"
 
 # general parameters
+CROWDSTRIKE_CID = "cid"
 CROWDSTRIKE_FILTER = "filter"
 CROWDSTRIKE_INCLUDE_HIDDEN = "include_hidden"
 CROWDSTRIKE_LIMIT = "limit"

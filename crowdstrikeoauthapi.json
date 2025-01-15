@@ -144,6 +144,11 @@
                     "data_type": "string",
                     "description": "Property to sort by",
                     "order": 3
+                },
+                "cid": {
+                    "data_type": "string",
+                    "description": "subtenant id to search",
+                    "order": 4
                 }
             },
             "output": [
@@ -1198,6 +1203,11 @@
                     "contains": [
                         "host name"
                     ]
+                },
+                "cid": {
+                    "data_type": "string",
+                    "description": "subtenant id to search",
+                    "order": 2
                 }
             },
             "output": [
@@ -1313,6 +1323,11 @@
                     "contains": [
                         "host name"
                     ]
+                },
+                "cid": {
+                    "data_type": "string",
+                    "description": "subtenant id to search",
+                    "order": 2
                 }
             },
             "output": [

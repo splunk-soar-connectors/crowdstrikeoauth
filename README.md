@@ -401,13 +401,12 @@ default ports used by Splunk SOAR.
         -   Updated name from 'lastName' to 'last_name'
 
 
-### Configuration Variables
-The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a CrowdStrike asset in SOAR.
+### Configuration variables
+This table lists the configuration variables required to operate CrowdStrike OAuth API. These variables are specified when configuring a CrowdStrike asset in Splunk SOAR.
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **url** |  required  | string | Base URL
-**place_holder** |  optional  | ph | Placeholder
 **client_id** |  required  | password | Client ID
 **client_secret** |  required  | password | Client Secret
 **app_id** |  optional  | string | App ID
@@ -508,6 +507,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **offset** |  optional  | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | 
 **filter** |  optional  | Filter expression used to limit the fetched devices (FQL Syntax) | string | 
 **sort** |  optional  | Property to sort by | string | 
+**cid** |  optional  | subtenant id to search | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -669,6 +669,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **device_id** |  optional  | Comma-separated list of device IDs | string |  `crowdstrike device id` 
 **hostname** |  optional  | Comma-separated list of hostnames | string |  `host name` 
+**cid** |  optional  | subtenant id to search | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -696,6 +697,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **device_id** |  optional  | Comma-separated list of device IDs | string |  `crowdstrike device id` 
 **hostname** |  optional  | Comma-separated list of hostnames | string |  `host name` 
+**cid** |  optional  | subtenant id to search | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES

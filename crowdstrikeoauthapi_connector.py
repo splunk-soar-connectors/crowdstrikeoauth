@@ -4951,6 +4951,7 @@ class CrowdstrikeConnector(BaseConnector):
         :param data: request body
         :param json: JSON object
         :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
+        :param subtenant: Optional subtenant dictionary with name and CID
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
@@ -4958,7 +4959,13 @@ class CrowdstrikeConnector(BaseConnector):
         if headers is None:
             headers = {}
 
-        tenant_name = list(subtenant.keys())[0] if subtenant else ""
+        tenant_name = ""
+        if subtenant and isinstance(subtenant, dict) and subtenant:
+            try:
+                tenant_name = next(iter(subtenant.keys()))
+            except StopIteration:
+                self.debug_print("Empty subtenant dictionary provided")
+
         token = self._state.get("oauth2_token{}".format(tenant_name), {})
 
         # token check

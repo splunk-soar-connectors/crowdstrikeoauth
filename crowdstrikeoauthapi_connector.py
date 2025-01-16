@@ -317,47 +317,35 @@ class CrowdstrikeConnector(BaseConnector):
                     )
 
         return action_result.set_status(phantom.APP_SUCCESS)
-    
+
     def _get_subtenants(self, action_result, cid=None):
         """Get subtenants list from asset configuration"""
         try:
             # Get subtenants from asset config (optionally set)
-            subtenants_config = self.get_config().get('subtenants', '[]')
+            subtenants_config = self.get_config().get("subtenants", "[]")
             subtenants = json.loads(subtenants_config)
-            
+
             if not isinstance(subtenants, list):
                 return action_result.set_status(phantom.APP_ERROR, "Subtenants configuration must be a JSON array")
-                
+
             # Validate format
             for tenant in subtenants:
-                if not isinstance(tenant, dict) or 'name' not in tenant or 'cid' not in tenant:
-                    return action_result.set_status(
-                        phantom.APP_ERROR,
-                        "Each subtenant must have 'name' and 'cid' fields"
-                    )
-            
+                if not isinstance(tenant, dict) or "name" not in tenant or "cid" not in tenant:
+                    return action_result.set_status(phantom.APP_ERROR, "Each subtenant must have 'name' and 'cid' fields")
+
             # Filter by CID if specified
             if cid:
-                subtenants = [tenant for tenant in subtenants if tenant['cid'] == cid]
+                subtenants = [tenant for tenant in subtenants if tenant["cid"] == cid]
                 if not subtenants:
-                    return action_result.set_status(
-                        phantom.APP_ERROR, 
-                        f"No subtenant found with CID {cid}"
-                    )
-                    
-            self.save_progress("Found subtenants: {}".format([t['name'] for t in subtenants]))
+                    return action_result.set_status(phantom.APP_ERROR, f"No subtenant found with CID {cid}")
+
+            self.save_progress("Found subtenants: {}".format([t["name"] for t in subtenants]))
             return subtenants
 
         except json.JSONDecodeError:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Failed to parse subtenants configuration. Must be valid JSON array."
-            )
+            return action_result.set_status(phantom.APP_ERROR, "Failed to parse subtenants configuration. Must be valid JSON array.")
         except Exception as e:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                f"Error processing subtenants configuration: {str(e)}"
-            )
+            return action_result.set_status(phantom.APP_ERROR, f"Error processing subtenants configuration: {str(e)}")
 
     def _save_results(self, results, param, is_incident=False):
         reused_containers = 0
@@ -642,9 +630,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         all_ids = []
         for tenant in subtenants:
-            ret_val, response = self._make_rest_call_helper_oauth2(
-                action_result, endpoint, params=param, subtenant=tenant
-            )
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param, subtenant=tenant)
             if phantom.is_fail(ret_val):
                 return None
 
@@ -2258,12 +2244,7 @@ class CrowdstrikeConnector(BaseConnector):
             else:
                 return action_result.get_status()
 
-        alert_id_list = self._get_ids(
-            action_result,
-            CROWDSTRIKE_LIST_ALERTS_ENDPOINT,
-            params,
-            subtenant=subtenant
-        )
+        alert_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_ALERTS_ENDPOINT, params, subtenant=subtenant)
         if alert_id_list is None:
             return action_result.get_status()
 
@@ -2323,12 +2304,7 @@ class CrowdstrikeConnector(BaseConnector):
             else:
                 return action_result.get_status()
 
-        detection_id_list = self._get_ids(
-            action_result,
-            CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT,
-            params,
-            subtenant=subtenant
-        )
+        detection_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT, params, subtenant=subtenant)
         if detection_id_list is None:
             return action_result.get_status()
 

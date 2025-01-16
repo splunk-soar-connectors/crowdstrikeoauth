@@ -65,6 +65,7 @@ CROWDSTRIKE_ADD_TAGS = "add_tags"
 CROWDSTRIKE_REMOVE_TAGS = "remove_tags"
 CROWDSTRIKE_REMOVE_TAGS_BY_PREFIX = "remove_tags_by_prefix"
 # general parameters
+CROWDSTRIKE_CID = "cid"
 CROWDSTRIKE_FILTER = "filter"
 CROWDSTRIKE_INCLUDE_HIDDEN = "include_hidden"
 CROWDSTRIKE_LIMIT = "limit"

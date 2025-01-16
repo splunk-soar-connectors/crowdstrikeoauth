@@ -58,68 +58,74 @@
             "description": "Client Secret",
             "required": true
         },
+        "subtenants": {
+            "description": "List of subtenants in JSON format. Example: [{\"name\": \"Tenant1\", \"cid\": \"123\"}, {\"name\": \"Tenant2\", \"cid\": \"456\"}]",
+            "order": 4,
+            "data_type": "string",
+            "required": false
+        },
         "app_id": {
             "data_type": "string",
-            "order": 4,
+            "order": 5,
             "description": "App ID"
         },
         "max_events": {
             "data_type": "numeric",
-            "order": 5,
+            "order": 6,
             "description": "Maximum events to get for scheduled and interval polling",
             "default": 10000
         },
         "max_events_poll_now": {
             "data_type": "numeric",
-            "order": 6,
+            "order": 7,
             "description": "Maximum events to get while POLL NOW",
             "default": 2000
         },
         "max_incidents": {
             "data_type": "numeric",
-            "order": 7,
+            "order": 8,
             "description": "Maximum incidents to get for scheduled and interval polling",
             "default": 1000
         },
         "max_incidents_poll_now": {
             "data_type": "numeric",
-            "order": 8,
+            "order": 9,
             "description": "Maximum incidents to get while POLL NOW",
             "default": 100
         },
         "ingest_incidents": {
             "data_type": "boolean",
-            "order": 9,
+            "order": 10,
             "description": "Should ingest incidents during polling",
             "default": false
         },
         "collate": {
             "data_type": "boolean",
-            "order": 10,
+            "order": 11,
             "description": "Merge containers for hostname and eventname",
             "default": true
         },
         "merge_time_interval": {
             "data_type": "numeric",
-            "order": 11,
+            "order":12,
             "description": "Merge same containers within specified seconds",
             "default": 0
         },
         "max_crlf": {
             "data_type": "numeric",
-            "order": 12,
+            "order": 13,
             "default": 50,
             "description": "Maximum allowed continuous blank lines"
         },
         "preprocess_script": {
             "data_type": "file",
             "description": "Script with functions to preprocess containers and artifacts",
-            "order": 13
+            "order": 14
         },
         "detonate_timeout": {
             "data_type": "numeric",
             "description": "Timeout for detonation result in minutes (Default: 15 minutes)",
-            "order": 14,
+            "order": 15,
             "default": 15
         }
     },
@@ -281,6 +287,11 @@
                     "data_type": "string",
                     "description": "Property to sort by",
                     "order": 3
+                },
+                "cid": {
+                    "data_type": "string",
+                    "description": "subtenant id to search",
+                    "order": 4
                 }
             },
             "output": [
@@ -1335,6 +1346,11 @@
                     "contains": [
                         "host name"
                     ]
+                },
+                "cid": {
+                    "data_type": "string",
+                    "description": "subtenant id to search",
+                    "order": 2
                 }
             },
             "output": [
@@ -1450,6 +1466,11 @@
                     "contains": [
                         "host name"
                     ]
+                },
+                "cid": {
+                    "data_type": "string",
+                    "description": "subtenant id to search",
+                    "order": 2
                 }
             },
             "output": [

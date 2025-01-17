@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_connector.py
 #
-# Copyright (c) 2019-2024 Splunk Inc.
+# Copyright (c) 2019-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -806,6 +806,40 @@ class CrowdstrikeConnector(BaseConnector):
 
         self.debug_print("Successfully fetched device scroll with response {0}".format(response))
         return action_result.set_status(phantom.APP_SUCCESS, "Device scroll fetched successfully")
+
+    def _handle_get_online_state(self, param):
+
+        # Add an action result to the App Run
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        fdid = param[CROWDSTRIKE_GET_ONLINE_STATE_DEVICE_ID]
+
+        api_data = {"ids": fdid}
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_ONLINE_STATE_ENDPOINT, params=api_data)
+
+        if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # successful request
+        try:
+            data = dict(response["resources"][0])
+        except Exception as ex:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Error occurred while parsing response of 'get online state' action."
+                " Unknown response retrieved Error:{}".format(self._get_error_message_from_exception(ex)),
+            )
+
+        action_result.add_data(data)
+
+        action_result.update_summary({})
+        self.debug_print("Successfully fetched device online state with response {0}".format(response))
+        return action_result.set_status(phantom.APP_SUCCESS, "Device online state fetched successfully")
 
     def _handle_get_process_detail(self, param):
 
@@ -4893,6 +4927,7 @@ class CrowdstrikeConnector(BaseConnector):
             "create_ioa_rule": self._handle_create_ioa_rule,
             "update_ioa_rule": self._handle_update_ioa_rule,
             "delete_ioa_rule": self._handle_delete_ioa_rule,
+            "get_online_state": self._handle_get_online_state,
         }
 
         action = self.get_action_identifier()

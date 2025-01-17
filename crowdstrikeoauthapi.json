@@ -18,10 +18,13 @@
         },
         {
             "name": "Katie Tanner"
+        },
+        {
+            "name": "Jason Meyer"
         }
     ],
-    "license": "Copyright (c) 2019-2024 Splunk Inc.",
-    "app_version": "5.0.0",
+    "license": "Copyright (c) 2019-2025 Splunk Inc.",
+    "app_version": "5.1.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, October 1st 2024, API versions: v1, v2"
     ],
@@ -115,6 +118,87 @@
             "parameters": {},
             "output": [],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "get online state",
+            "description": "Get online state of device(s)",
+            "type": "generic",
+            "identifier": "get_online_state",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "device_id": {
+                    "description": "Device IDs to query for online state, Comma-separated list allowed",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike device id"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_order": 1,
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "online",
+                        "offline",
+                        "unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Process details fetched successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Crowdstrike Device ID",
+                    "contains": [
+                        "crowdstrike device id"
+                    ],
+                    "example_values": [
+                        "07c312fabcb8473454d0a16f118928ab"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
         },
         {
             "action": "query device",

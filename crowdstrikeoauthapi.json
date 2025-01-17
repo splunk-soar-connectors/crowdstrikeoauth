@@ -59,10 +59,9 @@
             "required": true
         },
         "subtenants": {
-            "description": "List of subtenants in JSON format. Example: [{\"name\": \"Tenant1\", \"cid\": \"123\"}, {\"name\": \"Tenant2\", \"cid\": \"456\"}]",
+            "description": "Comma-separated list of subtenant CIDs. Example: 123,456,789",
             "order": 4,
-            "data_type": "string",
-            "required": false
+            "data_type": "string"
         },
         "app_id": {
             "data_type": "string",

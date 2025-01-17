@@ -322,28 +322,18 @@ class CrowdstrikeConnector(BaseConnector):
         """Get subtenants list from asset configuration"""
         try:
             # Get subtenants from asset config (optionally set)
-            subtenants_config = self.get_config().get("subtenants", "[]")
-            subtenants = json.loads(subtenants_config)
+            subtenants_config = self.get_config().get("subtenants", "")
 
-            if not isinstance(subtenants, list):
-                return action_result.set_status(phantom.APP_ERROR, "Subtenants configuration must be a JSON array")
+            # Comma separated list of subtenants
+            subtenants = [x.strip() for x in subtenants_config.split(",") if x.strip()]
 
-            # Validate format
-            for tenant in subtenants:
-                if not isinstance(tenant, dict) or "name" not in tenant or "cid" not in tenant:
-                    return action_result.set_status(phantom.APP_ERROR, "Each subtenant must have 'name' and 'cid' fields")
-
-            # Filter by CID if specified
             if cid:
-                subtenants = [tenant for tenant in subtenants if tenant["cid"] == cid]
-                if not subtenants:
+                if cid not in subtenants:
                     return action_result.set_status(phantom.APP_ERROR, f"No subtenant found with CID {cid}")
+                subtenants = [cid]
 
-            self.save_progress("Found subtenants: {}".format([t["name"] for t in subtenants]))
             return subtenants
 
-        except json.JSONDecodeError:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to parse subtenants configuration. Must be valid JSON array.")
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, f"Error processing subtenants configuration: {str(e)}")
 
@@ -445,20 +435,25 @@ class CrowdstrikeConnector(BaseConnector):
             limit = int(param.pop("limit"))
 
         offset = param.get("offset", 0)
-        subtenant = param.get("cid")
 
-        # None is the current tenant... always included if subtenant not provided
-        subtenants = [] if subtenant else [None]
-
-        if search_subtenants or subtenant:
-            configured_subtenants = self._get_subtenants(action_result, subtenant)
-            if configured_subtenants:
-                subtenants.extend(configured_subtenants)
+        # If CID provided, only search that tenant
+        if param.get("cid"):
+            subtenants = [param.get("cid")]
+        # Main tenant otherwise
+        else:
+            subtenants = [None]
+            # Add subtenants if requested
+            if search_subtenants:
+                configured_subtenants = self._get_subtenants(action_result)
+                if isinstance(configured_subtenants, list):
+                    subtenants.extend(configured_subtenants)
+                else:
+                    return None
 
         for subtenant in subtenants:
-            self.save_progress("_paginator: tenant {}".format(list(subtenant.keys())[0] if subtenant else "current"))
-            while True:
+            self.save_progress("Searching tenant: {}".format("main" if subtenant is None else subtenant))
 
+            while True:
                 param.update({"offset": offset})
                 ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param, subtenant=subtenant)
 
@@ -4959,14 +4954,9 @@ class CrowdstrikeConnector(BaseConnector):
         if headers is None:
             headers = {}
 
-        tenant_name = ""
-        if subtenant and isinstance(subtenant, dict) and subtenant:
-            try:
-                tenant_name = next(iter(subtenant.keys()))
-            except StopIteration:
-                self.debug_print("Empty subtenant dictionary provided")
-
-        token = self._state.get("oauth2_token{}".format(tenant_name), {})
+        # Use subtenant CID directly if provided
+        token_key = "oauth2_token{}".format(list(subtenant.keys())[0] if subtenant else "")
+        token = self._state.get(token_key, {})
 
         # token check
         if not token.get("access_token"):
@@ -5037,7 +5027,9 @@ class CrowdstrikeConnector(BaseConnector):
             self._state.pop(CROWDSTRIKE_OAUTH_TOKEN_STRING, {})
             return action_result.get_status()
 
-        self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING] = resp_json
+        # Tenant-specific key needed
+        token_key = "oauth2_token{}".format(tenant_name if tenant_name else "")
+        self._state[token_key] = resp_json
         self._oauth_access_token = resp_json[CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING]
         return phantom.APP_SUCCESS
 

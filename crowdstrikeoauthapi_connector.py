@@ -418,7 +418,7 @@ class CrowdstrikeConnector(BaseConnector):
     def validate_comma_seperated_values(values):
         return list(set(val.strip() for val in values.split(",") if val.strip()))
 
-    def _paginator(self, action_result, endpoint, param=None, search_subtenants=False):
+    def _paginator(self, action_result, endpoint, param=None):
         """
         This action is used to create an iterator that will paginate through responses from called methods.
 
@@ -436,70 +436,50 @@ class CrowdstrikeConnector(BaseConnector):
 
         offset = param.get("offset", 0)
 
-        # If CID provided, only search that tenant
-        if param.get("cid"):
-            subtenants = [param.get("cid")]
-        # Main tenant otherwise
-        else:
-            subtenants = [None]
-            # Add subtenants if requested
-            if search_subtenants:
-                configured_subtenants = self._get_subtenants(action_result)
-                if isinstance(configured_subtenants, list):
-                    subtenants.extend(configured_subtenants)
-                else:
-                    return None
+        while True:
 
-        for subtenant in subtenants:
-            self.save_progress("Searching tenant: {}".format("main" if subtenant is None else subtenant))
+            param.update({"offset": offset})
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param)
 
-            while True:
-                param.update({"offset": offset})
-                ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param, subtenant=subtenant)
+            if phantom.is_fail(ret_val):
+                return None
 
-                if phantom.is_fail(ret_val):
-                    return None
+            prev_offset = offset
+            offset = response.get("meta", {}).get("pagination", {}).get("offset")
+            if offset == prev_offset:
+                offset += len(response.get("resources", []))
 
-                prev_offset = offset
-                offset = response.get("meta", {}).get("pagination", {}).get("offset")
-                if offset == prev_offset:
-                    offset += len(response.get("resources", []))
+            # Fetching total from the response
+            total = response.get("meta", {}).get("pagination", {}).get("total")
 
-                # Fetching total from the response
-                total = response.get("meta", {}).get("pagination", {}).get("total")
+            if len(response.get("errors", [])):
+                error = response.get("errors")[0]
+                action_result.set_status(
+                    phantom.APP_ERROR, "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get("code"), error.get("message"))
+                )
+                return None
 
-                if len(response.get("errors", [])):
-                    error = response.get("errors")[0]
-                    action_result.set_status(
-                        phantom.APP_ERROR,
-                       
-                    "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get("code"), error.get("message")),,
-                    )
-                    return None
+            if offset is None or total is None:
+                action_result.set_status(
+                    phantom.APP_ERROR, "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results"
+                )
+                return None
 
-                if offset is None or total is None:
-                    action_result.set_status(
-                        phantom.APP_ERROR,
-                    "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results",
-                    )
-                    return None
+            if response.get("resources"):
+                list_ids.extend(response.get("resources"))
 
-                if response.get("resources"):
-                    list_ids.extend(response.get("resources"))
+            if limit and len(list_ids) >= int(limit):
+                return list_ids[: int(limit)]
 
-                if limit and len(list_ids) >= int(limit):
-                    list_ids = list_ids[: int(limit)]
-                    break
-
-                if self.get_action_identifier() in ["detonate_file", "detonate_url"]:
-                    if total == 0:
-                        self._required_detonation = True
-                if offset >= total:
-                    break
+            if self.get_action_identifier() in ["detonate_file", "detonate_url"]:
+                if total == 0:
+                    self._required_detonation = True
+            if offset >= total:
+                return list_ids
 
         return list_ids
 
-    def _hunt_paginator(self, action_result, endpoint, params, search_subtenants=False):
+    def _hunt_paginator(self, action_result, endpoint, params, search_subtenants=False, subtenant=None):
         list_ids = list()
 
         offset = ""
@@ -507,11 +487,18 @@ class CrowdstrikeConnector(BaseConnector):
         if params.get("limit"):
             limit = params.pop("limit")
 
-        subtenant = params.get("cid")
+        subtenants = [None]
 
-        # None is the current tenant... always included if not subtenant provided
-        subtenants = [] if subtenant else [None]
-        if search_subtenants or subtenant:
+        if subtenant:
+            if subtenant == "main":
+                subtenants = [None]
+            else:
+                subtenants = [subtenant]
+
+            # Subtenant is specified, don't need to search across all subtenants
+            search_subtenants = False
+
+        if search_subtenants:
             configured_subtenants = self._get_subtenants(action_result, subtenant)
             if configured_subtenants:
                 subtenants.extend(configured_subtenants)
@@ -613,17 +600,27 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Query completed successfully")
 
-    def _get_ids(self, action_result, endpoint, param=None, search_subtentants=False, is_str=True, subtenant=None):
+    def _get_ids(self, action_result, endpoint, param=None, search_subtenants=False, subtenant=None):
+        subtenants = [None]
 
-        if search_subtentants and not subtenant:
+        if subtenant:
+            if subtenant == "main":
+                subtenants = [None]
+            else:
+                subtenants = [subtenant]
+
+            # Subtenant is specified, don't need to search across all subtenants
+            search_subtenants = False
+
+        if search_subtenants:
             # Get all subtenants if searching across them
-            subtenants = self._get_subtenants(action_result)
-            if not isinstance(subtenants, list):
-                return None
-        else:
-            subtenants = [subtenant] if subtenant else [None]
+            configured_subtenants = self._get_subtenants(action_result)
+            if configured_subtenants:
+                subtenants.extend(configured_subtenants)
 
-        all_ids = []
+        # Dictionary to store IDs with their corresponding tenants
+        id_tenant_map = {}
+
         for tenant in subtenants:
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param, subtenant=tenant)
             if phantom.is_fail(ret_val):
@@ -633,44 +630,35 @@ class CrowdstrikeConnector(BaseConnector):
             if not ids:
                 continue
 
-            all_ids.extend(ids)
+            # Store each ID with its tenant
+            for device_id in ids:
+                id_tenant_map[device_id] = tenant
 
-        return all_ids
+        self.save_progress("ID-Tenant Map: {}".format(id_tenant_map))
 
-    def _get_details(self, action_result, endpoint, param, method="get", search_subtenants=False):
+        return id_tenant_map
 
+    def _get_details(self, action_result, endpoint, param, method="get", subtenant=None):
         list_ids = param.get("ids")
 
         list_ids_details = list()
 
-        subtenant = param.get("cid")
+        self.save_progress("_get_details: tenant {}".format(subtenant if subtenant else "current"))
 
-        # None is the current tenant... always included if no subtenant provided
-        subtenants = [] if subtenant else [None]
-        if search_subtenants or subtenant:
-            configured_subtenants = self._get_subtenants(action_result, subtenant)
-            if configured_subtenants:
-                subtenants.extend(configured_subtenants)
+        while list_ids:
+            if endpoint == CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT:
+                param = {"composite_ids": list_ids[: min(100, len(list_ids))]}
+            else:
+                param = {"ids": list_ids[: min(100, len(list_ids))]}
 
-        for subtenant in subtenants:
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, json_data=param, method=method, subtenant=subtenant)
+            if phantom.is_fail(ret_val):
+                return None
 
-            self.save_progress("_get_details: tenant {}".format(list(subtenant.keys())[0] if subtenant else "current"))
+            if response.get("resources"):
+                list_ids_details.extend(response.get("resources"))
 
-            while list_ids:
-                if endpoint == CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT:
-                    param = {"composite_ids": list_ids[: min(100, len(list_ids))]}
-                else:
-                    param = {"ids": list_ids[: min(100, len(list_ids))]}
-                ret_val, response = self._make_rest_call_helper_oauth2(
-                    action_result, endpoint, json_data=param, method=method, subtenant=subtenant
-                )
-                if phantom.is_fail(ret_val):
-                    return None
-
-                if response.get("resources"):
-                    list_ids_details.extend(response.get("resources"))
-
-                del list_ids[: min(100, len(list_ids))]
+            del list_ids[: min(100, len(list_ids))]
 
         return list_ids_details
 
@@ -682,8 +670,11 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
         api_data["limit"] = limit
         count_only = param.get(CROWDSTRIKE_JSON_COUNT_ONLY, False)
+        subtenant = param.get(CROWDSTRIKE_CID)
 
-        response = self._hunt_paginator(action_result, CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH, params=api_data, search_subtenants=True)
+        response = self._hunt_paginator(
+            action_result, CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH, params=api_data, search_subtenants=True, subtenant=subtenant
+        )
 
         if response is None:
             return action_result.get_status()
@@ -1340,21 +1331,29 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        device_id_list = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params, search_subtentants=True)
+        subtenant = params.get("cid")
 
-        if device_id_list is None:
+        id_tenant_map = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params, search_subtenants=True, subtenant=subtenant)
+        if id_tenant_map is None:
             return action_result.get_status()
 
-        if device_id_list:
-            params.update({"ids": device_id_list})
+        if id_tenant_map:
+            # Group IDs by tenant
+            tenant_id_groups = {}
+            for device_id, tenant in id_tenant_map.items():
+                if tenant not in tenant_id_groups:
+                    tenant_id_groups[tenant] = []
+                tenant_id_groups[tenant].append(device_id)
 
-            device_details_list = self._get_details(action_result, CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT, params, search_subtenants=True)
+            # Query each tenant for its specific devices
+            for tenant, device_ids in tenant_id_groups.items():
+                params.update({"ids": device_ids})
+                device_details_list = self._get_details(action_result, CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT, params, subtenant=tenant)
+                if device_details_list is None:
+                    return action_result.get_status()
 
-            if device_details_list is None:
-                return action_result.get_status()
-
-            for device in device_details_list:
-                action_result.add_data(device)
+                for device in device_details_list:
+                    action_result.add_data(device)
 
         summary = action_result.update_summary({})
         summary["total_devices"] = action_result.get_data_size()
@@ -1668,7 +1667,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _check_params(self, action_result, param):
+    def _check_params(self, action_result, param, subtenant=None):
 
         ids = list()
         device_id = param.get("device_id", "")
@@ -1733,7 +1732,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS), list(set(ids))
 
-    def _set_error_flag_inputs(self, action_result, list_items, key, subtenant):
+    def _set_error_flag_inputs(self, action_result, list_items, key, subtenant=None):
 
         flag = False
         check_list_items = list()
@@ -1743,7 +1742,7 @@ class CrowdstrikeConnector(BaseConnector):
             filter = "{f}{key}: '{item}', ".format(f=filter, key=key, item=item)  # or opeartion with given hostname/s
         filter = filter[:-2]  # removing last trailing , and space
 
-        check_list_items = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, param={"filter": filter, "cid": subtenant})
+        check_list_items = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, param={"filter": filter}, subtenant=subtenant)
 
         if check_list_items is None:
             return action_result.get_status(), flag, []
@@ -1758,7 +1757,20 @@ class CrowdstrikeConnector(BaseConnector):
 
         count = 0
 
-        ret_val, list_ids = self._check_params(action_result, param)
+        # Handle subtenant parameter
+        subtenant = param.get(CROWDSTRIKE_CID)
+        if subtenant:
+            if subtenant == "main":
+                subtenant = None
+        else:
+            # Find which tenant device belongs to
+            id_tenant_map = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, search_subtenants=True)
+            if id_tenant_map is None:
+                return action_result.get_status(phantom.APP_ERROR, "Device ID not found among any tenant")
+
+            subtenant = id_tenant_map.get(param.get("device_id"))
+
+        ret_val, list_ids = self._check_params(action_result, param, subtenant)
 
         if phantom.is_fail(ret_val):
             msg = action_result.get_message()
@@ -1778,15 +1790,6 @@ class CrowdstrikeConnector(BaseConnector):
         data = {}
         endpoint = None
         count = len(list_ids)
-
-        # Handle subtenant parameter
-        subtenant = None
-        if param.get("cid"):
-            subtenants = self._get_subtenants(action_result, param.get("cid"))
-            if isinstance(subtenants, list) and subtenants:
-                subtenant = subtenants[0]
-            else:
-                return action_result.get_status()
 
         action_name = param.get("action_name")
         params = {"action_name": action_name}
@@ -4954,8 +4957,7 @@ class CrowdstrikeConnector(BaseConnector):
         if headers is None:
             headers = {}
 
-        # Use subtenant CID directly if provided
-        token_key = "oauth2_token{}".format(list(subtenant.keys())[0] if subtenant else "")
+        token_key = "oauth2_token{}".format(subtenant if subtenant else "")
         token = self._state.get(token_key, {})
 
         # token check
@@ -4963,8 +4965,10 @@ class CrowdstrikeConnector(BaseConnector):
             ret_val = self._get_token(action_result, member_cid=subtenant)
             if phantom.is_fail(ret_val):
                 return phantom.APP_ERROR, None
+            token = self._state.get(token_key, {})  # Get updated token after _get_token
 
-        headers.update({"Authorization": "Bearer {0}".format(self._oauth_access_token)})
+        # Use the tenant-specific token instead of self._oauth_access_token
+        headers.update({"Authorization": "Bearer {0}".format(token.get("access_token"))})
 
         if not headers.get("Content-Type"):
             headers["Content-Type"] = "application/json"
@@ -4988,7 +4992,9 @@ class CrowdstrikeConnector(BaseConnector):
 
             action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched access token")
 
-            headers.update({"Authorization": "Bearer {0}".format(self._oauth_access_token)})
+            # Get the new token and update headers
+            token = self._state.get(token_key, {})
+            headers.update({"Authorization": "Bearer {0}".format(token.get("access_token"))})
 
             ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json_data, method)
 
@@ -5008,14 +5014,14 @@ class CrowdstrikeConnector(BaseConnector):
         data = {"client_id": self._client_id, "client_secret": self._client_secret}
 
         if member_cid:
-            data["member_cid"] = list(member_cid.values())[0]
+            data["member_cid"] = member_cid
 
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json",
         }
 
-        tenant_name = list(member_cid.keys())[0] if member_cid else ""
+        tenant_name = member_cid if member_cid else ""
         self.save_progress("_get_token for tenant {0}".format(tenant_name if tenant_name else "current"))
 
         url = "{}{}".format(self._base_url_oauth, CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT)

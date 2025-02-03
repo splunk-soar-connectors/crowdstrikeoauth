@@ -522,8 +522,7 @@ class CrowdstrikeConnector(BaseConnector):
                     error = response.get("errors")[0]
                     action_result.set_status(
                         phantom.APP_ERROR,
-                       
-                    "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get("code"), error.get("message")),,
+                        "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get("code"), error.get("message")),
                     )
                     return None
 

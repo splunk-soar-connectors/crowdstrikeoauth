@@ -289,7 +289,7 @@
                 },
                 "cid": {
                     "data_type": "string",
-                    "description": "tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main'",
+                    "description": "The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main'",
                     "order": 4
                 }
             },
@@ -1348,7 +1348,7 @@
                 },
                 "cid": {
                     "data_type": "string",
-                    "description": "tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant put 'main'",
+                    "description": "The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant put 'main'",
                     "order": 2
                 }
             },
@@ -1468,7 +1468,7 @@
                 },
                 "cid": {
                     "data_type": "string",
-                    "description": "tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main'",
+                    "description": "The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main'",
                     "order": 2
                 }
             },
@@ -11686,7 +11686,7 @@
                 },
                 "cid": {
                     "data_type": "string",
-                    "description": "tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main'",
+                    "description": "The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main'",
                     "order": 3
                 }
             },

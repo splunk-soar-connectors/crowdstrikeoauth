@@ -155,7 +155,7 @@
                 },
                 "filter": {
                     "data_type": "string",
-                    "description": "Filter expression (FQL Syntax)",
+                    "description": "Filter expression (FQL Syntax) (ex: last_seen: >'2020-01-01')",
                     "order": 2
                 },
                 "sort": {

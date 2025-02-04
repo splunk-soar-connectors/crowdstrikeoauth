@@ -504,7 +504,6 @@ class CrowdstrikeConnector(BaseConnector):
                 subtenants.extend(configured_subtenants)
 
         for subtenant in subtenants:
-            self.save_progress("_hunt_paginator: tenant {}".format(list(subtenant.keys())[0] if subtenant else "current"))
             while True:
                 params.update({"offset": offset})
                 params.update({"limit": 100})
@@ -513,7 +512,8 @@ class CrowdstrikeConnector(BaseConnector):
 
                 if phantom.is_fail(ret_val):
                     if CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE in action_result.get_message():
-                        return []
+                        # Continue (next subtenant if there is one)
+                        break
                     return None
 
                 offset = response.get("meta", {}).get("pagination", {}).get("offset")
@@ -533,7 +533,10 @@ class CrowdstrikeConnector(BaseConnector):
                     return list_ids[:limit]
 
                 if (not offset) and (not response.get("meta", {}).get("pagination", {}).get("next_page")):
-                    return list_ids
+                    # Continue (next subtenant if there is one)
+                    break
+
+        return list_ids
 
     def _handle_test_connectivity(self, param):
 
@@ -1330,7 +1333,7 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        subtenant = params.get("cid")
+        subtenant = param.get(CROWDSTRIKE_CID)
 
         id_tenant_map = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params, search_subtenants=True, subtenant=subtenant)
         if id_tenant_map is None:
@@ -1806,6 +1809,7 @@ class CrowdstrikeConnector(BaseConnector):
                     endpoint,
                     params=params,
                     data=json.dumps(data),
+                    subtenant=subtenant,
                     method="post",
                 )
 
@@ -4937,6 +4941,7 @@ class CrowdstrikeConnector(BaseConnector):
         params=None,
         data=None,
         json_data=None,
+        subtenant=None,
         method="get",
     ):
         """Function that helps setting REST call to the app.

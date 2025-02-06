@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_connector.py
 #
-# Copyright (c) 2019-2024 Splunk Inc.
+# Copyright (c) 2019-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -321,7 +321,7 @@ class CrowdstrikeConnector(BaseConnector):
     def _save_results(self, results, param, is_incident=False):
         reused_containers = 0
         containers_processed = 0
-        artifact_type = 'incident' if is_incident else 'event'
+        artifact_type = "incident" if is_incident else "event"
 
         for i, result in enumerate(results):
             self.send_progress("Adding {} artifact # {}".format(artifact_type, i))
@@ -532,17 +532,11 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Please provide endpoint path")
 
         # Ensure using query endpoint
-        if '/queries/' not in endpoint.lower():
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR
-            )
+        if "/queries/" not in endpoint.lower():
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR)
 
-        params = {
-            "limit": param.get("limit", 50),
-            "offset": param.get("offset", 0)
-        }
-        params.update({k: param[k] for k in ['filter', 'sort'] if param.get(k)})
+        params = {"limit": param.get("limit", 50), "offset": param.get("offset", 0)}
+        params.update({k: param[k] for k in ["filter", "sort"] if param.get(k)})
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
@@ -558,13 +552,15 @@ class CrowdstrikeConnector(BaseConnector):
         meta = response.get("meta", {})
         pagination = meta.get("pagination", {})
 
-        summary.update({
-            "total_objects": len(resources),
-            "total_count": pagination.get("total", 0),
-            "query_time": meta.get("query_time", 0),
-            "powered_by": meta.get("powered_by", ""),
-            "trace_id": meta.get("trace_id", "")
-        })
+        summary.update(
+            {
+                "total_objects": len(resources),
+                "total_count": pagination.get("total", 0),
+                "query_time": meta.get("query_time", 0),
+                "powered_by": meta.get("powered_by", ""),
+                "trace_id": meta.get("trace_id", ""),
+            }
+        )
 
         return action_result.set_status(phantom.APP_SUCCESS, "Query completed successfully")
 

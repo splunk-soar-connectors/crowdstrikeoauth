@@ -11,7 +11,7 @@ Minimum Product Version: 6.3.0
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2024 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2025 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""

@@ -42,8 +42,6 @@ def _get_incident_severity(fine_score):
         return "high"
     elif fine_score >= 60:
         return "medium"
-    elif fine_score >= 40:
-        return "low"
     else:
         return "low"
 

@@ -3146,8 +3146,9 @@ class CrowdstrikeConnector(BaseConnector):
                 )
             except Exception as ex:
                 self.debug_print("Error occurred while validating poll now parameters")
-                max_events = "{}: {}".format(DEFAULT_POLLNOW_EVENTS_COUNT, self._get_error_message_from_exception(ex))
-                max_incidents = "{}: {}".format(DEFAULT_POLLNOW_INCIDENTS_COUNT, self._get_error_message_from_exception(ex))
+                error_messages_from_exception = self._get_error_message_from_exception(ex)
+                max_events = "{}: {}".format(DEFAULT_POLLNOW_EVENTS_COUNT, error_messages_from_exception)
+                max_incidents = "{}: {}".format(DEFAULT_POLLNOW_INCIDENTS_COUNT, error_messages_from_exception)
         else:
             # Scheduled and Interval Polling
             try:

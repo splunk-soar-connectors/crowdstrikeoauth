@@ -3215,7 +3215,7 @@ class CrowdstrikeConnector(BaseConnector):
                     }
                     ret_val, resp = self._make_rest_call_helper_oauth2(
                         action_result, self._refresh_token_url, headers=header, method="post", append=False)
-
+                    self._start_time = time.time()
                     if phantom.is_fail(ret_val):
                         err_message = action_result.get_message()
                         self.debug_print(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}: {err_message}")
@@ -3230,16 +3230,14 @@ class CrowdstrikeConnector(BaseConnector):
                         else:
                             if restart_process:
                                 self.save_progress("Restarting feed...")
-                                self._start_time = time.time()
-                                return self._start_data_feed(param, action_result, max_crlf, max_events,
-                                                             config, lower_id)
+                                break
                             return action_result.get_status()
                     elif max_crlf is None:
                         # Save events after refreshing the token
                         self._save_events_on_poll(config, total_blank_lines_count, param)
 
-                    self._start_time = time.time()
-
+                if restart_process:
+                    return self._start_data_feed(param, action_result, max_crlf, max_events, config, lower_id)
                 if stream_data is None:
                     # Done with all the event data for now
                     self.debug_print(CROWDSTRIKE_NO_DATA_MESSAGE)

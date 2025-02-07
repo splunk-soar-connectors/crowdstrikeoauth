@@ -1129,7 +1129,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         endpoint = CROWDSTRIKE_LIST_CROWDSCORES_ENDPOINT
 
-        id_list = self._get_ids(action_result, endpoint, params, is_str=False)
+        id_list = self._get_ids(action_result, endpoint, params)
 
         if id_list is None:
             return action_result.get_status()
@@ -3264,8 +3264,9 @@ class CrowdstrikeConnector(BaseConnector):
                 self.debug_print("Validating 'max_incidents' asset configuration parameter")
                 max_incidents = self._validate_integers(action_result, config.get("max_incidents", DEFAULT_INCIDENTS_COUNT), "max_incidents")
             except Exception as ex:
-                max_events = "{}: {}".format(DEFAULT_EVENTS_COUNT, self._get_error_message_from_exception(ex))
-                max_incidents = "{}: {}".format(DEFAULT_INCIDENTS_COUNT, self._get_error_message_from_exception(ex))
+                error_messages_from_exception = self._get_error_message_from_exception(ex)
+                max_events = "{}: {}".format(DEFAULT_EVENTS_COUNT, error_messages_from_exception)
+                max_incidents = "{}: {}".format(DEFAULT_INCIDENTS_COUNT, error_messages_from_exception)
 
         return max_crlf, merge_time_interval, max_events, max_incidents, ingest_incidents
 

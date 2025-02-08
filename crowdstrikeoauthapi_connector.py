@@ -602,8 +602,21 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Query completed successfully")
 
-    def _get_ids(self, action_result, endpoint, param=None, search_subtenants=False, subtenant=None):
+    def _get_ids(self, action_result, endpoint, param, is_str=True):
+
+        id_list = self._paginator(action_result, endpoint, param)
+
+        if id_list is None:
+            return id_list
+
+        if is_str:
+            id_list = list(map(str, id_list))
+
+        return id_list
+
+    def _get_ids_with_subtenants(self, action_result, endpoint, param=None, subtenant=None):
         subtenants = [None]
+        search_subtenants = True
 
         if subtenant:
             if subtenant == "main":
@@ -636,9 +649,12 @@ class CrowdstrikeConnector(BaseConnector):
             for device_id in ids:
                 id_tenant_map[device_id] = tenant
 
-        self.save_progress("ID-Tenant Map: {}".format(id_tenant_map))
+        # Dictionary of IDs and their corresponding tenants (when searching across subtenants)
+        if search_subtenants:
+            return id_tenant_map
 
-        return id_tenant_map
+        # Just list if not searching across
+        return list(id_tenant_map.keys())
 
     def _get_details(self, action_result, endpoint, param, method="get", subtenant=None):
         list_ids = param.get("ids")
@@ -1129,7 +1145,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         endpoint = CROWDSTRIKE_LIST_CROWDSCORES_ENDPOINT
 
-        id_list = self._get_ids(action_result, endpoint, params)
+        id_list = self._get_ids(action_result, endpoint, params, is_str=False)
 
         if id_list is None:
             return action_result.get_status()
@@ -1335,7 +1351,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         subtenant = param.get(CROWDSTRIKE_CID)
 
-        id_tenant_map = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params, search_subtenants=True, subtenant=subtenant)
+        id_tenant_map = self._get_ids_with_subtenants(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params, subtenant=subtenant)
         if id_tenant_map is None:
             return action_result.get_status()
 
@@ -1398,8 +1414,7 @@ class CrowdstrikeConnector(BaseConnector):
         if not isinstance(host_group_id_list, list):
             return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
 
-        id_list = list()
-        id_list.extend(host_group_id_list)
+        id_list = host_group_id_list
         host_group_details_list = list()
 
         while id_list:
@@ -1766,7 +1781,7 @@ class CrowdstrikeConnector(BaseConnector):
                 subtenant = None
         else:
             # Find which tenant device belongs to
-            id_tenant_map = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, search_subtenants=True)
+            id_tenant_map = self._get_ids_with_subtenants(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT)
             if id_tenant_map is None:
                 return action_result.get_status(phantom.APP_ERROR, "Device ID not found among any tenant")
 

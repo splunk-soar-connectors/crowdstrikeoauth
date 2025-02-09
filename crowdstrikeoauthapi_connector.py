@@ -1355,7 +1355,7 @@ class CrowdstrikeConnector(BaseConnector):
         if id_tenant_map is None:
             return action_result.get_status()
 
-        if id_tenant_map:
+        if id_tenant_map and isinstance(id_tenant_map, dict):
             # Group IDs by tenant
             tenant_id_groups = {}
             for device_id, tenant in id_tenant_map.items():
@@ -1372,6 +1372,14 @@ class CrowdstrikeConnector(BaseConnector):
 
                 for device in device_details_list:
                     action_result.add_data(device)
+        else:
+            params.update({"ids": id_tenant_map})
+            device_details_list = self._get_details(action_result, CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT, params, subtenant=subtenant)
+            if device_details_list is None:
+                return action_result.get_status()
+
+            for device in device_details_list:
+                action_result.add_data(device)
 
         summary = action_result.update_summary({})
         summary["total_devices"] = action_result.get_data_size()
@@ -1759,7 +1767,9 @@ class CrowdstrikeConnector(BaseConnector):
             filter = "{f}{key}: '{item}', ".format(f=filter, key=key, item=item)  # or opeartion with given hostname/s
         filter = filter[:-2]  # removing last trailing , and space
 
-        check_list_items = self._get_ids(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, param={"filter": filter}, subtenant=subtenant)
+        check_list_items = self._get_ids_with_subtenants(
+            action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, param={"filter": filter}, subtenant=subtenant
+        )
 
         if check_list_items is None:
             return action_result.get_status(), flag, []
@@ -2252,15 +2262,7 @@ class CrowdstrikeConnector(BaseConnector):
         if "include_hidden" not in params:
             params["include_hidden"] = False
 
-        subtenant = None
-        if param.get("cid"):
-            subtenants = self._get_subtenants(action_result, param.get("cid"))
-            if isinstance(subtenants, list) and subtenants:
-                subtenant = subtenants[0]
-            else:
-                return action_result.get_status()
-
-        alert_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_ALERTS_ENDPOINT, params, subtenant=subtenant)
+        alert_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_ALERTS_ENDPOINT, params)
         if alert_id_list is None:
             return action_result.get_status()
 
@@ -2312,15 +2314,7 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        subtenant = None
-        if param.get("cid"):
-            subtenants = self._get_subtenants(action_result, param.get("cid"))
-            if isinstance(subtenants, list) and subtenants:
-                subtenant = subtenants[0]
-            else:
-                return action_result.get_status()
-
-        detection_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT, params, subtenant=subtenant)
+        detection_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT, params)
         if detection_id_list is None:
             return action_result.get_status()
 

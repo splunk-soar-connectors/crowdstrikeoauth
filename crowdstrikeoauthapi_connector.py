@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_connector.py
 #
-# Copyright (c) 2019-2024 Splunk Inc.
+# Copyright (c) 2019-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ from phantom_common import paths
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 import parse_cs_events as events_parser
+import parse_cs_incidents as incidents_parser
 
 # THIS Connector imports
 from crowdstrikeoauthapi_consts import *
@@ -322,14 +323,13 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _save_results(self, results, param):
-
+    def _save_results(self, results, param, is_incident=False):
         reused_containers = 0
-
         containers_processed = 0
-        for i, result in enumerate(results):
+        artifact_type = "incident" if is_incident else "event"
 
-            self.send_progress("Adding event artifact # {0}".format(i))
+        for i, result in enumerate(results):
+            self.send_progress("Adding {} artifact # {}".format(artifact_type, i))
             # result is a dictionary of a single container and artifacts
             if "container" not in result:
                 self.debug_print("Skipping empty container # {0}".format(i))
@@ -527,6 +527,47 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("Test connectivity passed")
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_CONNECTIVITY_TEST)
+
+    def _handle_run_query(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        endpoint = param.get("endpoint")
+        if not endpoint:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide endpoint path")
+
+        # Ensure using query endpoint
+        if "/queries/" not in endpoint.lower():
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR)
+
+        params = {"limit": param.get("limit", 50), "offset": param.get("offset", 0)}
+        params.update({k: param[k] for k in ["filter", "sort"] if param.get(k)})
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Add data items
+        resources = response.get("resources", [])
+        for resource in resources:
+            action_result.add_data({"resource_id": resource})
+
+        summary = action_result.update_summary({})
+        meta = response.get("meta", {})
+        pagination = meta.get("pagination", {})
+
+        summary.update(
+            {
+                "total_objects": len(resources),
+                "total_count": pagination.get("total", 0),
+                "query_time": meta.get("query_time", 0),
+                "powered_by": meta.get("powered_by", ""),
+                "trace_id": meta.get("trace_id", ""),
+            }
+        )
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Query completed successfully")
 
     def _get_ids(self, action_result, endpoint, param, is_str=True):
 
@@ -1982,7 +2023,11 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        params = {"device_id": param["device_id"], "origin": "phantom"}
+        params = {
+            "device_id": param["device_id"],
+            "origin": "phantom",
+            "queue_offline": param.get("queue_offline", False),  # default to False to maintain original behavior
+        }
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(
             action_result,
@@ -3091,6 +3136,8 @@ class CrowdstrikeConnector(BaseConnector):
             allow_zero=True,
         )
 
+        ingest_incidents = config.get("ingest_incidents", False)
+
         if self.is_poll_now():
             # Manual Poll Now
             try:
@@ -3100,25 +3147,27 @@ class CrowdstrikeConnector(BaseConnector):
                     config.get("max_events_poll_now", DEFAULT_POLLNOW_EVENTS_COUNT),
                     "max_events_poll_now",
                 )
-            except Exception as ex:
-                self.debug_print("Error occurred while validating 'max_events_poll_now' asset configuration parameter")
-                max_events = "{}: {}".format(
-                    DEFAULT_POLLNOW_EVENTS_COUNT,
-                    self._get_error_message_from_exception(ex),
+                self.debug_print("Validating 'max_incidents_poll_now' asset configuration parameter")
+                max_incidents = self._validate_integers(
+                    action_result, config.get("max_incidents_poll_now", DEFAULT_POLLNOW_INCIDENTS_COUNT), "max_incidents_poll_now"
                 )
+            except Exception as ex:
+                self.debug_print("Error occurred while validating poll now parameters")
+                error_messages_from_exception = self._get_error_message_from_exception(ex)
+                max_events = "{}: {}".format(DEFAULT_POLLNOW_EVENTS_COUNT, error_messages_from_exception)
+                max_incidents = "{}: {}".format(DEFAULT_POLLNOW_INCIDENTS_COUNT, error_messages_from_exception)
         else:
             # Scheduled and Interval Polling
             try:
                 self.debug_print("Validating 'max_events' asset configuration parameter")
-                max_events = self._validate_integers(
-                    action_result,
-                    config.get("max_events", DEFAULT_EVENTS_COUNT),
-                    "max_events",
-                )
+                max_events = self._validate_integers(action_result, config.get("max_events", DEFAULT_EVENTS_COUNT), "max_events")
+                self.debug_print("Validating 'max_incidents' asset configuration parameter")
+                max_incidents = self._validate_integers(action_result, config.get("max_incidents", DEFAULT_INCIDENTS_COUNT), "max_incidents")
             except Exception as ex:
                 max_events = "{}: {}".format(DEFAULT_EVENTS_COUNT, self._get_error_message_from_exception(ex))
+                max_incidents = "{}: {}".format(DEFAULT_INCIDENTS_COUNT, self._get_error_message_from_exception(ex))
 
-        return max_crlf, merge_time_interval, max_events
+        return max_crlf, merge_time_interval, max_events, max_incidents, ingest_incidents
 
     def _on_poll(self, param):  # noqa: C901
 
@@ -3127,11 +3176,25 @@ class CrowdstrikeConnector(BaseConnector):
 
         config = self.get_config()
 
-        max_crlf, merge_time_interval, max_events = self._validate_on_poll_config_params(action_result, config)
+        max_crlf, merge_time_interval, max_events, max_incidents, ingest_incidents = self._validate_on_poll_config_params(action_result, config)
 
-        if merge_time_interval is None or max_events is None:
+        if max_crlf is None or merge_time_interval is None or max_events is None:
             return action_result.get_status()
 
+        # Handle detection events
+        ret_val = self._poll_detection_events(action_result, param, config, max_crlf, max_events)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Handle incident ingestion if enabled
+        if ingest_incidents:
+            ret_val = self._poll_incidents(action_result, param, max_incidents)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _poll_detection_events(self, action_result, param, config, max_crlf, max_events):
         lower_id = 0
         if not self.is_poll_now():
             # we only mange the ids in case of on_poll on the interval
@@ -3338,6 +3401,63 @@ class CrowdstrikeConnector(BaseConnector):
                 self.save_state(self._state)
 
             self._events = []
+        return phantom.APP_SUCCESS
+
+    def _poll_incidents(self, action_result, param, max_incidents):
+        self.save_progress("Starting incident ingestion...")
+        try:
+            # Get incidents
+            params = {"limit": max_incidents, "sort": "modified_timestamp.asc"}
+
+            if not self.is_poll_now():
+                try:
+                    # Track timestamps to ensure ingesting new incidents
+                    last_ingestion_time = self._state.get("last_incident_timestamp", "")
+                    params["filter"] = f"modified_timestamp:>'{last_ingestion_time}'"
+                except Exception as e:
+                    self.debug_print(f"Error getting last incident timestamp, starting from epoch: {str(e)}")
+
+            self.send_progress(f"Fetching incidents with filter: {params}")
+
+            # Get incident IDs
+            incident_ids = self._get_ids(action_result, CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT, params)
+            if incident_ids is None:
+                return action_result.get_status()
+
+            if not incident_ids:
+                self.save_progress("No incidents found")
+                return phantom.APP_SUCCESS
+
+            # Get incident details
+            ret_val, response = self._make_rest_call_helper_oauth2(
+                action_result, CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT, json_data={"ids": incident_ids}, method="post"
+            )
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            incidents = response.get("resources", [])
+
+            if incidents:
+                # Update timestamp for next poll if not poll_now
+                if not self.is_poll_now():
+                    latest_timestamp = max(incident.get("modified_timestamp", 0) for incident in incidents)
+                    self._state["last_incident_timestamp"] = latest_timestamp
+
+                # Process incidents through parser
+                self.save_progress(f"Processing {len(incidents)} incidents...")
+                incident_results = incidents_parser.process_incidents(incidents)
+                self._save_results(incident_results, param, True)
+                self.save_progress("Successfully processed incidents")
+            else:
+                self.save_progress("No incidents found in response")
+
+            return phantom.APP_SUCCESS
+
+        except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
+            self.save_progress(f"Error ingesting incidents: {error_message}")
+            return action_result.set_status(phantom.APP_ERROR, f"Error ingesting incidents: {error_message}")
 
     def _handle_list_processes(self, param):
 
@@ -4888,6 +5008,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_mapping = {
             "test_asset_connectivity": self._handle_test_connectivity,
+            "run_query": self._handle_run_query,
             "query_device": self._handle_query_device,
             "list_groups": self._handle_list_groups,
             "quarantine_device": self._handle_quarantine_device,

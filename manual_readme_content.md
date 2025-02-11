@@ -1,5 +1,5 @@
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2024 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2025 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
@@ -14,6 +14,7 @@
 | **Action**                                                  | **Required Scope(s)**          | **Read**             | **Write**            |
 |-------------------------------------------------------------|--------------------------------|----------------------|----------------------|
 | [test connectivity](#action-test-connectivity)              | Hosts                          | &check;              | &cross;              |
+| [run query](#action-run-query)                              | Hosts                          | &check;              | &cross;              |
 | [query device](#action-query-device)                        | Hosts                          | &check;              | &cross;              |
 | [list groups](#action-list-groups)                          | Host Groups                    | &check;              | &cross;              |
 | [quarantine device](#action-quarantine-device)              | Hosts                          | &check;              | &check;              |

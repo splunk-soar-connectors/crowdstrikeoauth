@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_consts.py
 #
-# Copyright (c) 2019-2024 Splunk Inc.
+# Copyright (c) 2019-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,6 +74,8 @@ CROWDSTRIKE_SORT = "sort"
 DEFAULT_POLLNOW_EVENTS_COUNT = 2000
 DEFAULT_EVENTS_COUNT = 10000
 DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT = 50
+DEFAULT_POLLNOW_INCIDENTS_COUNT = 100
+DEFAULT_INCIDENTS_COUNT = 1000
 
 # Status messages for the app
 CROWDSTRIKE_SUCC_CONNECTIVITY_TEST = "Test connectivity passed"
@@ -119,6 +121,7 @@ CROWDSTRIKE_UNAVAILABLE_MESSAGE_ERROR = "Error message unavailable. Please check
 CROWDSTRIKE_UNICODE_DAMMIT_TYPE_MESSAGE_ERROR = (
     "Error occurred while connecting to the Crowdstrike server. " "Please check the asset configuration and|or the action parameters."
 )
+CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR = "Invalid endpoint. The endpoint must be a query endpoint"
 CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
 CROWDSTRIKE_STATUS_CODE_CHECK_MESSAGE = "Error details: 404"
 CROWDSTRIKE_PULLED_EVENTS_MESSAGE = "Pulled {0} detection events"

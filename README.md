@@ -1,7 +1,7 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk \
-Connector Version: 5.0.0 \
+Connector Version: 5.0.1 \
 Product Vendor: CrowdStrike \
 Product Name: CrowdStrike \
 Minimum Product Version: 6.3.0
@@ -20,6 +20,7 @@ This app integrates with CrowdStrike OAuth2 authentication standard to implement
 | **Action** | **Required Scope(s)** | **Read** | **Write** |
 |-------------------------------------------------------------|--------------------------------|----------------------|----------------------|
 | [test connectivity](#action-test-connectivity) | Hosts | ✓ | ✗ |
+| [run query](#action-run-query) | Hosts | ✓ | ✗ |
 | [query device](#action-query-device) | Hosts | ✓ | ✗ |
 | [list groups](#action-list-groups) | Host Groups | ✓ | ✗ |
 | [quarantine device](#action-quarantine-device) | Hosts | ✓ | ✓ |
@@ -86,11 +87,10 @@ error.
 ## App ID
 
 - Optionally, you can specify an **App ID** to be used with the Crowdstrike OAuth API used in the
-  on poll action. If one isn't set, it will default to the App ID with its last letters replaced by the Asset ID.
+  on poll action. If one isn't set, it will default to the asset ID.
 - It is recommended to have a unique **App ID** for each connection to the Crowdstrike OAuth API.
   That is to say, if you are planning on having multiple assets using the Crowdstrike OAuth API at
   once, you should give them unique App IDs.
-- Max length of an **APP ID** should be 32 characters
 
 ## On Poll
 
@@ -413,6 +413,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **app_id** | optional | string | App ID |
 **max_events** | optional | numeric | Maximum events to get for scheduled and interval polling |
 **max_events_poll_now** | optional | numeric | Maximum events to get while POLL NOW |
+**max_incidents** | optional | numeric | Maximum incidents to get for scheduled and interval polling |
+**max_incidents_poll_now** | optional | numeric | Maximum incidents to get while POLL NOW |
+**ingest_incidents** | optional | boolean | Should ingest incidents during polling |
 **collate** | optional | boolean | Merge containers for hostname and eventname |
 **merge_time_interval** | optional | numeric | Merge same containers within specified seconds |
 **max_crlf** | optional | numeric | Maximum allowed continuous blank lines |
@@ -422,6 +425,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 ### Supported Actions
 
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials \
+[run query](#action-run-query) - Run a query against CrowdStrike API \
 [query device](#action-query-device) - Fetch the device details based on the provided query \
 [list groups](#action-list-groups) - Fetch the details of the host groups \
 [quarantine device](#action-quarantine-device) - Block the device \
@@ -502,6 +506,45 @@ No parameters are required for this action
 #### Action Output
 
 No Output
+
+## action: 'run query'
+
+Run a query against CrowdStrike API
+
+Type: **investigate** \
+Read only: **True**
+
+#### Action Parameters
+
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**endpoint** | required | API endpoint path in the format: /<service>/queries/<resource>/<version> (ex: /devices/queries/devices/v1) | string | |
+**limit** | optional | Maximum number of results to return | numeric | |
+**filter** | optional | Filter expression (FQL Syntax) (ex: last_seen: >'2020-01-01') | string | |
+**sort** | optional | Property to sort by | string | |
+**offset** | optional | Starting index for results | numeric | |
+
+#### Action Output
+
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | |
+action_result.parameter.endpoint | string | | |
+action_result.parameter.limit | numeric | | |
+action_result.parameter.filter | string | | |
+action_result.parameter.sort | string | | |
+action_result.parameter.offset | numeric | | |
+action_result.data.\*.resource_id | string | | |
+action_result.summary.total_objects | numeric | | |
+action_result.summary.total_count | numeric | | |
+action_result.summary.offset | numeric | | |
+action_result.summary.limit | numeric | | |
+action_result.summary.query_time | numeric | | |
+action_result.summary.powered_by | string | | |
+action_result.summary.trace_id | string | | |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
+action_result.message | string | | |
 
 ## action: 'query device'
 
@@ -816,6 +859,7 @@ Read only: **False**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **device_id** | required | Device ID for session to be created | string | `crowdstrike device id` |
+**queue_offline** | optional | Queue commands for offline devices, will execute when system comes back online | boolean | |
 
 #### Action Output
 
@@ -823,6 +867,7 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
 action_result.parameter.device_id | string | `crowdstrike device id` | 07c312fabcb8473454d0a16f118928ab |
+action_result.parameter.queue_offline | boolean | | |
 action_result.data.\*.errors | string | | |
 action_result.data.\*.meta.powered_by | string | | empower-api |
 action_result.data.\*.meta.query_time | numeric | | 5.917429897 |

@@ -4971,6 +4971,9 @@ class CrowdstrikeConnector(BaseConnector):
         if headers is None:
             headers = {}
 
+        if subtenant and subtenant == "main":  # Main tenant is not a valid subtenant
+            subtenant = None
+
         token_key = "oauth2_token{}".format(subtenant if subtenant else "")
         token = self._state.get(token_key, {})
 

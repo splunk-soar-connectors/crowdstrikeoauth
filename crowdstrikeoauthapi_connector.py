@@ -3178,7 +3178,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         max_crlf, merge_time_interval, max_events, max_incidents, ingest_incidents = self._validate_on_poll_config_params(action_result, config)
 
-        if max_crlf is None or merge_time_interval is None or max_events is None:
+        if merge_time_interval is None or max_events is None:
             return action_result.get_status()
 
         # Handle detection events

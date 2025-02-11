@@ -3401,7 +3401,6 @@ class CrowdstrikeConnector(BaseConnector):
                 self.save_state(self._state)
 
             self._events = []
-        return phantom.APP_SUCCESS
 
     def _poll_incidents(self, action_result, param, max_incidents):
         self.save_progress("Starting incident ingestion...")

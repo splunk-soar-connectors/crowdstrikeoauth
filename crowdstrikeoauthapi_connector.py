@@ -3077,6 +3077,7 @@ class CrowdstrikeConnector(BaseConnector):
             headers=headers,
             data=multipart_data,
             method="post",
+            upload_file=True,
         )
 
         if phantom.is_fail(ret_val):
@@ -4953,6 +4954,7 @@ class CrowdstrikeConnector(BaseConnector):
         json_data=None,
         subtenant=None,
         method="get",
+        upload_file=False,
     ):
         """Function that helps setting REST call to the app.
 
@@ -4964,6 +4966,7 @@ class CrowdstrikeConnector(BaseConnector):
         :param json: JSON object
         :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
         :param subtenant: Optional subtenant dictionary with name and CID
+        :param upload_file: Boolean to check if the file is being uploaded (needed for token refresh)
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
@@ -4977,15 +4980,26 @@ class CrowdstrikeConnector(BaseConnector):
         token_key = "oauth2_token{}".format(subtenant if subtenant else "")
         token = self._state.get(token_key, {})
 
-        # token check
-        if not token.get("access_token"):
+        # Get token if not present (or upload file because it needs a fresh token)
+        if upload_file or not token.get("access_token"):
             ret_val = self._get_token(action_result, member_cid=subtenant)
             if phantom.is_fail(ret_val):
                 return phantom.APP_ERROR, None
             token = self._state.get(token_key, {})  # Get updated token after _get_token
 
-        # Use the tenant-specific token instead of self._oauth_access_token
-        headers.update({"Authorization": "Bearer {0}".format(token.get("access_token"))})
+        # Decrypt and use token
+        try:
+            access_token = token.get("access_token")
+            if access_token:
+                headers.update({"Authorization": "Bearer {0}".format(access_token)})
+                # Encrypt token if not already encrypted
+                if not access_token.startswith("salt:"):
+                    encrypted_token = encryption_helper.encrypt(access_token, self._asset_id)
+                    self._state[token_key]["access_token"] = encrypted_token
+                    self.save_state(self._state)
+        except Exception as e:
+            self.debug_print("Error decrypting token: {}".format(str(e)))
+            return phantom.APP_ERROR, None
 
         if not headers.get("Content-Type"):
             headers["Content-Type"] = "application/json"
@@ -5011,7 +5025,18 @@ class CrowdstrikeConnector(BaseConnector):
 
             # Get the new token and update headers
             token = self._state.get(token_key, {})
-            headers.update({"Authorization": "Bearer {0}".format(token.get("access_token"))})
+            try:
+                access_token = token.get("access_token")
+                if access_token:
+                    headers.update({"Authorization": "Bearer {0}".format(access_token)})
+                    # Encrypt new token if not already encrypted
+                    if not access_token.startswith("salt:"):
+                        encrypted_token = encryption_helper.encrypt(access_token, self._asset_id)
+                        self._state[token_key]["access_token"] = encrypted_token
+                        self.save_state(self._state)
+            except Exception as e:
+                self.debug_print("Error decrypting token: {}".format(str(e)))
+                return phantom.APP_ERROR, None
 
             ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json_data, method)
 
@@ -5020,11 +5045,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, resp_json
 
-    def _get_token(self, action_result, from_action=False, member_cid=None):
+    def _get_token(self, action_result, member_cid=None):
         """This function is used to get a token via REST Call.
 
         :param action_result: Object of action result
-        :param from_action: Boolean object of from_action ????
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
 
@@ -5046,14 +5070,24 @@ class CrowdstrikeConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers=headers, data=data, method="post")
 
         if phantom.is_fail(ret_val):
-            self._oauth_access_token = None
+            # Clear tokens on failure
+            token_key = "oauth2_token{}".format(member_cid if member_cid else "")
+            self._state.pop(token_key, None)
+            if not member_cid:
+                self._oauth_access_token = None
             self._state.pop(CROWDSTRIKE_OAUTH_TOKEN_STRING, {})
             return action_result.get_status()
 
-        # Tenant-specific key needed
-        token_key = "oauth2_token{}".format(tenant_name if tenant_name else "")
-        self._state[token_key] = resp_json
-        self._oauth_access_token = resp_json[CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING]
+        # Store encrypted token
+        token_key = "oauth2_token{}".format(member_cid if member_cid else "")
+        access_token = resp_json.get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING)
+        if access_token:
+            self._state[token_key] = resp_json
+            # Update main token reference if this is not a subtenant
+            if not member_cid:
+                self._oauth_access_token = access_token
+
+        self.save_state(self._state)
         return phantom.APP_SUCCESS
 
     def _get_fips_enabled(self):

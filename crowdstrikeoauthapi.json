@@ -106,7 +106,7 @@
         },
         "merge_time_interval": {
             "data_type": "numeric",
-            "order":12,
+            "order": 12,
             "description": "Merge same containers within specified seconds",
             "default": 0
         },
@@ -289,7 +289,7 @@
                 },
                 "cid": {
                     "data_type": "string",
-                    "description": "The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main'",
+                    "description": "A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main'",
                     "order": 4
                 }
             },
@@ -1348,7 +1348,7 @@
                 },
                 "cid": {
                     "data_type": "string",
-                    "description": "The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant put 'main'",
+                    "description": "A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main'",
                     "order": 2
                 }
             },
@@ -1468,7 +1468,7 @@
                 },
                 "cid": {
                     "data_type": "string",
-                    "description": "The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main'",
+                    "description": "A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main'",
                     "order": 2
                 }
             },
@@ -11686,7 +11686,7 @@
                 },
                 "cid": {
                     "data_type": "string",
-                    "description": "The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main'",
+                    "description": "A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main'",
                     "order": 3
                 }
             },

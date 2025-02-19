@@ -573,7 +573,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **offset** | optional | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | |
 **filter** | optional | Filter expression used to limit the fetched devices (FQL Syntax) | string | |
 **sort** | optional | Property to sort by | string | |
-**cid** | optional | The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main' | string | |
+**cid** | optional | A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main' | string | |
 
 #### Action Output
 
@@ -741,7 +741,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **device_id** | optional | Comma-separated list of device IDs | string | `crowdstrike device id` |
 **hostname** | optional | Comma-separated list of hostnames | string | `host name` |
-**cid** | optional | The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant put 'main' | string | |
+**cid** | optional | A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main' | string | |
 
 #### Action Output
 
@@ -772,7 +772,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **device_id** | optional | Comma-separated list of device IDs | string | `crowdstrike device id` |
 **hostname** | optional | Comma-separated list of hostnames | string | `host name` |
-**cid** | optional | The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main' | string | |
+**cid** | optional | A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main' | string | |
 
 #### Action Output
 
@@ -2646,7 +2646,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **hash** | required | File hash to search | string | `hash` `sha256` `sha1` `md5` |
 **count_only** | optional | Get endpoint count only | boolean | |
 **limit** | optional | Maximum device IDs to be fetched (defaults to 100) | numeric | |
-**cid** | optional | The tenant id to search (will only search this tenant), by default will search asset main tenant and all listed subtenants, to search only main tenant (even if you have subtenants) put 'main' | string | |
+**cid** | optional | A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main' | string | |
 
 #### Action Output
 

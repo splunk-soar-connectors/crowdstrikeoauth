@@ -1,1 +1,9 @@
 **Unreleased**
+* Added support for ingesting incidents during polling (disabled by default) [PAPP-35103]
+* Added 'run query' action for general CrowdStrike query support [PAPP-35103]
+* Updated 'create session' to support offline command queueing using 'queue_offline' parameter (disabled by default) [PAPP-35103]
+* Added multitenancy functionality to connector supported by requested actions [PAPP-11254]
+    * 'query device'
+    * 'quarantine device'
+    * 'unquarantine device'
+    * 'hunt file'

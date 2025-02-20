@@ -72,6 +72,17 @@
 | [get zta data](#action-get-zta-data)                        | Zero Trust Assessment          | &check;              | &cross;              |
 
 
+## Multitenancy
+
+This connector supports CrowdStrike multitenancy for the following actions:
+
+* 'query device'
+* 'quarantine device'
+* 'unquarantine device'
+* 'hunt file'
+
+If you have multiple tenants, add the subtenant IDs you want to automatically use in the above actions to the 'subtenants' parameter in the asset configuration. Once added, these subtenants will be used by default in those actions. However, if after you want to target a specific tenant instead, you can override the default behavior by specifying the desired tenant’s ID in the 'cid' parameter within the action.
+
 ## Preprocess Script
 
 The user can add a script file in the configuration parameter \[ **Script with functions to

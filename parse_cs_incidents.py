@@ -17,6 +17,7 @@ import sys
 
 from bs4 import UnicodeDammit
 
+
 _container_common = {
     "description": "Container added by Phantom",
     "run_automation": False,  # Don't run any playbooks when this container is added
@@ -40,10 +41,9 @@ _host_artifact_common = {
 def _get_incident_severity(fine_score):
     if fine_score >= 80:
         return "high"
-    elif fine_score >= 60:
+    if fine_score >= 60:
         return "medium"
-    else:
-        return "low"
+    return "low"
 
 
 def _create_incident_artifact(incident):

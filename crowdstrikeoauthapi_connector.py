@@ -20,6 +20,7 @@ import os
 import time
 import traceback
 import uuid
+from _collections import defaultdict
 from datetime import datetime, timedelta
 
 import encryption_helper
@@ -28,7 +29,6 @@ import phantom.rules as phantom_rules
 import phantom.utils as util
 import pytz
 import requests
-from _collections import defaultdict
 from bs4 import BeautifulSoup, UnicodeDammit
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
@@ -44,16 +44,12 @@ from crowdstrikeoauthapi_consts import *
 
 
 class RetVal(tuple):
-
     def __new__(cls, val1, val2):
-
         return tuple.__new__(RetVal, (val1, val2))
 
 
 class CrowdstrikeConnector(BaseConnector):
-
     def __init__(self):
-
         # Call the BaseConnectors init first
         super(CrowdstrikeConnector, self).__init__()
 
@@ -120,24 +116,14 @@ class CrowdstrikeConnector(BaseConnector):
                         self._asset_id,
                     )
                 except Exception as ex:
-                    self.debug_print(
-                        "{}: {}".format(
-                            CROWDSTRIKE_DECRYPTION_ERROR,
-                            self._get_error_message_from_exception(ex),
-                        )
-                    )
+                    self.debug_print(f"{CROWDSTRIKE_DECRYPTION_ERROR}: {self._get_error_message_from_exception(ex)}")
         return None
 
     def encrypt_state(self):
         try:
             return encryption_helper.encrypt(self._oauth_access_token, self._asset_id)
         except Exception as ex:
-            self.debug_print(
-                "{}: {}".format(
-                    CROWDSTRIKE_ENCRYPTION_ERROR,
-                    self._get_error_message_from_exception(ex),
-                )
-            )
+            self.debug_print(f"{CROWDSTRIKE_ENCRYPTION_ERROR}: {self._get_error_message_from_exception(ex)}")
         return None
 
     def _is_ip(self, input_ip_address):
@@ -155,7 +141,6 @@ class CrowdstrikeConnector(BaseConnector):
         return True
 
     def _handle_preprocess_scripts(self):
-
         config = self.get_config()
         script = config.get("preprocess_script")
 
@@ -169,7 +154,7 @@ class CrowdstrikeConnector(BaseConnector):
                 self._script_module = importlib.util.module_from_spec(preprocess_methods)
                 exec(script, self._script_module.__dict__)
             except Exception as e:
-                self.save_progress("Error loading custom script. Error: {}".format(self._get_error_message_from_exception(e)))
+                self.save_progress(f"Error loading custom script. Error: {self._get_error_message_from_exception(e)}")
                 return phantom.APP_ERROR
 
             try:
@@ -177,7 +162,7 @@ class CrowdstrikeConnector(BaseConnector):
             except Exception as ex:
                 self.save_progress(
                     "Error loading custom script. Does not contain preprocess_container function, "
-                    "Error:{}".format(self._get_error_message_from_exception(ex))
+                    f"Error:{self._get_error_message_from_exception(ex)}"
                 )
                 return phantom.APP_ERROR
 
@@ -202,12 +187,12 @@ class CrowdstrikeConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_message = e.args[0]
         except Exception as e:
-            self.error_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
+            self.error_print(f"Error occurred while fetching exception information. Details: {e!s}")
 
         if not error_code:
-            error_text = "Error Message: {}".format(error_message)
+            error_text = f"Error Message: {error_message}"
         else:
-            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_message)
+            error_text = f"Error Code: {error_code}. Error Message: {error_message}"
 
         return error_text
 
@@ -227,14 +212,14 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             r = requests.get(request_str, verify=False)  # nosemgrep
         except Exception as e:
-            self.debug_print("Error making local rest call: {0}".format(self._get_error_message_from_exception(e)))
-            self.debug_print("DB QUERY: {}".format(request_str))
+            self.debug_print(f"Error making local rest call: {self._get_error_message_from_exception(e)}")
+            self.debug_print(f"DB QUERY: {request_str}")
             return phantom.APP_ERROR, None
 
         try:
             resp_json = r.json()
         except Exception as e:
-            self.debug_print("Exception caught: {0}".format(self._get_error_message_from_exception(e)))
+            self.debug_print(f"Exception caught: {self._get_error_message_from_exception(e)}")
             return phantom.APP_ERROR, None
 
         count = resp_json.get("count", 0)
@@ -253,12 +238,11 @@ class CrowdstrikeConnector(BaseConnector):
                 if most_recent_id is not None:
                     return phantom.APP_SUCCESS, most_recent_id
             except Exception as e:
-                self.debug_print("Caught Exception in parsing containers: {0}".format(self._get_error_message_from_exception(e)))
+                self.debug_print(f"Caught Exception in parsing containers: {self._get_error_message_from_exception(e)}")
                 return phantom.APP_ERROR, None
         return phantom.APP_ERROR, None
 
     def _get_hash_type(self, hash_value, action_result):
-
         if util.is_md5(hash_value):
             return (phantom.APP_SUCCESS, "md5")
 
@@ -274,7 +258,6 @@ class CrowdstrikeConnector(BaseConnector):
         )
 
     def _get_ioc_type(self, ioc, action_result):
-
         if util.is_ip(ioc):
             return phantom.APP_SUCCESS, "ipv4"
 
@@ -295,7 +278,6 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_ERROR, "Failed to detect the IOC type")
 
     def _check_data(self, action_result, param, max_limit=None, sort_data=None):
-
         limit = self._validate_integers(action_result, param.get("limit", 50), "limit")
         if limit is None:
             return action_result.get_status()
@@ -335,7 +317,7 @@ class CrowdstrikeConnector(BaseConnector):
             return subtenants
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, f"Error processing subtenants configuration: {str(e)}")
+            return action_result.set_status(phantom.APP_ERROR, f"Error processing subtenants configuration: {e!s}")
 
     def _save_results(self, results, param, is_incident=False):
         reused_containers = 0
@@ -343,20 +325,20 @@ class CrowdstrikeConnector(BaseConnector):
         artifact_type = "incident" if is_incident else "event"
 
         for i, result in enumerate(results):
-            self.send_progress("Adding {} artifact # {}".format(artifact_type, i))
+            self.send_progress(f"Adding {artifact_type} artifact # {i}")
             # result is a dictionary of a single container and artifacts
             if "container" not in result:
-                self.debug_print("Skipping empty container # {0}".format(i))
+                self.debug_print(f"Skipping empty container # {i}")
                 continue
 
             if "artifacts" not in result:
                 # ignore containers without artifacts
-                self.debug_print("Skipping container # {0} without artifacts".format(i))
+                self.debug_print(f"Skipping container # {i} without artifacts")
                 continue
 
             if len(result["artifacts"]) == 0:
                 # ignore containers without artifacts
-                self.debug_print("Skipping container # {0} with 0 artifacts".format(i))
+                self.debug_print(f"Skipping container # {i} with 0 artifacts")
                 continue
 
             config = self.get_config()
@@ -374,7 +356,7 @@ class CrowdstrikeConnector(BaseConnector):
                 try:
                     container = self._preprocess_container(container)
                 except Exception as e:
-                    self.debug_print("Preprocess error: {}".format(self._get_error_message_from_exception(e)))
+                    self.debug_print(f"Preprocess error: {self._get_error_message_from_exception(e)}")
 
             artifacts = container.pop("artifacts", [])
 
@@ -382,7 +364,7 @@ class CrowdstrikeConnector(BaseConnector):
 
             if not container_id:
                 ret_val, response, container_id = self.save_container(container)
-                self.debug_print("save_container returns, value: {0}, reason: {1}, id: {2}".format(ret_val, response, container_id))
+                self.debug_print(f"save_container returns, value: {ret_val}, reason: {response}, id: {container_id}")
 
                 if phantom.is_fail(ret_val):
                     self.debug_print("Error occurred while creating a new container")
@@ -401,11 +383,11 @@ class CrowdstrikeConnector(BaseConnector):
                 artifact["container_id"] = container_id
 
             ret_val, status_string, artifact_ids = self.save_artifacts(artifacts)
-            self.debug_print("save_artifacts returns, value: {0}, reason: {1}".format(ret_val, status_string))
-            self.debug_print("Container with id: {0}".format(container_id))
+            self.debug_print(f"save_artifacts returns, value: {ret_val}, reason: {status_string}")
+            self.debug_print(f"Container with id: {container_id}")
 
             if phantom.is_fail(ret_val):
-                self.debug_print("Error occurred while adding {} artifacts to container: {}".format(len_artifacts, container_id))
+                self.debug_print(f"Error occurred while adding {len_artifacts} artifacts to container: {container_id}")
 
             containers_processed += 1
 
@@ -437,7 +419,6 @@ class CrowdstrikeConnector(BaseConnector):
         offset = param.get("offset", 0)
 
         while True:
-
             param.update({"offset": offset})
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param)
 
@@ -539,7 +520,6 @@ class CrowdstrikeConnector(BaseConnector):
         return list_ids
 
     def _handle_test_connectivity(self, param):
-
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not param:
@@ -562,7 +542,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_CONNECTIVITY_TEST)
 
     def _handle_run_query(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         endpoint = param.get("endpoint")
@@ -603,7 +583,6 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Query completed successfully")
 
     def _get_ids(self, action_result, endpoint, param, is_str=True):
-
         id_list = self._paginator(action_result, endpoint, param)
 
         if id_list is None:
@@ -681,7 +660,6 @@ class CrowdstrikeConnector(BaseConnector):
         return list_ids_details
 
     def _get_devices_ran_on(self, ioc, ioc_type, param, action_result):
-
         api_data = {"type": ioc_type, "value": ioc}
         limit = self._validate_integers(action_result, param.get("limit", 100), "limit")
         if limit is None:
@@ -709,7 +687,6 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_resolve_detection(self, param):
-
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -796,17 +773,17 @@ class CrowdstrikeConnector(BaseConnector):
             ids = id_list[: min(100, len(id_list))]
             endpoint_param = ""
             for resource in ids:
-                endpoint_param += "ids={}&".format(resource)
+                endpoint_param += f"ids={resource}&"
 
             endpoint_param = endpoint_param.strip("&")
 
-            endpoint = "{}?{}".format(endpoint, endpoint_param)
+            endpoint = f"{endpoint}?{endpoint_param}"
 
             # Make REST call
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
 
             if phantom.is_fail(ret_val) and check_message not in action_result.get_message():
-                self.debug_print("Error response returned from the API : {}".format(endpoint))
+                self.debug_print(f"Error response returned from the API : {endpoint}")
                 return action_result.get_status()
 
             if ret_val and response.get("resources"):
@@ -822,11 +799,10 @@ class CrowdstrikeConnector(BaseConnector):
         for item in resource_details_list:
             action_result.add_data(item)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "{} fetched successfully".format(resource_data))
+        return action_result.set_status(phantom.APP_SUCCESS, f"{resource_data} fetched successfully")
 
     def _handle_get_zta_data(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         agent_ids = param["agent_id"]
@@ -841,7 +817,6 @@ class CrowdstrikeConnector(BaseConnector):
         )
 
     def _handle_hunt_file(self, param):
-
         file_hash = param[phantom.APP_JSON_HASH]
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -854,7 +829,6 @@ class CrowdstrikeConnector(BaseConnector):
         return self._get_devices_ran_on(file_hash, ioc_type, param, action_result)
 
     def _handle_hunt_domain(self, param):
-
         domain = param[phantom.APP_JSON_DOMAIN]
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -862,7 +836,7 @@ class CrowdstrikeConnector(BaseConnector):
         return self._get_devices_ran_on(domain, "domain", param, action_result)
 
     def _handle_hunt_ip(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         ioc = param[phantom.APP_JSON_IP]
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -874,9 +848,8 @@ class CrowdstrikeConnector(BaseConnector):
         return self._get_devices_ran_on(ioc, ioc_type, param, action_result)
 
     def _handle_get_device_detail(self, param):
-
         # Add an action result to the App Run
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         fdid = param[CROWDSTRIKE_GET_DEVICE_DETAIL_DEVICE_ID]
@@ -898,7 +871,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Error occurred while parsing response of 'get_system_info' action."
-                " Unknown response retrieved Error:{}".format(self._get_error_message_from_exception(ex)),
+                f" Unknown response retrieved Error:{self._get_error_message_from_exception(ex)}",
             )
 
         action_result.add_data(data)
@@ -907,12 +880,12 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             summary["hostname"] = response["resources"][0]["hostname"]
         except Exception as ex:
-            self.debug_print("Error occured while getting hostname, Error:{}".format(self._get_error_message_from_exception(ex)))
+            self.debug_print(f"Error occured while getting hostname, Error:{self._get_error_message_from_exception(ex)}")
 
         return action_result.set_status(phantom.APP_SUCCESS, "Device details fetched successfully")
 
     def _handle_get_device_scroll(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         data = {
@@ -930,11 +903,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        self.debug_print("Successfully fetched device scroll with response {0}".format(response))
+        self.debug_print(f"Successfully fetched device scroll with response {response}")
         return action_result.set_status(phantom.APP_SUCCESS, "Device scroll fetched successfully")
 
     def _handle_get_process_detail(self, param):
-
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -953,7 +925,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Error occurred while parsing response of 'get_process_detail' action. Unknown response retrieved "
-                "{}".format(self._get_error_message_from_exception(ex)),
+                f"{self._get_error_message_from_exception(ex)}",
             )
 
         action_result.add_data(data)
@@ -961,8 +933,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Process details fetched successfully")
 
     def _handle_list_incidents(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1022,8 +993,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_incident_behaviors(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1063,8 +1033,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_incident_details(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1088,11 +1057,10 @@ class CrowdstrikeConnector(BaseConnector):
         summary = action_result.update_summary({})
         summary["total_incidents"] = action_result.get_data_size()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Incidents fetched: {}".format(len(details_list)))
+        return action_result.set_status(phantom.APP_SUCCESS, f"Incidents fetched: {len(details_list)}")
 
     def _handle_get_incident_behaviors(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1117,8 +1085,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Incident behavior fetched successfully")
 
     def _handle_list_crowdscores(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1160,8 +1127,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_incident(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1225,8 +1191,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Incident updated successfully")
 
     def _handle_list_users(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1259,8 +1224,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_user_roles(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1281,8 +1245,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "User roles fetched successfully")
 
     def _handle_get_role(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1299,8 +1262,7 @@ class CrowdstrikeConnector(BaseConnector):
         )
 
     def _handle_list_roles(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1328,8 +1290,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Roles listed successfully")
 
     def _handle_query_device(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
         max_limit = 5000
 
@@ -1387,8 +1348,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_groups(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
         max_limit = None
 
@@ -1430,12 +1390,12 @@ class CrowdstrikeConnector(BaseConnector):
             ids = id_list[: min(100, len(id_list))]
             endpoint_param = ""
             for resource in ids:
-                endpoint_param += "ids={}&".format(resource)
+                endpoint_param += f"ids={resource}&"
 
             endpoint_param = endpoint_param.strip("&")
             endpoint = CROWDSTRIKE_GET_HOST_GROUP_DETAILS_ENDPOINT
 
-            endpoint = "{}?{}".format(endpoint, endpoint_param)
+            endpoint = f"{endpoint}?{endpoint_param}"
 
             # Make REST call
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
@@ -1474,48 +1434,47 @@ class CrowdstrikeConnector(BaseConnector):
     def helper_create_query(self, param, filter_query):
         if CROWDSTRIKE_JSON_LIST_IOC in param:
             if filter_query:
-                filter_query = "{}+value:'{}'".format(filter_query, param.get(CROWDSTRIKE_JSON_LIST_IOC))
+                filter_query = f"{filter_query}+value:'{param.get(CROWDSTRIKE_JSON_LIST_IOC)}'"
             else:
-                filter_query = "value:'{}'".format(param.get(CROWDSTRIKE_JSON_LIST_IOC))
+                filter_query = f"value:'{param.get(CROWDSTRIKE_JSON_LIST_IOC)}'"
         if CROWDSTRIKE_IOCS_ACTION in param:
             ioc_action = param.get(CROWDSTRIKE_IOCS_ACTION).lower()
             if filter_query:
-                filter_query = "{}+action:'{}'".format(filter_query, ioc_action)
+                filter_query = f"{filter_query}+action:'{ioc_action}'"
             else:
-                filter_query = "action:'{}'".format(ioc_action)
+                filter_query = f"action:'{ioc_action}'"
         if CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION in param:
             if filter_query:
-                filter_query = "{}+expiration:>='{}'".format(filter_query, param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION))
+                filter_query = f"{filter_query}+expiration:>='{param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION)}'"
             else:
-                filter_query = "expiration:>='{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION))
+                filter_query = f"expiration:>='{param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION)}'"
         if CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION in param:
             if filter_query:
-                filter_query = "{}+expiration:<='{}'".format(filter_query, param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION))
+                filter_query = f"{filter_query}+expiration:<='{param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION)}'"
             else:
-                filter_query = "expiration:<='{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION))
+                filter_query = f"expiration:<='{param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION)}'"
         if CROWDSTRIKE_IOCS_SOURCE in param:
             if filter_query:
-                filter_query = "{}+source:'{}'".format(filter_query, param.get(CROWDSTRIKE_IOCS_SOURCE))
+                filter_query = f"{filter_query}+source:'{param.get(CROWDSTRIKE_IOCS_SOURCE)}'"
             else:
-                filter_query = "source:'{}'".format(param.get(CROWDSTRIKE_IOCS_SOURCE))
+                filter_query = f"source:'{param.get(CROWDSTRIKE_IOCS_SOURCE)}'"
         if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE).lower() != "all":
             search_ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE).lower()
             if search_ioc_type == "hash":
                 source_list = ["md5", "sha256"]
                 if filter_query:
-                    filter_query = "{}+type:{}".format(filter_query, source_list)
+                    filter_query = f"{filter_query}+type:{source_list}"
                 else:
-                    filter_query = "type:{}".format(source_list)
+                    filter_query = f"type:{source_list}"
             else:
                 if filter_query:
-                    filter_query = "{}+type:'{}'".format(filter_query, search_ioc_type)
+                    filter_query = f"{filter_query}+type:'{search_ioc_type}'"
                 else:
-                    filter_query = "type:'{}'".format(search_ioc_type)
+                    filter_query = f"type:'{search_ioc_type}'"
         return filter_query
 
     def _handle_list_custom_indicators(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1574,7 +1533,6 @@ class CrowdstrikeConnector(BaseConnector):
         self.send_progress("Completed 0 %")
         ioc_infos = []
         while more:
-
             ret_val, response = self._make_rest_call_helper_oauth2(
                 action_result,
                 CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT,
@@ -1626,7 +1584,7 @@ class CrowdstrikeConnector(BaseConnector):
             action_result.add_data(data)
 
             for key in summary_keys:
-                summary_data_key = "total_{}".format(key)
+                summary_data_key = f"total_{key}"
 
                 if key not in data:
                     action_result.update_summary({summary_data_key: 0})
@@ -1639,8 +1597,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_put_files(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {
@@ -1682,7 +1639,7 @@ class CrowdstrikeConnector(BaseConnector):
                 if test_details[id] not in put_file_sorted_list:
                     put_file_sorted_list.append(test_details[id])
             except Exception as ex:
-                self.debug_print("Error occurred while sorting the 'put' file details, {}".format(self._get_error_message_from_exception(ex)))
+                self.debug_print(f"Error occurred while sorting the 'put' file details, {self._get_error_message_from_exception(ex)}")
 
         for put_file in put_file_sorted_list:
             action_result.add_data(put_file)
@@ -1693,7 +1650,6 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _check_params(self, action_result, param, subtenant=None):
-
         ids = list()
         device_id = param.get("device_id", "")
         hostname = param.get("hostname")
@@ -1742,29 +1698,27 @@ class CrowdstrikeConnector(BaseConnector):
                 action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_DEVICE_ID_AND_HOSTNAME_ERROR),
                 None,
             )
-        elif device_id_flag:
+        if device_id_flag:
             return (
                 action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_DEVICE_ID_ERROR),
                 None,
             )
-        elif hostname_flag:
+        if hostname_flag:
             return (
                 action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_HOSTNAME_ERROR),
                 None,
             )
-        else:
-            ids.extend(intermediate_device_ids)
+        ids.extend(intermediate_device_ids)
 
         return action_result.set_status(phantom.APP_SUCCESS), list(set(ids))
 
     def _set_error_flag_inputs(self, action_result, list_items, key, subtenant=None):
-
         flag = False
         check_list_items = list()
         filter = ""
 
         for item in list_items:
-            filter = "{f}{key}: '{item}', ".format(f=filter, key=key, item=item)  # or opeartion with given hostname/s
+            filter = f"{filter}{key}: '{item}', "  # or opeartion with given hostname/s
         filter = filter[:-2]  # removing last trailing , and space
 
         check_list_items = self._get_ids_with_subtenants(
@@ -1781,7 +1735,6 @@ class CrowdstrikeConnector(BaseConnector):
         return phantom.APP_SUCCESS, flag, check_list_items
 
     def _perform_device_action(self, action_result, param):
-
         count = 0
 
         # Handle subtenant parameter
@@ -1804,7 +1757,7 @@ class CrowdstrikeConnector(BaseConnector):
             if "Invalid filter expression supplied" in msg:
                 return action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error occurred while validating given input parameters. Error : {}".format(msg),
+                    f"Error occurred while validating given input parameters. Error : {msg}",
                 )
             return action_result.get_status()
 
@@ -1822,11 +1775,9 @@ class CrowdstrikeConnector(BaseConnector):
         params = {"action_name": action_name}
 
         if action_name == "contain" or action_name == "lift_containment":
-
             endpoint = CROWDSTRIKE_DEVICE_ACTION_ENDPOINT
 
             while list_ids:
-
                 data = {"ids": list_ids[: min(100, len(list_ids))]}
 
                 ret_val, response = self._make_rest_call_helper_oauth2(
@@ -1861,8 +1812,7 @@ class CrowdstrikeConnector(BaseConnector):
 
             return phantom.APP_SUCCESS
 
-        elif action_name == "add-hosts" or action_name == "remove-hosts":
-
+        if action_name == "add-hosts" or action_name == "remove-hosts":
             endpoint = CROWDSTRIKE_GROUP_DEVICE_ACTION_ENDPOINT
 
             while list_ids:
@@ -1870,7 +1820,7 @@ class CrowdstrikeConnector(BaseConnector):
                     "action_parameters": [
                         {
                             "name": "filter",
-                            "value": "(device_id:{})".format(list_ids[: min(100, len(list_ids))]),
+                            "value": f"(device_id:{list_ids[: min(100, len(list_ids))]})",
                         }
                     ],
                     "ids": [param.get("host_group_id")],
@@ -1907,12 +1857,10 @@ class CrowdstrikeConnector(BaseConnector):
 
             return phantom.APP_SUCCESS
 
-        else:
-            return action_result.set_status(phantom.APP_ERROR, "Incorrect action name")
+        return action_result.set_status(phantom.APP_ERROR, "Incorrect action name")
 
     def _handle_quarantine_device(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {k: param[k] for k in param.keys() if k in ["device_id", "hostname", "cid"]}
@@ -1927,8 +1875,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Device quarantined successfully")
 
     def _handle_unquarantine_device(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {k: param[k] for k in param.keys() if k in ["device_id", "hostname", "cid"]}
@@ -1943,8 +1890,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Device unquarantined successfully")
 
     def _handle_assign_hosts(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {k: param[k] for k in param.keys() if k in ["device_id", "hostname", "host_group_id"]}
@@ -1959,8 +1905,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Host added successfully")
 
     def _handle_remove_hosts(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {k: param[k] for k in param.keys() if k in ["device_id", "hostname", "host_group_id"]}
@@ -1975,7 +1920,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Host removed successfully")
 
     def _handle_create_ioa_rule(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
@@ -2060,7 +2005,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Rule created successfully")
 
     def _handle_create_ioa_rule_group(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         create_params = {
@@ -2131,7 +2076,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Rule group created successfully")
 
     def _handle_create_session(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {
@@ -2159,13 +2104,13 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_SUCCESS,
                 "Session created successfully, but unable to find session_id from the response. "
-                "Unexpected response retrieved, {}".format(self._get_error_message_from_exception(ex)),
+                f"Unexpected response retrieved, {self._get_error_message_from_exception(ex)}",
             )
 
         return action_result.set_status(phantom.APP_SUCCESS, "Session created successfully")
 
     def _handle_delete_ioa_rule(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         group_id = param["rule_group_id"]
@@ -2191,7 +2136,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, f"Deleted {resources_affected} rules")
 
     def _handle_delete_ioa_rule_group(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ids_str = param["id"]
@@ -2216,7 +2161,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, f"Deleted {resources_affected} rule groups")
 
     def _handle_delete_session(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {"session_id": param["session_id"]}
@@ -2239,7 +2184,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Session ended successfully")
 
     def _handle_list_alerts(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         resp = self._check_data(action_result, param)
@@ -2291,9 +2236,7 @@ class CrowdstrikeConnector(BaseConnector):
                 if test_details[id] not in alerts_sorted_list:
                     alerts_sorted_list.append(test_details[id])
             except Exception as ex:
-                self.debug_print(
-                    "Error occurred while sorting the alert details, Error: " "{}".format(self._get_error_message_from_exception(ex))
-                )
+                self.debug_print(f"Error occurred while sorting the alert details, Error: {self._get_error_message_from_exception(ex)}")
 
         for alert in alerts_sorted_list:
             action_result.add_data(alert)
@@ -2304,7 +2247,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_detections(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_SORT]}
@@ -2343,9 +2286,7 @@ class CrowdstrikeConnector(BaseConnector):
                 if test_details[detection_id] not in detection_sorted_list:
                     detection_sorted_list.append(test_details[detection_id])
             except Exception as ex:
-                self.debug_print(
-                    "Error occurred while sorting the alert details, Error: " "{}".format(self._get_error_message_from_exception(ex))
-                )
+                self.debug_print(f"Error occurred while sorting the alert details, Error: {self._get_error_message_from_exception(ex)}")
 
         for detection in detection_sorted_list:
             action_result.add_data(detection)
@@ -2356,7 +2297,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_epp_alerts(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_SORT]}
@@ -2407,7 +2348,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_detections_details(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ids = self.validate_comma_seperated_values(param.get("detection_ids"))
@@ -2438,7 +2379,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_epp_alerts_details(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         composite_ids = self.validate_comma_seperated_values(param.get(CROWDSTRIKE_ALERT_IDS))
@@ -2469,7 +2410,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_detections(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         assigned_to_user = param.get("assigned_to_user")
@@ -2523,7 +2464,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_epp_alerts(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         composite_ids = self.validate_comma_seperated_values(param.get(CROWDSTRIKE_ALERT_IDS))
@@ -2611,7 +2552,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_ioa_platforms(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # We'll paginate here, just to be future-proof, but we probably won't ever need it.
@@ -2647,7 +2588,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_ioa_rule_groups(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {}
@@ -2686,7 +2627,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_ioa_severities(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # We'll paginate here, just to be future-proof, but we probably won't ever need it.
@@ -2722,7 +2663,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_ioa_types(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         platform_filter = param.get("platform")
@@ -2778,8 +2719,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_sessions(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_SORT]}
@@ -2818,9 +2758,7 @@ class CrowdstrikeConnector(BaseConnector):
                 if test_details[id] not in sessions_sorted_list:
                     sessions_sorted_list.append(test_details[id])
             except Exception as ex:
-                self.debug_print(
-                    "Error occurred while sorting the session details, Error: " "{}".format(self._get_error_message_from_exception(ex))
-                )
+                self.debug_print(f"Error occurred while sorting the session details, Error: {self._get_error_message_from_exception(ex)}")
 
         for session in sessions_sorted_list:
             action_result.add_data(session)
@@ -2831,7 +2769,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_run_command(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {
@@ -2857,7 +2795,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Error occurred while fetching the cloud_request_id "
-                "from the response. Unexpected response retrieved, {}".format(self._get_error_message_from_exception(ex)),
+                f"from the response. Unexpected response retrieved, {self._get_error_message_from_exception(ex)}",
             )
 
         summary = action_result.update_summary({})
@@ -2868,7 +2806,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.get_status()
 
     def _handle_run_admin_command(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {
@@ -2893,7 +2831,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_ERROR,
                 "Error occurred while fetching the cloud_request_id from the response."
-                " Unexpected response retrieved, {}".format(self._get_error_message_from_exception(ex)),
+                f" Unexpected response retrieved, {self._get_error_message_from_exception(ex)}",
             )
 
         summary = action_result.update_summary({})
@@ -2904,7 +2842,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.get_status()
 
     def _handle_get_command_details(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         timeout = self._validate_integers(action_result, param.get("timeout_seconds", 60), "timeout_seconds")
@@ -2949,7 +2887,7 @@ class CrowdstrikeConnector(BaseConnector):
                 # if complete, grab all sequences
                 if resources[0].get("complete", False):
                     while True:
-                        self.save_progress("sequence: {}".format(sequence_id))
+                        self.save_progress(f"sequence: {sequence_id}")
                         params = {
                             "cloud_request_id": cloud_request_id,
                             "sequence_id": sequence_id,
@@ -2993,8 +2931,7 @@ class CrowdstrikeConnector(BaseConnector):
         )
 
     def _handle_list_session_files(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {"session_id": param["session_id"]}
@@ -3019,8 +2956,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Session files listed successfully")
 
     def _handle_get_session_file(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         params = {"session_id": param["session_id"], "sha256": param["file_hash"]}
@@ -3041,8 +2977,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Session file fetched successfully")
 
     def _handle_upload_put_file(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
@@ -3057,7 +2992,7 @@ class CrowdstrikeConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)),
+                f"Vault ID not valid: {self._get_error_message_from_exception(e)}",
             )
 
         multipart_data = MultipartEncoder(
@@ -3088,8 +3023,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Put file uploaded successfully")
 
     def _handle_get_indicator(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE)
@@ -3139,7 +3073,6 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_GET_ALERT)
 
     def _parse_resp_data(self, data):
-
         event = None
         try:
             event = json.loads(data)
@@ -3154,7 +3087,6 @@ class CrowdstrikeConnector(BaseConnector):
         return (phantom.APP_SUCCESS, event)
 
     def _get_stream(self, action_result):
-
         # Progress
         self.save_progress(CROWDSTRIKE_USING_BASE_URL_ERROR, base_url=self._base_url_oauth)
 
@@ -3218,13 +3150,13 @@ class CrowdstrikeConnector(BaseConnector):
             if parameter < 0:
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Please provide a valid non-negative integer value in the {} parameter".format(key),
+                    f"Please provide a valid non-negative integer value in the {key} parameter",
                 )
                 return None
             if not allow_zero and parameter == 0:
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Please provide non-zero positive integer in {}".format(key),
+                    f"Please provide non-zero positive integer in {key}",
                 )
                 return None
 
@@ -3264,8 +3196,8 @@ class CrowdstrikeConnector(BaseConnector):
             except Exception as ex:
                 self.debug_print("Error occurred while validating poll now parameters")
                 error_messages_from_exception = self._get_error_message_from_exception(ex)
-                max_events = "{}: {}".format(DEFAULT_POLLNOW_EVENTS_COUNT, error_messages_from_exception)
-                max_incidents = "{}: {}".format(DEFAULT_POLLNOW_INCIDENTS_COUNT, error_messages_from_exception)
+                max_events = f"{DEFAULT_POLLNOW_EVENTS_COUNT}: {error_messages_from_exception}"
+                max_incidents = f"{DEFAULT_POLLNOW_INCIDENTS_COUNT}: {error_messages_from_exception}"
         else:
             # Scheduled and Interval Polling
             try:
@@ -3275,14 +3207,13 @@ class CrowdstrikeConnector(BaseConnector):
                 max_incidents = self._validate_integers(action_result, config.get("max_incidents", DEFAULT_INCIDENTS_COUNT), "max_incidents")
             except Exception as ex:
                 error_messages_from_exception = self._get_error_message_from_exception(ex)
-                max_events = "{}: {}".format(DEFAULT_EVENTS_COUNT, error_messages_from_exception)
-                max_incidents = "{}: {}".format(DEFAULT_INCIDENTS_COUNT, error_messages_from_exception)
+                max_events = f"{DEFAULT_EVENTS_COUNT}: {error_messages_from_exception}"
+                max_incidents = f"{DEFAULT_INCIDENTS_COUNT}: {error_messages_from_exception}"
 
         return max_crlf, merge_time_interval, max_events, max_incidents, ingest_incidents
 
     def _on_poll(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Connect to the server
@@ -3323,7 +3254,7 @@ class CrowdstrikeConnector(BaseConnector):
                 lower_id = int(self._state.get("last_offset_id", 0))
             except Exception as ex:
                 self.debug_print(
-                    "Error occurred while fetching last_offset_id from the state file, " "{}".format(self._get_error_message_from_exception(ex))
+                    f"Error occurred while fetching last_offset_id from the state file, {self._get_error_message_from_exception(ex)}"
                 )
                 self.debug_print("Considering this run as first run")
                 lower_id = 0
@@ -3337,10 +3268,10 @@ class CrowdstrikeConnector(BaseConnector):
         # Query for the events
         try:
             # Need to check both event types
-            self._data_feed_url = self._data_feed_url + "&offset={0}&eventType=DetectionSummaryEvent,EppDetectionSummaryEvent".format(lower_id)
+            self._data_feed_url = self._data_feed_url + f"&offset={lower_id}&eventType=DetectionSummaryEvent,EppDetectionSummaryEvent"
             kwargs = {
                 "headers": {
-                    "Authorization": "Token {0}".format(self._token),
+                    "Authorization": f"Token {self._token}",
                     "Connection": "Keep-Alive",
                 },
                 "stream": True,
@@ -3388,21 +3319,18 @@ class CrowdstrikeConnector(BaseConnector):
                         self.debug_print(CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter))
                         self.save_progress(CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter))
                         break
-                    else:
-                        self.debug_print(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
-                        self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
-                        continue
+                    self.debug_print(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
+                    self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
+                    continue
 
                 ret_val, stream_data = self._parse_resp_data(stream_data)
 
                 if phantom.is_fail(ret_val):
                     self.save_progress(
-                        "Failed to parse the stream_data. Find stream_data details in logs. Error Message: {}".format(
-                            action_result.get_status_message()
-                        )
+                        f"Failed to parse the stream_data. Find stream_data details in logs. Error Message: {action_result.get_status_message()}"
                     )
                     self.save_progress("Continuing with next event.")
-                    self.debug_print("Failed to parse the stream_data: {}".format(stream_data))
+                    self.debug_print(f"Failed to parse the stream_data: {stream_data}")
                     continue
 
                 # Check for both event types
@@ -3424,7 +3352,7 @@ class CrowdstrikeConnector(BaseConnector):
             err_message = self._get_error_message_from_exception(e)
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "{}. Error response from server: {}".format(CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message),
+                f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Error response from server: {err_message}",
             )
 
         # Check if to collate the data or not
@@ -3441,7 +3369,7 @@ class CrowdstrikeConnector(BaseConnector):
             # Update messages to reference both event types
             self.send_progress("Parsing the fetched Detection Events...")
             results = events_parser.parse_events(self._events, self, collate)
-            self.save_progress("Created {0} relevant results from the fetched Detection Events".format(len(results)))
+            self.save_progress(f"Created {len(results)} relevant results from the fetched Detection Events")
             if results:
                 self.save_progress(
                     "Adding {0} event artifact{1}. Empty containers will be skipped.".format(len(results), "s" if len(results) > 1 else "")
@@ -3467,7 +3395,7 @@ class CrowdstrikeConnector(BaseConnector):
                     last_ingestion_time = self._state.get("last_incident_timestamp", "")
                     params["filter"] = f"modified_timestamp:>'{last_ingestion_time}'"
                 except Exception as e:
-                    self.debug_print(f"Error getting last incident timestamp, starting from epoch: {str(e)}")
+                    self.debug_print(f"Error getting last incident timestamp, starting from epoch: {e!s}")
 
             self.send_progress(f"Fetching incidents with filter: {params}")
 
@@ -3512,7 +3440,6 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, f"Error ingesting incidents: {error_message}")
 
     def _handle_list_processes(self, param):
-
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3549,14 +3476,12 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_time_string(self, days):
-
         expiry_date = datetime.now(pytz.utc) + timedelta(days=days)
         time_str = expiry_date.strftime(CROWDSTRIKE_TIME_FORMAT)
 
-        return "{0}:{1}".format(time_str[:-2], time_str[-2:])
+        return f"{time_str[:-2]}:{time_str[-2:]}"
 
     def _handle_upload_iocs(self, param):
-
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3630,7 +3555,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_POST_ALERT)
 
     def _handle_update_ioa_rule(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
@@ -3692,7 +3617,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Rule updated successfully")
 
     def _handle_update_ioa_rule_group(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         update_params = {
@@ -3760,7 +3685,6 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Rule group updated successfully")
 
     def _handle_update_iocs(self, param):
-
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3832,7 +3756,6 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_UPDATE_ALERT)
 
     def _handle_delete_iocs(self, param):
-
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3903,17 +3826,17 @@ class CrowdstrikeConnector(BaseConnector):
             ids = id_list[: min(100, len(id_list))]
             endpoint_param = ""
             for resource in ids:
-                endpoint_param += "ids={}&".format(resource)
+                endpoint_param += f"ids={resource}&"
 
             endpoint_param = endpoint_param.strip("&")
 
-            endpoint = "{}?{}".format(endpoint, endpoint_param)
+            endpoint = f"{endpoint}?{endpoint_param}"
 
             # Make REST call
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
 
             if phantom.is_fail(ret_val):
-                self.debug_print("Error response returned from the API : {}".format(endpoint))
+                self.debug_print(f"Error response returned from the API : {endpoint}")
                 return action_result.get_status()
 
             if response.get("resources"):
@@ -3964,10 +3887,10 @@ class CrowdstrikeConnector(BaseConnector):
                     )
         except Exception as e:
             err_message = self._get_error_message_from_exception(e)
-            self.debug_print("Error occurred while sorting the response : {}".format(err_message))
+            self.debug_print(f"Error occurred while sorting the response : {err_message}")
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Error occurred while sorting the response : {}".format(err_message),
+                f"Error occurred while sorting the response : {err_message}",
             )
 
         for report in resource_details_list:
@@ -3982,7 +3905,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_file_reputation(self, param):
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -4001,7 +3924,7 @@ class CrowdstrikeConnector(BaseConnector):
             except Exception as e:
                 return action_result.set_status(
                     phantom.APP_ERROR,
-                    "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)),
+                    f"Vault ID not valid: {self._get_error_message_from_exception(e)}",
                 )
         elif param.get("sha256"):
             endpoint = CROWDSTRIKE_QUERY_REPORT_ENDPOINT
@@ -4009,7 +3932,7 @@ class CrowdstrikeConnector(BaseConnector):
         else:
             return action_result.set_status(phantom.APP_ERROR, "No Vault ID or SHA256 was provided")
 
-        filter_query = "sandbox.sha256:'{}'".format(file_hash)
+        filter_query = f"sandbox.sha256:'{file_hash}'"
 
         max_limit = CROWDSTRIKE_FALCONX_API_LIMIT
 
@@ -4067,7 +3990,7 @@ class CrowdstrikeConnector(BaseConnector):
         return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _handle_url_reputation(self, param):
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -4080,7 +4003,7 @@ class CrowdstrikeConnector(BaseConnector):
         elif "ftp://" in url:
             url = url.replace("ftp://", "fxp://")
 
-        filter_query = "sandbox.submit_url.raw:'{}'".format(url)
+        filter_query = f"sandbox.submit_url.raw:'{url}'"
 
         # Define constant in consts file
         max_limit = CROWDSTRIKE_FALCONX_API_LIMIT
@@ -4137,7 +4060,7 @@ class CrowdstrikeConnector(BaseConnector):
         return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _handle_download_report(self, param):
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         query_param = {"id": param["artifact_id"]}
@@ -4156,7 +4079,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Report downloaded successfully")
 
     def _handle_check_detonate_status(self, param):
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
         query_param = {"ids": param["resource_id"]}
@@ -4186,15 +4109,15 @@ class CrowdstrikeConnector(BaseConnector):
             action_result.add_data(resp_json["resources"][0])
         except Exception as e:
             err_message = self._get_error_message_from_exception(e)
-            self.debug_print("Error occurred while parsing the response : {}".format(err_message))
+            self.debug_print(f"Error occurred while parsing the response : {err_message}")
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Error occurred while parsing the response : {}".format(err_message),
+                f"Error occurred while parsing the response : {err_message}",
             )
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_detonate_url(self, param):
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -4211,7 +4134,7 @@ class CrowdstrikeConnector(BaseConnector):
         if environment_param not in list(CROWDSTRIKE_ENVIRONMENT_ID_DICT.keys()):
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid environment")
 
-        filter_query = "sandbox.submit_url.raw:'{}'+sandbox.environment_id:'{}'".format(url, CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_param])
+        filter_query = f"sandbox.submit_url.raw:'{url}'+sandbox.environment_id:'{CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_param]}'"
 
         max_limit = CROWDSTRIKE_FALCONX_API_LIMIT
 
@@ -4264,7 +4187,7 @@ class CrowdstrikeConnector(BaseConnector):
         return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _handle_detonate_file(self, param):
-        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
@@ -4280,14 +4203,14 @@ class CrowdstrikeConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)),
+                f"Vault ID not valid: {self._get_error_message_from_exception(e)}",
             )
 
         environment_param = param["environment"].lower()
         if environment_param not in list(CROWDSTRIKE_ENVIRONMENT_ID_DICT.keys()):
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid environment")
 
-        filter_query = "sandbox.sha256:'{}'+sandbox.environment_id:'{}'".format(file_hash, CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_param])
+        filter_query = f"sandbox.sha256:'{file_hash}'+sandbox.environment_id:'{CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_param]}'"
 
         max_limit = CROWDSTRIKE_FALCONX_API_LIMIT
 
@@ -4341,7 +4264,6 @@ class CrowdstrikeConnector(BaseConnector):
         return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _upload_file(self, action_result, param, file_info=None):
-
         file_path = file_info["path"]
         file_name = file_info["name"]
 
@@ -4366,14 +4288,14 @@ class CrowdstrikeConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            self.debug_print("Error response returned from the API : {}".format(CROWDSTRIKE_UPLOAD_FILE_ENDPOINT))
+            self.debug_print(f"Error response returned from the API : {CROWDSTRIKE_UPLOAD_FILE_ENDPOINT}")
             return action_result.get_status()
 
         try:
             sha256 = json_resp["resources"][0]["sha256"]
         except Exception as e:
             err_message = self._get_error_message_from_exception(e)
-            self.debug_print("Error while fetching sha256. Error: {}".format(err_message))
+            self.debug_print(f"Error while fetching sha256. Error: {err_message}")
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching sha256 for the file")
 
         return self._submit_resource_for_detonation(action_result, param, sha256=sha256)
@@ -4437,17 +4359,17 @@ class CrowdstrikeConnector(BaseConnector):
             method="post",
         )
         if phantom.is_fail(ret_val):
-            self.debug_print("Error response returned from the API : {}".format(CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT))
+            self.debug_print(f"Error response returned from the API : {CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT}")
             return action_result.get_status()
 
         try:
             resource_id = json_resp["resources"][0]["id"]
         except Exception as e:
             err_message = self._get_error_message_from_exception(e)
-            self.debug_print("Error occurred while fetching the resource id : {}".format(err_message))
+            self.debug_print(f"Error occurred while fetching the resource id : {err_message}")
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Error occurred while fetching the resource id : {}".format(err_message),
+                f"Error occurred while fetching the resource id : {err_message}",
             )
         return self._poll_for_detonate_results(action_result, param, resource_id)
 
@@ -4462,7 +4384,7 @@ class CrowdstrikeConnector(BaseConnector):
                 endpoint=CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT,
             )
             if phantom.is_fail(ret_val):
-                self.debug_print("Error response returned from the API : {}".format(CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT))
+                self.debug_print(f"Error response returned from the API : {CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT}")
                 return action_result.get_status()
 
             prev_resp = json_resp
@@ -4486,7 +4408,7 @@ class CrowdstrikeConnector(BaseConnector):
                 self.debug_print("Error state returned from the CrowdStrike Server")
                 return action_result.set_status(
                     phantom.APP_ERROR,
-                    "Analysis of the report failed for resource id : {}".format(resource_id),
+                    f"Analysis of the report failed for resource id : {resource_id}",
                 )
 
             counter += 1
@@ -4497,18 +4419,16 @@ class CrowdstrikeConnector(BaseConnector):
                 action_result.add_data(prev_resp["resources"][0])
         except Exception as e:
             err_message = self._get_error_message_from_exception(e)
-            self.debug_print("Error occurred while adding the response to action result : {}".format(err_message))
+            self.debug_print(f"Error occurred while adding the response to action result : {err_message}")
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Error occurred while adding the response to action result : {}".format(err_message),
+                f"Error occurred while adding the response to action result : {err_message}",
             )
 
         return action_result.set_status(
             phantom.APP_SUCCESS,
-            "Timed out while waiting for the result. To know the status of submitted \
-            sample please run the check status action with {} resource id.".format(
-                resource_id
-            ),
+            f"Timed out while waiting for the result. To know the status of submitted \
+            sample please run the check status action with {resource_id} resource id.",
         )
 
     def _get_resource_report(self, action_result, param, resource_id):
@@ -4521,7 +4441,7 @@ class CrowdstrikeConnector(BaseConnector):
         query_param = {"ids": resource_id}
         ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, endpoint=endpoint)
         if phantom.is_fail(ret_val):
-            self.debug_print("Error response returned from the API : {}".format(endpoint))
+            self.debug_print(f"Error response returned from the API : {endpoint}")
             return action_result.get_status()
 
         try:
@@ -4530,10 +4450,10 @@ class CrowdstrikeConnector(BaseConnector):
             action_result.add_data(json_resp["resources"][0])
         except Exception as e:
             err_message = self._get_error_message_from_exception(e)
-            self.debug_print("Error occurred while parsing the response : {}".format(err_message))
+            self.debug_print(f"Error occurred while parsing the response : {err_message}")
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Error occurred while parsing the response : {}".format(err_message),
+                f"Error occurred while parsing the response : {err_message}",
             )
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -4547,7 +4467,7 @@ class CrowdstrikeConnector(BaseConnector):
         """
 
         if response.status_code in CROWDSTRIKE_API_SUCC_CODES:
-            return RetVal(phantom.APP_SUCCESS, "Status code: {}".format(response.status_code))
+            return RetVal(phantom.APP_SUCCESS, f"Status code: {response.status_code}")
 
         return RetVal(
             action_result.set_status(
@@ -4569,7 +4489,7 @@ class CrowdstrikeConnector(BaseConnector):
         status_code = response.status_code
 
         if status_code == 400:
-            message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, CROWDSTRIKE_HTML_ERROR)
+            message = f"Status Code: {status_code}. Data from server:\n{CROWDSTRIKE_HTML_ERROR}\n"
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
@@ -4581,9 +4501,9 @@ class CrowdstrikeConnector(BaseConnector):
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = "\n".join(split_lines)
         except Exception as ex:
-            error_text = "Cannot parse error details, Error: {}".format(self._get_error_message_from_exception(ex))
+            error_text = f"Cannot parse error details, Error: {self._get_error_message_from_exception(ex)}"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = f"Status Code: {status_code}. Data from server:\n{error_text}\n"
 
         message = message.replace("{", "{{").replace("}", "}}")
 
@@ -4607,7 +4527,7 @@ class CrowdstrikeConnector(BaseConnector):
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Unable to parse JSON response. Error: {0}".format(err_message),
+                    f"Unable to parse JSON response. Error: {err_message}",
                 ),
                 None,
             )
@@ -4620,7 +4540,7 @@ class CrowdstrikeConnector(BaseConnector):
                         and resp_json["errors"]
                         and len(resp_json["errors"]) != 0
                     ):
-                        error_msg = str()
+                        error_msg = ""
                         for error_data in resp_json["errors"]:
                             error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
                         self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
@@ -4632,7 +4552,7 @@ class CrowdstrikeConnector(BaseConnector):
                             None,
                         )
                     if resp_json["resources"] and len(resp_json["resources"]) != 0 and resp_json["errors"] and len(resp_json["errors"]) != 0:
-                        error_msg = str()
+                        error_msg = ""
                         for error_data in resp_json["errors"]:
                             error_msg += "{} - {}, ".format(error_data["code"], error_data["message"])
                         self.debug_print("Error from server. Error details: {}".format(error_msg.strip(", ")))
@@ -4647,14 +4567,13 @@ class CrowdstrikeConnector(BaseConnector):
                                 ),
                                 None,
                             )
-                        else:
-                            return RetVal(
-                                action_result.set_status(
-                                    phantom.APP_SUCCESS,
-                                    "Error from server. Error details: {}".format(error_msg.strip(", ")),
-                                ),
-                                resp_json,
-                            )
+                        return RetVal(
+                            action_result.set_status(
+                                phantom.APP_SUCCESS,
+                                "Error from server. Error details: {}".format(error_msg.strip(", ")),
+                            ),
+                            resp_json,
+                        )
         except Exception:
             return RetVal(
                 action_result.set_status(
@@ -4668,16 +4587,16 @@ class CrowdstrikeConnector(BaseConnector):
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
         error_message = response.text.replace("{", "{{").replace("}", "}}")
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
+        message = f"Error from server. Status Code: {response.status_code} Data from server: {error_message}"
 
         # Show only error message if available
         if isinstance(resp_json.get("errors", []), list):
             msg = ""
             for error in resp_json.get("errors", []):
                 msg = "{} {}".format(msg, error.get("message"))
-            message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, msg)
+            message = f"Error from server. Status Code: {response.status_code} Data from server: {msg}"
         else:
-            message = "Error from server. Status Code: {0}".format(response.status_code)
+            message = f"Error from server. Status Code: {response.status_code}"
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -4708,17 +4627,16 @@ class CrowdstrikeConnector(BaseConnector):
         return filename
 
     def _process_compressed_file_response(self, response, action_result, type, file_extension=None):
-
         guid = uuid.uuid4()
 
         if hasattr(Vault, "get_vault_tmp_dir"):
             vault_tmp_dir = Vault.get_vault_tmp_dir().rstrip("/")
-            local_dir = "{}/{}".format(vault_tmp_dir, guid)
+            local_dir = f"{vault_tmp_dir}/{guid}"
         else:
             local_dir = os.path.join(paths.PHANTOM_VAULT, "tmp", str(guid))
 
-        self.save_progress("Using temp directory: {0}".format(guid))
-        self.debug_print("Using temp directory: {0}".format(guid))
+        self.save_progress(f"Using temp directory: {guid}")
+        self.debug_print(f"Using temp directory: {guid}")
 
         try:
             os.makedirs(local_dir)
@@ -4733,7 +4651,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         filename = self._get_file_name(action_params, type, file_extension)
 
-        compressed_file_path = "{0}/{1}".format(local_dir, filename)
+        compressed_file_path = f"{local_dir}/{filename}"
 
         # Try to stream the response to a file
         if response.status_code == 200:
@@ -4745,13 +4663,13 @@ class CrowdstrikeConnector(BaseConnector):
                             f.write(chunk)
                     else:
                         f.write(response.content)
-            except IOError as e:
+            except OSError as e:
                 error_message = self._get_error_message_from_exception(e)
                 if "File name too long" in error_message:
                     new_file_name = "ph_long_file_name_temp"
-                    compressed_file_path = "{0}/{1}".format(local_dir, new_file_name)
-                    self.debug_print("Original filename : {}".format(filename))
-                    self.debug_print("Modified filename : {}".format(new_file_name))
+                    compressed_file_path = f"{local_dir}/{new_file_name}"
+                    self.debug_print(f"Original filename : {filename}")
+                    self.debug_print(f"Modified filename : {new_file_name}")
                     with open(compressed_file_path, "wb") as f:
                         if self._stream_file_data:
                             for chunk in response.iter_content(chunk_size=10 * 1024 * 1024):
@@ -4762,7 +4680,7 @@ class CrowdstrikeConnector(BaseConnector):
                     return RetVal(
                         action_result.set_status(
                             phantom.APP_ERROR,
-                            "Unable to write file to disk. Error: {0}".format(self._get_error_message_from_exception(e)),
+                            f"Unable to write file to disk. Error: {self._get_error_message_from_exception(e)}",
                         ),
                         None,
                     )
@@ -4771,7 +4689,7 @@ class CrowdstrikeConnector(BaseConnector):
                 return RetVal(
                     action_result.set_status(
                         phantom.APP_ERROR,
-                        "Unable to write file to disk. Error: {0}".format(self._get_error_message_from_exception(e)),
+                        f"Unable to write file to disk. Error: {self._get_error_message_from_exception(e)}",
                     ),
                     None,
                 )
@@ -4815,7 +4733,7 @@ class CrowdstrikeConnector(BaseConnector):
                         return RetVal(
                             action_result.set_status(
                                 phantom.APP_ERROR,
-                                "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)),
+                                f"Vault ID not valid: {self._get_error_message_from_exception(e)}",
                             ),
                             None,
                         )
@@ -4824,14 +4742,14 @@ class CrowdstrikeConnector(BaseConnector):
                 return RetVal(
                     action_result.set_status(
                         phantom.APP_ERROR,
-                        "Unable to store file in Phantom Vault. Error: {0}".format(self._get_error_message_from_exception(e)),
+                        f"Unable to store file in Phantom Vault. Error: {self._get_error_message_from_exception(e)}",
                     ),
                     None,
                 )
 
         # You should process the error returned in the json
         error_message = response.text.replace("{", "{{").replace("}", "}}")
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
+        message = f"Error from server. Status Code: {response.status_code} Data from server: {error_message}"
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -4892,7 +4810,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         # everything else is actually an error at this point
         error_message = response.text.replace("{", "{{").replace("}", "}}")
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
+        message = f"Can't process response from server. Status Code: {response.status_code} Data from server: {error_message}"
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -4934,7 +4852,7 @@ class CrowdstrikeConnector(BaseConnector):
             return (
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error connecting to server. Details: {0}".format(self._get_error_message_from_exception(e)),
+                    f"Error connecting to server. Details: {self._get_error_message_from_exception(e)}",
                 ),
                 resp_json,
             )
@@ -4970,7 +4888,7 @@ class CrowdstrikeConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
-        url = "{0}{1}".format(self._base_url_oauth, endpoint)
+        url = f"{self._base_url_oauth}{endpoint}"
         if headers is None:
             headers = {}
 
@@ -4991,14 +4909,14 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             access_token = token.get("access_token")
             if access_token:
-                headers.update({"Authorization": "Bearer {0}".format(access_token)})
+                headers.update({"Authorization": f"Bearer {access_token}"})
                 # Encrypt token if not already encrypted
                 if not access_token.startswith("salt:"):
                     encrypted_token = encryption_helper.encrypt(access_token, self._asset_id)
                     self._state[token_key]["access_token"] = encrypted_token
                     self.save_state(self._state)
         except Exception as e:
-            self.debug_print("Error decrypting token: {}".format(str(e)))
+            self.debug_print(f"Error decrypting token: {e!s}")
             return phantom.APP_ERROR, None
 
         if not headers.get("Content-Type"):
@@ -5009,8 +4927,7 @@ class CrowdstrikeConnector(BaseConnector):
         # If token is expired, generate a new token
         msg = action_result.get_message()
         if (
-            msg
-            and "token is invalid" in msg
+            (msg and "token is invalid" in msg)
             or "token has expired" in msg
             or "ExpiredAuthenticationToken" in msg
             or "authorization failed" in msg
@@ -5028,14 +4945,14 @@ class CrowdstrikeConnector(BaseConnector):
             try:
                 access_token = token.get("access_token")
                 if access_token:
-                    headers.update({"Authorization": "Bearer {0}".format(access_token)})
+                    headers.update({"Authorization": f"Bearer {access_token}"})
                     # Encrypt new token if not already encrypted
                     if not access_token.startswith("salt:"):
                         encrypted_token = encryption_helper.encrypt(access_token, self._asset_id)
                         self._state[token_key]["access_token"] = encrypted_token
                         self.save_state(self._state)
             except Exception as e:
-                self.debug_print("Error decrypting token: {}".format(str(e)))
+                self.debug_print(f"Error decrypting token: {e!s}")
                 return phantom.APP_ERROR, None
 
             ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json_data, method)
@@ -5065,7 +4982,7 @@ class CrowdstrikeConnector(BaseConnector):
         tenant_name = member_cid if member_cid else ""
         self.save_progress("_get_token for tenant {0}".format(tenant_name if tenant_name else "current"))
 
-        url = "{}{}".format(self._base_url_oauth, CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT)
+        url = f"{self._base_url_oauth}{CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT}"
 
         ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers=headers, data=data, method="post")
 
@@ -5104,7 +5021,6 @@ class CrowdstrikeConnector(BaseConnector):
         return fips_enabled
 
     def handle_action(self, param):
-
         # Get the action that we are supposed to execute for this App Run
         self.debug_print("action_id ", self.get_action_identifier())
 
@@ -5114,7 +5030,7 @@ class CrowdstrikeConnector(BaseConnector):
             end_time = time.time()
             diff_time = end_time - start_time
             human_time = str(timedelta(seconds=int(diff_time)))
-            self.save_progress("Time taken: {0}".format(human_time))
+            self.save_progress(f"Time taken: {human_time}")
 
             return result
 
@@ -5228,7 +5144,6 @@ if __name__ == "__main__":
     verify = args.verify
 
     if username is not None and password is None:
-
         # User specified a username but not a password, so ask
         import getpass
 

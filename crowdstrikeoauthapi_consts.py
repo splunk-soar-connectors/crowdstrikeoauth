@@ -118,7 +118,7 @@ CROWDSTRIKE_COMPLETED = "Completed {0:.0%}"
 CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in the {key} parameter"
 CROWDSTRIKE_UNAVAILABLE_MESSAGE_ERROR = "Error message unavailable. Please check the asset configuration and|or action parameters"
 CROWDSTRIKE_UNICODE_DAMMIT_TYPE_MESSAGE_ERROR = (
-    "Error occurred while connecting to the Crowdstrike server. " "Please check the asset configuration and|or the action parameters."
+    "Error occurred while connecting to the Crowdstrike server. Please check the asset configuration and|or the action parameters."
 )
 CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR = "Invalid endpoint. The endpoint must be a query endpoint"
 CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
@@ -130,9 +130,7 @@ CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE = "CR/LF received on iteration {} - continuin
 CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE = "Total blank lines count: {}"
 CROWDSTRIKE_GOT_EVENTS_MESSAGE = "Got {0} detection events"
 
-CROWDSTRIKE_FILTER_REQUEST_STR = (
-    "{0}rest/container?page_size=0" "&_filter_asset={1}" '&_filter_name__contains="{2}"' '&_filter_start_time__gte="{3}"'
-)
+CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0&_filter_asset={1}&_filter_name__contains="{2}"&_filter_start_time__gte="{3}"'
 CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "(type:'{}' + value:'{}') + (deleted:'true', deleted: 'false')"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID = "id:'{}' + (deleted:'true', deleted: 'false')"

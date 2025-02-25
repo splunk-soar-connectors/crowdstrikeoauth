@@ -4978,27 +4978,26 @@ class CrowdstrikeConnector(BaseConnector):
             subtenant = None
 
         token_key = "oauth2_token{}".format(subtenant if subtenant else "")
-        token = self._state.get(token_key, {})
+        # Get new token if in old format
+        if not isinstance(self._oauth_access_token, dict):
+            self._get_token(action_result, member_cid=subtenant)
+
+        token = self._oauth_access_token.get(token_key, {})
 
         # Get token if not present (or upload file because it needs a fresh token)
         if upload_file or not token.get("access_token"):
             ret_val = self._get_token(action_result, member_cid=subtenant)
             if phantom.is_fail(ret_val):
                 return phantom.APP_ERROR, None
-            token = self._state.get(token_key, {})  # Get updated token after _get_token
+            token = self._oauth_access_token[token_key]
 
-        # Decrypt and use token
+        # Set Headers
         try:
             access_token = token.get("access_token")
             if access_token:
                 headers.update({"Authorization": "Bearer {0}".format(access_token)})
-                # Encrypt token if not already encrypted
-                if not access_token.startswith("salt:"):
-                    encrypted_token = encryption_helper.encrypt(access_token, self._asset_id)
-                    self._state[token_key]["access_token"] = encrypted_token
-                    self.save_state(self._state)
         except Exception as e:
-            self.debug_print("Error decrypting token: {}".format(str(e)))
+            self.debug_print("Error handling token: {}".format(str(e)))
             return phantom.APP_ERROR, None
 
         if not headers.get("Content-Type"):
@@ -5024,18 +5023,13 @@ class CrowdstrikeConnector(BaseConnector):
             action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched access token")
 
             # Get the new token and update headers
-            token = self._state.get(token_key, {})
+            token = self._oauth_access_token[token_key]
             try:
                 access_token = token.get("access_token")
                 if access_token:
                     headers.update({"Authorization": "Bearer {0}".format(access_token)})
-                    # Encrypt new token if not already encrypted
-                    if not access_token.startswith("salt:"):
-                        encrypted_token = encryption_helper.encrypt(access_token, self._asset_id)
-                        self._state[token_key]["access_token"] = encrypted_token
-                        self.save_state(self._state)
             except Exception as e:
-                self.debug_print("Error decrypting token: {}".format(str(e)))
+                self.debug_print("Error handling token: {}".format(str(e)))
                 return phantom.APP_ERROR, None
 
             ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json_data, method)
@@ -5069,25 +5063,15 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers=headers, data=data, method="post")
 
+        token_key = "oauth2_token{}".format(member_cid if member_cid else "")
+
         if phantom.is_fail(ret_val):
-            # Clear tokens on failure
-            token_key = "oauth2_token{}".format(member_cid if member_cid else "")
-            self._state.pop(token_key, None)
-            if not member_cid:
-                self._oauth_access_token = None
-            self._state.pop(CROWDSTRIKE_OAUTH_TOKEN_STRING, {})
+            self._oauth_access_token.pop(token_key, None)
             return action_result.get_status()
 
-        # Store encrypted token
-        token_key = "oauth2_token{}".format(member_cid if member_cid else "")
-        access_token = resp_json.get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING)
-        if access_token:
-            self._state[token_key] = resp_json
-            # Update main token reference if this is not a subtenant
-            if not member_cid:
-                self._oauth_access_token = access_token
-
-        self.save_state(self._state)
+        if not isinstance(self._oauth_access_token, dict):
+            self._oauth_access_token = {}
+        self._oauth_access_token[token_key] = resp_json
         return phantom.APP_SUCCESS
 
     def _get_fips_enabled(self):

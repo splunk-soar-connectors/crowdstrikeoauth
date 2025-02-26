@@ -687,6 +687,7 @@ action_result.summary.total_devices | numeric | | 2 |
 action_result.message | string | | Total devices: 2 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.cid | string | | |
 
 ## action: 'list groups'
 
@@ -756,6 +757,7 @@ action_result.summary.total_quarantined_device | numeric | | 1 |
 action_result.message | string | | Device quarantined successfully |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.cid | string | | |
 
 ## action: 'unquarantine device'
 
@@ -787,6 +789,7 @@ action_result.summary.total_unquarantined_device | numeric | | 1 |
 action_result.message | string | | Device unquarantined successfully |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.cid | string | | |
 
 ## action: 'assign hosts'
 
@@ -1264,6 +1267,7 @@ action_result.message | string | | Success |
 action_result.status | string | | success |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.limit | numeric | | |
 
 ## action: 'get detections details'
 
@@ -1644,6 +1648,7 @@ action_result.message | string | | Success |
 action_result.status | string | | success |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.comment | string | | |
 
 ## action: 'list alerts'
 
@@ -2661,6 +2666,7 @@ action_result.summary.device_count | numeric | | 1 |
 action_result.message | string | | Device count: 1 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.cid | string | | |
 
 ## action: 'hunt domain'
 

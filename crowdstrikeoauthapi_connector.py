@@ -105,9 +105,23 @@ class CrowdstrikeConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def finalize(self):
-        if self._oauth_access_token:
-            self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING][CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING] = self.encrypt_state()
+        if isinstance(self._oauth_access_token, dict):  # Exists and is a dict (updated format)
+            # Initialize dict if not present
+            if CROWDSTRIKE_OAUTH_TOKEN_STRING not in self._state:
+                self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING] = {}
+
+            # Need to encrypt each tenant's token (multiple tenants supported) [PAPP-11254]
+            encrypted_tokens = {}
+            for tenant, token in self._oauth_access_token.items():
+                try:
+                    encrypted_tokens[tenant] = encryption_helper.encrypt(token, self._asset_id)
+                except Exception as ex:
+                    self.debug_print(f"Error encrypting token for tenant {tenant}: {str(ex)}")
+                    continue
+
+            self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING][CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING] = encrypted_tokens
             self._state[CROWDSTRIKE_OAUTH_ACCESS_TOKEN_IS_ENCRYPTED] = True
+
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
@@ -115,10 +129,12 @@ class CrowdstrikeConnector(BaseConnector):
         if self._state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING, {}).get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING):
             if self._state.get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_IS_ENCRYPTED, False):
                 try:
-                    return encryption_helper.decrypt(
-                        self._state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING).get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING),
-                        self._asset_id,
-                    )
+                    # Decrypt each tenant's token (multiple tenants supported) [PAPP-11254]
+                    encrypted_tokens = self._state[CROWDSTRIKE_OAUTH_TOKEN_STRING][CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING]
+                    decrypted_tokens = {}
+                    for tenant, token in encrypted_tokens.items():
+                        decrypted_tokens[tenant] = encryption_helper.decrypt(token, self._asset_id)
+                    return decrypted_tokens
                 except Exception as ex:
                     self.debug_print(
                         "{}: {}".format(
@@ -126,18 +142,6 @@ class CrowdstrikeConnector(BaseConnector):
                             self._get_error_message_from_exception(ex),
                         )
                     )
-        return None
-
-    def encrypt_state(self):
-        try:
-            return encryption_helper.encrypt(self._oauth_access_token, self._asset_id)
-        except Exception as ex:
-            self.debug_print(
-                "{}: {}".format(
-                    CROWDSTRIKE_ENCRYPTION_ERROR,
-                    self._get_error_message_from_exception(ex),
-                )
-            )
         return None
 
     def _is_ip(self, input_ip_address):

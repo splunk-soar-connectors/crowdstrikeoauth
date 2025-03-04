@@ -1,5 +1,5 @@
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2024 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2025 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
@@ -14,6 +14,7 @@
 | **Action**                                                  | **Required Scope(s)**          | **Read**             | **Write**            |
 |-------------------------------------------------------------|--------------------------------|----------------------|----------------------|
 | [test connectivity](#action-test-connectivity)              | Hosts                          | &check;              | &cross;              |
+| [run query](#action-run-query)                              | Hosts                          | &check;              | &cross;              |
 | [query device](#action-query-device)                        | Hosts                          | &check;              | &cross;              |
 | [list groups](#action-list-groups)                          | Host Groups                    | &check;              | &cross;              |
 | [quarantine device](#action-quarantine-device)              | Hosts                          | &check;              | &check;              |
@@ -70,6 +71,17 @@
 | [get device scroll](#action-get-device-scroll)              | Hosts                          | &check;              | &cross;              |
 | [get zta data](#action-get-zta-data)                        | Zero Trust Assessment          | &check;              | &cross;              |
 
+
+## Multitenancy
+
+This connector supports CrowdStrike multitenancy for the following actions:
+
+* 'query device'
+* 'quarantine device'
+* 'unquarantine device'
+* 'hunt file'
+
+If you have multiple tenants, add the subtenant IDs you want to automatically use in the above actions to the 'subtenants' parameter in the asset configuration. Once added, these subtenants will be used by default in those actions. However, if after you want to target a specific tenant instead, you can override the default behavior by specifying the desired tenant’s ID in the 'cid' parameter within the action.
 
 ## Preprocess Script
 

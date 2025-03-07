@@ -1,7 +1,7 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk \
-Connector Version: 5.0.1 \
+Connector Version: 5.1.0 \
 Product Vendor: CrowdStrike \
 Product Name: CrowdStrike \
 Minimum Product Version: 6.3.0
@@ -76,6 +76,17 @@ This app integrates with CrowdStrike OAuth2 authentication standard to implement
 | [check status](#action-check-status) | Sandbox(Falcon Intelligence) | ✓ | ✗ |
 | [get device scroll](#action-get-device-scroll) | Hosts | ✓ | ✗ |
 | [get zta data](#action-get-zta-data) | Zero Trust Assessment | ✓ | ✗ |
+
+## Multitenancy
+
+This connector supports CrowdStrike multitenancy for the following actions:
+
+- 'query device'
+- 'quarantine device'
+- 'unquarantine device'
+- 'hunt file'
+
+If you have multiple tenants, add the subtenant IDs you want to automatically use in the above actions to the 'subtenants' parameter in the asset configuration. Once added, these subtenants will be used by default in those actions. However, if after you want to target a specific tenant instead, you can override the default behavior by specifying the desired tenant’s ID in the 'cid' parameter within the action.
 
 ## Preprocess Script
 
@@ -411,6 +422,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **url** | required | string | Base URL |
 **client_id** | required | password | Client ID |
 **client_secret** | required | password | Client Secret |
+**subtenants** | optional | string | Comma-separated list of subtenant CIDs. Example: 123,456,789 |
 **app_id** | optional | string | App ID |
 **max_events** | optional | numeric | Maximum events to get for scheduled and interval polling |
 **max_events_poll_now** | optional | numeric | Maximum events to get while POLL NOW |
@@ -562,6 +574,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **offset** | optional | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | |
 **filter** | optional | Filter expression used to limit the fetched devices (FQL Syntax) | string | |
 **sort** | optional | Property to sort by | string | |
+**cid** | optional | A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main' | string | |
 
 #### Action Output
 
@@ -729,6 +742,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **device_id** | optional | Comma-separated list of device IDs | string | `crowdstrike device id` |
 **hostname** | optional | Comma-separated list of hostnames | string | `host name` |
+**cid** | optional | A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main' | string | |
 
 #### Action Output
 
@@ -759,6 +773,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **device_id** | optional | Comma-separated list of device IDs | string | `crowdstrike device id` |
 **hostname** | optional | Comma-separated list of hostnames | string | `host name` |
+**cid** | optional | A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main' | string | |
 
 #### Action Output
 
@@ -2632,6 +2647,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **hash** | required | File hash to search | string | `hash` `sha256` `sha1` `md5` |
 **count_only** | optional | Get endpoint count only | boolean | |
 **limit** | optional | Maximum device IDs to be fetched (defaults to 100) | numeric | |
+**cid** | optional | A single, specific tenant id to search. By default, will search asset main tenant and all listed subtenants; to search only main tenant (even if you have subtenants) use 'main' | string | |
 
 #### Action Output
 

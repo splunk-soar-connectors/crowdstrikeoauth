@@ -1,7 +1,7 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk \
-Connector Version: 5.1.0 \
+Connector Version: 5.1.1 \
 Product Vendor: CrowdStrike \
 Product Name: CrowdStrike \
 Minimum Product Version: 6.3.0
@@ -98,10 +98,11 @@ error.
 ## App ID
 
 - Optionally, you can specify an **App ID** to be used with the Crowdstrike OAuth API used in the
-  on poll action. If one isn't set, it will default to the asset ID.
+  on poll action. If one isn't set, it will default to the App ID with its last letters replaced by the Asset ID.
 - It is recommended to have a unique **App ID** for each connection to the Crowdstrike OAuth API.
   That is to say, if you are planning on having multiple assets using the Crowdstrike OAuth API at
   once, you should give them unique App IDs.
+- Max length of an **APP ID** should be 32 characters
 
 ## On Poll
 

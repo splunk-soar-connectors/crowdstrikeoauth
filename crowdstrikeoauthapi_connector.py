@@ -5137,7 +5137,8 @@ class CrowdstrikeConnector(BaseConnector):
         token_key = "oauth2_token{}".format(member_cid if member_cid else "")
 
         if phantom.is_fail(ret_val):
-            self._oauth_access_token.pop(token_key, None)
+            if self._oauth_access_token:
+                self._oauth_access_token.pop(token_key, None)
             return action_result.get_status()
 
         if not isinstance(self._oauth_access_token, dict):

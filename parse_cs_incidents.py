@@ -13,9 +13,6 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
-import sys
-
-from bs4 import UnicodeDammit
 
 _container_common = {
     "description": "Container added by Phantom",
@@ -113,18 +110,11 @@ def process_incidents(incidents):
         ingest_event["container"] = container
         container.update(_container_common)
 
-        if sys.version_info[0] == 2:
-            container["name"] = "{0} on {1} at {2}".format(
-                UnicodeDammit(incident.get("name", "Unnamed Incident")).unicode_markup.encode("utf-8"),
-                UnicodeDammit(incident.get("hosts", [{}])[0].get("hostname", "Unknown Host")).unicode_markup.encode("utf-8"),
-                incident.get("start", "Unknown Time"),
-            )
-        else:
-            container["name"] = "{0} on {1} at {2}".format(
-                incident.get("name", "Unnamed Incident"),
-                incident.get("hosts", [{}])[0].get("hostname", "Unknown Host"),
-                incident.get("start", "Unknown Time"),
-            )
+        container["name"] = "{} on {} at {}".format(
+            incident.get("name", "Unnamed Incident"),
+            incident.get("hosts", [{}])[0].get("hostname", "Unknown Host"),
+            incident.get("start", "Unknown Time"),
+        )
 
         # Container properties
         container["description"] = incident.get("description", "No description available")

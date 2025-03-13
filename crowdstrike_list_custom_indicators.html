@@ -1,15 +1,16 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
-
-{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block custom_title_prop %}
+  {% if title_logo %}
+    style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"
+  {% endif %}
+{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
-{% block custom_tools %}
-{% endblock %}
-
-{% block widget_content %} <!-- Main Start Block -->
-
-<!--
+{% block custom_tools %}{% endblock %}
+{% block widget_content %}
+  <!-- Main Start Block -->
+  <!--
 File: crowdstrike_list_custom_indicators.html
   Copyright (c) 2019-2025 Splunk Inc.
 
@@ -24,10 +25,7 @@ File: crowdstrike_list_custom_indicators.html
   either express or implied. See the License for the specific language governing permissions
   and limitations under the License.
 -->
-
-<style>
-
-
+  <style>
 a:hover {
   text-decoration:underline;
 }
@@ -88,423 +86,417 @@ a:hover {
   display: none
 }
 
-</style>
-
-<div class="crowdstrike" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
-  {% for result in results %} <!-- loop for each result -->
-<br>
-
-<h3 class="ph-h3-style">System Info</h3>
-<br>
-{% if result.data %} <!------------------- Message ---------------------->
-<ul class="nav nav-tabs" role="tablist">
-  <li class="active">
-    <a data-toggle="tab" href="#summary">Summary</a>
-  </li>
-  {% for data in result.data %}
-  {% for key in data %}
-  <li>
-  <a data-toggle="tab" href="#{{ key }}" onclick="displayDataTable()">{{ key|title }}</a>
-  </li>
+  </style>
+  <div class="crowdstrike"
+       style="overflow: auto;
+              width: 100%;
+              height: 100%;
+              padding-left:10px;
+              padding-right:10px">
+    <!-- Main Div -->
+    {% for result in results %}
+      <!-- loop for each result -->
+      <br>
+      <h3 class="ph-h3-style">System Info</h3>
+      <br>
+      {% if result.data %}
+        <!------------------- Message ---------------------->
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="active">
+            <a data-toggle="tab" href="#summary">Summary</a>
+          </li>
+          {% for data in result.data %}
+            {% for key in data %}
+              <li>
+                <a data-toggle="tab" href="#{{ key }}" onclick="displayDataTable()">{{ key|title }}</a>
+              </li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+        <div class="tab-content" style="z-index:1;">
+          <!--- All Tabs content -->
+          <h4 class="ph-h4-style"></h4>
+          <div id="summary" class="tab-pane active in" role="tabpanel">
+            <table class="ph-table-vertical datatable">
+              {% if result.summary %}
+                <tr>
+                  <td>
+                    <b>Total IPV4</b>
+                  </td>
+                  <td>{{ result.summary.total_ipv4 }}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <b>Total IPV6</b>
+                  </td>
+                  <td>{{ result.summary.total_ipv6 }}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <b>Total Domains</b>
+                  </td>
+                  <td>{{ result.summary.total_domain }}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <b>Total SHA256s</b>
+                  </td>
+                  <td>{{ result.summary.total_sha256 }}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <b>Total MD5s</b>
+                  </td>
+                  <td>{{ result.summary.total_md5 }}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <b>Total IOCs</b>
+                  </td>
+                  <td>{{ result.summary.alerts_found }}</td>
+                </tr>
+              {% endif %}
+            </table>
+          </div>
+        </div>
+        {% for data in result.data %}
+          {% if data.md5 %}
+            <div id="md5" class="tab-pane fade" role="tabpanel">
+              <!--- MD5 -->
+              <h4 class="ph-h4-style"></h4>
+              <table class="ph-table-horizontal datatable">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>IOC</th>
+                    <th>Severity</th>
+                    <th>Action</th>
+                    <th>Date Added</th>
+                    <th>Last Modified</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for curr_entry in data.md5 %}
+                    <tr>
+                      <td>{{ curr_entry.type | default:"None" }}</td>
+                      <td>
+                        {% if curr_entry.value %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.value }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.severity %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.severity }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.action %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.action }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>{{ curr_entry.created_on | default:"None" }}</td>
+                      <td>{{ curr_entry.modified_on | default:"None" }}</td>
+                      <td>{{ curr_entry.expiration | default:"None" }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+          <!-- if result.data.md5 -->
+          {% if data.sha256 %}
+            <div id="sha256" class="tab-pane fade" role="tabpanel">
+              <!--- sha256 -->
+              <h4 class="ph-h4-style"></h4>
+              <table class="ph-table-horizontal datatable">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>IOC</th>
+                    <th>Severity</th>
+                    <th>Action</th>
+                    <th>Date Added</th>
+                    <th>Last Modified</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for curr_entry in data.sha256 %}
+                    <tr>
+                      <td>{{ curr_entry.type | default:"None" }}</td>
+                      <td>
+                        {% if curr_entry.value %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.value }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.severity %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.severity }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.action %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.action }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>{{ curr_entry.created_on | default:"None" }}</td>
+                      <td>{{ curr_entry.modified_on | default:"None" }}</td>
+                      <td>{{ curr_entry.expiration | default:"None" }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+          <!-- if data.sha256 -->
+          {% if data.domain %}
+            <div id="domain" class="tab-pane fade" role="tabpanel">
+              <!--- domain -->
+              <h4 class="ph-h4-style"></h4>
+              <table class="ph-table-horizontal datatable">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>IOC</th>
+                    <th>Severity</th>
+                    <th>Action</th>
+                    <th>Date Added</th>
+                    <th>Last Modified</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for curr_entry in data.domain %}
+                    <tr>
+                      <td>{{ curr_entry.type | default:"None" }}</td>
+                      <td>
+                        {% if curr_entry.value %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.value }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.severity %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.severity }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.action %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.action }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>{{ curr_entry.created_on | default:"None" }}</td>
+                      <td>{{ curr_entry.modified_on | default:"None" }}</td>
+                      <td>{{ curr_entry.expiration | default:"None" }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+          <!-- if data.domain -->
+          {% if data.ipv4 %}
+            <div id="ipv4" class="tab-pane fade" role="tabpanel">
+              <!--- ipv4 -->
+              <h4 class="ph-h4-style"></h4>
+              <table class="ph-table-horizontal datatable">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>IOC</th>
+                    <th>Severity</th>
+                    <th>Action</th>
+                    <th>Date Added</th>
+                    <th>Last Modified</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for curr_entry in data.ipv4 %}
+                    <tr>
+                      <td>{{ curr_entry.type | default:"None" }}</td>
+                      <td>
+                        {% if curr_entry.value %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.value }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.severity %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.severity }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.action %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.action }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>{{ curr_entry.created_on | default:"None" }}</td>
+                      <td>{{ curr_entry.modified_on | default:"None" }}</td>
+                      <td>{{ curr_entry.expiration | default:"None" }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+          <!-- if data.ipv4 -->
+          {% if data.ipv6 %}
+            <div id="ipv6" class="tab-pane fade" role="tabpanel">
+              <!--- ipv6 -->
+              <h4 class="ph-h4-style"></h4>
+              <table class="ph-table-horizontal datatable">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>IOC</th>
+                    <th>Severity</th>
+                    <th>Action</th>
+                    <th>Date Added</th>
+                    <th>Last Modified</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for curr_entry in data.ipv6 %}
+                    <tr>
+                      <td>{{ curr_entry.type | default:"None" }}</td>
+                      <td>
+                        {% if curr_entry.value %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.value }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.severity %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.severity }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_entry.action %}
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_entry.action }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% else %}
+                          None
+                        {% endif %}
+                      </td>
+                      <td>{{ curr_entry.created_on | default:"None" }}</td>
+                      <td>{{ curr_entry.modified_on | default:"None" }}</td>
+                      <td>{{ curr_entry.expiration | default:"None" }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+          <!-- if data.ipv6 -->
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No alerts found</p>
+    {% endif %}
   {% endfor %}
-  {% endfor %}
-</ul>
-
-<div class="tab-content" style="z-index:1;"> <!--- All Tabs content -->
-  <h4 class="ph-h4-style"> </h4>
-  <div id="summary" class="tab-pane active in" role="tabpanel">
-    <table class="ph-table-vertical datatable">
-      {% if result.summary %}
-      <tr>
-        <td><b>Total IPV4</b></td>
-        <td>{{ result.summary.total_ipv4 }}</td>
-      </tr>
-      <tr>
-        <td><b>Total IPV6</b></td>
-        <td>{{ result.summary.total_ipv6 }}</td>
-      </tr>
-      <tr>
-        <td><b>Total Domains</b></td>
-        <td>{{ result.summary.total_domain }}</td>
-      </tr>
-      <tr>
-        <td><b>Total SHA256s</b></td>
-        <td>{{ result.summary.total_sha256 }}</td>
-      </tr>
-      <tr>
-        <td><b>Total MD5s</b></td>
-        <td>{{ result.summary.total_md5 }}</td>
-      </tr>
-      <tr>
-        <td><b>Total IOCs</b></td>
-        <td>{{ result.summary.alerts_found }}</td>
-      </tr>
-      {% endif %}
-    </table>
-  </div>
-</div>
-
-{% for data in result.data %}
-  {% if data.md5 %}
-  <div id="md5" class="tab-pane fade" role="tabpanel"> <!--- MD5 -->
-    <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal datatable">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>IOC</th>
-          <th>Severity</th>
-          <th>Action</th>
-          <th>Date Added</th>
-          <th>Last Modified</th>
-          <th>Expiration Date</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for curr_entry in data.md5 %}
-      <tr>
-        <td>
-          {{ curr_entry.type | default:"None"}}
-        </td>
-        <td>
-          {% if curr_entry.value %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.severity %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.severity }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.action %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.action }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {{ curr_entry.created_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.modified_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.expiration | default:"None" }}
-        </td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% endif %} <!-- if result.data.md5 -->
-
-  {% if data.sha256 %}
-  <div id="sha256" class="tab-pane fade" role="tabpanel"> <!--- sha256 -->
-    <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal datatable">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>IOC</th>
-          <th>Severity</th>
-          <th>Action</th>
-          <th>Date Added</th>
-          <th>Last Modified</th>
-          <th>Expiration Date</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for curr_entry in data.sha256 %}
-      <tr>
-        <td>
-          {{ curr_entry.type | default:"None"}}
-        </td>
-        <td>
-          {% if curr_entry.value %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.severity %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.severity }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.action %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.action }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {{ curr_entry.created_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.modified_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.expiration | default:"None" }}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-    </table>
-  </div>
-  {% endif %} <!-- if data.sha256 -->
-
-  {% if data.domain %}
-  <div id="domain" class="tab-pane fade" role="tabpanel"> <!--- domain -->
-    <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal datatable">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>IOC</th>
-          <th>Severity</th>
-          <th>Action</th>
-          <th>Date Added</th>
-          <th>Last Modified</th>
-          <th>Expiration Date</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for curr_entry in data.domain %}
-      <tr>
-        <td>
-          {{ curr_entry.type | default:"None"}}
-        </td>
-        <td>
-          {% if curr_entry.value %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value}}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.severity %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.severity }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.action %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.action }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {{ curr_entry.created_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.modified_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.expiration | default:"None" }}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-    </table>
-  </div>
-  {% endif %} <!-- if data.domain -->
-
-  {% if data.ipv4 %}
-  <div id="ipv4" class="tab-pane fade" role="tabpanel"> <!--- ipv4 -->
-    <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal datatable">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>IOC</th>
-          <th>Severity</th>
-          <th>Action</th>
-          <th>Date Added</th>
-          <th>Last Modified</th>
-          <th>Expiration Date</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for curr_entry in data.ipv4 %}
-      <tr>
-        <td>
-          {{ curr_entry.type | default:"None"}}
-        </td>
-        <td>
-          {% if curr_entry.value %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value}}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.severity %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.severity }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.action %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.action }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {{ curr_entry.created_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.modified_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.expiration | default:"None" }}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-    </table>
-  </div>
-  {% endif %} <!-- if data.ipv4 -->
-
-  {% if data.ipv6 %}
-  <div id="ipv6" class="tab-pane fade" role="tabpanel"> <!--- ipv6 -->
-    <h4 class="ph-h4-style"> </h4>
-    <table class="ph-table-horizontal datatable">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>IOC</th>
-          <th>Severity</th>
-          <th>Action</th>
-          <th>Date Added</th>
-          <th>Last Modified</th>
-          <th>Expiration Date</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for curr_entry in data.ipv6 %}
-      <tr>
-        <td>
-          {{ curr_entry.type | default:"None"}}
-        </td>
-        <td>
-          {% if curr_entry.value %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.severity %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.severity }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {% if curr_entry.action %}
-          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.action }}
-            &nbsp;
-            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a>
-          {% else %}
-            None
-          {% endif %}
-        </td>
-        <td>
-          {{ curr_entry.created_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.modified_on | default:"None" }}
-        </td>
-        <td>
-          {{ curr_entry.expiration | default:"None" }}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-    </table>
-  </div>
-  {% endif %} <!-- if data.ipv6 -->
-
-{% endfor %}
-
-</div>
-
-{% else %}
-  <p> No alerts found </p>
-{% endif %}
-{% endfor %}
-
-<script>
+  <script>
   function displayDataTable(){
     $.extend(true, $.fn.dataTable.defaults, {
       "searching": false,
@@ -525,5 +517,5 @@ a:hover {
   $('.datatable').DataTable();
   }
   displayDataTable();
-</script>
+  </script>
 {% endblock %}

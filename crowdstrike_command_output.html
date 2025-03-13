@@ -1,15 +1,16 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
-
-{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block custom_title_prop %}
+  {% if title_logo %}
+    style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"
+  {% endif %}
+{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
-{% block custom_tools %}
-{% endblock %}
-
-{% block widget_content %} <!-- Main Start Block -->
-
-<!-- File: crowdstrike_command_output.html
+{% block custom_tools %}{% endblock %}
+{% block widget_content %}
+  <!-- Main Start Block -->
+  <!-- File: crowdstrike_command_output.html
   Copyright (c) 2019-2025 Splunk Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,9 +24,7 @@
   either express or implied. See the License for the specific language governing permissions
   and limitations under the License.
 -->
-
-<style>
-
+  <style>
     .output {
       font-family: Consolas,"courier new",monospace;
       background-color: black;
@@ -106,111 +105,114 @@
 		content: counter(serial-number);  /* Display the counter */
 	}
 
-</style>
-<div class="crowdstrike" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
-
-    {% for result in results %} <!-- loop for each result -->
-    <br>
-
-    <!------------------- For each Result ---------------------->
-    {% if not result.data %}
+  </style>
+  <div class="crowdstrike"
+       style="overflow: auto;
+              width: 100%;
+              height: 100%;
+              padding-left:10px;
+              padding-right:10px">
+    <!-- Main Div -->
+    {% for result in results %}
+      <!-- loop for each result -->
+      <br>
+      <!------------------- For each Result ---------------------->
+      {% if not result.data %}
         <h4 class="wf-h4-style">No data found</h4>
-
-    {% else %}
-    <h3 class="wf-h3-style">Command Info</h3>
-    <table class="wf-table-vertical">
-    {% if result.param.device_id %}
-        <tr>
-            <td>Device ID</td>
-            <td>
+      {% else %}
+        <h3 class="wf-h3-style">Command Info</h3>
+        <table class="wf-table-vertical">
+          {% if result.param.device_id %}
+            <tr>
+              <td>Device ID</td>
+              <td>
                 <a href="javascript:;"
-                                    onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ result.param.device_id }}
-                                        &nbsp;
-                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                    </a>
+                   onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id }}' }], 0, {{ container.id }}, null, false);">
+                  {{ result.param.device_id }}
+                  &nbsp;
+                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
+              </td>
+            </tr>
+          {% endif %}
+          {% if result.param.session_id %}
+            <td>Session ID</td>
+            <td>
+              <a href="javascript:;"
+                 onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ result.param.session_id }}' }], 0, {{ container.id }}, null, false);">
+                {{ result.param.session_id }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
             </td>
-        </tr>
-    {% endif %}
-    {% if result.param.session_id %}
-    <td>Session ID</td>
-    <td>
-        <a href="javascript:;"
-        onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ result.param.session_id }}' }], 0, {{ container.id }}, null, false);">
-            {{ result.param.session_id }}
-        &nbsp;
-        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-        </a>
-    </td>
-    {% endif %}
-    {% if result.param.command %}
-        <tr>
-            <td>Command</td>
-            <td>{{ result.param.command }}</td>
-        </tr>
-    {% endif %}
-    </table>
-
-    <h3 class="wf-h3-style">Run Info</h3>
-    <div class="metadata_div">
-        <!--Default View-->
-        <div class="panel-group" id="server-information">
+          {% endif %}
+          {% if result.param.command %}
+            <tr>
+              <td>Command</td>
+              <td>{{ result.param.command }}</td>
+            </tr>
+          {% endif %}
+        </table>
+        <h3 class="wf-h3-style">Run Info</h3>
+        <div class="metadata_div">
+          <!--Default View-->
+          <div class="panel-group" id="server-information">
             <div class="panel">
-                <div id="default-view-table" class="panel-collapse collapse in">
-                    <table class="wf-table-horizontal datatable">
-                        <thead>
-                            <tr>
-                                <th>Cloud Request ID</th>
-                                <th>Stdout</th>
-                                <th>Stderr</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in result.data %}
-                            {% for field in item.resources %}
-                                <tr>
-                                  <td>
-                                    {% if result.summary.cloud_request_id %}
-                                      <a href="javascript:;"
-                                      onclick="context_menu(this, [{'contains': ['crowdstrike cloud request id'], 'value': '{{ result.summary.cloud_request_id }}' }], 0, {{ container.id }}, null, false);">
-                                        {{ result.summary.cloud_request_id }}
-                                      &nbsp;
-                                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                      </a>
-                                    {% else %}
-                                        None
-                                    {% endif %}
-                                </td>
-                                  <td>
-                                        {% if field.stdout %}
-                                            <pre class="output">{{ field.stdout }}</pre>
-                                        {% else %}
-                                            None
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if field.stderr %}
-                                            <pre class="output">{{ field.stderr }}</pre>
-                                        {% else %}
-                                            None
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+              <div id="default-view-table" class="panel-collapse collapse in">
+                <table class="wf-table-horizontal datatable">
+                  <thead>
+                    <tr>
+                      <th>Cloud Request ID</th>
+                      <th>Stdout</th>
+                      <th>Stderr</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in result.data %}
+                      {% for field in item.resources %}
+                        <tr>
+                          <td>
+                            {% if result.summary.cloud_request_id %}
+                              <a href="javascript:;"
+                                 onclick="context_menu(this, [{'contains': ['crowdstrike cloud request id'], 'value': '{{ result.summary.cloud_request_id }}' }], 0, {{ container.id }}, null, false);">
+                                {{ result.summary.cloud_request_id }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                              </a>
+                            {% else %}
+                              None
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if field.stdout %}
+                              <pre class="output">{{ field.stdout }}</pre>
+                            {% else %}
+                              None
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if field.stderr %}
+                              <pre class="output">{{ field.stderr }}</pre>
+                            {% else %}
+                              None
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-    <br>
-    {% endif %}
-    {% endfor %} <!-- loop for each result end -->
-</div> <!-- Main Div -->
-
-
-<script>
+        <br>
+      {% endif %}
+    {% endfor %}
+    <!-- loop for each result end -->
+  </div>
+  <!-- Main Div -->
+  <script>
     $.extend(true, $.fn.dataTable.defaults, {
         "searching": false,
         "bLengthChange": false,
@@ -231,5 +233,6 @@
     $('.datatable').DataTable({
         order: []
     });
-</script>
-{% endblock %} <!-- Main Start Block -->
+  </script>
+{% endblock %}
+<!-- Main Start Block -->

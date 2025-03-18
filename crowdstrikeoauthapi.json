@@ -1118,6 +1118,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.cid",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)",
@@ -1429,6 +1433,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.cid",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)",
@@ -1549,6 +1557,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.cid",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)",
@@ -4338,6 +4350,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 }
             ],
             "versions": "EQ(*)",
@@ -6628,6 +6644,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -11771,6 +11791,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.cid",
+                    "data_type": "string"
                 }
             ]
         },

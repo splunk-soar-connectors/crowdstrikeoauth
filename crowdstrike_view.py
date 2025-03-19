@@ -19,7 +19,6 @@ import phantom.utils as util
 
 
 def _get_hash_type(hash_value):
-
     if util.is_md5(hash_value):
         return phantom.APP_SUCCESS, "md5"
 
@@ -33,7 +32,6 @@ def _get_hash_type(hash_value):
 
 
 def get_ctx_result_ps(result):
-
     ctx_result = {}
 
     param = result.get_param()
@@ -61,7 +59,6 @@ def get_ctx_result_ps(result):
 
 
 def _get_ioc_type(ioc):
-
     if util.is_ip(ioc):
         return phantom.APP_SUCCESS, "ip"
 
@@ -82,7 +79,6 @@ def _get_ioc_type(ioc):
 
 
 def _trim_results(data, key):
-
     if key not in data:
         return
 
@@ -95,7 +91,6 @@ def _trim_results(data, key):
 
 
 def get_ctx_result_hunt(result):
-
     ctx_result = {}
 
     param = result.get_param()
@@ -129,7 +124,6 @@ def get_ctx_result_hunt(result):
 
 
 def get_ctx_result(result):
-
     ctx_result = {}
 
     param = result.get_param()
@@ -168,7 +162,6 @@ def get_ctx_result(result):
 
 
 def get_ctx_result_indicator(result):
-
     ctx_result = {}
 
     param = result.get_param()
@@ -193,7 +186,6 @@ def get_ctx_result_indicator(result):
 
 
 def _get_ctx_result(result, provides):
-
     ctx_result = {}
 
     param = result.get_param()
@@ -219,7 +211,7 @@ def _get_ctx_result(result, provides):
     return ctx_result
 
 
-def display_view(provides, all_app_runs, context):  # noqa: C901
+def display_view(provides, all_app_runs, context):
     context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
@@ -314,11 +306,9 @@ def display_view(provides, all_app_runs, context):  # noqa: C901
 
 
 def hunt_view(provides, all_app_runs, context):
-
     context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
-
             ctx_result = get_ctx_result_hunt(result)
             if not ctx_result:
                 continue
@@ -329,11 +319,9 @@ def hunt_view(provides, all_app_runs, context):
 
 
 def indicator_view(provides, all_app_runs, context):
-
     context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
-
             ctx_result = get_ctx_result_indicator(result)
             if not ctx_result:
                 continue
@@ -349,11 +337,9 @@ def indicator_view(provides, all_app_runs, context):
 
 
 def set_status_view(provides, all_app_runs, context):
-
     context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
-
             ctx_result = get_ctx_result(result)
             if not ctx_result:
                 continue
@@ -364,11 +350,9 @@ def set_status_view(provides, all_app_runs, context):
 
 
 def process_list_view(provides, all_app_runs, context):
-
     context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
-
             ctx_result = get_ctx_result_ps(result)
             if not ctx_result:
                 continue
@@ -379,11 +363,9 @@ def process_list_view(provides, all_app_runs, context):
 
 
 def command_view(provides, all_app_runs, context):
-
     context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
-
             ctx_result = get_ctx_result_ps(result)
             if not ctx_result:
                 continue

@@ -3279,7 +3279,6 @@ class CrowdstrikeConnector(BaseConnector):
         return self._start_data_feed(param, action_result, max_crlf, max_events, config, lower_id)
 
     def _start_data_feed(self, param, action_result, max_crlf, max_events, config, lower_id):
-
         # Connect to the server
         if phantom.is_fail(self._get_stream(action_result)):
             return action_result.get_status()
@@ -3331,7 +3330,7 @@ class CrowdstrikeConnector(BaseConnector):
                 # Check if it is time to refresh the stream connection and creating new bearer token [after 29 Min]
                 if int(time.time() - self._start_time) > (self._refresh_token_timeout - 60):
                     header = {
-                        "Authorization": "Bearer {0}".format(self._oauth_access_token),
+                        "Authorization": f"Bearer {self._oauth_access_token}",
                         "Connection": "Keep-Alive",
                         "Content-Type": "application/json",
                         "Accept": "application/json",
@@ -3410,13 +3409,11 @@ class CrowdstrikeConnector(BaseConnector):
             self.debug_print(f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Error response from server: {err_message}")
             if self._events:
                 self.save_progress(f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Saving the events...")
-                action_result.set_status(
-                    phantom.APP_ERROR, "{}. Error response from server: {}".format(CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message)
-                )
+                action_result.set_status(phantom.APP_ERROR, f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Error response from server: {err_message}")
                 is_error_occurred = True
             else:
                 return action_result.set_status(
-                    phantom.APP_ERROR, "{}. Error response from server: {}".format(CROWDSTRIKE_EVENTS_FETCH_ERROR, err_message)
+                    phantom.APP_ERROR, f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Error response from server: {err_message}"
                 )
 
         self._save_events_on_poll(config, total_blank_lines_count, param)
@@ -4968,7 +4965,7 @@ class CrowdstrikeConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
-        url = "{0}{1}".format(self._base_url_oauth, endpoint) if append else endpoint
+        url = f"{self._base_url_oauth}{endpoint}" if append else endpoint
         if headers is None:
             headers = {}
 

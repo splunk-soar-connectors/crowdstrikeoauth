@@ -14,7 +14,6 @@
 # and limitations under the License.
 import hashlib
 import json
-import sys
 import time
 from datetime import datetime
 
@@ -22,6 +21,7 @@ from bs4 import UnicodeDammit
 from phantom import utils as ph_utils
 
 from crowdstrikeoauthapi_consts import CROWDSTRIKE_EVENT_TYPES
+
 
 _container_common = {
     "description": "Container added by Phantom",
@@ -133,7 +133,6 @@ def _set_cef_key_list(event_details, cef, event_type):
 
 
 def _get_event_types(events):
-
     event_types = [x.get("metadata", {}).get("eventType", "") for x in events]
     event_types = list(set(event_types))
 
@@ -196,29 +195,15 @@ def _collate_results(base_connector, detection_events):
             container = dict()
             ingest_event["container"] = container
             container.update(_container_common)
-            if sys.version_info[0] == 2:
-                container["name"] = "{0} {1}".format(
-                    UnicodeDammit(detection_name).unicode_markup.encode("utf-8"),
-                    (
-                        "at {0}".format(creation_time)
-                        if (not machine_name)
-                        else "on {0} at {1}".format(
-                            UnicodeDammit(machine_name).unicode_markup.encode("utf-8"),
-                            creation_time,
-                        )
-                    ),
-                )
-            else:
-                container["name"] = "{0} {1}".format(
-                    detection_name,
-                    ("at {0}".format(creation_time) if (not machine_name) else "on {0} at {1}".format(machine_name, creation_time)),
-                )
+            container["name"] = "{} {}".format(
+                detection_name,
+                (f"at {creation_time}" if (not machine_name) else f"on {machine_name} at {creation_time}"),
+            )
             container["source_data_identifier"] = _create_dict_hash(base_connector, container)
 
             # now the artifacts
             ingest_event["artifacts"] = artifacts = []
             for j, detection_event in enumerate(per_detection_machine_events):
-
                 artifacts_ret = _create_artifacts_from_event(base_connector, detection_event)
 
                 if artifacts_ret:
@@ -228,7 +213,6 @@ def _collate_results(base_connector, detection_events):
 
 
 def _convert_to_cef_dict(output_dict, input_dict):
-
     time_keys = list()
     # convert any remaining keys in the event_details to follow the cef naming conventions
     input_dict_items = input_dict.items()
@@ -246,18 +230,16 @@ def _convert_to_cef_dict(output_dict, input_dict):
             time_epoch = int(v)
         except:
             continue
-        key_name = "{0}Iso".format(curr_item)
+        key_name = f"{curr_item}Iso"
         output_dict[key_name] = datetime.utcfromtimestamp(time_epoch).isoformat() + "Z"
 
     return output_dict
 
 
 def _set_cef_types(artifact, cef):
-
     cef_types = dict()
     cef_items = cef.items()
     for k, v in cef_items:
-
         if k.lower().endswith("filename"):
             cef_types[k] = ["file name"]
             continue
@@ -289,7 +271,6 @@ def _set_cef_types(artifact, cef):
 
 
 def _get_artifact_name(key_name):
-
     # generate the artifact name, based on the key name
     # There should be a regex based way of replacing a Capital with '<space><CaP>'
     artifact_name = key_to_name.get(key_name, "")
@@ -298,7 +279,6 @@ def _get_artifact_name(key_name):
         return artifact_name
 
     for curr_char in key_name:
-
         if curr_char.isupper():
             artifact_name += " "
 
@@ -312,7 +292,6 @@ def _get_artifact_name(key_name):
 
 
 def _create_dict_hash(base_connector, input_dict):
-
     input_dict_str = None
 
     if not input_dict:
@@ -323,8 +302,7 @@ def _create_dict_hash(base_connector, input_dict):
     except:
         return None
 
-    if sys.version_info[0] == 3:
-        input_dict_str = UnicodeDammit(input_dict_str).unicode_markup.encode("utf-8")
+    input_dict_str = UnicodeDammit(input_dict_str).unicode_markup.encode("utf-8")
 
     fips_enabled = base_connector._get_fips_enabled()
     # if fips is not enabled, we should continue with our existing md5 usage for generating SDIs
@@ -373,7 +351,6 @@ def _parse_sub_events(base_connector, artifacts_list, input_dict, key_name, pare
 
 
 def _create_artifacts_from_event(base_connector, event):
-
     # Make a copy, since the dictionary will be modified
     event_details = dict(event["event"])
     event_metadata = event.get("metadata", {})
@@ -447,7 +424,7 @@ def parse_events(events, base_connector, collate):
         base_connector.save_progress("Did not match any events of supported types")
         return results
 
-    base_connector.save_progress("Got {0} detection events".format(len(detection_events)))
+    base_connector.save_progress(f"Got {len(detection_events)} detection events")
 
     if collate:
         return _collate_results(base_connector, detection_events)
@@ -479,14 +456,7 @@ def parse_events(events, base_connector, collate):
         container = dict()
         ingest_event["container"] = container
         container.update(_container_common)
-        if sys.version_info[0] == 2:
-            container["name"] = "{0} on {1} at {2}".format(
-                UnicodeDammit(detection_name).unicode_markup.encode("utf-8"),
-                UnicodeDammit(hostname).unicode_markup.encode("utf-8"),
-                creation_time,
-            )
-        else:
-            container["name"] = "{0} on {1} at {2}".format(detection_name, hostname, creation_time)
+        container["name"] = f"{detection_name} on {hostname} at {creation_time}"
         container["severity"] = container_severity
         container["source_data_identifier"] = _create_dict_hash(base_connector, container)
 

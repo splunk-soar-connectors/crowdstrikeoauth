@@ -1,35 +1,54 @@
 Splunk SOAR CrowdStrike OAuth API
 Copyright (c) 2019-2025 Splunk Inc.
 
-Third-party Software Attributions:
+Third Party Software Attributions:
 
-Library: beautifulsoup4
+Name: beautifulsoup4
 Version: 4.9.1
+Author: Leonard Richardson
 License: MIT
-Copyright 2004-2017 Leonard Richardson
-Copyright 2004-2019 Leonard Richardson
-Copyright 2018 Isaac Muse
 
-Library: pytz
+Name: certifi
+Version: 2025.1.31
+Author: Kenneth Reitz
+License: MPL-2.0
+
+Name: charset-normalizer
+Version: 3.4.1
+Author:
+License: MIT
+
+Name: idna
+Version: 3.10
+Author:
+License:
+
+Name: pytz
 Version: 2021.1
+Author: Stuart Bishop
 License: MIT
-License: Zope
-Copyright 1987-2006 implementation only works for dates between
-Copyright 2003-2019 Stuart Bishop <stuart@stuartbishop.net>
 
-Library: requests
-Version: 2.25.0
-License: Apache 2.0
-Kenneth Reitz
+Name: requests
+Version: 2.32.3
+Author: Kenneth Reitz
+License: Apache-2.0
 
-Library: requests-toolbelt
+Name: requests-toolbelt
 Version: 0.9.1
+Author: Ian Cordasco, Cory Benfield
 License: Apache 2.0
-Copyright 2014 Ian Cordasco, Cory Benfield
 
-Library: simplejson
+Name: simplejson
 Version: 3.17.2
-License: Academic 2.1
-License: MIT
-Copyright 2003-2004 Lawrence E
-Copyright 2006 Bob Ippolito
+Author: Bob Ippolito
+License: MIT License
+
+Name: soupsieve
+Version: 2.6
+Author:
+License:
+
+Name: urllib3
+Version: 2.3.0
+Author:
+License:

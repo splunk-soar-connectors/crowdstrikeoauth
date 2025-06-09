@@ -10,7 +10,7 @@ repos:
         stages: [commit-msg]
         args: [--verbose]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v3.2.0
     hooks:
       - id: check-merge-conflict
       - id: end-of-file-fixer
@@ -23,7 +23,7 @@ repos:
       - id: check-json
       - id: check-yaml
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.0
+    rev: v0.9.6
     hooks:
       - id: ruff
         args: [ "--fix", "--unsafe-fixes"] # Allow unsafe fixes (ruff pretty strict about what it can fix)
@@ -39,7 +39,7 @@ repos:
       - id: mdformat
         exclude: "release_notes/.*"
   - repo: https://github.com/returntocorp/semgrep
-    rev: v1.89.0
+    rev: v1.107.0
     hooks:
       - id: semgrep
   - repo: https://github.com/Yelp/detect-secrets

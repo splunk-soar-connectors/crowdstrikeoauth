@@ -261,3 +261,8 @@ CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT = "/policy/entities/prevention-ac
 
 CROWDSTRIKE_UPDATE_ALERT_ENDPOINT = "/alerts/entities/alerts/v3"
 CROWDSTRIKE_GET_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v2"
+
+# Crowdstrike workflow api
+CROWDSTRIKE_GET_WORKFLOW_DEFINITIONS_ENDPOINT = "/workflows/combined/definitions/v1"
+CROWDSTRIKE_EXECUTE_WORKFLOW_ENDPOINT = "/workflows/entities/execute/v1"
+CROWDSTRIKE_GET_WORKFLOW_RESULTS_ENDPOINT = "/workflows/entities/execution-results/v1"

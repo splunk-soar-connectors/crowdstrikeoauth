@@ -22966,32 +22966,16 @@
     "pip39_dependencies": {
         "wheel": [
             {
-                "module": "pytz",
-                "input_file": "wheels/shared/pytz-2021.1-py2.py3-none-any.whl"
-            },
-            {
                 "module": "requests_toolbelt",
-                "input_file": "wheels/shared/requests_toolbelt-0.9.1-py2.py3-none-any.whl"
-            },
-            {
-                "module": "simplejson",
-                "input_file": "wheels/py39/simplejson-3.17.2-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/shared/requests_toolbelt-1.0.0-py2.py3-none-any.whl"
             }
         ]
     },
-    "pip_dependencies": {
+    "pip313_dependencies": {
         "wheel": [
             {
-                "module": "pytz",
-                "input_file": "wheels/shared/pytz-2021.1-py2.py3-none-any.whl"
-            },
-            {
                 "module": "requests_toolbelt",
-                "input_file": "wheels/shared/requests_toolbelt-0.9.1-py2.py3-none-any.whl"
-            },
-            {
-                "module": "simplejson",
-                "input_file": "wheels/py36/simplejson-3.17.2-cp36-cp36m-manylinux2010_x86_64.manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_28_x86_64.whl"
+                "input_file": "wheels/shared/requests_toolbelt-1.0.0-py2.py3-none-any.whl"
             }
         ]
     }

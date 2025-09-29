@@ -1,9 +1,9 @@
 # CrowdStrike OAuth API
 
-Publisher: Splunk \
-Connector Version: 5.1.1 \
-Product Vendor: CrowdStrike \
-Product Name: CrowdStrike \
+Publisher: Splunk <br>
+Connector Version: 5.1.0 <br>
+Product Vendor: CrowdStrike <br>
+Product Name: CrowdStrike <br>
 Minimum Product Version: 6.3.0
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
@@ -436,79 +436,79 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials \
-[run query](#action-run-query) - Run a query against CrowdStrike API \
-[query device](#action-query-device) - Fetch the device details based on the provided query \
-[list groups](#action-list-groups) - Fetch the details of the host groups \
-[quarantine device](#action-quarantine-device) - Block the device \
-[unquarantine device](#action-unquarantine-device) - Unblock the device \
-[assign hosts](#action-assign-hosts) - Assign one or more hosts to the static host group \
-[remove hosts](#action-remove-hosts) - Remove one or more hosts from the static host group \
-[create session](#action-create-session) - Initialize a new session with the Real Time Response cloud \
-[delete session](#action-delete-session) - Deletes a Real Time Response session \
-[list detections](#action-list-detections) - Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\* \
-[list epp alerts](#action-list-epp-alerts) - Get a list of epp alerts, replaces legacy Detects API \
-[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection IDs \*The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead\* \
-[get epp details](#action-get-epp-details) - Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API \
-[update detections](#action-update-detections) - Update detections in crowdstrike host \*The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead\* \
-[update epp alerts](#action-update-epp-alerts) - Update EPP alerts in CrowdStrike, replaces legacy Detects API \
-[list alerts](#action-list-alerts) - Get a list of alerts \
-[list sessions](#action-list-sessions) - Lists Real Time Response sessions \
-[run command](#action-run-command) - Execute an active responder command on a single host \
-[run admin command](#action-run-admin-command) - Execute an RTR Admin command on a single host \
-[get command details](#action-get-command-details) - Retrieve results of an active responder command executed on a single host \
-[list session files](#action-list-session-files) - Get a list of files for the specified RTR session \
-[get incident behaviors](#action-get-incident-behaviors) - Get details on behaviors by providing behavior IDs \
-[update incident](#action-update-incident) - Perform a set of actions on one or more incidents, such as adding tags or comments or updating the incident name or description \
-[list users](#action-list-users) - Get information about all users in your Customer ID \
-[get user roles](#action-get-user-roles) - Gets the roles that are assigned to the user \
-[list roles](#action-list-roles) - Get information about all user roles from your Customer ID \
-[get role](#action-get-role) - Get information about all user roles from your Customer ID \
-[list crowdscores](#action-list-crowdscores) - Query environment wide CrowdScore and return the entity data \
-[get incident details](#action-get-incident-details) - Get details on incidents by providing incident IDs \
-[list incident behaviors](#action-list-incident-behaviors) - Search for behaviors by providing an FQL filter, sorting, and paging details \
-[list incidents](#action-list-incidents) - Search for incidents by providing an FQL filter, sorting, and paging details \
-[get session file](#action-get-session-file) - Get RTR extracted file contents for the specified session and sha256 and add it to the vault \
-[set status](#action-set-status) - Set the state of a detection in Crowdstrike Host \*The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead\* \
-[resolve epp alerts](#action-resolve-epp-alerts) - Update the status of an EPP alert in CrowdStrike, replaces legacy Detects API \
-[get system info](#action-get-system-info) - Get details of a device, given the device ID \
-[get process detail](#action-get-process-detail) - Retrieve the details of a process that is running or that previously ran, given a process ID \
-[hunt file](#action-hunt-file) - Hunt for a file on the network by querying for the hash \
-[hunt domain](#action-hunt-domain) - Get a list of device IDs on which the domain was matched \
-[hunt ip](#action-hunt-ip) - Get a list of device IDs on which the ip was matched \
-[upload put file](#action-upload-put-file) - Upload a new put-file to use for the RTR `put` command \
-[get indicator](#action-get-indicator) - Get the full definition of one or more indicators that are being watched \
-[list custom indicators](#action-list-custom-indicators) - Queries for custom indicators in your customer account \
-[list put files](#action-list-put-files) - Queries for files uploaded to Crowdstrike for use with the RTR `put` command \
-[on poll](#action-on-poll) - Callback action for the on_poll ingest functionality \
-[list processes](#action-list-processes) - List processes that have recently used the IOC on a particular device \
-[upload indicator](#action-upload-indicator) - Upload indicator that you want CrowdStrike to watch \
-[delete indicator](#action-delete-indicator) - Delete an indicator that is being watched \
-[update indicator](#action-update-indicator) - Update an indicator that has been uploaded \
-[file reputation](#action-file-reputation) - Queries CrowdStrike for the file info given a vault ID or a SHA256 hash, vault ID has higher priority than SHA256 hash if both are provided \
-[url reputation](#action-url-reputation) - Queries CrowdStrike for the url info \
-[download report](#action-download-report) - To download the report of the provided artifact id \
-[detonate file](#action-detonate-file) - Upload a file to CrowdStrike and retrieve the analysis results \
-[detonate url](#action-detonate-url) - Upload an url to CrowdStrike and retrieve the analysis results \
-[check status](#action-check-status) - To check detonation status of the provided resource id \
-[get device scroll](#action-get-device-scroll) - Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit) \
-[get zta data](#action-get-zta-data) - Get Zero Trust Assessment data for one or more hosts by providing agent IDs (AID) \
-[create ioa rule group](#action-create-ioa-rule-group) - Create an empty IOA Rule Group \
-[update ioa rule group](#action-update-ioa-rule-group) - Modify an existing IOA Rule Group \
-[delete ioa rule group](#action-delete-ioa-rule-group) - Delete an existing IOA Rule Group \
-[list ioa platforms](#action-list-ioa-platforms) - List valid platforms for IOA Rule Groups \
-[list ioa rule groups](#action-list-ioa-rule-groups) - List IOA Rule Groups \
-[list ioa severities](#action-list-ioa-severities) - List valid severity values for IOA rules \
-[list ioa types](#action-list-ioa-types) - List valid types of IOA rules \
-[create ioa rule](#action-create-ioa-rule) - Create a new IOA Rule \
-[update ioa rule](#action-update-ioa-rule) - Update an existing IOA Rule \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials <br>
+[run query](#action-run-query) - Run a query against CrowdStrike API <br>
+[query device](#action-query-device) - Fetch the device details based on the provided query <br>
+[list groups](#action-list-groups) - Fetch the details of the host groups <br>
+[quarantine device](#action-quarantine-device) - Block the device <br>
+[unquarantine device](#action-unquarantine-device) - Unblock the device <br>
+[assign hosts](#action-assign-hosts) - Assign one or more hosts to the static host group <br>
+[remove hosts](#action-remove-hosts) - Remove one or more hosts from the static host group <br>
+[create session](#action-create-session) - Initialize a new session with the Real Time Response cloud <br>
+[delete session](#action-delete-session) - Deletes a Real Time Response session <br>
+[list detections](#action-list-detections) - Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\* <br>
+[list epp alerts](#action-list-epp-alerts) - Get a list of epp alerts, replaces legacy Detects API <br>
+[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection IDs \*The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead\* <br>
+[get epp details](#action-get-epp-details) - Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API <br>
+[update detections](#action-update-detections) - Update detections in crowdstrike host \*The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead\* <br>
+[update epp alerts](#action-update-epp-alerts) - Update EPP alerts in CrowdStrike, replaces legacy Detects API <br>
+[list alerts](#action-list-alerts) - Get a list of alerts <br>
+[list sessions](#action-list-sessions) - Lists Real Time Response sessions <br>
+[run command](#action-run-command) - Execute an active responder command on a single host <br>
+[run admin command](#action-run-admin-command) - Execute an RTR Admin command on a single host <br>
+[get command details](#action-get-command-details) - Retrieve results of an active responder command executed on a single host <br>
+[list session files](#action-list-session-files) - Get a list of files for the specified RTR session <br>
+[get incident behaviors](#action-get-incident-behaviors) - Get details on behaviors by providing behavior IDs <br>
+[update incident](#action-update-incident) - Perform a set of actions on one or more incidents, such as adding tags or comments or updating the incident name or description <br>
+[list users](#action-list-users) - Get information about all users in your Customer ID <br>
+[get user roles](#action-get-user-roles) - Gets the roles that are assigned to the user <br>
+[list roles](#action-list-roles) - Get information about all user roles from your Customer ID <br>
+[get role](#action-get-role) - Get information about all user roles from your Customer ID <br>
+[list crowdscores](#action-list-crowdscores) - Query environment wide CrowdScore and return the entity data <br>
+[get incident details](#action-get-incident-details) - Get details on incidents by providing incident IDs <br>
+[list incident behaviors](#action-list-incident-behaviors) - Search for behaviors by providing an FQL filter, sorting, and paging details <br>
+[list incidents](#action-list-incidents) - Search for incidents by providing an FQL filter, sorting, and paging details <br>
+[get session file](#action-get-session-file) - Get RTR extracted file contents for the specified session and sha256 and add it to the vault <br>
+[set status](#action-set-status) - Set the state of a detection in Crowdstrike Host \*The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead\* <br>
+[resolve epp alerts](#action-resolve-epp-alerts) - Update the status of an EPP alert in CrowdStrike, replaces legacy Detects API <br>
+[get system info](#action-get-system-info) - Get details of a device, given the device ID <br>
+[get process detail](#action-get-process-detail) - Retrieve the details of a process that is running or that previously ran, given a process ID <br>
+[hunt file](#action-hunt-file) - Hunt for a file on the network by querying for the hash <br>
+[hunt domain](#action-hunt-domain) - Get a list of device IDs on which the domain was matched <br>
+[hunt ip](#action-hunt-ip) - Get a list of device IDs on which the ip was matched <br>
+[upload put file](#action-upload-put-file) - Upload a new put-file to use for the RTR `put` command <br>
+[get indicator](#action-get-indicator) - Get the full definition of one or more indicators that are being watched <br>
+[list custom indicators](#action-list-custom-indicators) - Queries for custom indicators in your customer account <br>
+[list put files](#action-list-put-files) - Queries for files uploaded to Crowdstrike for use with the RTR `put` command <br>
+[on poll](#action-on-poll) - Callback action for the on_poll ingest functionality <br>
+[list processes](#action-list-processes) - List processes that have recently used the IOC on a particular device <br>
+[upload indicator](#action-upload-indicator) - Upload indicator that you want CrowdStrike to watch <br>
+[delete indicator](#action-delete-indicator) - Delete an indicator that is being watched <br>
+[update indicator](#action-update-indicator) - Update an indicator that has been uploaded <br>
+[file reputation](#action-file-reputation) - Queries CrowdStrike for the file info given a vault ID or a SHA256 hash, vault ID has higher priority than SHA256 hash if both are provided <br>
+[url reputation](#action-url-reputation) - Queries CrowdStrike for the url info <br>
+[download report](#action-download-report) - To download the report of the provided artifact id <br>
+[detonate file](#action-detonate-file) - Upload a file to CrowdStrike and retrieve the analysis results <br>
+[detonate url](#action-detonate-url) - Upload an url to CrowdStrike and retrieve the analysis results <br>
+[check status](#action-check-status) - To check detonation status of the provided resource id <br>
+[get device scroll](#action-get-device-scroll) - Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit) <br>
+[get zta data](#action-get-zta-data) - Get Zero Trust Assessment data for one or more hosts by providing agent IDs (AID) <br>
+[create ioa rule group](#action-create-ioa-rule-group) - Create an empty IOA Rule Group <br>
+[update ioa rule group](#action-update-ioa-rule-group) - Modify an existing IOA Rule Group <br>
+[delete ioa rule group](#action-delete-ioa-rule-group) - Delete an existing IOA Rule Group <br>
+[list ioa platforms](#action-list-ioa-platforms) - List valid platforms for IOA Rule Groups <br>
+[list ioa rule groups](#action-list-ioa-rule-groups) - List IOA Rule Groups <br>
+[list ioa severities](#action-list-ioa-severities) - List valid severity values for IOA rules <br>
+[list ioa types](#action-list-ioa-types) - List valid types of IOA rules <br>
+[create ioa rule](#action-create-ioa-rule) - Create a new IOA Rule <br>
+[update ioa rule](#action-update-ioa-rule) - Update an existing IOA Rule <br>
 [delete ioa rule](#action-delete-ioa-rule) - Delete an existing IOA Rule
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity. This action logs into the site to check the connection and credentials
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -523,7 +523,7 @@ No Output
 
 Run a query against CrowdStrike API
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -562,7 +562,7 @@ action_result.message | string | | |
 
 Fetch the device details based on the provided query
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -693,7 +693,7 @@ action_result.parameter.cid | string | | |
 
 Fetch the details of the host groups
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -731,7 +731,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Block the device
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 This action contains the host, which stops any network communications to locations other than the CrowdStrike cloud and IPs specified in the user's containment policy.
@@ -763,7 +763,7 @@ action_result.parameter.cid | string | | |
 
 Unblock the device
 
-Type: **correct** \
+Type: **correct** <br>
 Read only: **False**
 
 This action lifts containment on the host, which returns its network communications to normal.
@@ -795,7 +795,7 @@ action_result.parameter.cid | string | | |
 
 Assign one or more hosts to the static host group
 
-Type: **correct** \
+Type: **correct** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -832,7 +832,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Remove one or more hosts from the static host group
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -869,7 +869,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Initialize a new session with the Real Time Response cloud
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -944,7 +944,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Deletes a Real Time Response session
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -969,7 +969,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\*
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action supports filtering in order to retrieve a particular set of detections.
@@ -1099,7 +1099,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get a list of epp alerts, replaces legacy Detects API
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -1273,7 +1273,7 @@ action_result.parameter.limit | numeric | | |
 
 Get a list of detections details by providing detection IDs \*The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead\*
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -1399,7 +1399,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -1569,7 +1569,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update detections in crowdstrike host \*The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead\*
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -1606,7 +1606,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update EPP alerts in CrowdStrike, replaces legacy Detects API
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -1654,7 +1654,7 @@ action_result.parameter.comment | string | | |
 
 Get a list of alerts
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action supports filtering in order to retrieve a particular set of alerts.
@@ -1719,7 +1719,7 @@ action_result.parameter.include_hidden | numeric | | True |
 
 Lists Real Time Response sessions
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action supports filtering in order to retrieve a particular session.
@@ -1776,7 +1776,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Execute an active responder command on a single host
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 The API works by first creating a cloud request to execute the command, then the results need to be retrieved using a GET with the cloud_request_id. The action will attempt to retrieve the results, but in the event that a timeout occurs, execute a 'get command details' action.
@@ -1817,7 +1817,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Execute an RTR Admin command on a single host
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 This action requires a token with RTR Admin permissions.
@@ -1858,7 +1858,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Retrieve results of an active responder command executed on a single host
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -1893,7 +1893,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get a list of files for the specified RTR session
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -1929,7 +1929,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get details on behaviors by providing behavior IDs
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2001,7 +2001,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Perform a set of actions on one or more incidents, such as adding tags or comments or updating the incident name or description
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -2040,7 +2040,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about all users in your Customer ID
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2070,7 +2070,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Gets the roles that are assigned to the user
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2099,7 +2099,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about all user roles from your Customer ID
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2127,7 +2127,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about all user roles from your Customer ID
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2160,7 +2160,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Query environment wide CrowdScore and return the entity data
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action fetches crowdscores using pagination logic.
@@ -2209,7 +2209,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get details on incidents by providing incident IDs
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2285,7 +2285,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Search for behaviors by providing an FQL filter, sorting, and paging details
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action fetches incident behaviors using pagination logic.
@@ -2329,7 +2329,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Search for incidents by providing an FQL filter, sorting, and paging details
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action fetches incidents using pagination logic.
@@ -2374,7 +2374,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get RTR extracted file contents for the specified session and sha256 and add it to the vault
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -2419,7 +2419,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Set the state of a detection in Crowdstrike Host \*The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead\*
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 The detection <b>id</b> can be obtained from the Crowdstrike UI and its state can be set.
@@ -2448,7 +2448,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update the status of an EPP alert in CrowdStrike, replaces legacy Detects API
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -2482,7 +2482,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get details of a device, given the device ID
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2606,7 +2606,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Retrieve the details of a process that is running or that previously ran, given a process ID
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2639,7 +2639,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Hunt for a file on the network by querying for the hash
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 In case of count_only set to true, keep the limit value larger to fetch count of all the devices.
@@ -2672,7 +2672,7 @@ action_result.parameter.cid | string | | |
 
 Get a list of device IDs on which the domain was matched
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 In case of count_only set to true, keep the limit value larger to fetch count of all the devices.
@@ -2703,7 +2703,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get a list of device IDs on which the ip was matched
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 In case of count_only set to true, keep the limit value larger to fetch count of all the devices.
@@ -2734,7 +2734,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Upload a new put-file to use for the RTR `put` command
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 This action requires a token with RTR Admin permissions.
@@ -2770,7 +2770,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the full definition of one or more indicators that are being watched
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 In this action, either 'indicator_value' and 'indicator_type' or 'resource_id' should be provided. The priority of 'resource_id' is higher. If all the parameters are provided then the indicator will be fetched based on the 'resource_id'.
@@ -2832,7 +2832,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Queries for custom indicators in your customer account
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -3010,7 +3010,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Queries for files uploaded to Crowdstrike for use with the RTR `put` command
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 For additional information on FQL syntax see: https://falcon.crowdstrike.com/support/documentation/45/falcon-query-language-feature-guide.
@@ -3057,7 +3057,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Callback action for the on_poll ingest functionality
 
-Type: **ingest** \
+Type: **ingest** <br>
 Read only: **True**
 
 This action remembers the last event ID that was queried for. The next ingestion carried out will query for later event IDs. This way, the same events are not queried for in every run. However, in the case of 'POLL NOW' queried event IDs will not be remembered.
@@ -3079,7 +3079,7 @@ No Output
 
 List processes that have recently used the IOC on a particular device
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Given a file hash or domain, the action will list all the processes that have either recently connected to the domain or interacted with the file that matches the supplied hash. Use the <b>query device</b> actions to get the device id to run the action on.In case of count_only set to true, keep the limit value larger to fetch count of all the devices.
@@ -3110,7 +3110,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Upload indicator that you want CrowdStrike to watch
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 Valid values for the <b>action</b> parameter are:<ul><li>no_action<br> Save the indicator for future use, but take no action. No severity required.</li><li>allow<br> Applies to hashes only. Allow the indicator and do not detect it. Severity does not apply and should not be provided.</li><li>prevent_no_ui<br> Applies to hashes only. Block and detect the indicator, but hide it from <b>Activity > Detections</b>. Has a default severity value.</li><li>prevent<br> Applies to hashes only. Block the indicator and show it as a detection at the selected severity.</li><li>detect<br> Enable detections for the indicator at the selected severity.</li></ul>Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>Leave it blank for all the host groups</li></ul>The <b>platforms</b> parameter is the list of platforms that the indicator applies to. You can enter multiple platform names, separated by commas. Valid values are: <b>mac, windows, and linux</b>.<br>The CrowdStrike API accepts the standard timestamp format in the <b>expiration</b> parameter. In this action, the number of days provided in the <b>expiration</b> parameter is internally converted into the timestamp format to match the API format.<br>If the indicator with the same type and value is created again, the action will fail as duplicate type-value combination is not allowed.
@@ -3179,7 +3179,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete an indicator that is being watched
 
-Type: **correct** \
+Type: **correct** <br>
 Read only: **False**
 
 In this action, either 'ioc' or 'resource_id' should be provided. The priority of 'resource_id' is higher. If both the parameters are provided then the indicator will be deleted based on the 'resource_id'. The CrowdStrike API returns success for the 'resource_id' of the already deleted indicator.
@@ -3208,7 +3208,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update an indicator that has been uploaded
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>The value '<b>all</b>' for all the host groups</li><li>Leave it blank if there is no change</li></ul>If no parameters are provided as input, the action would pass successfully.
@@ -3253,7 +3253,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Queries CrowdStrike for the file info given a vault ID or a SHA256 hash, vault ID has higher priority than SHA256 hash if both are provided
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -3420,7 +3420,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Queries CrowdStrike for the url info
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -3573,7 +3573,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 To download the report of the provided artifact id
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -3600,7 +3600,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Upload a file to CrowdStrike and retrieve the analysis results
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -3780,7 +3780,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Upload an url to CrowdStrike and retrieve the analysis results
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -3940,7 +3940,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 To check detonation status of the provided resource id
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -3981,7 +3981,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 More info can be found at <a href='https://assets.falcon.crowdstrike.com/support/api/swagger.html#/hosts/QueryDevicesByFilterScroll' target='_blank'>here</a>.
@@ -4024,7 +4024,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get Zero Trust Assessment data for one or more hosts by providing agent IDs (AID)
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -4069,7 +4069,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create an empty IOA Rule Group
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4121,7 +4121,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Modify an existing IOA Rule Group
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4180,7 +4180,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete an existing IOA Rule Group
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4209,7 +4209,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List valid platforms for IOA Rule Groups
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -4235,7 +4235,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List IOA Rule Groups
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -4287,7 +4287,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List valid severity values for IOA rules
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -4313,7 +4313,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List valid types of IOA rules
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -4354,7 +4354,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create a new IOA Rule
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4423,7 +4423,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update an existing IOA Rule
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4517,7 +4517,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete an existing IOA Rule
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters

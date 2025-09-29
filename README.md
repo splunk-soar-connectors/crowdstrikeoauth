@@ -1,7 +1,7 @@
 # CrowdStrike OAuth API
 
 Publisher: Splunk <br>
-Connector Version: 5.1.0 <br>
+Connector Version: 5.1.1 <br>
 Product Vendor: CrowdStrike <br>
 Product Name: CrowdStrike <br>
 Minimum Product Version: 6.3.0

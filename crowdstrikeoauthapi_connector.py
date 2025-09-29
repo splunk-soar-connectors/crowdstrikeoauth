@@ -396,7 +396,7 @@ class CrowdstrikeConnector(BaseConnector):
             for artifact in artifacts:
                 artifact["container_id"] = container_id
 
-            ret_val, status_string, artifact_ids = self.save_artifacts(artifacts)
+            ret_val, status_string, _artifact_ids = self.save_artifacts(artifacts)
             self.debug_print(f"save_artifacts returns, value: {ret_val}, reason: {status_string}")
             self.debug_print(f"Container with id: {container_id}")
 
@@ -545,7 +545,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         param.update({"limit": 1})
         self.save_progress("Fetching devices")
-        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params=param)
+        ret_val, _resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params=param)
 
         if phantom.is_fail(ret_val):
             self.save_progress(CROWDSTRIKE_CONNECTIVITY_TEST_ERROR)
@@ -712,7 +712,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         api_data = {"ids": detection_id, "status": to_state}
 
-        ret_val, response = self._make_rest_call_helper_oauth2(
+        ret_val, _response = self._make_rest_call_helper_oauth2(
             action_result,
             CROWDSTRIKE_RESOLVE_DETECTION_APIPATH,
             json_data=api_data,
@@ -2073,7 +2073,7 @@ class CrowdstrikeConnector(BaseConnector):
                 "action_parameters": [{"name": "rule_group_id", "value": rulegroup_id}],
                 "ids": [policy_id],
             }
-            assign_ret_val, assign_resp_json = self._make_rest_call_helper_oauth2(
+            assign_ret_val, _assign_resp_json = self._make_rest_call_helper_oauth2(
                 action_result,
                 CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
                 params={"action_name": "add-rule-group"},
@@ -2998,7 +2998,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         try:
             file_id = param["vault_id"]
-            success, message, file_info = phantom_rules.vault_info(vault_id=file_id)
+            _success, _message, file_info = phantom_rules.vault_info(vault_id=file_id)
             file_info = next(iter(file_info))
         except IndexError:
             return action_result.set_status(
@@ -3335,7 +3335,7 @@ class CrowdstrikeConnector(BaseConnector):
                         "Content-Type": "application/json",
                         "Accept": "application/json",
                     }
-                    ret_val, resp = self._make_rest_call_helper_oauth2(
+                    ret_val, _resp = self._make_rest_call_helper_oauth2(
                         action_result, self._refresh_token_url, headers=header, method="post", append=False
                     )
                     self._start_time = time.time()
@@ -3721,7 +3721,7 @@ class CrowdstrikeConnector(BaseConnector):
                 "action_parameters": [{"name": "rule_group_id", "value": rulegroup_id}],
                 "ids": [policy_id],
             }
-            assign_ret_val, assign_resp_json = self._make_rest_call_helper_oauth2(
+            assign_ret_val, _assign_resp_json = self._make_rest_call_helper_oauth2(
                 action_result,
                 CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
                 params={"action_name": "add-rule-group"},
@@ -3739,7 +3739,7 @@ class CrowdstrikeConnector(BaseConnector):
                 "action_parameters": [{"name": "rule_group_id", "value": rulegroup_id}],
                 "ids": [policy_id],
             }
-            remove_ret_val, remove_resp_json = self._make_rest_call_helper_oauth2(
+            remove_ret_val, _remove_resp_json = self._make_rest_call_helper_oauth2(
                 action_result,
                 CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
                 params={"action_name": "remove-rule-group"},

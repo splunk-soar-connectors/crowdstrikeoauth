@@ -38,7 +38,7 @@ def get_ctx_result_ps(result):
 
     if "ioc" in param:
         ioc = param.get("ioc")
-        ret_val, param["ioc_type"] = _get_ioc_type(ioc)
+        _ret_val, param["ioc_type"] = _get_ioc_type(ioc)
 
     ctx_result["param"] = param
 
@@ -103,7 +103,7 @@ def get_ctx_result_hunt(result):
         hunt_object = param.get("ip")
 
     param["ioc"] = hunt_object
-    ret_val, param["ioc_type"] = _get_ioc_type(hunt_object)
+    _ret_val, param["ioc_type"] = _get_ioc_type(hunt_object)
 
     ctx_result["param"] = param
 
@@ -130,7 +130,7 @@ def get_ctx_result(result):
 
     if "ioc" in param:
         ioc = param.get("ioc")
-        ret_val, param["ioc_type"] = _get_ioc_type(ioc)
+        _ret_val, param["ioc_type"] = _get_ioc_type(ioc)
 
     ctx_result["param"] = param
 
@@ -168,11 +168,11 @@ def get_ctx_result_indicator(result):
 
     if "ioc" in param:
         ioc = param.get("ioc")
-        ret_val, param["ioc_type"] = _get_ioc_type(ioc)
+        _ret_val, param["ioc_type"] = _get_ioc_type(ioc)
 
     if "indicator_value" in param:
         ioc = param.get("indicator_value")
-        ret_val, param["ioc_type"] = _get_ioc_type(ioc)
+        _ret_val, param["ioc_type"] = _get_ioc_type(ioc)
 
     ctx_result["param"] = param
 

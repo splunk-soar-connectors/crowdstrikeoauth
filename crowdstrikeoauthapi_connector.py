@@ -4531,6 +4531,195 @@ class CrowdstrikeConnector(BaseConnector):
             )
 
         return action_result.set_status(phantom.APP_SUCCESS)
+    
+    def _handle_get_workflow_definitions(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        
+        from urllib.parse import quote as urlquote
+        name = param.get('name', '')
+        definition_id = param.get('definition_id', '')
+        fql_filter = urlquote(param.get('fql_filter', ''))
+        offset = param.get('offset', '')
+        limit = param.get('limit', '')
+        sort = urlquote(param.get('sort', ''))
+
+        if name:
+            name = f"name:'{name}'"
+            definition_id = None
+            fql_filter = None
+
+        elif definition_id:
+            definition_id = f"id:'{definition_id}'"
+            fql_filter = None
+
+        endpoint = [CROWDSTRIKE_GET_WORKFLOW_DEFINITIONS_ENDPOINT + '?']
+        endpoint += [f"name={name}"]                   if name else []
+        endpoint += [f"definition_id={definition_id}"] if definition_id else []
+        endpoint += [f"fql_filter={fql_filter}"]       if fql_filter else []
+        endpoint += [f"offset={offset}"]               if offset else []
+        endpoint += [f"limit={limit}"]                 if limit else []
+        endpoint += [f"sort={sort}"]                   if sort else []
+        endpoint = [x.strip() for x in endpoint if x.strip()]
+        endpoint = '&'.join(endpoint).replace('&&', '&').replace('?&', '?').strip('?').strip('&').strip('?')
+        self.save_progress(f"endpoint: {endpoint}")
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, method="get")       
+        status_code = self._rest_response.status_code
+        try:
+            response_data = self._rest_response.json()
+        except:
+            response_data = self._rest_response.text
+
+        summary = {}
+        self.save_progress(f"status code: {status_code}")
+        if isinstance(response_data, dict):
+            self.save_progress(json.dumps(response_data, indent=4))
+            action_result.add_data(response_data)
+            trace_id = response_data.get('meta', {}).get('trace_id', 'n/a')
+            if trace_id:
+                summary['trace_id'] = trace_id
+            definitions = response_data.get('resources', [])
+            summary['count']= len(definitions)
+            summary.update({d['name']:d['id'] for d in definitions})
+            action_result.set_summary(summary)
+
+        else:
+            self.save_progress(f"<{self._rest_response.text}>")
+            action_result.add_data(response_data)
+
+        if phantom.is_fail(ret_val) or (status_code < 200 or status_code > 299):
+            return action_result #.set_status(phantom.APP_ERROR)        
+        return action_result.set_status(phantom.APP_SUCCESS)
+    
+    def _handle_execute_workflow(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        definition_id = param.get('definition_id', '')
+        name = param.get('name', '')
+        key = param.get('key', '')
+        depth = param.get('depth', '')
+        source_event_url = param.get('source_event_url', '')
+        body = param.get('body', '')
+        
+        if name and definition_id:
+            self.save_progress(f"Warning: both definition_id ({definition_id}) and name ({name}) defined; using definition_id instead of name")
+        
+        if not name and not definition_id:
+            error_message = "Error: no definition id or name specified"
+            self.save_progress(error_message)
+            return action_result.set_status(phantom.APP_ERROR,error_message)
+
+        if definition_id:
+            definition_id = [f"definition_id={x.strip()}" for x in definition_id.split(',') if x.strip()]
+            if not definition_id:
+                error_message = "Error: definition id fails parameter validation"
+                self.save_progress(error_message)
+                return action_result.set_status(phantom.APP_ERROR,error_message)
+        
+        try:
+            if body:
+                body = json.loads(body)
+            else:
+                body = {}
+        except:
+            body = {}
+            self.save_progress(f"Warning: body is not json, reseting to empty dictionary")            
+
+        # [1..5] inclusive   
+        for index in range(1,6):
+            key = param.get(f"body_key{index}")
+            value = param.get(f"body_value{index}", '')
+            if key:
+                body[key] = value
+        
+        endpoint = [CROWDSTRIKE_EXECUTE_WORKFLOW_ENDPOINT + '?']
+        endpoint += definition_id                            if definition_id else []
+        endpoint += [f"name={name}"]                         if name and not definition_id else []
+        endpoint += [f"key={key}"]                           if key else []
+        endpoint += [f"depth={depth}"]                       if depth else []
+        endpoint += [f"source_event_url={source_event_url}"] if source_event_url else []
+        endpoint = list(filter(lambda x: x.strip(), endpoint))
+        endpoint = '&'.join(endpoint).replace('&&', '&').replace('?&', '?').strip('?').strip('&').strip('?')
+        self.save_progress(f"endpoint: {endpoint}")
+        self.save_progress(json.dumps(body, indent=4, default=str))
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, json_data=body, method="post")       
+        status_code = self._rest_response.status_code
+        try:
+            response_data = self._rest_response.json()
+        except:
+            response_data = self._rest_response.text
+
+        summary = {}
+        self.save_progress(f"status code: {status_code}")
+        if isinstance(response_data, dict):
+            self.save_progress(json.dumps(response_data, indent=4))
+            action_result.add_data(response_data)
+            trace_id = response_data.get('meta', {}).get('trace_id', 'n/a')
+            if trace_id:
+                summary['trace_id'] = trace_id
+            execute_ids = response_data.get('resources', [])
+            summary['count']= len(execute_ids)
+            summary['ids'] = execute_ids
+            action_result.set_summary(summary)
+        else:
+            self.save_progress(f"<{self._rest_response.text}>")
+            action_result.add_data(response_data)
+
+        if phantom.is_fail(ret_val) or (status_code < 200 or status_code > 299):
+            return action_result #.set_status(phantom.APP_ERROR)        
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_workflow_results(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        
+        execution_ids = param.get('ids', '')
+
+        if execution_ids:
+            execution_ids = [f"ids={x.strip()}" for x in execution_ids.split(',') if x.strip()]
+            if not execution_ids:
+                error_message = "Error: eexecution ids fails parameter validation"
+                self.save_progress(error_message)
+                return action_result.set_status(phantom.APP_ERROR,error_message)
+
+        endpoint = [CROWDSTRIKE_GET_WORKFLOW_RESULTS_ENDPOINT + '?']
+        endpoint += execution_ids if execution_ids else []
+        endpoint = [x.strip() for x in endpoint if x.strip()]
+        endpoint = '&'.join(endpoint).replace('&&', '&').replace('?&', '?').strip('?').strip('&').strip('?')
+        self.save_progress(f"endpoint: {endpoint}")
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, method="get")       
+        status_code = self._rest_response.status_code
+        try:
+            response_data = self._rest_response.json()
+        except:
+            response_data = self._rest_response.text
+
+        summary = {}
+        self.save_progress(f"status code: {status_code}")
+        if isinstance(response_data, dict):
+            self.save_progress(json.dumps(response_data, indent=4))
+            action_result.add_data(response_data)
+            trace_id = response_data.get('meta', {}).get('trace_id', 'n/a')
+            if trace_id:
+                summary['trace_id'] = trace_id
+            results = response_data.get('resources', [])
+            summary['count']= len(results)
+            summary.update({r['execution_id']:r['status'] for r in results})
+            action_result.set_summary(summary)
+        else:
+            self.save_progress(f"<{self._rest_response.text}>")
+            action_result.add_data(response_data)
+
+        if phantom.is_fail(ret_val) or (status_code < 200 or status_code > 299):
+            return action_result #.set_status(phantom.APP_ERROR)        
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _process_empty_response(self, response, action_result):
         """This function is used to process empty response.
@@ -5164,6 +5353,9 @@ class CrowdstrikeConnector(BaseConnector):
             "create_ioa_rule": self._handle_create_ioa_rule,
             "update_ioa_rule": self._handle_update_ioa_rule,
             "delete_ioa_rule": self._handle_delete_ioa_rule,
+            "get_workflow_definitions": self._handle_get_workflow_definitions,
+            "execute_workflow": self._handle_execute_workflow,
+            "get_workflow_results": self._handle_get_workflow_results,
         }
 
         action = self.get_action_identifier()

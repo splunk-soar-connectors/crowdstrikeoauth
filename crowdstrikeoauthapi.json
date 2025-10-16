@@ -22961,6 +22961,839 @@
                 "type": "custom",
                 "view": "crowdstrike_view.display_view"
             }
+        },
+        {
+            "action": "get workflow definitions",
+            "identifier": "get_workflow_definitions",
+            "description": "Search workflow definitions based on the provided filter.",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "name": {
+                    "description": "Builds a filter to search for a definition matching the provided value. '*' may used as a wildcard.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "cs workflow definition name"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "name",
+                    "id": 1,
+                    "param_name": "name"
+                },
+                "definition_id": {
+                    "description": "Builds a filter to search for a definition matching the provided value. '*' may used as a wildcard. If name is defined, this parameter is ignored",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "cs workflow definition id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "definition_id",
+                    "id": 2,
+                    "param_name": "definition_id"
+                },
+                "fql_filter": {
+                    "description": "FQL query specifying filter parameters. For further information reference FQL language. If name or definition is defined this parameter is ignored",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 2,
+                    "name": "fql_filter",
+                    "id": 3,
+                    "param_name": "fql_filter"
+                },
+                "offset": {
+                    "description": "Starting pagination offset of records to return.",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 3,
+                    "name": "offset",
+                    "id": 4,
+                    "param_name": "offset"
+                },
+                "limit": {
+                    "description": "Maximum number of records to return.",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 4,
+                    "name": "limit",
+                    "id": 5,
+                    "param_name": "limit"
+                },
+                "sort": {
+                    "description": "Sort items by providing a comma separated list of property and direction (eg name.desc, time.asc). If direction is omitted, defaults to descending. For further information reference FQL language.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 5,
+                    "name": "sort",
+                    "id": 6,
+                    "param_name": "sort"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [
+                        "cs workflow definition name"
+                    ]                   },
+                {
+                    "data_path": "action_result.parameter.definition_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cs workflow definition id"
+                    ]                
+                },
+                {
+                    "data_path": "action_result.parameter.fql_filter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "cs workflow definition id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "contains": [
+                        "cs workflow definition name"
+                    ],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.enabled",
+                    "data_type": "boolean",
+                    "column_name": "Enabled",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.version",
+                    "data_type": "numeric",
+                    "column_name": "Version",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.last_modified_timestamp",
+                    "data_type": "string",
+                    "column_name": "Last Modified Timestamp",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.trace_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "execute workflow",
+            "identifier": "execute_workflow",
+            "description": "Execute CS workflow",
+            "verbose": "Execute an on-demand workflow. Response will contain the execution ID.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "definition_id": {
+                    "description": "One or more comma separated definition ID to execute; either a name or an ID can be specified. Only one of definition_id or name must be specified",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "cs workflow definition id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "definition_id",
+                    "id": 1,
+                    "param_name": "definition_id"
+                },
+                "name": {
+                    "description": "Workflow name to execute; either a name or an ID can be specified.  Only one of definition_id or name must be specified",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "cs workflow definition name"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "name",
+                    "id": 2,
+                    "param_name": "name"
+                },
+                "key": {
+                    "description": "Key used to help deduplicate executions, if unset a new UUID is used",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "cs workflow execution key"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2,
+                    "name": "key",
+                    "id": 3,
+                    "param_name": "key"
+                },
+                "depth": {
+                    "description": "Used to record the execution depth to help limit execution loops when a workflow triggers another. The maximum depth is 4.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 3,
+                    "name": "depth",
+                    "id": 4,
+                    "param_name": "depth"
+                },
+                "source_event_url": {
+                    "description": "Used to record a URL to the source that led to triggering this workflow",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "url"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 4,
+                    "name": "source_event_url",
+                    "id": 5,
+                    "param_name": "source_event_url"
+                },
+                "body": {
+                    "description": "Full body payload in JSON format.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 5,
+                    "name": "body",
+                    "id": 6,
+                    "param_name": "body"
+                },
+                "body_key1": {
+                    "description": "key1 to be merged into body",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 6,
+                    "name": "body_key1",
+                    "id": 7,
+                    "param_name": "body_key1"
+                },
+                "body_value1": {
+                    "description": "value for key1",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 7,
+                    "name": "body_value1",
+                    "id": 8,
+                    "param_name": "body_value1"
+                },
+                "body_key2": {
+                    "description": "key2 to be merged into body",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 8,
+                    "name": "body_key2",
+                    "id": 9,
+                    "param_name": "body_key2"
+                },
+                "body_value2": {
+                    "description": "value for key2",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 9,
+                    "name": "body_value2",
+                    "id": 10,
+                    "param_name": "body_value2"
+                },
+                "body_key3": {
+                    "description": "key3 to be merged into body",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 10,
+                    "name": "body_key3",
+                    "id": 11,
+                    "param_name": "body_key3"
+                },
+                "body_value3": {
+                    "description": "value for key3",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 11,
+                    "name": "body_value3",
+                    "id": 12,
+                    "param_name": "body_value3"
+                },
+                "body_key4": {
+                    "description": "key4 to be merged into body",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 12,
+                    "name": "body_key4",
+                    "id": 13,
+                    "param_name": "body_key4"
+                },
+                "body_value4": {
+                    "description": "value for key4",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 13,
+                    "name": "body_value4",
+                    "id": 14,
+                    "param_name": "body_value4"
+                },
+                "body_key5": {
+                    "description": "key5 to be merged into body",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 14,
+                    "name": "body_key5",
+                    "id": 15,
+                    "param_name": "body_key5"
+                },
+                "body_value5": {
+                    "description": "value for key5",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 15,
+                    "name": "body_value5",
+                    "id": 16,
+                    "param_name": "body_value5"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.definition_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cs workflow definition id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [
+                        "cs workflow definition name"
+                    ]             
+                },
+                {
+                    "data_path": "action_result.parameter.key",
+                    "data_type": "string",
+                    "contains": [
+                        "cs workflow execution key"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.depth",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.source_event_url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.body",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_key1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_value1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_key2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_value2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_key3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_value3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_key4",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_value4",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_key5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.body_value5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.meta.trace_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.meta.pagination.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.meta.pagination.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.meta.pagination.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.meta.powered_by",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.meta.query_time",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resources",
+                    "data_type": "string",
+                    "contains": [
+                        "cs workflow execution id"
+                    ],
+                    "column_name": "Execution ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.ids",
+                    "data_type": "string",
+                    "contains": [
+                        "cs workflow execution id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.trace_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get workflow results",
+            "identifier": "get_workflow_results",
+            "description": "Get result(s) of one or more workflow executions",
+            "verbose": "Get the results of one or more workflow executions. Successful requests return an HTTP 200 code and an array with detailed results.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "ids": {
+                    "description": "One or more comma/space separated execution IDs",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "cs workflow execution id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "ids"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ids",
+                    "data_type": "string",
+                    "contains": [
+                        "cs workflow execution id"
+                    ]          
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.loops",
+                    "data_type": "string",
+                    "column_name": "Loops",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.retryable",
+                    "data_type": "boolean",
+                    "column_name": "Retryable",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.execution_id",
+                    "data_type": "string",
+                    "column_name": "Execution ID",
+                    "column_order": 3,
+                    "contains": [
+                        "cs workflow execution id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.definition_id",
+                    "data_type": "string",
+                    "column_name": "Definition ID",
+                    "column_order": 4,
+                    "contains": [
+                        "cs workflow definition id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.definition_version",
+                    "data_type": "numeric",
+                    "column_name": "Definition Version",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.start_timestamp",
+                    "data_type": "string",
+                    "column_name": "Start Timestamp",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.end_timestamp",
+                    "data_type": "string",
+                    "column_name": "End Timestamp",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.ancestor_executions",
+                    "data_type": "string",
+                    "column_name": "Ancestor Executions",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.name",
+                    "data_type": "string",
+                    "column_name": "Trigger Name",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.CID",
+                    "data_type": "string",
+                    "column_name": "Trigger Result CID",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.Name",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Name",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.Category",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Category",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.TriggerIP",
+                    "data_type": "string",
+                    "column_name": "Trigger Result IP",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.somefield",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Somefield",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.ObservedTime",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Observed Time",
+                    "column_order": 15
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.SourceEventURL",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Source Event URL",
+                    "column_order": 16
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.ExecutionDepth",
+                    "data_type": "numeric",
+                    "column_name": "Trigger Result Execution Depth",
+                    "column_order": 17
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.TriggerSource.User.UUID",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Source User UUID",
+                    "column_order": 18
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.TriggerSource.User.Email",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Source User Email",
+                    "column_order": 19
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.TriggerSource.Workflow.ExecutionID",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Source Workflow Execution ID",
+                    "column_order": 20
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.TriggerSource.Workflow.DefinitionID",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Source Workflow Definition ID",
+                    "column_order": 21
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.TriggerSource.Workflow.DefinitionVersion",
+                    "data_type": "numeric",
+                    "column_name": "Trigger Result Source Workflow Definition Version",
+                    "column_order": 22
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.trigger.result.TriggerSource.APIClient.ID",
+                    "data_type": "string",
+                    "column_name": "Trigger Result Source API Client ID",
+                    "column_order": 23
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.activities.*.id",
+                    "data_type": "string",
+                    "column_name": "Activity ID",
+                    "column_order": 24
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.activities.*.name",
+                    "data_type": "string",
+                    "column_name": "Activity Name",
+                    "column_order": 25
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.activities.*.type",
+                    "data_type": "string",
+                    "column_name": "Activity Type",
+                    "column_order": 26
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.activities.*.status",
+                    "data_type": "string",
+                    "column_name": "Activity Status",
+                    "column_order": 27
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.activities.*.node_id",
+                    "data_type": "string",
+                    "column_name": "Activity Node ID",
+                    "column_order": 28
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.activities.*.start_timestamp",
+                    "data_type": "string",
+                    "column_name": "Activity Start Timestamp",
+                    "column_order": 29
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.activities.*.end_timestamp",
+                    "data_type": "string",
+                    "column_name": "Activity End Timestamp",
+                    "column_order": 30
+                },
+                {
+                    "data_path": "action_result.summary.trace_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
         }
     ],
     "pip39_dependencies": {

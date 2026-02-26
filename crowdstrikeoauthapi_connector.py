@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_connector.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -699,30 +699,6 @@ class CrowdstrikeConnector(BaseConnector):
         action_result.set_summary({"device_count": len(response)})
 
         return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_resolve_detection(self, param):
-        # Add an action result to the App Run
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        detection_id = param[CROWDSTRIKE_JSON_ID]
-        to_state = param[CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE]
-
-        detection_id = [x.strip() for x in detection_id.split(",")]
-        detection_id = list(filter(None, detection_id))
-
-        api_data = {"ids": detection_id, "status": to_state}
-
-        ret_val, _response = self._make_rest_call_helper_oauth2(
-            action_result,
-            CROWDSTRIKE_RESOLVE_DETECTION_APIPATH,
-            json_data=api_data,
-            method="patch",
-        )
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        return action_result.set_status(phantom.APP_SUCCESS, "Status set successfully")
 
     def _handle_resolve_epp_alerts(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2262,56 +2238,6 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_list_detections(self, param):
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        params = {k: param[k] for k in param.keys() if k in [CROWDSTRIKE_FILTER, CROWDSTRIKE_LIMIT, CROWDSTRIKE_SORT]}
-
-        resp = self._check_data(action_result, params)
-
-        if phantom.is_fail(resp):
-            return action_result.get_status()
-
-        detection_id_list = self._get_ids(action_result, CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT, params)
-        if detection_id_list is None:
-            return action_result.get_status()
-
-        detection_id_data = list()
-        detection_id_data.extend(detection_id_list)
-        params.update({"ids": detection_id_list})
-
-        detection_details_list = self._get_details(
-            action_result,
-            CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT,
-            params,
-            method="post",
-        )
-
-        if detection_details_list is None:
-            return action_result.get_status()
-
-        detection_sorted_list = list()
-        test_details = dict()
-
-        for data in detection_details_list:
-            test_details.update({data["detection_id"]: data})
-
-        for detection_id in detection_id_data:
-            try:
-                if test_details[detection_id] not in detection_sorted_list:
-                    detection_sorted_list.append(test_details[detection_id])
-            except Exception as ex:
-                self.debug_print(f"Error occurred while sorting the alert details, Error: {self._get_error_message_from_exception(ex)}")
-
-        for detection in detection_sorted_list:
-            action_result.add_data(detection)
-
-        summary = action_result.update_summary({})
-        summary["total_detections"] = action_result.get_data_size()
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
     def _handle_list_epp_alerts(self, param):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2363,37 +2289,6 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_get_detections_details(self, param):
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        ids = self.validate_comma_seperated_values(param.get("detection_ids"))
-        if not ids:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="detection_ids"),
-            )
-
-        data = {"ids": ids}
-
-        detection_details_list = self._get_details(
-            action_result,
-            CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT,
-            data,
-            method="post",
-        )
-
-        if detection_details_list is None:
-            return action_result.get_status()
-
-        for detection in detection_details_list:
-            action_result.add_data(detection)
-
-        summary = action_result.update_summary({})
-        summary["total_detections"] = len(detection_details_list)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
     def _handle_get_epp_alerts_details(self, param):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2422,60 +2317,6 @@ class CrowdstrikeConnector(BaseConnector):
 
         summary = action_result.update_summary({})
         summary["total_alerts"] = len(alert_details_list)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_update_detections(self, param):
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        assigned_to_user = param.get("assigned_to_user")
-        comment = param.get("comment")
-        show_in_ui = param.get("show_in_ui", True)
-        status = param.get("status")
-        ids = self.validate_comma_seperated_values(param.get("detection_ids"))
-        if not ids:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="detection_ids"),
-            )
-
-        data = {"ids": ids, "show_in_ui": show_in_ui}
-
-        if assigned_to_user:
-            data["assigned_to_uuid"] = assigned_to_user
-
-        if comment:
-            data["comment"] = comment
-
-        if status:
-            if status not in CROWDSTRIKE_DETECTION_STATUSES:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    CROWDSTRIKE_ERROR_INVALID_ACTION_PARAM.format(key="status"),
-                )
-            data["status"] = status
-
-        ret_val, response = self._make_rest_call_helper_oauth2(
-            action_result,
-            CROWDSTRIKE_RESOLVE_DETECTION_APIPATH,
-            json_data=data,
-            method="patch",
-        )
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(response)
-        if response.get("meta", {}).get("writes", {}).get("resources_affected", 0) != len(ids):
-            errors = [error.get("message") for error in response.get("errors", [])]
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Errors occurred while updating detections: {}".format("\r\n".join(errors)),
-            )
-
-        summary = action_result.update_summary({})
-        summary["detections_affected"] = len(ids)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -5110,10 +4951,7 @@ class CrowdstrikeConnector(BaseConnector):
             "delete_session": self._handle_delete_session,
             "list_alerts": self._handle_list_alerts,
             "list_epp_alerts": self._handle_list_epp_alerts,
-            "list_detections": self._handle_list_detections,
-            "get_detections_details": self._handle_get_detections_details,
             "get_epp_alerts_details": self._handle_get_epp_alerts_details,
-            "update_detections": self._handle_update_detections,
             "update_epp_alerts": self._handle_update_epp_alerts,
             "list_sessions": self._handle_list_sessions,
             "run_command": self._handle_run_command,
@@ -5130,7 +4968,6 @@ class CrowdstrikeConnector(BaseConnector):
             "hunt_ip": self._handle_hunt_ip,
             "get_process_detail": self._handle_get_process_detail,
             "get_device_detail": self._handle_get_device_detail,
-            "resolve_detection": self._handle_resolve_detection,
             "resolve_epp_alerts": self._handle_resolve_epp_alerts,
             "list_incidents": self._handle_list_incidents,
             "list_incident_behaviors": self._handle_list_incident_behaviors,

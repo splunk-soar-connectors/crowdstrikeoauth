@@ -29,9 +29,6 @@ This app integrates with CrowdStrike OAuth2 authentication standard to implement
 | [remove hosts](#action-remove-hosts) | Hosts <br> Hosts Group | ✓ <br> ✗ | ✗ <br> ✓ |
 | [create session](#action-create-session) | Real time response(RTR) | ✓ | ✗ |
 | [delete session](#action-delete-session) | Real time response(RTR) | ✓ | ✗ |
-| [list detections](#action-list-detections) | Detections | ✓ | ✗ |
-| [get detections details](#action-get-detections-details) | Detections | ✓ | ✗ |
-| [update detections](#action-update-detections) | Detections | ✗ | ✓ |
 | [list alerts](#action-list-alerts) | Alerts | ✓ | ✗ |
 | [list epp alerts](#action-list-epp-alerts) | Alerts | ✓ | ✗ |
 | [get epp details](#action-get-epp-details) | Alerts | ✓ | ✗ |
@@ -53,7 +50,6 @@ This app integrates with CrowdStrike OAuth2 authentication standard to implement
 | [list incident behaviors](#action-list-incident-behaviors) | Incidents | ✓ | ✗ |
 | [list incidents](#action-list-incidents) | Incidents | ✓ | ✗ |
 | [get session file](#action-get-session-file) | Real time response(RTR) | ✗ | ✓ |
-| [set status](#action-set-status) | Detections | ✗ | ✓ |
 | [get system info](#action-get-system-info) | Hosts | ✓ | ✗ |
 | [get process detail](#action-get-process-detail) | IOCs(Indicators of Compromise) | ✓ | ✗ |
 | [hunt file](#action-hunt-file) | IOCs(Indicators of Compromise) | ✓ | ✗ |
@@ -400,6 +396,19 @@ default ports used by Splunk SOAR.
 | http | tcp | 80 |
 | https | tcp | 443 |
 
+## Removed Actions
+
+The following actions have been removed because they relied on the legacy CrowdStrike Detects API which has been deprecated:
+
+| **Removed Action** | **Replacement Action** |
+|--------------------|------------------------|
+| list detections | [list epp alerts](#action-list-epp-alerts) |
+| get detections details | [get epp details](#action-get-epp-details) |
+| set status | [resolve epp alerts](#action-resolve-epp-alerts) |
+| update detections | [update epp alerts](#action-update-epp-alerts) |
+
+Existing playbooks that use any of these removed actions must be updated to use the corresponding replacement actions listed above.
+
 ## Playbook Backward Compatibility
 
 - The output data-paths have been updated in the below-existing action. Hence, it is requested to
@@ -446,11 +455,8 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [remove hosts](#action-remove-hosts) - Remove one or more hosts from the static host group <br>
 [create session](#action-create-session) - Initialize a new session with the Real Time Response cloud <br>
 [delete session](#action-delete-session) - Deletes a Real Time Response session <br>
-[list detections](#action-list-detections) - Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\* <br>
 [list epp alerts](#action-list-epp-alerts) - Get a list of epp alerts, replaces legacy Detects API <br>
-[get detections details](#action-get-detections-details) - Get a list of detections details by providing detection IDs \*The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead\* <br>
 [get epp details](#action-get-epp-details) - Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API <br>
-[update detections](#action-update-detections) - Update detections in crowdstrike host \*The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead\* <br>
 [update epp alerts](#action-update-epp-alerts) - Update EPP alerts in CrowdStrike, replaces legacy Detects API <br>
 [list alerts](#action-list-alerts) - Get a list of alerts <br>
 [list sessions](#action-list-sessions) - Lists Real Time Response sessions <br>
@@ -469,7 +475,6 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [list incident behaviors](#action-list-incident-behaviors) - Search for behaviors by providing an FQL filter, sorting, and paging details <br>
 [list incidents](#action-list-incidents) - Search for incidents by providing an FQL filter, sorting, and paging details <br>
 [get session file](#action-get-session-file) - Get RTR extracted file contents for the specified session and sha256 and add it to the vault <br>
-[set status](#action-set-status) - Set the state of a detection in Crowdstrike Host \*The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead\* <br>
 [resolve epp alerts](#action-resolve-epp-alerts) - Update the status of an EPP alert in CrowdStrike, replaces legacy Detects API <br>
 [get system info](#action-get-system-info) - Get details of a device, given the device ID <br>
 [get process detail](#action-get-process-detail) - Retrieve the details of a process that is running or that previously ran, given a process ID <br>
@@ -965,136 +970,6 @@ action_result.message | string | | Session ended successfully |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'list detections'
-
-Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\*
-
-Type: **investigate** <br>
-Read only: **True**
-
-This action supports filtering in order to retrieve a particular set of detections.
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**limit** | optional | Maximum detections to be fetched | numeric | |
-**filter** | optional | Filter expression used to limit the fetched detections (FQL Syntax) | string | |
-**sort** | optional | Property to sort by | string | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failed |
-action_result.parameter.filter | string | | modified_timestamp:\<='2019-06-14T10:22:02.02236652Z' |
-action_result.parameter.limit | numeric | | 120 |
-action_result.parameter.sort | string | | created_timestamp.asc |
-action_result.data | string | | |
-action_result.data.\*.behaviors.\*.alleged_filetype | string | | exe |
-action_result.data.\*.behaviors.\*.behavior_id | string | | 10354 |
-action_result.data.\*.behaviors.\*.cmdline | string | | |
-action_result.data.\*.behaviors.\*.confidence | numeric | | 80 |
-action_result.data.\*.behaviors.\*.control_graph_id | string | | ctg:46592f3d661a469eb2503d72a29afd3a:309255693652 |
-action_result.data.\*.behaviors.\*.description | string | | |
-action_result.data.\*.behaviors.\*.device_id | string | `md5` `crowdstrike device id` | 46592f3d661a469eb2503d72a29afd3a |
-action_result.data.\*.behaviors.\*.display_name | string | | CredentialsInFilesCredentialAccess |
-action_result.data.\*.behaviors.\*.filename | string | | powershell.exe |
-action_result.data.\*.behaviors.\*.filepath | string | | \\Device\\HarddiskVolume2\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe |
-action_result.data.\*.behaviors.\*.ioc_description | string | | \\Device\\HarddiskVolume2\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe |
-action_result.data.\*.behaviors.\*.ioc_source | string | | library_load |
-action_result.data.\*.behaviors.\*.ioc_type | string | | hash_sha256 |
-action_result.data.\*.behaviors.\*.ioc_value | string | | 9f914d42706fe215501044acd85a32d58aaef1419d404fddfa5d3b48f66ccd9f |
-action_result.data.\*.behaviors.\*.md5 | string | | 04029e121a0cfa5991749937dd22a1d9 |
-action_result.data.\*.behaviors.\*.objective | string | | Gain Access |
-action_result.data.\*.behaviors.\*.parent_details.parent_cmdline | string | | "C:\\WINDOWS\\system32\\cmd.exe" |
-action_result.data.\*.behaviors.\*.parent_details.parent_md5 | string | | 8a2122e8162dbef04694b9c3e0b6cdee |
-action_result.data.\*.behaviors.\*.parent_details.parent_process_graph_id | string | | pid:46592f3d661a469eb2503d72a29afd3a:740512001748 |
-action_result.data.\*.behaviors.\*.parent_details.parent_sha256 | string | | b99d61d874728edc0918ca0eb10eab93d381e7367e377406e65963366c874450 |
-action_result.data.\*.behaviors.\*.pattern_disposition | numeric | | 2048 |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.blocking_unsupported_or_disabled | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.bootup_safeguard_enabled | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.critical_process_disabled | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.detect | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.fs_operation_blocked | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.handle_operation_downgraded | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.inddet_mask | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.indicator | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_action_failed | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_parent | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_process | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_subprocess | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.operation_blocked | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.policy_disabled | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.process_blocked | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.quarantine_file | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.quarantine_machine | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.registry_operation_blocked | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.rooting | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.sensor_only | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.suspend_parent | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.suspend_process | boolean | | False True |
-action_result.data.\*.behaviors.\*.scenario | string | | suspicious_activity |
-action_result.data.\*.behaviors.\*.severity | numeric | | 70 |
-action_result.data.\*.behaviors.\*.sha256 | string | | 9f914d42706fe215501044acd85a32d58aaef1419d404fddfa5d3b48f66ccd9f |
-action_result.data.\*.behaviors.\*.tactic | string | | Credential Access |
-action_result.data.\*.behaviors.\*.tactic_id | string | | TA0006 |
-action_result.data.\*.behaviors.\*.technique | string | | Credentials In Files |
-action_result.data.\*.behaviors.\*.technique_id | string | | T1552.001 |
-action_result.data.\*.behaviors.\*.template_instance_id | string | | 2649 |
-action_result.data.\*.behaviors.\*.timestamp | string | | 2022-09-26T11:30:26Z |
-action_result.data.\*.behaviors.\*.triggering_process_graph_id | string | | pid:46592f3d661a469eb2503d72a29afd3a:743690872884 |
-action_result.data.\*.behaviors.\*.user_id | string | | S-1-5-21-3607613384-2395287924-1763154957-1001 |
-action_result.data.\*.behaviors.\*.user_name | string | | testuser |
-action_result.data.\*.cid | string | `md5` | 3061c7ff3b634e22b38274d4b586558e |
-action_result.data.\*.created_timestamp | string | | 2022-09-26T11:30:42.246972793Z |
-action_result.data.\*.date_updated | string | | 2022-09-26T11:45:46Z |
-action_result.data.\*.detection_id | string | `crowdstrike detection id` | ldt:46592f3d661a469eb2503d72a29afd3a:309255693652 |
-action_result.data.\*.device.agent_load_flags | string | | 0 |
-action_result.data.\*.device.agent_local_time | string | | 2022-08-22T15:45:16.195Z |
-action_result.data.\*.device.agent_version | string | | 6.44.15806.0 |
-action_result.data.\*.device.bios_manufacturer | string | | Phoenix Technologies LTD |
-action_result.data.\*.device.bios_version | string | | 6.00 |
-action_result.data.\*.device.cid | string | | 3061c7ff3b634e22b38274d4b586558e |
-action_result.data.\*.device.config_id_base | string | | 65994753 |
-action_result.data.\*.device.config_id_build | string | | 15806 |
-action_result.data.\*.device.config_id_platform | string | | 3 |
-action_result.data.\*.device.device_id | string | `md5` `crowdstrike device id` | 46592f3d661a469eb2503d72a29afd3a |
-action_result.data.\*.device.external_ip | string | | 204.107.141.240 |
-action_result.data.\*.device.first_seen | string | | 2020-08-13T23:45:59Z |
-action_result.data.\*.device.hostname | string | | CB-TEST-02 |
-action_result.data.\*.device.last_seen | string | | 2022-09-26T11:21:40Z |
-action_result.data.\*.device.local_ip | string | | 10.1.18.205 |
-action_result.data.\*.device.mac_address | string | | 00-50-56-12-34-56 |
-action_result.data.\*.device.machine_domain | string | | sql19.local |
-action_result.data.\*.device.major_version | string | | 10 |
-action_result.data.\*.device.minor_version | string | | 0 |
-action_result.data.\*.device.modified_timestamp | string | | 2022-09-26T11:27:43Z |
-action_result.data.\*.device.os_version | string | | Windows 10 |
-action_result.data.\*.device.platform_id | string | | 0 |
-action_result.data.\*.device.platform_name | string | | Windows |
-action_result.data.\*.device.product_type | string | | 1 |
-action_result.data.\*.device.product_type_desc | string | | Workstation |
-action_result.data.\*.device.site_name | string | | Default-First-Site-Name |
-action_result.data.\*.device.status | string | | normal |
-action_result.data.\*.device.system_manufacturer | string | | VMware, Inc. |
-action_result.data.\*.device.system_product_name | string | | VMware Virtual Platform |
-action_result.data.\*.email_sent | boolean | | False |
-action_result.data.\*.first_behavior | string | | 2022-09-26T11:30:26Z |
-action_result.data.\*.hostinfo.domain | string | | |
-action_result.data.\*.last_behavior | string | | 2022-09-26T11:30:26Z |
-action_result.data.\*.max_confidence | numeric | | 80 |
-action_result.data.\*.max_severity | numeric | | 70 |
-action_result.data.\*.max_severity_displayname | string | | High |
-action_result.data.\*.seconds_to_resolved | numeric | | 0 |
-action_result.data.\*.seconds_to_triaged | numeric | | 0 |
-action_result.data.\*.show_in_ui | boolean | | True |
-action_result.data.\*.status | string | | new |
-action_result.summary.total_detections | numeric | | 44 |
-action_result.message | string | | Total detections: 44 |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
 ## action: 'list epp alerts'
 
 Get a list of epp alerts, replaces legacy Detects API
@@ -1269,132 +1144,6 @@ summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 action_result.parameter.limit | numeric | | |
 
-## action: 'get detections details'
-
-Get a list of detections details by providing detection IDs \*The action uses legacy Detects API being deprecated. Please use the 'get epp details' action instead\*
-
-Type: **investigate** <br>
-Read only: **True**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**detection_ids** | required | List of detection IDs. Comma-separated list allowed | string | `crowdstrike detection id` |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failed |
-action_result.parameter.detection_ids | string | `crowdstrike detection id` | |
-action_result.data | string | | |
-action_result.data.\*.assigned_to_name | string | | test user |
-action_result.data.\*.assigned_to_uid | string | | usertest@gmail.com |
-action_result.data.\*.behaviors.\*.alleged_filetype | string | | exe |
-action_result.data.\*.behaviors.\*.behavior_id | string | | 10354 |
-action_result.data.\*.behaviors.\*.cmdline | string | | |
-action_result.data.\*.behaviors.\*.confidence | numeric | | 80 |
-action_result.data.\*.behaviors.\*.control_graph_id | string | | ctg:46592f3d661a469eb2503d72a29afd3a:309255693652 |
-action_result.data.\*.behaviors.\*.description | string | | |
-action_result.data.\*.behaviors.\*.device_id | string | `md5` `crowdstrike device id` | 46592f3d661a469eb2503d72a29afd3a |
-action_result.data.\*.behaviors.\*.display_name | string | | CredentialsInFilesCredentialAccess |
-action_result.data.\*.behaviors.\*.filename | string | | powershell.exe |
-action_result.data.\*.behaviors.\*.filepath | string | | \\Device\\HarddiskVolume2\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe |
-action_result.data.\*.behaviors.\*.ioc_description | string | | \\Device\\HarddiskVolume2\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe |
-action_result.data.\*.behaviors.\*.ioc_source | string | | library_load |
-action_result.data.\*.behaviors.\*.ioc_type | string | | hash_sha256 |
-action_result.data.\*.behaviors.\*.ioc_value | string | | 9f914d42706fe215501044acd85a32d58aaef1419d404fddfa5d3b48f66ccd9f |
-action_result.data.\*.behaviors.\*.md5 | string | | 04029e121a0cfa5991749937dd22a1d9 |
-action_result.data.\*.behaviors.\*.objective | string | | Gain Access |
-action_result.data.\*.behaviors.\*.parent_details.parent_cmdline | string | | "C:\\WINDOWS\\system32\\cmd.exe" |
-action_result.data.\*.behaviors.\*.parent_details.parent_md5 | string | | 8a2122e8162dbef04694b9c3e0b6cdee |
-action_result.data.\*.behaviors.\*.parent_details.parent_process_graph_id | string | | pid:46592f3d661a469eb2503d72a29afd3a:740512001748 |
-action_result.data.\*.behaviors.\*.parent_details.parent_sha256 | string | | b99d61d874728edc0918ca0eb10eab93d381e7367e377406e65963366c874450 |
-action_result.data.\*.behaviors.\*.pattern_disposition | numeric | | 2048 |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.blocking_unsupported_or_disabled | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.bootup_safeguard_enabled | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.critical_process_disabled | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.detect | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.fs_operation_blocked | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.handle_operation_downgraded | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.inddet_mask | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.indicator | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_action_failed | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_parent | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_process | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.kill_subprocess | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.operation_blocked | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.policy_disabled | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.process_blocked | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.quarantine_file | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.quarantine_machine | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.registry_operation_blocked | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.rooting | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.sensor_only | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.suspend_parent | boolean | | False True |
-action_result.data.\*.behaviors.\*.pattern_disposition_details.suspend_process | boolean | | False True |
-action_result.data.\*.behaviors.\*.scenario | string | | suspicious_activity |
-action_result.data.\*.behaviors.\*.severity | numeric | | 70 |
-action_result.data.\*.behaviors.\*.sha256 | string | | 9f914d42706fe215501044acd85a32d58aaef1419d404fddfa5d3b48f66ccd9f |
-action_result.data.\*.behaviors.\*.tactic | string | | Credential Access |
-action_result.data.\*.behaviors.\*.tactic_id | string | | TA0006 |
-action_result.data.\*.behaviors.\*.technique | string | | Credentials In Files |
-action_result.data.\*.behaviors.\*.technique_id | string | | T1552.001 |
-action_result.data.\*.behaviors.\*.template_instance_id | string | | 2649 |
-action_result.data.\*.behaviors.\*.timestamp | string | | 2022-09-26T11:30:26Z |
-action_result.data.\*.behaviors.\*.triggering_process_graph_id | string | | pid:46592f3d661a469eb2503d72a29afd3a:743690872884 |
-action_result.data.\*.behaviors.\*.user_id | string | | S-1-5-21-3607613384-2395287924-1763154957-1001 |
-action_result.data.\*.behaviors.\*.user_name | string | | testuser |
-action_result.data.\*.cid | string | `md5` | 3061c7ff3b634e22b38274d4b586558e |
-action_result.data.\*.created_timestamp | string | | 2022-09-26T11:30:42.246972793Z |
-action_result.data.\*.date_updated | string | | 2022-09-26T11:45:46Z |
-action_result.data.\*.detection_id | string | `crowdstrike detection id` | ldt:46592f3d661a469eb2503d72a29afd3a:309255693652 |
-action_result.data.\*.device.agent_load_flags | string | | 0 |
-action_result.data.\*.device.agent_local_time | string | | 2022-08-22T15:45:16.195Z |
-action_result.data.\*.device.agent_version | string | | 6.44.15806.0 |
-action_result.data.\*.device.bios_manufacturer | string | | Phoenix Technologies LTD |
-action_result.data.\*.device.bios_version | string | | 6.00 |
-action_result.data.\*.device.cid | string | | 3061c7ff3b634e22b38274d4b586558e |
-action_result.data.\*.device.config_id_base | string | | 65994753 |
-action_result.data.\*.device.config_id_build | string | | 15806 |
-action_result.data.\*.device.config_id_platform | string | | 3 |
-action_result.data.\*.device.device_id | string | `md5` `crowdstrike device id` | 46592f3d661a469eb2503d72a29afd3a |
-action_result.data.\*.device.external_ip | string | | 204.107.141.240 |
-action_result.data.\*.device.first_seen | string | | 2020-08-13T23:45:59Z |
-action_result.data.\*.device.hostname | string | | CB-TEST-02 |
-action_result.data.\*.device.last_seen | string | | 2022-09-26T11:21:40Z |
-action_result.data.\*.device.local_ip | string | | 10.1.18.205 |
-action_result.data.\*.device.mac_address | string | | 00-50-56-12-34-56 |
-action_result.data.\*.device.machine_domain | string | | sql19.local |
-action_result.data.\*.device.major_version | string | | 10 |
-action_result.data.\*.device.minor_version | string | | 0 |
-action_result.data.\*.device.modified_timestamp | string | | 2022-09-26T11:27:43Z |
-action_result.data.\*.device.os_version | string | | Windows 10 |
-action_result.data.\*.device.platform_id | string | | 0 |
-action_result.data.\*.device.platform_name | string | | Windows |
-action_result.data.\*.device.product_type | string | | 1 |
-action_result.data.\*.device.product_type_desc | string | | Workstation |
-action_result.data.\*.device.site_name | string | | Default-First-Site-Name |
-action_result.data.\*.device.status | string | | normal |
-action_result.data.\*.device.system_manufacturer | string | | VMware, Inc. |
-action_result.data.\*.device.system_product_name | string | | VMware Virtual Platform |
-action_result.data.\*.email_sent | boolean | | False |
-action_result.data.\*.first_behavior | string | | 2022-09-26T11:30:26Z |
-action_result.data.\*.hostinfo.domain | string | | |
-action_result.data.\*.last_behavior | string | | 2022-09-26T11:30:26Z |
-action_result.data.\*.max_confidence | numeric | | 80 |
-action_result.data.\*.max_severity | numeric | | 70 |
-action_result.data.\*.max_severity_displayname | string | | High |
-action_result.data.\*.seconds_to_resolved | numeric | | 2 |
-action_result.data.\*.seconds_to_triaged | numeric | | 1 |
-action_result.data.\*.show_in_ui | boolean | | True |
-action_result.data.\*.status | string | | new |
-action_result.summary.total_detections | numeric | | 44 |
-action_result.message | string | | Total detections: 44 |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
 ## action: 'get epp details'
 
 Get list of alert details for EPP alerts by providing composite IDs, replaces legacy Detects API
@@ -1562,43 +1311,6 @@ action_result.data.\*.user_id | string | | S-1-5-21-246xxxx873-120xxxx372-215xxx
 action_result.data.\*.user_name | string | | testusername |
 action_result.message | string | | Success |
 action_result.status | string | | success |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
-## action: 'update detections'
-
-Update detections in crowdstrike host \*The action uses legacy Detects API being deprecated. Please use the 'update epp alerts' action instead\*
-
-Type: **generic** <br>
-Read only: **False**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**detection_ids** | required | List of Detection IDs to update, Comma-separated list allowed | string | `crowdstrike detection id` |
-**comment** | optional | Comment to add to the detection (Maximum 2048 bytes) | string | |
-**assigned_to_user** | optional | User ID to assign | string | `crowdstrike unique user id` |
-**show_in_ui** | optional | This detection is displayed or not in falcon UI | boolean | |
-**status** | optional | Status to set | string | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failed |
-action_result.parameter.assigned_to_user | string | `crowdstrike unique user id` | |
-action_result.parameter.comment | string | | update status of detection |
-action_result.parameter.detection_ids | string | `crowdstrike detection id` | ldt:07c312fabcb8473454d0a16f118928fg:10548439893999 |
-action_result.parameter.show_in_ui | boolean | | True False |
-action_result.parameter.status | string | | in_progress |
-action_result.data.\*.meta.powered_by | string | | legacy-detects |
-action_result.data.\*.meta.query_time | numeric | | 0 |
-action_result.data.\*.meta.trace_id | string | | a30c7b54-ae00-4a87-8324-0a575ba7dcb4 |
-action_result.data.\*.meta.writes.resources_affected | numeric | | 2 |
-action_result.summary | string | | |
-action_result.summary.detections_affected | numeric | | 1 |
-action_result.message | string | | Detections affected: 1 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -2412,35 +2124,6 @@ action_result.data.\*.vault_document | numeric | | 556 |
 action_result.data.\*.vault_id | string | `sha1` `vault id` | 30c5e524e975816fbce1d958150e394efc219772 |
 action_result.summary.vault_id | string | `sha1` `vault id` | 30c5e524e975816fbce1d958150e394efc219772 |
 action_result.message | string | | Session file fetched successfully |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
-## action: 'set status'
-
-Set the state of a detection in Crowdstrike Host \*The action uses legacy Detects API being deprecated. Please use the 'resolve epp alerts' action instead\*
-
-Type: **generic** <br>
-Read only: **False**
-
-The detection <b>id</b> can be obtained from the Crowdstrike UI and its state can be set.
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**id** | required | Detection ID to set the state of | string | `crowdstrike detection id` |
-**state** | required | State to set | string | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failed |
-action_result.parameter.id | string | `crowdstrike detection id` | ldt:07c312fabcb8473454d0a16f118928fg:10548439893999 |
-action_result.parameter.state | string | | in_progress |
-action_result.data | string | | |
-action_result.summary | string | | |
-action_result.message | string | | Status set successfully |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -4547,7 +4230,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

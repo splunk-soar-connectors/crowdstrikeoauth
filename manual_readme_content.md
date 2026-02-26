@@ -19,9 +19,6 @@
 | [remove hosts](#action-remove-hosts) | Hosts <br> Hosts Group | ✓ <br> ✗ | ✗ <br> ✓ |
 | [create session](#action-create-session) | Real time response(RTR) | ✓ | ✗ |
 | [delete session](#action-delete-session) | Real time response(RTR) | ✓ | ✗ |
-| [list detections](#action-list-detections) | Detections | ✓ | ✗ |
-| [get detections details](#action-get-detections-details) | Detections | ✓ | ✗ |
-| [update detections](#action-update-detections) | Detections | ✗ | ✓ |
 | [list alerts](#action-list-alerts) | Alerts | ✓ | ✗ |
 | [list epp alerts](#action-list-epp-alerts) | Alerts | ✓ | ✗ |
 | [get epp details](#action-get-epp-details) | Alerts | ✓ | ✗ |
@@ -43,7 +40,6 @@
 | [list incident behaviors](#action-list-incident-behaviors) | Incidents | ✓ | ✗ |
 | [list incidents](#action-list-incidents) | Incidents | ✓ | ✗ |
 | [get session file](#action-get-session-file) | Real time response(RTR) | ✗ | ✓ |
-| [set status](#action-set-status) | Detections | ✗ | ✓ |
 | [get system info](#action-get-system-info) | Hosts | ✓ | ✗ |
 | [get process detail](#action-get-process-detail) | IOCs(Indicators of Compromise) | ✓ | ✗ |
 | [hunt file](#action-hunt-file) | IOCs(Indicators of Compromise) | ✓ | ✗ |
@@ -389,6 +385,19 @@ default ports used by Splunk SOAR.
 |--------------|--------------------|------|
 | http | tcp | 80 |
 | https | tcp | 443 |
+
+## Removed Actions
+
+The following actions have been removed because they relied on the legacy CrowdStrike Detects API which has been deprecated:
+
+| **Removed Action** | **Replacement Action** |
+|--------------------|------------------------|
+| list detections | [list epp alerts](#action-list-epp-alerts) |
+| get detections details | [get epp details](#action-get-epp-details) |
+| set status | [resolve epp alerts](#action-resolve-epp-alerts) |
+| update detections | [update epp alerts](#action-update-epp-alerts) |
+
+Existing playbooks that use any of these removed actions must be updated to use the corresponding replacement actions listed above.
 
 ## Playbook Backward Compatibility
 

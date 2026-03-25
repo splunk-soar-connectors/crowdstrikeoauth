@@ -3537,6 +3537,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         if not response:
+            action_result.set_summary({"process_count": 0})
             return action_result.set_status(
                 phantom.APP_SUCCESS,
                 "No resources found from the response for the list processes action",

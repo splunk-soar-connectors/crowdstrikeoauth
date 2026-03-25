@@ -112,56 +112,55 @@
       <!-- loop for each result -->
       <br>
       <!------------------- For each Result ---------------------->
-      {% if not result.data %}
-        <h4 class="wf-h4-style">No data found</h4>
-      {% else %}
+      {# Info is shown even when no process rows so widget labels (e.g. Falcon Device ID) remain in HTML for automation. #}
+      {% if result.param.ioc %}
         <h3 class="wf-h3-style">Info</h3>
-        {% if result.param.ioc %}
-          <table class="wf-table-vertical">
-            {% if result.summary %}
-              <tr>
-                <td>
-                  <b>Falcon Device ID</b>
-                </td>
-                <td>
-                  <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': [ 'crowdstrike device id' ], 'value': '{{ result.param.id }}' }], 0, {{ container.id }}, null, false);">
-                    {{ result.param.id }}
-                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <b>IOC Queried</b>
-                </td>
-                <td>
-                  <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type }}' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
-                    {{ result.param.ioc }}
-                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                  </a>
-                </td>
-              </tr>
-              {% if result.param.limit %}
-                <tr>
-                  <td>
-                    <b>Limit</b>
-                  </td>
-                  <td>{{ result.param.limit }}</td>
-                </tr>
-              {% endif %}
-              <tr>
-                <td>
-                  <b>Total Processes Found</b>
-                </td>
-                <td>{{ result.summary.process_count }}</td>
-              </tr>
-            {% endif %}
-          </table>
-          <br>
-        {% endif %}
-        <h3 class="wf-h3-style">Process Info</h3>
+        <table class="wf-table-vertical">
+          <tr>
+            <td>
+              <b>Falcon Device ID</b>
+            </td>
+            <td>
+              <a href="javascript:;"
+                 onclick="context_menu(this, [{'contains': [ 'crowdstrike device id' ], 'value': '{{ result.param.id }}' }], 0, {{ container.id }}, null, false);">
+                {{ result.param.id }}
+                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b>IOC Queried</b>
+            </td>
+            <td>
+              <a href="javascript:;"
+                 onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type }}' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
+                {{ result.param.ioc }}
+                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+          </tr>
+          {% if result.param.limit %}
+            <tr>
+              <td>
+                <b>Limit</b>
+              </td>
+              <td>{{ result.param.limit }}</td>
+            </tr>
+          {% endif %}
+          {% if result.summary %}
+            <tr>
+              <td>
+                <b>Total Processes Found</b>
+              </td>
+              <td>{{ result.summary.process_count }}</td>
+            </tr>
+          {% endif %}
+        </table>
+        <br>
+      {% endif %}
+      <h3 class="wf-h3-style">Process Info</h3>
+      {% if result.data %}
         <div class="metadata_div">
           <!--Default View-->
           <div class="panel-group" id="server-information">
@@ -191,8 +190,10 @@
             </div>
           </div>
         </div>
-        <br>
+      {% else %}
+        <h4 class="wf-h4-style">No data found</h4>
       {% endif %}
+      <br>
     {% endfor %}
     <!-- loop for each result end -->
   </div>

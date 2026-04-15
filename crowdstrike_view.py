@@ -262,14 +262,8 @@ def display_view(provides, all_app_runs, context):
     if provides == "list users":
         return "crowdstrike_list_users.html"
 
-    if provides == "list detections":
-        return "crowdstrike_list_detections.html"
-
     if provides == "list epp alerts":
         return "crowdstrike_list_epp_alerts.html"
-
-    if provides == "get detections details":
-        return "crowdstrike_get_detections_details.html"
 
     if provides == "get epp alerts details":
         return "crowdstrike_get_alerts_details.html"
@@ -334,19 +328,6 @@ def indicator_view(provides, all_app_runs, context):
         return "crowdstrike_delete_indicator.html"
 
     return "crowdstrike_get_indicator.html"
-
-
-def set_status_view(provides, all_app_runs, context):
-    context["results"] = results = []
-    for summary, action_results in all_app_runs:
-        for result in action_results:
-            ctx_result = get_ctx_result(result)
-            if not ctx_result:
-                continue
-            results.append(ctx_result)
-
-    # print context
-    return "crowdstrike_set_status_view.html"
 
 
 def process_list_view(provides, all_app_runs, context):

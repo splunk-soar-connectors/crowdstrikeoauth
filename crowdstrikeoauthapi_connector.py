@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_connector.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -3537,6 +3537,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         if not response:
+            action_result.set_summary({"process_count": 0})
             return action_result.set_status(
                 phantom.APP_SUCCESS,
                 "No resources found from the response for the list processes action",
@@ -3560,60 +3561,79 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # required parameters
-        ioc = param[CROWDSTRIKE_JSON_IOC]
+        ioc_input = param[CROWDSTRIKE_JSON_IOC]
         action = param[CROWDSTRIKE_IOCS_ACTION]
 
-        ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+        # Split on commas and newlines so that multiple IOC values entered in
+        # the ioc field (e.g. "hash1,hash2,hash3") are handled individually.
+        ioc_values = []
+        for part in ioc_input.replace("\n", ",").split(","):
+            val = part.strip()
+            if val:
+                ioc_values.append(val)
+
+        if not ioc_values:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "No valid IOC value(s) found. Provide one or more domain, IP, or hash values separated by commas or newlines.",
+            )
 
         platforms = [x.strip() for x in param[CROWDSTRIKE_IOCS_PLATFORMS].split(",")]
         platforms = list(filter(None, platforms))
 
-        indicator = {
-            CROWDSTRIKE_IOCS_ACTION: action,
-            CROWDSTRIKE_IOCS_PLATFORMS: platforms,
-            CROWDSTRIKE_IOCS_TYPE: ioc_type,
-            CROWDSTRIKE_IOCS_VALUE: ioc,
-        }
-        api_data = {"indicators": [indicator]}
-
-        # optional parameters
-        if CROWDSTRIKE_IOCS_EXPIRATION in param:
-            days = self._validate_integers(
-                action_result,
-                param.get(CROWDSTRIKE_IOCS_EXPIRATION),
-                CROWDSTRIKE_IOCS_EXPIRATION,
-            )
-            if days is None:
+        indicators = []
+        for ioc in ioc_values:
+            # Type is always auto-detected per IOC
+            ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
+            if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
-            indicator[CROWDSTRIKE_IOCS_EXPIRATION] = self._get_time_string(days)
+            indicator = {
+                CROWDSTRIKE_IOCS_ACTION: action,
+                CROWDSTRIKE_IOCS_PLATFORMS: platforms,
+                CROWDSTRIKE_IOCS_TYPE: ioc_type,
+                CROWDSTRIKE_IOCS_VALUE: ioc,
+            }
 
-        if CROWDSTRIKE_IOCS_SEVERITY in param:
-            indicator[CROWDSTRIKE_IOCS_SEVERITY] = param.get(CROWDSTRIKE_IOCS_SEVERITY)
+            # optional parameters
+            if CROWDSTRIKE_IOCS_EXPIRATION in param:
+                days = self._validate_integers(
+                    action_result,
+                    param.get(CROWDSTRIKE_IOCS_EXPIRATION),
+                    CROWDSTRIKE_IOCS_EXPIRATION,
+                )
+                if days is None:
+                    return action_result.get_status()
+                indicator[CROWDSTRIKE_IOCS_EXPIRATION] = self._get_time_string(days)
 
-        if CROWDSTRIKE_IOCS_SOURCE in param:
-            indicator[CROWDSTRIKE_IOCS_SOURCE] = param.get(CROWDSTRIKE_IOCS_SOURCE)
+            if CROWDSTRIKE_IOCS_SEVERITY in param:
+                indicator[CROWDSTRIKE_IOCS_SEVERITY] = param.get(CROWDSTRIKE_IOCS_SEVERITY)
 
-        if CROWDSTRIKE_IOCS_DESCRIPTION in param:
-            indicator[CROWDSTRIKE_IOCS_DESCRIPTION] = param.get(CROWDSTRIKE_IOCS_DESCRIPTION)
+            if CROWDSTRIKE_IOCS_SOURCE in param:
+                indicator[CROWDSTRIKE_IOCS_SOURCE] = param.get(CROWDSTRIKE_IOCS_SOURCE)
 
-        if CROWDSTRIKE_IOCS_TAGS in param:
-            tags = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_TAGS, "").split(",")]
-            tags = list(filter(None, tags))
-            indicator[CROWDSTRIKE_IOCS_TAGS] = tags
+            if CROWDSTRIKE_IOCS_DESCRIPTION in param:
+                indicator[CROWDSTRIKE_IOCS_DESCRIPTION] = param.get(CROWDSTRIKE_IOCS_DESCRIPTION)
 
-        if CROWDSTRIKE_IOCS_HOSTS in param:
-            hosts = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_HOSTS, "").split(",")]
-            hosts = list(filter(None, hosts))
-            indicator[CROWDSTRIKE_IOCS_HOSTS] = hosts
-        else:
-            indicator[CROWDSTRIKE_IOCS_ALL_HOSTS] = True
+            if CROWDSTRIKE_IOCS_TAGS in param:
+                tags = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_TAGS, "").split(",")]
+                tags = list(filter(None, tags))
+                indicator[CROWDSTRIKE_IOCS_TAGS] = tags
 
-        if CROWDSTRIKE_IOCS_FILENAME in param:
-            indicator[CROWDSTRIKE_IOCS_METADATA] = dict()
-            indicator[CROWDSTRIKE_IOCS_METADATA][CROWDSTRIKE_IOCS_FILENAME] = param.get(CROWDSTRIKE_IOCS_FILENAME)
+            if CROWDSTRIKE_IOCS_HOSTS in param:
+                hosts = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_HOSTS, "").split(",")]
+                hosts = list(filter(None, hosts))
+                indicator[CROWDSTRIKE_IOCS_HOSTS] = hosts
+            else:
+                indicator[CROWDSTRIKE_IOCS_ALL_HOSTS] = True
+
+            if CROWDSTRIKE_IOCS_FILENAME in param:
+                indicator[CROWDSTRIKE_IOCS_METADATA] = dict()
+                indicator[CROWDSTRIKE_IOCS_METADATA][CROWDSTRIKE_IOCS_FILENAME] = param.get(CROWDSTRIKE_IOCS_FILENAME)
+
+            indicators.append(indicator)
+
+        api_data = {"indicators": indicators}
         ret_val, response = self._make_rest_call_helper_oauth2(
             action_result,
             CROWDSTRIKE_GET_INDICATOR_ENDPOINT,

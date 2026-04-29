@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_consts.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ CROWDSTRIKE_JSON_COUNT_ONLY = "count_only"
 CROWDSTRIKE_GET_PROCESS_DETAIL_FALCON_PROCESS_ID = "falcon_process_id"
 CROWDSTRIKE_GET_DEVICE_DETAIL_DEVICE_ID = "id"
 CROWDSTRIKE_JSON_ID = "id"
-CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE = "state"
 PAYLOAD_SECURITY_API_KEY = "api_key"  # pragma: allowlist secret
 CROWDSTRIKE_JSON_IOC = "ioc"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID = "id"
@@ -94,7 +93,6 @@ CROWDSTRIKE_UNSUPPORTED_HASH_TYPE_ERROR = "Unsupported hash type"
 CROWDSTRIKE_API_UNSUPPORTED_METHOD_ERROR = "Unsupported method"
 CROWDSTRIKE_SERVER_CONNECTIVITY_ERROR = "Connection failed"
 CROWDSTRIKE_JSON_PARSE_ERROR = "Unable to parse reply as a Json, raw string reply: '{raw_text}'"
-CROWDSTRIKE_SUCC_SET_STATUS_ERROR = "Successfully set status"
 CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE = "No more feeds available"
 CROWDSTRIKE_GETTING_EVENTS_MESSAGE = "Getting maximum {max_events} events from id {lower_id} onwards (ids might not be contiguous)"
 CROWDSTRIKE_CONNECTIVITY_ERROR = "Error connecting to server"
@@ -166,8 +164,6 @@ CROWDSTRIKE_RUN_COMMAND_ENDPOINT = "/real-time-response/entities/command/v1"
 CROWDSTRIKE_LIST_ALERTS_ENDPOINT = "/alerts/queries/alerts/v2"
 CROWDSTRIKE_LIST_ALERT_DETAILS_ENDPOINT = "/alerts/entities/alerts/v2"
 
-CROWDSTRIKE_LIST_DETECTIONS_ENDPOINT = "/detects/queries/detects/v1"
-CROWDSTRIKE_LIST_DETECTIONS_DETAILS_ENDPOINT = "/detects/entities/summaries/GET/v1"
 
 CROWDSTRIKE_GET_RTR_FILES_ENDPOINT = "/real-time-response/entities/file/v1"
 CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT = "/real-time-response/entities/extracted-file-contents/v1"
@@ -178,7 +174,6 @@ CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT = "/iocs/combined/indicator/
 CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH = "/indicators/queries/devices/v1"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH = "/indicators/queries/processes/v1"
 CROWDSTRIKE_GET_PROCESS_DETAIL_APIPATH = "/processes/entities/processes/v1"
-CROWDSTRIKE_RESOLVE_DETECTION_APIPATH = "/detects/entities/detects/v2"
 CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT = "/incidents/queries/incidents/v1"
 CROWDSTRIKE_LIST_BEHAVIORS_ENDPOINT = "/incidents/queries/behaviors/v1"
 CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT = "/incidents/entities/incidents/GET/v1"
@@ -239,15 +234,6 @@ CROWDSTRIKE_SORT_CRITERIA_LIST = [
     "last_modified.desc",
 ]
 CROWDSTRIKE_API_SUCC_CODES = [200, 202, 204]
-CROWDSTRIKE_DETECTION_STATUSES = [
-    "new",
-    "in_progress",
-    "true_positive",
-    "false_positive",
-    "ignored",
-    "closed",
-    "reopened",
-]
 CROWDSTRIKE_EPP_ALERT_STATUSES = ["new", "in_progress", "closed", "reopened"]
 CROWDSTRIKE_EVENT_TYPES = ["DetectionSummaryEvent", "EppDetectionSummaryEvent"]
 

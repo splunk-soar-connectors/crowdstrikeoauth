@@ -14,7 +14,7 @@ repos:
         stages: [commit-msg]
         args: [--verbose]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+    rev: v5.0.0
     hooks:
       - id: check-merge-conflict
       - id: end-of-file-fixer
@@ -48,10 +48,9 @@ repos:
       - id: mdformat
         exclude: "release_notes/.*"
   - repo: https://github.com/returntocorp/semgrep
-    rev: v1.136.0
+    rev: v1.154.0
     hooks:
       - id: semgrep
-        additional_dependencies: ["setuptools==81.0.0"]
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
     hooks:

@@ -4368,6 +4368,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **rule_type_id** | required | Rule type to create (run the "list ioa types" action to find valid types of rules and their IDs and parameters) | numeric | |
 **disposition_id** | required | The action that the rule should take when triggered (valid dispositions can be found in the "list ioa types" output) | numeric | |
 **field_values** | required | JSON list of parameters to pass to the new rule (valid fields can be found in the "list ioa types" output) | string | |
+**field_values_substitutions** | optional | Comma-separated list of values to substitute into field_values placeholders ({0}, {1}, ...). Map playbook datapaths here instead of inside the JSON string. | string | |
 **comment** | optional | Comment for the audit log (optional) | string | |
 **enabled** | optional | Enable this rule immediately | boolean | |
 
@@ -4418,6 +4419,7 @@ action_result.summary.rule_id | string | `crowdstrike ioa rule id` | 1 |
 action_result.message | string | | Rule created successfully |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.field_values_substitutions | string | | |
 
 ## action: 'update ioa rule'
 
@@ -4547,7 +4549,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

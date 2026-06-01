@@ -1,6 +1,6 @@
 # File: crowdstrikeoauthapi_connector.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1943,6 +1943,23 @@ class CrowdstrikeConnector(BaseConnector):
             field_values = json.loads(param["field_values"])
         except json.JSONDecodeError as e:
             return action_result.set_status(phantom.APP_ERROR, f"Failed to parse field_values: {e}")
+
+        field_values_substitutions = param.get("field_values_substitutions")
+        if field_values_substitutions:
+            substitution_values = [v.strip() for v in field_values_substitutions.split(",") if v.strip()]
+
+            def _substitute(obj, values):
+                if isinstance(obj, str):
+                    for i, val in enumerate(values):
+                        obj = obj.replace(f"{{{i}}}", val)
+                    return obj
+                elif isinstance(obj, list):
+                    return [_substitute(item, values) for item in obj]
+                elif isinstance(obj, dict):
+                    return {k: _substitute(v, values) for k, v in obj.items()}
+                return obj
+
+            field_values = _substitute(field_values, substitution_values)
 
         create_comment = param.get("comment")
 

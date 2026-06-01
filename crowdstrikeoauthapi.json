@@ -20,7 +20,7 @@
             "name": "Katie Tanner"
         }
     ],
-    "license": "Copyright (c) 2019-2025 Splunk Inc.",
+    "license": "Copyright (c) 2019-2026 Splunk Inc.",
     "app_version": "5.1.2",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, October 1st 2024, API versions: v1, v2"
@@ -21887,18 +21887,24 @@
                     "required": true,
                     "order": 6
                 },
+                "field_values_substitutions": {
+                    "data_type": "string",
+                    "description": "Comma-separated list of values to substitute into field_values placeholders ({0}, {1}, ...). Map playbook datapaths here instead of inside the JSON string.",
+                    "required": false,
+                    "order": 7
+                },
                 "comment": {
                     "data_type": "string",
                     "description": "Comment for the audit log (optional)",
                     "required": false,
-                    "order": 7
+                    "order": 8
                 },
                 "enabled": {
                     "data_type": "boolean",
                     "description": "Enable this rule immediately",
                     "required": false,
                     "default": false,
-                    "order": 8
+                    "order": 9
                 }
             },
             "output": [
@@ -22221,6 +22227,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.field_values_substitutions",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)",

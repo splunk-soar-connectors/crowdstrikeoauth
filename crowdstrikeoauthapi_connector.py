@@ -1960,8 +1960,6 @@ class CrowdstrikeConnector(BaseConnector):
                 return obj
 
             field_values = _substitute(field_values, substitution_values)
-            self.save_progress(f"field_values after substitution: {json.dumps(field_values)}")
-            self.debug_print(f"field_values after substitution: {json.dumps(field_values)}")
 
         create_comment = param.get("comment")
 

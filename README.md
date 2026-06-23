@@ -4,7 +4,7 @@ Publisher: Splunk <br>
 Connector Version: 5.1.2 <br>
 Product Vendor: CrowdStrike <br>
 Product Name: CrowdStrike <br>
-Minimum Product Version: 6.3.0
+Minimum Product Version: 8.6.0
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
@@ -3613,7 +3613,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **limit** | optional | Maximum reports to be fetched | numeric | |
 **offset** | optional | Starting index of overall result set from which to return ids (Defaults to 0) | numeric | |
 **command_line** | optional | Command line script passed to the submitted file at runtime (Max length: 2048 characters) | string | |
-**document_password** | optional | Password of the document if password protected (Max length: 32 characters) | string | |
+**document_password** | optional | Password of the document if password protected (Max length: 32 characters) | password | |
 **submit_name** | optional | Name of the malware sample that's used for file type detection and analysis | string | |
 **user_tags** | optional | Comma seperated list of user tags (Max length: 100 characters per tag) | string | |
 **sort** | optional | Property to sort by | string | |
@@ -3631,7 +3631,7 @@ action_result.parameter.action_script | string | | default |
 action_result.parameter.command_line | string | | |
 action_result.parameter.comment | string | | This is a test comment |
 action_result.parameter.detail_report | boolean | | True False |
-action_result.parameter.document_password | string | | test_password |
+action_result.parameter.document_password | password | | test_password |
 action_result.parameter.enable_tor | boolean | | True False |
 action_result.parameter.environment | string | `crowdstrike environment` | Windows 10, 64-bit |
 action_result.parameter.is_confidential | boolean | | True False |
@@ -3791,7 +3791,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **environment** | required | Sandbox environment to be used for analysis | string | `crowdstrike environment` |
 **limit** | optional | Maximum reports to be fetched | numeric | |
 **offset** | optional | Starting index of overall result set from which to return ids (Defaults to 0) | numeric | |
-**document_password** | optional | Password of the document if password protected (Max length: 32 characters) | string | |
+**document_password** | optional | Password of the document if password protected (Max length: 32 characters) | password | |
 **command_line** | optional | Command line script passed to the submitted file at runtime (Max length: 2048 characters) | string | |
 **user_tags** | optional | Comma seperated list of user tags (Max length: 100 characters per tag) | string | |
 **sort** | optional | Property to sort by | string | |
@@ -3807,7 +3807,7 @@ action_result.status | string | | success failed |
 action_result.parameter.action_script | string | | default |
 action_result.parameter.command_line | string | | |
 action_result.parameter.detail_report | boolean | | True False |
-action_result.parameter.document_password | string | | test_password |
+action_result.parameter.document_password | password | | test_password |
 action_result.parameter.enable_tor | boolean | | True False |
 action_result.parameter.environment | string | `crowdstrike environment` | Windows 10, 64-bit |
 action_result.parameter.limit | numeric | | 5 |
@@ -4547,7 +4547,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

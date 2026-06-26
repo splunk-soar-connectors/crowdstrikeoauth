@@ -1,0 +1,127 @@
+<!--
+ Copyright (c) 2019-2026 Splunk Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software distributed under
+ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ either express or implied. See the License for the specific language governing permissions
+ and limitations under the License.
+-->
+{% extends 'widgets/widget_template.html' %}
+{% block widget_content %}
+  <style>
+    .crowdstrike a:hover {
+        text-decoration:underline;
+    }
+
+    .crowdstrike .wf-table-vertical {
+    width: initial;
+    font-size: 12px;
+    }
+
+    .crowdstrike .wf-table-vertical td{
+    padding: 8px 10px;
+    border: 1px solid;
+    }
+
+    .crowdstrike .wf-table-vertical tr td:first-child {
+    font-weight: bold;
+    }
+
+    .crowdstrike .wf-table-horizontal {
+        border: 1px solid;
+        font-size: 12px;
+    }
+
+    .crowdstrike .wf-table-horizontal th {
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
+    }
+
+    .crowdstrike .wf-table-horizontal td {
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
+    }
+
+    .crowdstrike .wf-h3-style {
+        font-size : 20px
+    }
+
+    .crowdstrike .wf-h4-style {
+        font-size : 16px
+    }
+  </style>
+  <div class="crowdstrike"
+       style="overflow: auto;
+              width: 100%;
+              height: 100%;
+              padding-left:10px;
+              padding-right:10px">
+    {% for result in results %}
+      <br>
+      {% if not result.data %}
+        <h4 class="wf-h4-style">No data found</h4>
+      {% else %}
+        {% for session in result.data %}
+          <h3 class="wf-h3-style">Info</h3>
+          <table class="wf-table-vertical">
+            <tr>
+              <td>Device ID</td>
+              <td>
+                <a href="javascript:;"
+                   onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ session.device_id }}' }], 0, {{ container }}, null, false);">
+                  {{ session.device_id }}
+                  &nbsp;
+                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
+              </td>
+            </tr>
+          </table>
+          <h3 class="wf-h3-style">Session Info</h3>
+          <table class="wf-table-horizontal datatable">
+            <thead>
+              <tr>
+                <th>Session ID</th>
+                <th>Created At</th>
+                <th>File Path</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for resource in session.resources %}
+                <tr>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ resource.session_id }}' }], 0, {{ container }}, null, false);">
+                      {{ resource.session_id }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                  <td>{{ resource.created_at }}</td>
+                  <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ resource.pwd }}' }], 0, {{ container }}, null, false);">
+                      {{ resource.pwd }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endfor %}
+        <br>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endblock %}

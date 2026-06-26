@@ -1,0 +1,110 @@
+<!--
+ Copyright (c) 2026 Splunk Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+{% extends 'widgets/widget_template.html' %}
+{% block widget_content %}
+  <style>
+a:hover {
+  text-decoration:underline;
+}
+
+
+.ph-table-vertical {
+  width: initial;
+  font-size: 12px;
+}
+
+.ph-table-vertical td {
+  padding: 5px;
+  border: 1px solid;
+}
+
+.ph-table-horizontal {
+  width: initial;
+  border: 1px solid;
+  font-size: 12px;
+}
+
+.ph-table-horizontal th {
+  text-align: center;
+  border: 1px solid;
+  text-transform: uppercase;
+  font-weight: normal;
+  padding: 5px;
+}
+
+.ph-table-horizontal td {
+  border: 1px solid;
+  padding: 5px;
+  padding-left: 4px;
+}
+
+.ph-h3-style {
+  font-size : 20px
+}
+
+.ph-h4-style {
+  font-size : 16px
+}
+
+.ph-h5-style {
+  font-size : 14px
+}
+.ph-subheader-style {
+  font-size : 12px
+}
+
+  </style>
+  <div class="crowdstrike"
+       style="overflow: auto;
+              width: 100%;
+              height: 100%;
+              padding-left:10px;
+              padding-right:10px">
+    {% for result in results %}
+      <br>
+      {% if not result.param.ioc and not result.param.resource_id %}
+        <h4 class="wf-h4-style">No data found</h4>
+      {% else %}
+        <table class="ph-table-horizontal">
+          <tr>
+            {% if result.param.ioc %}<th>IOC</th>{% endif %}
+            {% if result.param.resource_id %}<th>Resource ID</th>{% endif %}
+          </tr>
+          <tr>
+            {% if result.param.ioc %}
+              <td>
+                <a href="javascript:;"
+                   onclick="context_menu(this, [{'contains': [ 'ip', 'ipv6', 'sha256', 'md5', 'domain' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
+                  {{ result.param.ioc }}
+                  &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
+              </td>
+            {% endif %}
+            {% if result.param.resource_id %}
+              <td>
+                <a href="javascript:;"
+                   onclick="context_menu(this, [{'contains': [ 'crowdstrike indicator id' ], 'value': '{{ result.param.resource_id }}' }], 0, {{ container.id }}, null, false);">
+                  {{ result.param.resource_id }}
+                  &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
+              </td>
+            {% endif %}
+          </tr>
+        </table>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endblock %}

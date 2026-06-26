@@ -1,0 +1,146 @@
+<!--
+ Copyright (c) 2026 Splunk Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+{% extends 'widgets/widget_template.html' %}
+{% block widget_content %}
+  <style>
+    .crowdstrike a:hover {
+        text-decoration:underline;
+    }
+
+    .crowdstrike .wf-table-horizontal {
+        border: 1px solid;
+        font-size: 12px;
+    }
+
+    .crowdstrike .wf-table-horizontal th {
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
+    }
+
+    .crowdstrike .wf-table-horizontal td {
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
+    }
+
+    .crowdstrike .wf-h3-style {
+        font-size : 20px
+    }
+
+    .crowdstrike .wf-h4-style {
+        font-size : 16px
+    }
+
+    .crowdstrike .collapse.in {
+        display: block !important;
+    }
+
+    .crowdstrike .panel-collapse {
+        overflow-x: auto;
+    }
+
+    .crowdstrike a.nowrap {
+        white-space:nowrap;
+    }
+
+  </style>
+  <div class="crowdstrike"
+       style="overflow: auto;
+              width: 100%;
+              height: 100%;
+              padding-left:10px;
+              padding-right:10px">
+    {% for result in results %}
+      <br>
+      {% if not result.data %}
+        <h4 class="wf-h4-style">No data found</h4>
+      {% else %}
+        <h3 class="wf-h3-style">Alert Info</h3>
+        <div class="metadata_div">
+          <div class="panel-group" id="server-information">
+            <div class="panel">
+              <div id="default-view-table" class="panel-collapse collapse in">
+                <table class="wf-table-horizontal datatable">
+                  <thead>
+                    <tr>
+                      <th>Alert ID</th>
+                      <th>Device ID</th>
+                      <th>Hostname</th>
+                      <th>Platform Name</th>
+                      <th>Status</th>
+                      <th>Severity</th>
+                      <th>Modified Timestamp</th>
+                      <th>Created Timestamp</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for data in result.data %}
+                      <tr>
+                        <td>
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['crowdstrike alert id'], 'value': '{{ data.composite_id }}' }], 0, {{ container }}, null, false);">{{ data.composite_id }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        </td>
+                        <td>
+                          <a href="javascript:;"
+                             onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ data.device.device_id }}' }], 0, {{ container }}, null, false);">{{ data.device.device_id }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        </td>
+                        <td>{{ data.device.hostname }}</td>
+                        <td>{{ data.device.platform_name }}</td>
+                        <td>{{ data.status }}</td>
+                        <td>{{ data.severity }}</td>
+                        <td>{{ data.device.modified_timestamp }}</td>
+                        <td>{{ data.created_timestamp }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      <br>
+    {% endfor %}
+  </div>
+  <script>
+    $.extend(true, $.fn.dataTable.defaults, {
+        "searching": false,
+        "bLengthChange": false,
+        "language": {
+            "paginate": {
+                "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+                "next": "<i class='fa fa-angle-right fa-lg'></i>"
+            }
+        },
+        "dom": '<"top">rt<"bottom"p><"clear">',
+        drawCallback: function(settings) {
+            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+            pagination.toggle(this.api().page.info().pages > 1);
+        }
+    });
+    $.fn.DataTable.ext.pager.numbers_length = 5;
+    $('.datatable').DataTable({"iDisplayLength": 5});
+  </script>
+{% endblock %}

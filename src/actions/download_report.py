@@ -11,12 +11,14 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+import uuid
+from pathlib import Path
+
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, OutputField
+from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
-from ..consts import CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT
 
 
 class DownloadReportParams(Params):
@@ -36,8 +38,29 @@ class DownloadReportParams(Params):
     )
 
 
-class DownloadReportOutput(ActionOutput):
-    status: str | None = OutputField(column_name="Status")
+class DownloadReportOutput(PermissiveActionOutput):
+    vault_id: str | None = OutputField(
+        cef_types=["sha1", "vault id"], column_name="Vault ID"
+    )
+    name: str | None = OutputField(column_name="Name")
+    size: int | None = None
+    container_id: int | None = None
+
+
+class DownloadReportSummary(ActionOutput):
+    vault_id: str | None = OutputField(cef_types=["sha1", "vault id"])
+
+
+def _artifact_extension(content_type: str, content_disposition: str) -> str:
+    if "csv" in content_type:
+        return "csv"
+    if "plain" in content_type:
+        return "pcap" if "pcap" in content_disposition else "zip"
+    if "png" in content_type:
+        return "png"
+    if "json" in content_type:
+        return "json"
+    return "gz"
 
 
 @app.action(
@@ -46,17 +69,55 @@ class DownloadReportOutput(ActionOutput):
     action_type="investigate",
     read_only=True,
     render_as="table",
+    summary_type=DownloadReportSummary,
 )
 def download_report(
     params: DownloadReportParams, soar: SOARClient, asset: Asset
 ) -> list[DownloadReportOutput]:
     client = get_client(asset)
 
-    client.make_rest_call(
-        CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT,
-        params={"id": params.artifact_id},
-        headers={"Accept-Encoding": "application/gzip"},
+    response = client.stream_report_artifact(params.artifact_id)
+
+    if response.status_code != 200:
+        soar.set_message("No report artifact found for the supplied artifact id")
+        return []
+
+    extension = _artifact_extension(
+        response.headers.get("Content-Type", ""),
+        response.headers.get("Content-Disposition", ""),
+    )
+    filename = f"{params.file_name or params.artifact_id}.{extension}"
+
+    vault_tmp_dir = Path(soar.vault.get_vault_tmp_dir())
+    local_dir = vault_tmp_dir / str(uuid.uuid4())
+    local_dir.mkdir(parents=True)
+    file_path = local_dir / filename
+
+    with open(file_path, "wb") as f:
+        for chunk in response.iter_content(chunk_size=10 * 1024 * 1024):
+            f.write(chunk)
+
+    container_id = soar.get_executing_container_id()
+    vault_id = soar.vault.add_attachment(
+        container_id=container_id,
+        file_location=str(file_path),
+        file_name=filename,
     )
 
+    attachments = soar.vault.get_attachment(vault_id=vault_id)
+    if not attachments:
+        raise ValueError("Vault file could not be found with supplied Vault ID")
+
+    attachment = attachments[0]
+
+    soar.set_summary(DownloadReportSummary(vault_id=attachment.vault_id))
     soar.set_message("Report downloaded successfully")
-    return [DownloadReportOutput(status="success")]
+
+    return [
+        DownloadReportOutput(
+            vault_id=attachment.vault_id,
+            name=attachment.name,
+            size=attachment.size,
+            container_id=attachment.container_id,
+        )
+    ]

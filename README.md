@@ -619,7 +619,11 @@ action_result.status | string | | success failure |
 action_result.message | string | | |
 action_result.parameter.artifact_id | string | `crowdstrike artifact id` | |
 action_result.parameter.file_name | string | `filename` | |
-action_result.data.\*.status | string | | |
+action_result.data.\*.vault_id | string | `sha1` `vault id` | |
+action_result.data.\*.name | string | | |
+action_result.data.\*.size | numeric | | |
+action_result.data.\*.container_id | numeric | | |
+action_result.summary.vault_id | string | `sha1` `vault id` | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -797,6 +801,10 @@ action_result.data.\*.meta.pagination.total | numeric | | |
 action_result.data.\*.meta.powered_by | string | | |
 action_result.data.\*.meta.query_time | numeric | | |
 action_result.data.\*.meta.trace_id | string | | |
+action_result.data.\*.param_offset | string | | |
+action_result.data.\*.param_limit | numeric | | |
+action_result.data.\*.param_sort | string | | |
+action_result.data.\*.param_filter | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -1741,6 +1749,10 @@ action_result.parameter.ioc | string | `hash` `sha256` `sha1` `md5` `domain` | |
 action_result.parameter.id | string | `crowdstrike device id` | |
 action_result.parameter.limit | numeric | | |
 action_result.data.\*.falcon_process_id | string | `falcon process id` | |
+action_result.data.\*.device_id | string | | |
+action_result.data.\*.ioc | string | | |
+action_result.data.\*.ioc_type | string | | |
+action_result.data.\*.limit | numeric | | |
 action_result.summary.process_count | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |

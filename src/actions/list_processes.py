@@ -44,6 +44,10 @@ class ListProcessesOutput(PermissiveActionOutput):
     falcon_process_id: str | None = OutputField(
         cef_types=["falcon process id"], column_name="Falcon Process ID"
     )
+    device_id: str | None = None
+    ioc: str | None = None
+    ioc_type: str | None = None
+    limit: int | None = None
 
 
 class ListProcessesSummary(ActionOutput):
@@ -52,7 +56,25 @@ class ListProcessesSummary(ActionOutput):
 
 @app.view_handler(template="crowdstrike_process_list_view.html")
 def list_processes_view(outputs: list[ListProcessesOutput]) -> dict:
-    return {"results": [{"data": [o.model_dump() for o in outputs]}]}
+    data = [o.model_dump() for o in outputs]
+    param = {}
+    if outputs:
+        first = outputs[0]
+        param = {
+            "id": first.device_id,
+            "ioc": first.ioc,
+            "ioc_type": first.ioc_type,
+            "limit": first.limit,
+        }
+    return {
+        "results": [
+            {
+                "data": data,
+                "param": param,
+                "summary": {"process_count": len(data)},
+            }
+        ]
+    }
 
 
 @app.action(
@@ -81,13 +103,21 @@ def list_processes(
     response = client.hunt_paginator(CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH, api_data)
 
     if not response:
+        soar.set_summary(ListProcessesSummary(process_count=0))
         soar.set_message(
             "No resources found from the response for the list processes action"
         )
         return []
 
     outputs = [
-        ListProcessesOutput(falcon_process_id=process_id) for process_id in response
+        ListProcessesOutput(
+            falcon_process_id=process_id,
+            device_id=params.id,
+            ioc=params.ioc,
+            ioc_type=ioc_type,
+            limit=limit,
+        )
+        for process_id in response
     ]
 
     soar.set_summary(ListProcessesSummary(process_count=len(response)))

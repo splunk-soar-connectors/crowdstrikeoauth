@@ -220,6 +220,27 @@ class CrowdStrikeClient:
         except Exception as e:
             raise ConnectionError(f"Error connecting to server. Details: {e}") from e
 
+    def stream_report_artifact(self, artifact_id: str):
+        """Stream a detonation report artifact. Returns the raw streaming response."""
+        access_token = self.access_token()
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Accept-Encoding": "application/gzip",
+        }
+        url = f"{self._base_url}{CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT}"
+        params = {"id": artifact_id}
+        try:
+            return requests.request(
+                "get",
+                url,
+                headers=headers,
+                params=params,
+                stream=True,
+                timeout=CROWDSTRIKE_DEFAULT_TIMEOUT,
+            )
+        except Exception as e:
+            raise ConnectionError(f"Error connecting to server. Details: {e}") from e
+
     @staticmethod
     def parse_stream_event(data: str):
         """Parse a single streamed event line. Returns (ok, event_or_raw)."""

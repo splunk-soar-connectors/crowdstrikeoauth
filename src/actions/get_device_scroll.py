@@ -55,11 +55,26 @@ class GetDeviceScrollMeta(PermissiveActionOutput):
 class GetDeviceScrollOutput(PermissiveActionOutput):
     resources: list[str] | None = OutputField(cef_types=["crowdstrike device id"])
     meta: GetDeviceScrollMeta | None = None
+    param_offset: str | None = None
+    param_limit: int | None = None
+    param_sort: str | None = None
+    param_filter: str | None = None
 
 
 @app.view_handler(template="crowdstrike_get_device_scroll.html")
 def get_device_scroll_view(outputs: list[GetDeviceScrollOutput]) -> dict:
-    return {"results": [{"data": [o.model_dump() for o in outputs]}]}
+    data = [o.model_dump() for o in outputs]
+    param = {}
+    if outputs:
+        first = outputs[0]
+        param = {
+            "offset": first.param_offset,
+            "limit": first.param_limit,
+            "sort": first.param_sort,
+            "filter": first.param_filter,
+        }
+    check_param = any(param.values())
+    return {"results": [{"data": data, "param": param, "check_param": check_param}]}
 
 
 @app.action(
@@ -89,4 +104,12 @@ def get_device_scroll(
     )
 
     soar.set_message("Device scroll fetched successfully")
-    return [GetDeviceScrollOutput(**response)]
+    return [
+        GetDeviceScrollOutput(
+            **response,
+            param_offset=params.offset,
+            param_limit=params.limit,
+            param_sort=params.sort,
+            param_filter=params.filter,
+        )
+    ]

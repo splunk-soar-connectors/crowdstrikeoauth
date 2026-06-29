@@ -375,6 +375,7 @@ from .actions import list_put_files  # noqa: F401
 from .actions import list_roles  # noqa: F401
 from .actions import list_session_files  # noqa: F401
 from .actions import list_sessions  # noqa: F401
+from .actions import make_request  # noqa: F401
 from .actions import list_users  # noqa: F401
 from .actions import query_device  # noqa: F401
 from .actions import quarantine_device  # noqa: F401

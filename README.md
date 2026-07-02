@@ -48,12 +48,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [download report](#action-download-report) - Download the report of a detonated file or URL <br>
 [file reputation](#action-file-reputation) - Queries CrowdStrike for the file reputation info <br>
 [get command details](#action-get-command-details) - Retrieve results of an active responder command executed on a single host <br>
-[get detections details](#action-get-detections-details) - Get details for the given detections <br>
 [get system info](#action-get-system-info) - Queries CrowdStrike for the details of a device <br>
 [get device scroll](#action-get-device-scroll) - Get a list of device IDs using pagination <br>
 [get epp details](#action-get-epp-details) - Get details for the given EPP alerts <br>
-[get incident behaviors](#action-get-incident-behaviors) - Queries CrowdStrike for the details of behaviors of an incident <br>
-[get incident details](#action-get-incident-details) - Queries CrowdStrike for the details of incidents <br>
 [get indicator](#action-get-indicator) - Get the details for an indicator <br>
 [get process detail](#action-get-process-detail) - Queries CrowdStrike for the details of a process <br>
 [get role](#action-get-role) - Get information about a specific role <br>
@@ -64,13 +61,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [hunt file](#action-hunt-file) - Hunt for a file across all hosts in the environment <br>
 [hunt ip](#action-hunt-ip) - Hunt for an IP across all hosts in the environment <br>
 [list alerts](#action-list-alerts) - Fetch the list of alerts <br>
-[list crowdscores](#action-list-crowdscores) - Queries CrowdStrike for the CrowdScores of incidents <br>
 [list custom indicators](#action-list-custom-indicators) - List the custom indicators <br>
-[list detections](#action-list-detections) - Fetch the list of detections <br>
 [list epp alerts](#action-list-epp-alerts) - Fetch the list of EPP alerts <br>
 [list groups](#action-list-groups) - Fetch the details of the host groups <br>
-[list incident behaviors](#action-list-incident-behaviors) - Queries CrowdStrike for the behaviors of an incident <br>
-[list incidents](#action-list-incidents) - Queries CrowdStrike for the list of incidents <br>
 [list ioa platforms](#action-list-ioa-platforms) - Get the platforms that support IOA rules <br>
 [list ioa rule groups](#action-list-ioa-rule-groups) - Get the configured IOA rule groups <br>
 [list ioa severities](#action-list-ioa-severities) - Get the severity levels that can be assigned to IOA rules <br>
@@ -85,16 +78,13 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [query device](#action-query-device) - Fetch the list of devices <br>
 [quarantine device](#action-quarantine-device) - This action contains the host, which stops any network communications to locations other than the CrowdStrike cloud and IPs specified in the user's containment policy. <br>
 [remove hosts](#action-remove-hosts) - Remove one or more hosts from an existing static host group <br>
-[set status](#action-set-status) - Set the state of detections to a new, in_progress, true_positive, false_positive, or ignored <br>
 [resolve epp alerts](#action-resolve-epp-alerts) - Update the status of the given EPP alerts <br>
 [run admin command](#action-run-admin-command) - Execute an RTR administrator command on a single host <br>
 [run command](#action-run-command) - Execute an RTR command on a single host <br>
 [run query](#action-run-query) - Run a generic query against a CrowdStrike API query endpoint <br>
 [unquarantine device](#action-unquarantine-device) - This action lifts containment on the host, which returns its network communications to normal. <br>
 [url reputation](#action-url-reputation) - Queries CrowdStrike for the URL reputation info <br>
-[update detections](#action-update-detections) - Update the given detections <br>
 [update epp alerts](#action-update-epp-alerts) - Update the given EPP alerts <br>
-[update incident](#action-update-incident) - Update incident <br>
 [update indicator](#action-update-indicator) - Update an IOC <br>
 [update ioa rule](#action-update-ioa-rule) - Update an existing IOA rule <br>
 [update ioa rule group](#action-update-ioa-rule-group) - Update an existing IOA rule group <br>
@@ -712,33 +702,6 @@ action_result.summary.results | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'get detections details'
-
-Get details for the given detections
-
-Type: **investigate** <br>
-Read only: **True**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**detection_ids** | required | Comma-separated list of detection IDs | string | `crowdstrike detection id` |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.detection_ids | string | `crowdstrike detection id` | |
-action_result.data.\*.detection_id | string | `crowdstrike detection id` | |
-action_result.data.\*.status | string | | |
-action_result.data.\*.created_timestamp | string | | |
-action_result.summary.total_detections | numeric | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
 ## action: 'get system info'
 
 Queries CrowdStrike for the details of a device
@@ -834,67 +797,6 @@ action_result.data.\*.status | string | | |
 action_result.data.\*.severity | string | | |
 action_result.data.\*.created_timestamp | string | | |
 action_result.summary.total_alerts | numeric | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
-## action: 'get incident behaviors'
-
-Queries CrowdStrike for the details of behaviors of an incident
-
-Type: **investigate** <br>
-Read only: **True**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**ids** | required | List of behavior IDs. Comma separated list allowed | string | `crowdstrike incidentbehavior id` |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.ids | string | `crowdstrike incidentbehavior id` | |
-action_result.data.\*.behavior_id | string | `crowdstrike incidentbehavior id` | |
-action_result.data.\*.tactic | string | | |
-action_result.data.\*.technique | string | | |
-action_result.data.\*.objective | string | | |
-action_result.data.\*.timestamp | string | | |
-action_result.data.\*.cmdline | string | | |
-action_result.data.\*.filepath | string | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
-## action: 'get incident details'
-
-Queries CrowdStrike for the details of incidents
-
-Type: **investigate** <br>
-Read only: **True**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**ids** | required | List of incident IDs. Comma separated list allowed | string | `crowdstrike incident id` |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.ids | string | `crowdstrike incident id` | |
-action_result.data.\*.incident_id | string | `crowdstrike incident id` | |
-action_result.data.\*.name | string | | |
-action_result.data.\*.description | string | | |
-action_result.data.\*.start | string | | |
-action_result.data.\*.state | string | | |
-action_result.data.\*.hosts.\*.hostname | string | | |
-action_result.data.\*.hosts.\*.device_id | string | `crowdstrike device id` | |
-action_result.summary.total_incidents | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -1224,39 +1126,6 @@ action_result.summary.total_alerts | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'list crowdscores'
-
-Queries CrowdStrike for the CrowdScores of incidents
-
-Type: **investigate** <br>
-Read only: **True**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**filter** | optional | Optional filter and sort criteria in the form of an FQL query | string | |
-**sort** | optional | Sort the results by a specific field and direction. (Example: assigned_to.asc) | string | |
-**offset** | optional | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | |
-**limit** | optional | Limit the number of results to return. (Defaults to 50, Max 500) | numeric | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.filter | string | | |
-action_result.parameter.sort | string | | |
-action_result.parameter.offset | numeric | | |
-action_result.parameter.limit | numeric | | |
-action_result.data.\*.id | string | `crowdstrike crowdscore id` | |
-action_result.data.\*.score | numeric | | |
-action_result.data.\*.timestamp | string | | |
-action_result.summary.total_crowdscores | numeric | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
 ## action: 'list custom indicators'
 
 List the custom indicators
@@ -1460,37 +1329,6 @@ action_result.summary.total_sha256 | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'list detections'
-
-Fetch the list of detections
-
-Type: **investigate** <br>
-Read only: **True**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**limit** | optional | Maximum detections to be fetched | numeric | |
-**filter** | optional | Filter expression used to limit the fetched detections (FQL Syntax) | string | |
-**sort** | optional | Property to sort by | string | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.limit | numeric | | |
-action_result.parameter.filter | string | | |
-action_result.parameter.sort | string | | |
-action_result.data.\*.detection_id | string | `crowdstrike detection id` | |
-action_result.data.\*.status | string | | |
-action_result.data.\*.created_timestamp | string | | |
-action_result.summary.total_detections | numeric | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
 ## action: 'list epp alerts'
 
 Fetch the list of EPP alerts
@@ -1556,68 +1394,6 @@ action_result.data.\*.group_type | string | | |
 action_result.data.\*.modified_by | string | `email` | |
 action_result.data.\*.modified_timestamp | string | | |
 action_result.summary.total_host_groups | numeric | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
-## action: 'list incident behaviors'
-
-Queries CrowdStrike for the behaviors of an incident
-
-Type: **investigate** <br>
-Read only: **True**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**filter** | optional | Optional filter and sort criteria in the form of an FQL query | string | |
-**sort** | optional | Sort the results by a specific field and direction. (Example: assigned_to.asc) | string | |
-**offset** | optional | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | |
-**limit** | optional | Limit the number of results to return. (Defaults to 50, Max 500) | numeric | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.filter | string | | |
-action_result.parameter.sort | string | | |
-action_result.parameter.offset | numeric | | |
-action_result.parameter.limit | numeric | | |
-action_result.data.\*.resources.\* | string | | |
-action_result.summary.total_incident_behaviors | numeric | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
-## action: 'list incidents'
-
-Queries CrowdStrike for the list of incidents
-
-Type: **investigate** <br>
-Read only: **True**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**filter** | optional | Optional filter and sort criteria in the form of an FQL query | string | |
-**sort** | optional | Sort the results by a specific field and direction. (Example: assigned_to.asc) | string | |
-**offset** | optional | Starting index of overall result set from which to return ids. (Defaults to 0) | numeric | |
-**limit** | optional | Limit the number of results to return. (Defaults to 50, Max 500) | numeric | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.filter | string | | |
-action_result.parameter.sort | string | | |
-action_result.parameter.offset | numeric | | |
-action_result.parameter.limit | numeric | | |
-action_result.data.\*.resources.\* | string | | |
-action_result.summary.total_incidents | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -2040,31 +1816,6 @@ action_result.summary.total_removed_device | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'set status'
-
-Set the state of detections to a new, in_progress, true_positive, false_positive, or ignored
-
-Type: **generic** <br>
-Read only: **False**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**id** | required | Comma-separated list of detection IDs | string | `crowdstrike detection id` |
-**state** | required | State to set the detection(s) to | string | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.id | string | `crowdstrike detection id` | |
-action_result.parameter.state | string | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
 ## action: 'resolve epp alerts'
 
 Update the status of the given EPP alerts
@@ -2280,39 +2031,6 @@ action_result.summary.total_reports | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
-## action: 'update detections'
-
-Update the given detections
-
-Type: **generic** <br>
-Read only: **False**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**detection_ids** | required | Comma-separated list of detection IDs | string | `crowdstrike detection id` |
-**comment** | optional | Comment to add to the detections | string | |
-**assigned_to_user** | optional | UUID of the user to assign the detections to | string | |
-**show_in_ui** | optional | Whether the detections should be displayed in the UI | boolean | |
-**status** | optional | Status to set the detections to | string | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.detection_ids | string | `crowdstrike detection id` | |
-action_result.parameter.comment | string | | |
-action_result.parameter.assigned_to_user | string | | |
-action_result.parameter.show_in_ui | boolean | | |
-action_result.parameter.status | string | | |
-action_result.data.\*.meta.writes.resources_affected | numeric | | |
-action_result.summary.detections_affected | numeric | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
 ## action: 'update epp alerts'
 
 Update the given EPP alerts
@@ -2351,44 +2069,6 @@ action_result.parameter.remove_tags | string | | |
 action_result.parameter.remove_tags_by_prefix | string | | |
 action_result.data.\*.meta.writes.resources_affected | numeric | | |
 action_result.summary.alerts_affected | numeric | | |
-summary.total_objects | numeric | | 1 |
-summary.total_objects_successful | numeric | | 1 |
-
-## action: 'update incident'
-
-Update incident
-
-Type: **generic** <br>
-Read only: **False**
-
-#### Action Parameters
-
-PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
---------- | -------- | ----------- | ---- | --------
-**ids** | required | List of incident IDs. Comma separated list allowed | string | `crowdstrike incident id` |
-**add_tag** | optional | Adds the associated tag to all the incident(s) of the ids list. See example values for the defined list | string | |
-**delete_tag** | optional | Deletes the matching tag from all the incident(s) in the ids list. See example values for the defined list | string | |
-**update_name** | optional | Updates the name of all the incident(s) in the ids list | string | |
-**update_description** | optional | Updates the description of all the incident(s) listed in the ids | string | |
-**update_status** | optional | Updates the status of all the incident(s) in the ids list | string | |
-**add_comment** | optional | Adds a comment for all the incident(s) in the ids list | string | |
-
-#### Action Output
-
-DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
---------- | ---- | -------- | --------------
-action_result.status | string | | success failure |
-action_result.message | string | | |
-action_result.parameter.ids | string | `crowdstrike incident id` | |
-action_result.parameter.add_tag | string | | |
-action_result.parameter.delete_tag | string | | |
-action_result.parameter.update_name | string | | |
-action_result.parameter.update_description | string | | |
-action_result.parameter.update_status | string | | |
-action_result.parameter.add_comment | string | | |
-action_result.data.\*.meta.powered_by | string | | |
-action_result.data.\*.meta.query_time | numeric | | |
-action_result.data.\*.meta.trace_id | string | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

@@ -13,6 +13,7 @@
 
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import PermissiveActionOutput
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
@@ -84,13 +85,16 @@ def upload_put_file(
 
     headers = {"Content-Type": multipart_data.content_type}
 
-    resp_json = client.make_rest_call(
-        CROWDSTRIKE_RTR_ADMIN_PUT_FILES,
-        headers=headers,
-        data=multipart_data,
-        method="post",
-        upload_file=True,
-    )
+    try:
+        resp_json = client.make_rest_call(
+            CROWDSTRIKE_RTR_ADMIN_PUT_FILES,
+            headers=headers,
+            data=multipart_data,
+            method="post",
+            upload_file=True,
+        )
+    except Exception as e:
+        raise ActionFailure(str(e)) from e
 
     soar.set_message("Put file uploaded successfully")
 

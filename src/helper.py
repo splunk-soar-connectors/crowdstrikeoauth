@@ -142,13 +142,15 @@ class CrowdStrikeClient:
     # ------------------------------------------------------------------ #
     # Streaming data feed (on_poll)
     # ------------------------------------------------------------------ #
-    def get_datafeed(self, app_id: str) -> dict:
+    def get_datafeed(self, app_id: str, subtenant: str | None = None) -> dict:
         """Fetch the detection-event data feed descriptor.
 
         Returns a dict with keys: data_feed_url, token, refresh_url, refresh_interval.
         """
         params = {"appId": app_id.replace("-", "")}
-        resp = self.make_rest_call(CROWDSTRIKE_BASE_ENDPOINT, params=params)
+        resp = self.make_rest_call(
+            CROWDSTRIKE_BASE_ENDPOINT, params=params, subtenant=subtenant
+        )
 
         if not resp.get("meta"):
             raise Exception(CROWDSTRIKE_META_KEY_EMPTY_ERROR)
@@ -421,7 +423,12 @@ class CrowdStrikeClient:
     # ------------------------------------------------------------------ #
     # Pagination
     # ------------------------------------------------------------------ #
-    def paginator(self, endpoint: str, param: dict | None = None) -> list:
+    def paginator(
+        self,
+        endpoint: str,
+        param: dict | None = None,
+        subtenant: str | None = None,
+    ) -> list:
         if param is None:
             param = {}
         list_ids = []
@@ -433,7 +440,7 @@ class CrowdStrikeClient:
 
         while True:
             param.update({"offset": offset})
-            response = self.make_rest_call(endpoint, params=param)
+            response = self.make_rest_call(endpoint, params=param, subtenant=subtenant)
 
             prev_offset = offset
             offset = response.get("meta", {}).get("pagination", {}).get("offset")

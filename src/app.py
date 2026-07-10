@@ -42,7 +42,7 @@ from .consts import (
     DEFAULT_POLLNOW_EVENTS_COUNT,
     DEFAULT_POLLNOW_INCIDENTS_COUNT,
 )
-from .helper import CrowdStrikeClient, validate_integer
+from .helper import CrowdStrikeClient, get_subtenants, validate_integer
 
 
 logger = getLogger()
@@ -177,10 +177,17 @@ def on_poll(
             asset.max_incidents or DEFAULT_INCIDENTS_COUNT, "max_incidents"
         )
 
-    yield from _poll_detection_events(client, asset, is_poll_now, max_crlf, max_events)
+    tenants = [None, *get_subtenants(asset)]
 
-    if asset.ingest_incidents:
-        yield from _poll_incidents(client, asset, is_poll_now, max_incidents)
+    for tenant in tenants:
+        yield from _poll_detection_events(
+            client, asset, is_poll_now, max_crlf, max_events, subtenant=tenant
+        )
+
+        if asset.ingest_incidents:
+            yield from _poll_incidents(
+                client, asset, is_poll_now, max_incidents, subtenant=tenant
+            )
 
 
 def _poll_detection_events(
@@ -189,11 +196,14 @@ def _poll_detection_events(
     is_poll_now: bool,
     max_crlf: int | None,
     max_events: int,
+    subtenant: str | None = None,
 ) -> Iterator[Container | Artifact]:
+    offset_key = f"last_offset_id_{subtenant}" if subtenant else "last_offset_id"
+
     lower_id = 0
     if not is_poll_now:
         try:
-            lower_id = int(asset.ingest_state.get("last_offset_id", 0))
+            lower_id = int(asset.ingest_state.get(offset_key, 0))
         except (TypeError, ValueError):
             lower_id = 0
     if lower_id < 0:
@@ -206,7 +216,7 @@ def _poll_detection_events(
     )
 
     app_id = asset.app_id or app.appid
-    feed = client.get_datafeed(app_id)
+    feed = client.get_datafeed(app_id, subtenant=subtenant)
 
     events: list = []
     counter = 0
@@ -226,7 +236,7 @@ def _poll_detection_events(
     for stream_data in response.iter_lines(chunk_size=None):
         if int(time.time() - start_time) > (feed["refresh_interval"] - 60):
             try:
-                client.refresh_datafeed_session(feed["refresh_url"])
+                client.refresh_datafeed_session(feed["refresh_url"], subtenant)
                 start_time = time.time()
             except Exception as e:
                 logger.debug(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}: {e}")
@@ -272,7 +282,7 @@ def _poll_detection_events(
 
         if not is_poll_now:
             last_offset_id = events[-1]["metadata"]["offset"]
-            asset.ingest_state["last_offset_id"] = last_offset_id + 1
+            asset.ingest_state[offset_key] = last_offset_id + 1
 
 
 def _poll_incidents(
@@ -280,15 +290,24 @@ def _poll_incidents(
     asset: Asset,
     is_poll_now: bool,
     max_incidents: int,
+    subtenant: str | None = None,
 ) -> Iterator[Container | Artifact]:
+    timestamp_key = (
+        f"last_incident_timestamp_{subtenant}"
+        if subtenant
+        else "last_incident_timestamp"
+    )
+
     logger.progress("Starting incident ingestion")
     params = {"limit": max_incidents, "sort": "modified_timestamp.asc"}
 
     if not is_poll_now:
-        last_ingestion_time = asset.ingest_state.get("last_incident_timestamp", "")
+        last_ingestion_time = asset.ingest_state.get(timestamp_key, "")
         params["filter"] = f"modified_timestamp:>'{last_ingestion_time}'"
 
-    incident_ids = client.paginator(CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT, params)
+    incident_ids = client.paginator(
+        CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT, params, subtenant=subtenant
+    )
     if not incident_ids:
         logger.info("No incidents found")
         return
@@ -297,6 +316,7 @@ def _poll_incidents(
         CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT,
         json_data={"ids": incident_ids},
         method="post",
+        subtenant=subtenant,
     )
     incidents = response.get("resources", [])
 
@@ -308,7 +328,7 @@ def _poll_incidents(
         latest_timestamp = max(
             incident.get("modified_timestamp", 0) for incident in incidents
         )
-        asset.ingest_state["last_incident_timestamp"] = latest_timestamp
+        asset.ingest_state[timestamp_key] = latest_timestamp
 
     logger.progress(f"Processing {len(incidents)} incidents")
     results = incidents_parser.process_incidents(incidents)

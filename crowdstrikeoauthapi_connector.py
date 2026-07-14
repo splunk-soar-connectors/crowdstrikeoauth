@@ -185,18 +185,19 @@ class CrowdstrikeConnector(BaseConnector):
         gt_date = datetime.utcnow() - timedelta(seconds=int(time_interval))
         # Cutoff Timestamp From String
         common_str = " ".join(container["name"].split()[:-1])
-        request_str = CROWDSTRIKE_FILTER_REQUEST_STR.format(
-            self.get_phantom_base_url(),
-            self.get_asset_id(),
-            common_str,
-            gt_date.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        )
+        request_url = f"{self.get_phantom_base_url()}rest/container"
+        request_params = {
+            "page_size": 0,
+            "_filter_asset": self.get_asset_id(),
+            "_filter_name__contains": f'"{common_str}"',
+            "_filter_start_time__gte": f'"{gt_date.strftime("%Y-%m-%dT%H:%M:%SZ")}"',
+        }
 
         try:
-            r = requests.get(request_str, verify=False)  # nosemgrep
+            r = requests.get(request_url, params=request_params, verify=False)  # nosemgrep
         except Exception as e:
             self.debug_print(f"Error making local rest call: {self._get_error_message_from_exception(e)}")
-            self.debug_print(f"DB QUERY: {request_str}")
+            self.debug_print(f"DB QUERY: {request_url}")
             return phantom.APP_ERROR, None
 
         try:
@@ -211,6 +212,8 @@ class CrowdstrikeConnector(BaseConnector):
                 most_recent = gt_date
                 most_recent_id = None
                 for container in resp_json["data"]:
+                    if str(container.get("asset")) != str(self.get_asset_id()):
+                        continue
                     if container.get("parent_container"):
                         # container created through aggregation, skip this
                         continue

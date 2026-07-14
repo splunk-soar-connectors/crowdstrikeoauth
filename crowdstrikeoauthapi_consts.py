@@ -132,7 +132,6 @@ CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE = "CR/LF received on iteration {} - continuin
 CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE = "Total blank lines count: {}"
 CROWDSTRIKE_GOT_EVENTS_MESSAGE = "Got {0} detection events"
 
-CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0&_filter_asset={1}&_filter_name__contains="{2}"&_filter_start_time__gte="{3}"'
 CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "(type:'{}' + value:'{}') + (deleted:'true', deleted: 'false')"
 CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID = "id:'{}' + (deleted:'true', deleted: 'false')"

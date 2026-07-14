@@ -398,20 +398,23 @@ class CrowdstrikeConnector(BaseConnector):
 
         offset = param.get("offset", 0)
 
+        pages = 0
         while True:
+            pages += 1
+            if pages > CROWDSTRIKE_MAX_PAGINATION_PAGES:
+                action_result.set_status(phantom.APP_ERROR, "Exceeded maximum pagination rounds")
+                return None
             param.update({"offset": offset})
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param)
 
             if phantom.is_fail(ret_val):
                 return None
 
+            resources = response.get("resources", [])
             prev_offset = offset
-            offset = response.get("meta", {}).get("pagination", {}).get("offset")
-            if offset == prev_offset:
-                offset += len(response.get("resources", []))
-
-            # Fetching total from the response
-            total = response.get("meta", {}).get("pagination", {}).get("total")
+            pagination = response.get("meta", {}).get("pagination", {})
+            offset = pagination.get("offset")
+            total = pagination.get("total")
 
             if len(response.get("errors", [])):
                 error = response.get("errors")[0]
@@ -426,8 +429,22 @@ class CrowdstrikeConnector(BaseConnector):
                 )
                 return None
 
-            if response.get("resources"):
-                list_ids.extend(response.get("resources"))
+            try:
+                offset = int(offset)
+                total = int(total)
+                prev_offset = int(prev_offset)
+            except (TypeError, ValueError):
+                action_result.set_status(phantom.APP_ERROR, "Pagination offset and total must be integers")
+                return None
+
+            if offset == prev_offset:
+                offset += len(resources)
+            if offset <= prev_offset and offset < total:
+                action_result.set_status(phantom.APP_ERROR, "Server pagination did not advance")
+                return None
+
+            if resources:
+                list_ids.extend(resources)
 
             if limit and len(list_ids) >= int(limit):
                 return list_ids[: int(limit)]
@@ -466,8 +483,14 @@ class CrowdstrikeConnector(BaseConnector):
                 subtenants.extend(configured_subtenants)
 
         for subtenant in subtenants:
+            offset = ""
+            pages = 0
             subtenant_total_counted = False
             while True:
+                pages += 1
+                if pages > CROWDSTRIKE_MAX_PAGINATION_PAGES:
+                    action_result.set_status(phantom.APP_ERROR, "Exceeded maximum pagination rounds")
+                    return None
                 params.update({"offset": offset})
                 params.update({"limit": 100})
 
@@ -479,7 +502,9 @@ class CrowdstrikeConnector(BaseConnector):
                         break
                     return None
 
-                offset = response.get("meta", {}).get("pagination", {}).get("offset")
+                previous_offset = offset
+                pagination = response.get("meta", {}).get("pagination", {})
+                offset = pagination.get("offset")
 
                 if len(response.get("errors", [])):
                     error = response.get("errors")[0]
@@ -502,9 +527,15 @@ class CrowdstrikeConnector(BaseConnector):
                 if limit and len(list_ids) >= limit:
                     return list_ids[:limit]
 
-                if (not offset) and (not response.get("meta", {}).get("pagination", {}).get("next_page")):
-                    # Continue (next subtenant if there is one)
-                    break
+                if not offset:
+                    if not pagination.get("next_page"):
+                        # Continue (next subtenant if there is one)
+                        break
+                    action_result.set_status(phantom.APP_ERROR, "Server pagination did not provide a continuation offset")
+                    return None
+                if offset == previous_offset:
+                    action_result.set_status(phantom.APP_ERROR, "Server pagination did not advance")
+                    return None
 
         return list_ids
 
@@ -1520,7 +1551,11 @@ class CrowdstrikeConnector(BaseConnector):
 
         self.send_progress("Completed 0 %")
         ioc_infos = []
+        pages = 0
         while more:
+            pages += 1
+            if pages > CROWDSTRIKE_MAX_PAGINATION_PAGES:
+                return action_result.set_status(phantom.APP_ERROR, "Exceeded maximum pagination rounds")
             ret_val, response = self._make_rest_call_helper_oauth2(
                 action_result,
                 CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT,
@@ -1543,6 +1578,8 @@ class CrowdstrikeConnector(BaseConnector):
             after = response.get("meta", {}).get("pagination", {}).get("after")
             if after is None:
                 break
+            if not response.get("resources") or after == api_data.get("after"):
+                return action_result.set_status(phantom.APP_ERROR, "Server pagination did not advance")
             total = response.get("meta", {}).get("pagination", {}).get("total")
 
             if total:
@@ -2551,7 +2588,11 @@ class CrowdstrikeConnector(BaseConnector):
         total_rows = 0
         offset = -1
         results = []
+        pages = 0
         while offset < total_rows:
+            pages += 1
+            if pages > CROWDSTRIKE_MAX_PAGINATION_PAGES:
+                return action_result.set_status(phantom.APP_ERROR, "Exceeded maximum pagination rounds")
             if offset >= 0:
                 params["offset"] = offset
 
@@ -2568,7 +2609,10 @@ class CrowdstrikeConnector(BaseConnector):
             results += resp_json["resources"]
 
             total_rows = resp_json["meta"]["pagination"]["total"]
+            previous_offset = offset
             offset = resp_json["meta"]["pagination"]["offset"]
+            if offset < total_rows and offset <= previous_offset:
+                return action_result.set_status(phantom.APP_ERROR, "Server pagination did not advance")
 
         resp_json["resources"] = results
         action_result.add_data(resp_json)
@@ -2590,7 +2634,11 @@ class CrowdstrikeConnector(BaseConnector):
         total_rows = 0
         offset = -1
         results = []
+        pages = 0
         while offset < total_rows:
+            pages += 1
+            if pages > CROWDSTRIKE_MAX_PAGINATION_PAGES:
+                return action_result.set_status(phantom.APP_ERROR, "Exceeded maximum pagination rounds")
             if offset >= 0:
                 params["offset"] = offset
 
@@ -2607,7 +2655,10 @@ class CrowdstrikeConnector(BaseConnector):
             results += resp_json["resources"]
 
             total_rows = resp_json["meta"]["pagination"]["total"]
+            previous_offset = offset
             offset = resp_json["meta"]["pagination"]["offset"]
+            if offset < total_rows and offset <= previous_offset:
+                return action_result.set_status(phantom.APP_ERROR, "Server pagination did not advance")
 
         resp_json["resources"] = results
         action_result.add_data(resp_json)
@@ -2626,7 +2677,11 @@ class CrowdstrikeConnector(BaseConnector):
         total_rows = 0
         offset = -1
         results = []
+        pages = 0
         while offset < total_rows:
+            pages += 1
+            if pages > CROWDSTRIKE_MAX_PAGINATION_PAGES:
+                return action_result.set_status(phantom.APP_ERROR, "Exceeded maximum pagination rounds")
             if offset >= 0:
                 params["offset"] = offset
 
@@ -2643,7 +2698,10 @@ class CrowdstrikeConnector(BaseConnector):
             results += resp_json["resources"]
 
             total_rows = resp_json["meta"]["pagination"]["total"]
+            previous_offset = offset
             offset = resp_json["meta"]["pagination"]["offset"]
+            if offset < total_rows and offset <= previous_offset:
+                return action_result.set_status(phantom.APP_ERROR, "Server pagination did not advance")
 
         resp_json["resources"] = results
         action_result.add_data(resp_json)
@@ -2664,7 +2722,11 @@ class CrowdstrikeConnector(BaseConnector):
         total_rows = 0
         offset = -1
         results = []
+        pages = 0
         while offset < total_rows:
+            pages += 1
+            if pages > CROWDSTRIKE_MAX_PAGINATION_PAGES:
+                return action_result.set_status(phantom.APP_ERROR, "Exceeded maximum pagination rounds")
             if offset >= 0:
                 params["offset"] = offset
 
@@ -2697,7 +2759,10 @@ class CrowdstrikeConnector(BaseConnector):
                 results += next_resp_json["resources"]
 
             total_rows = resp_json["meta"]["pagination"]["total"]
+            previous_offset = offset
             offset = resp_json["meta"]["pagination"]["offset"]
+            if offset < total_rows and offset <= previous_offset:
+                return action_result.set_status(phantom.APP_ERROR, "Server pagination did not advance")
 
         resp_json["resources"] = results
         total_rows = len(results)

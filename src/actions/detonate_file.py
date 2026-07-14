@@ -91,6 +91,7 @@ class DetonateFileParams(Params):
     document_password: str = Param(
         description="Auto-filled password for Adobe or Office files",
         required=False,
+        sensitive=True,
     )
     submit_name: str = Param(
         description="Name of the malware sample that is used for file type detection and analysis",

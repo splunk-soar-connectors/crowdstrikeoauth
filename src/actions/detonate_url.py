@@ -94,6 +94,7 @@ class DetonateUrlParams(Params):
     document_password: str = Param(
         description="Auto-filled password for Adobe or Office files",
         required=False,
+        sensitive=True,
     )
     command_line: str = Param(
         description="Command line script passed to the submitted file at runtime",

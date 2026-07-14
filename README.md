@@ -473,7 +473,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **limit** | optional | Maximum reports to be fetched | numeric | |
 **offset** | optional | Starting index of overall result set | numeric | |
 **command_line** | optional | Command line script passed to the submitted file at runtime | string | |
-**document_password** | optional | Auto-filled password for Adobe or Office files | string | |
+**document_password** | optional | Auto-filled password for Adobe or Office files | password | |
 **submit_name** | optional | Name of the malware sample that is used for file type detection and analysis | string | |
 **user_tags** | optional | Comma-separated list of tags to categorize the submission | string | |
 **sort** | optional | Property to sort by | string | |
@@ -539,7 +539,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **environment** | required | Sandbox environment to use for analysis | string | `crowdstrike environment` |
 **limit** | optional | Maximum reports to be fetched | numeric | |
 **offset** | optional | Starting index of overall result set | numeric | |
-**document_password** | optional | Auto-filled password for Adobe or Office files | string | |
+**document_password** | optional | Auto-filled password for Adobe or Office files | password | |
 **command_line** | optional | Command line script passed to the submitted file at runtime | string | |
 **user_tags** | optional | Comma-separated list of tags to categorize the submission | string | |
 **sort** | optional | Property to sort by | string | |

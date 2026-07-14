@@ -9,3 +9,4 @@
 * Bounded shared, custom-indicator, and IOA pagination loops and rejected non-advancing server cursors.
 * Preserved detection and incident polling checkpoints when fetched records fail to persist in SOAR.
 * Reported sandbox detonation poll timeouts as action failures while retaining follow-up data.
+* Protected detonation document passwords from action result parameter persistence.

@@ -3632,7 +3632,6 @@ action_result.parameter.action_script | string | | default |
 action_result.parameter.command_line | string | | |
 action_result.parameter.comment | string | | This is a test comment |
 action_result.parameter.detail_report | boolean | | True False |
-action_result.parameter.document_password | password | | test_password |
 action_result.parameter.enable_tor | boolean | | True False |
 action_result.parameter.environment | string | `crowdstrike environment` | Windows 10, 64-bit |
 action_result.parameter.is_confidential | boolean | | True False |
@@ -3776,6 +3775,7 @@ action_result.summary.verdict | string | | suspicious |
 action_result.message | string | | Verdict: no specific threat, Total reports: 1 Total reports: 6 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.document_password | password | | |
 
 ## action: 'detonate url'
 
@@ -3808,7 +3808,6 @@ action_result.status | string | | success failed |
 action_result.parameter.action_script | string | | default |
 action_result.parameter.command_line | string | | |
 action_result.parameter.detail_report | boolean | | True False |
-action_result.parameter.document_password | password | | test_password |
 action_result.parameter.enable_tor | boolean | | True False |
 action_result.parameter.environment | string | `crowdstrike environment` | Windows 10, 64-bit |
 action_result.parameter.limit | numeric | | 5 |
@@ -3936,6 +3935,7 @@ action_result.summary.verdict | string | | suspicious |
 action_result.message | string | | Verdict: no specific threat, Total reports: 1 Total reports: 6 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.document_password | password | | |
 
 ## action: 'check status'
 

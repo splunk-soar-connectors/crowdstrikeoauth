@@ -17645,13 +17645,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.document_password",
-                    "data_type": "password",
-                    "example_values": [
-                        "test_password"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.enable_tor",
                     "data_type": "boolean",
                     "example_values": [
@@ -18757,6 +18750,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.document_password",
+                    "data_type": "password"
                 }
             ],
             "versions": "EQ(*)",
@@ -18893,13 +18890,6 @@
                     "example_values": [
                         true,
                         false
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.document_password",
-                    "data_type": "password",
-                    "example_values": [
-                        "test_password"
                     ]
                 },
                 {
@@ -19892,6 +19882,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.document_password",
+                    "data_type": "password"
                 }
             ],
             "versions": "EQ(*)",

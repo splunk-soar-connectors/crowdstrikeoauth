@@ -4284,7 +4284,9 @@ class CrowdstrikeConnector(BaseConnector):
     def _handle_detonate_url(self, param):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Add an action result to the App Run
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        result_param = dict(param)
+        result_param.pop("document_password", None)
+        action_result = self.add_action_result(ActionResult(result_param))
 
         url = param["url"]
         if "https://" in url:
@@ -4354,7 +4356,9 @@ class CrowdstrikeConnector(BaseConnector):
     def _handle_detonate_file(self, param):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
         # Add an action result to the App Run
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        result_param = dict(param)
+        result_param.pop("document_password", None)
+        action_result = self.add_action_result(ActionResult(result_param))
         try:
             file_id = param["vault_id"]
             _, _, file_info = phantom_rules.vault_info(vault_id=file_id)

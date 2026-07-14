@@ -116,15 +116,10 @@
             "default": 50,
             "description": "Maximum allowed continuous blank lines"
         },
-        "preprocess_script": {
-            "data_type": "file",
-            "description": "Script with functions to preprocess containers and artifacts",
-            "order": 14
-        },
         "detonate_timeout": {
             "data_type": "numeric",
             "description": "Timeout for detonation result in minutes (Default: 15 minutes)",
-            "order": 15,
+            "order": 14,
             "default": 15
         }
     },

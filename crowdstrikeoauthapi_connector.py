@@ -99,10 +99,6 @@ class CrowdstrikeConnector(BaseConnector):
 
         self._oauth_access_token = self.decrypt_state()
 
-        ret = self._handle_preprocess_scripts()
-        if phantom.is_fail(ret):
-            return ret
-
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -153,34 +149,6 @@ class CrowdstrikeConnector(BaseConnector):
         except Exception:
             return False
         return True
-
-    def _handle_preprocess_scripts(self):
-        config = self.get_config()
-        script = config.get("preprocess_script")
-
-        self._preprocess_container = lambda x: x
-
-        if script:
-            try:  # Try to laod in script to preprocess artifacts
-                import importlib.util
-
-                preprocess_methods = importlib.util.spec_from_loader("preprocess_methods", loader=None)
-                self._script_module = importlib.util.module_from_spec(preprocess_methods)
-                exec(script, self._script_module.__dict__)
-            except Exception as e:
-                self.save_progress(f"Error loading custom script. Error: {self._get_error_message_from_exception(e)}")
-                return phantom.APP_ERROR
-
-            try:
-                self._preprocess_container = self._script_module.preprocess_container
-            except Exception as ex:
-                self.save_progress(
-                    "Error loading custom script. Does not contain preprocess_container function, "
-                    f"Error:{self._get_error_message_from_exception(ex)}"
-                )
-                return phantom.APP_ERROR
-
-        return phantom.APP_SUCCESS
 
     def _get_error_message_from_exception(self, e):
         """This method is used to get appropriate error message from the exception.
@@ -365,12 +333,6 @@ class CrowdstrikeConnector(BaseConnector):
 
             container = result["container"]
             container["artifacts"] = artifacts
-
-            if hasattr(self, "_preprocess_container"):
-                try:
-                    container = self._preprocess_container(container)
-                except Exception as e:
-                    self.debug_print(f"Preprocess error: {self._get_error_message_from_exception(e)}")
 
             artifacts = container.pop("artifacts", [])
 

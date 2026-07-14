@@ -323,15 +323,15 @@ def _poll_incidents(
         logger.info("No incidents found in response")
         return
 
+    logger.progress(f"Processing {len(incidents)} incidents")
+    results = incidents_parser.process_incidents(incidents)
+    yield from _yield_results(results)
+
     if not is_poll_now:
         latest_timestamp = max(
             incident.get("modified_timestamp", 0) for incident in incidents
         )
         asset.ingest_state[timestamp_key] = latest_timestamp
-
-    logger.progress(f"Processing {len(incidents)} incidents")
-    results = incidents_parser.process_incidents(incidents)
-    yield from _yield_results(results)
 
 
 def _yield_results(results: list) -> Iterator[Container | Artifact]:

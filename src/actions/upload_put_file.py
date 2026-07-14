@@ -74,27 +74,28 @@ def upload_put_file(
 
     file_info = attachments[0]
 
-    multipart_data = MultipartEncoder(
-        fields={
-            "file": (file_info.name, open(file_info.path, "rb")),  # noqa: SIM115
-            "description": params.description,
-            "name": params.file_name or "",
-            "comments_for_audit_log": params.comment or "",
-        }
-    )
-
-    headers = {"Content-Type": multipart_data.content_type}
-
-    try:
-        resp_json = client.make_rest_call(
-            CROWDSTRIKE_RTR_ADMIN_PUT_FILES,
-            headers=headers,
-            data=multipart_data,
-            method="post",
-            upload_file=True,
+    with open(file_info.path, "rb") as file_obj:
+        multipart_data = MultipartEncoder(
+            fields={
+                "file": (file_info.name, file_obj),
+                "description": params.description,
+                "name": params.file_name or "",
+                "comments_for_audit_log": params.comment or "",
+            }
         )
-    except Exception as e:
-        raise ActionFailure(str(e)) from e
+
+        headers = {"Content-Type": multipart_data.content_type}
+
+        try:
+            resp_json = client.make_rest_call(
+                CROWDSTRIKE_RTR_ADMIN_PUT_FILES,
+                headers=headers,
+                data=multipart_data,
+                method="post",
+                upload_file=True,
+            )
+        except Exception as e:
+            raise ActionFailure(str(e)) from e
 
     soar.set_message("Put file uploaded successfully")
 

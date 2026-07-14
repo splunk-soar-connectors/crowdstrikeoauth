@@ -134,7 +134,7 @@ app = App(
     appid="ae971ba5-3117-444a-8ac5-6ce779f3a232",
     fips_compliant=True,
     asset_cls=Asset,
-    min_phantom_version="8.6",
+    min_phantom_version="8.6.0",
 )
 
 

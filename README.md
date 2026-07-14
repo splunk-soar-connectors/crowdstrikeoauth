@@ -4,7 +4,7 @@ Publisher: Splunk <br>
 Connector Version: 5.1.3 <br>
 Product Vendor: CrowdStrike <br>
 Product Name: CrowdStrike <br>
-Minimum Product Version: 8.6
+Minimum Product Version: 8.6.0
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 

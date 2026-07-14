@@ -42,7 +42,12 @@ from .consts import (
     DEFAULT_POLLNOW_EVENTS_COUNT,
     DEFAULT_POLLNOW_INCIDENTS_COUNT,
 )
-from .helper import CrowdStrikeClient, get_subtenants, validate_integer
+from .helper import (
+    CrowdStrikeClient,
+    get_subtenants,
+    migrate_legacy_ingest_state,
+    validate_integer,
+)
 
 
 logger = getLogger()
@@ -157,6 +162,9 @@ def on_poll(
 ) -> Iterator[Container | Artifact]:
     client = get_client(asset)
     is_poll_now = params.is_manual_poll()
+
+    if not is_poll_now:
+        migrate_legacy_ingest_state(asset)
 
     max_crlf = validate_integer(asset.max_crlf, "max_crlf") if asset.max_crlf else None
 

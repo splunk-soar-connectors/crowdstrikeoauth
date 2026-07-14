@@ -146,21 +146,21 @@
                           <td>{{ resource.last_name }}</td>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike user id'], 'value': '{{ resource.uid }}' }], 0, {{ container.id }}, null, false);">{{ resource.uid }}
+                               onclick="context_menu(this, [{'contains': ['crowdstrike user id'], 'value': '{{ resource.uid|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ resource.uid }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                             </a>
                           </td>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike unique user id'], 'value': '{{ resource.uuid }}' }], 0, {{ container.id }}, null, false);">{{ resource.uuid }}
+                               onclick="context_menu(this, [{'contains': ['crowdstrike unique user id'], 'value': '{{ resource.uuid|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ resource.uuid }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                             </a>
                           </td>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike customer id'], 'value': '{{ resource.cid }}' }], 0, {{ container.id }}, null, false);">{{ resource.cid }}
+                               onclick="context_menu(this, [{'contains': ['crowdstrike customer id'], 'value': '{{ resource.cid|escapejs }}' }], 0, {{ container.id }}, null, false);">{{ resource.cid }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                             </a>

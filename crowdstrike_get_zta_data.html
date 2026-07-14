@@ -123,7 +123,7 @@
                       <tr>
                         <td>
                           <a href="javascript:;"
-                             onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ item.aid }}' }], 0, {{ container.id }}, null, false);">
+                             onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ item.aid|escapejs }}' }], 0, {{ container.id }}, null, false);">
                             {{ item.aid }}
                             &nbsp;
                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -131,7 +131,7 @@
                         </td>
                         <td>
                           <a href="javascript:;"
-                             onclick="context_menu(this, [{'contains': ['crowdstrike customer id'], 'value': '{{ item.cid }}' }], 0, {{ container.id }}, null, false);">
+                             onclick="context_menu(this, [{'contains': ['crowdstrike customer id'], 'value': '{{ item.cid|escapejs }}' }], 0, {{ container.id }}, null, false);">
                             {{ item.cid }}
                             &nbsp;
                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>

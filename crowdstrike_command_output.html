@@ -127,7 +127,7 @@
               <td>Device ID</td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ result.param.device_id }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -139,7 +139,7 @@
             <td>Session ID</td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ result.param.session_id }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ result.param.session_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.param.session_id }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -174,7 +174,7 @@
                           <td>
                             {% if result.summary.cloud_request_id %}
                               <a href="javascript:;"
-                                 onclick="context_menu(this, [{'contains': ['crowdstrike cloud request id'], 'value': '{{ result.summary.cloud_request_id }}' }], 0, {{ container.id }}, null, false);">
+                                 onclick="context_menu(this, [{'contains': ['crowdstrike cloud request id'], 'value': '{{ result.summary.cloud_request_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                 {{ result.summary.cloud_request_id }}
                                 &nbsp;
                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>

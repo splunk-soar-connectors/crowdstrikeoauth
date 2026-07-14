@@ -120,7 +120,7 @@
               </td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type }}' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type|escapejs }}' ], 'value': '{{ result.param.ioc|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ result.param.ioc }}
                   &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                 </a>
@@ -162,7 +162,7 @@
                         <tr>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': [ 'crowdstrike device id' ], 'value': '{{ curr_entry.device_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': [ 'crowdstrike device id' ], 'value': '{{ curr_entry.device_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ curr_entry.device_id }}
                               &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                             </a>

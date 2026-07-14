@@ -107,7 +107,7 @@
             <td>Host Group ID</td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['crowdstrike host group id'], 'value': '{{ result.param.host_group_id }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['crowdstrike host group id'], 'value': '{{ result.param.host_group_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.param.host_group_id }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -119,7 +119,7 @@
               <td>Hostname</td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['host name'], 'value': '{{ result.param.hostname }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['host name'], 'value': '{{ result.param.hostname|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ result.param.hostname }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -132,7 +132,7 @@
               <td>Device ID</td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ result.param.device_id }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -163,7 +163,7 @@
                       <tr>
                         <td>
                           <a href="javascript:;"
-                             onclick="context_menu(this, [{'contains': ['crowdstrike host group id'], 'value': '{{ group.id }}' }], 0, {{ container.id }}, null, false);">
+                             onclick="context_menu(this, [{'contains': ['crowdstrike host group id'], 'value': '{{ group.id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                             {{ group.id }}
                             &nbsp;
                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>

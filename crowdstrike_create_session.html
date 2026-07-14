@@ -108,7 +108,7 @@
             <td>Device ID</td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['crowdstrike device id'], 'value': '{{ result.param.device_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.param.device_id }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -136,7 +136,7 @@
                         <tr>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ resource.session_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ resource.session_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ resource.session_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -145,7 +145,7 @@
                           <td>{{ resource.created_at }}</td>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ resource.pwd }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['file path'], 'value': '{{ resource.pwd|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ resource.pwd }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>

@@ -126,7 +126,7 @@
                         <tr>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike ioa rule group id'], 'value': '{{ resource.id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike ioa rule group id'], 'value': '{{ resource.id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ resource.id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -167,7 +167,7 @@
                           <tr>
                             <td>
                               <a href="javascript:;"
-                                 onclick="context_menu(this, [{'contains': ['crowdstrike ioa rule group id'], 'value': '{{ resource.id }}' }], 0, {{ container.id }}, null, false);">
+                                 onclick="context_menu(this, [{'contains': ['crowdstrike ioa rule group id'], 'value': '{{ resource.id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                 {{ resource.id }}
                                 &nbsp;
                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -175,7 +175,7 @@
                             </td>
                             <td>
                               <a href="javascript:;"
-                                 onclick="context_menu(this, [{'contains': ['crowdstrike prevention policy id'], 'value': '{{ policy_id }}' }], 0, {{ container.id }}, null, false);">
+                                 onclick="context_menu(this, [{'contains': ['crowdstrike prevention policy id'], 'value': '{{ policy_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                 {{ policy_id }}
                                 &nbsp;
                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>

@@ -3101,6 +3101,8 @@ action_result.parameter.ioc | string | `hash` `sha256` `sha1` `md5` `domain` | e
 action_result.parameter.limit | numeric | | 100 |
 action_result.data.\*.falcon_process_id | string | `falcon process id` | pid:07c312fabcb8473454d0a16f118928fg:16716090292999 |
 action_result.summary.process_count | numeric | | 1 |
+action_result.summary.total_process_count | numeric | | 250 |
+action_result.summary.truncated | boolean | | True |
 action_result.message | string | | Process count: 1 |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |

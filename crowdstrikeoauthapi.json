@@ -14323,6 +14323,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.summary.total_process_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        250
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.truncated",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [

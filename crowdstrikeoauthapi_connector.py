@@ -442,6 +442,7 @@ class CrowdstrikeConnector(BaseConnector):
 
     def _hunt_paginator(self, action_result, endpoint, params, search_subtenants=False, subtenant=None):
         list_ids = list()
+        self._hunt_total = 0
 
         offset = ""
         limit = None
@@ -465,6 +466,7 @@ class CrowdstrikeConnector(BaseConnector):
                 subtenants.extend(configured_subtenants)
 
         for subtenant in subtenants:
+            subtenant_total_counted = False
             while True:
                 params.update({"offset": offset})
                 params.update({"limit": 100})
@@ -486,6 +488,13 @@ class CrowdstrikeConnector(BaseConnector):
                         "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get("code"), error.get("message")),
                     )
                     return None
+
+                if not subtenant_total_counted:
+                    try:
+                        self._hunt_total += int(response.get("meta", {}).get("pagination", {}).get("total") or 0)
+                    except (TypeError, ValueError):
+                        pass
+                    subtenant_total_counted = True
 
                 if response.get("resources"):
                     list_ids.extend(response.get("resources"))
@@ -3510,7 +3519,14 @@ class CrowdstrikeConnector(BaseConnector):
         for process_id in response:
             action_result.add_data({"falcon_process_id": process_id})
 
-        action_result.set_summary({"process_count": len(response)})
+        total_process_count = max(self._hunt_total, len(response))
+        action_result.set_summary(
+            {
+                "process_count": len(response),
+                "total_process_count": total_process_count,
+                "truncated": total_process_count > len(response),
+            }
+        )
 
         return action_result.set_status(phantom.APP_SUCCESS)
 

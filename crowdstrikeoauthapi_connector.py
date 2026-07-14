@@ -1760,18 +1760,42 @@ class CrowdstrikeConnector(BaseConnector):
             filter = f"{filter}{key}: '{item}', "  # or opeartion with given hostname/s
         filter = filter[:-2]  # removing last trailing , and space
 
-        check_list_items = self._get_ids_with_subtenants(
+        resolved_items = self._get_ids_with_subtenants(
             action_result, CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, param={"filter": filter}, subtenant=subtenant
         )
 
-        if check_list_items is None:
+        if resolved_items is None:
             return action_result.get_status(), flag, []
 
-        if len(list_items) != len(check_list_items):
-            flag = True
-            check_list_items = []
+        if isinstance(resolved_items, dict):
+            id_tenant_map = resolved_items
+        else:
+            id_tenant_map = dict.fromkeys(resolved_items, subtenant)
 
-        return phantom.APP_SUCCESS, flag, check_list_items
+        if len(list_items) != len(id_tenant_map):
+            flag = True
+            return phantom.APP_SUCCESS, flag, []
+
+        requested_items = {str(item).lower() for item in list_items}
+        tenant_ids = defaultdict(list)
+        for device_id, tenant in id_tenant_map.items():
+            tenant_ids[tenant].append(device_id)
+
+        for tenant, device_ids in tenant_ids.items():
+            details = self._get_details(
+                action_result,
+                CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT,
+                {"ids": device_ids},
+                method="post",
+                subtenant=tenant,
+            )
+            if details is None:
+                return action_result.get_status(), flag, []
+            if len(details) != len(device_ids) or any(str(device.get(key, "")).lower() not in requested_items for device in details):
+                flag = True
+                return phantom.APP_SUCCESS, flag, []
+
+        return phantom.APP_SUCCESS, flag, list(id_tenant_map)
 
     def _perform_device_action(self, action_result, param):
         count = 0

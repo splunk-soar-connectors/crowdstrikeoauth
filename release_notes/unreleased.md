@@ -13,3 +13,4 @@
 * Preserved existing IOA rule and rule-group enabled state when update actions omit the optional enabled parameter.
 * Bounded RTR command result sequence retrieval by the action timeout and a hard sequence limit.
 * Redacted OAuth token endpoint bodies and headers from connector debug data.
+* Verified resolved device identities exactly match requested hostnames or device IDs before device actions run.

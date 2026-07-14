@@ -25,9 +25,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **max_incidents_poll_now** | optional | numeric | Maximum incidents to get while POLL NOW |
 **ingest_incidents** | optional | boolean | Should ingest incidents during polling |
 **collate** | optional | boolean | Merge containers for hostname and eventname |
-**merge_time_interval** | optional | numeric | Merge same containers within specified seconds |
 **max_crlf** | optional | numeric | Maximum allowed continuous blank lines |
-**preprocess_script** | optional | file | Script with functions to preprocess containers and artifacts |
 **detonate_timeout** | optional | numeric | Timeout for detonation result in minutes (Default: 15 minutes) |
 
 ### Supported Actions

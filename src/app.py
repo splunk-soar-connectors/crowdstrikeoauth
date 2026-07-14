@@ -106,19 +106,9 @@ class Asset(BaseAsset):
         default=True,
         category=FieldCategory.INGEST,
     )
-    merge_time_interval: int | None = AssetField(
-        description="Merge same containers within specified seconds",
-        default=0,
-        category=FieldCategory.INGEST,
-    )
     max_crlf: int | None = AssetField(
         description="Maximum allowed continuous blank lines",
         default=50,
-        category=FieldCategory.INGEST,
-    )
-    preprocess_script: str | None = AssetField(
-        description="Script with functions to preprocess containers and artifacts",
-        is_file=True,
         category=FieldCategory.INGEST,
     )
     detonate_timeout: int | None = AssetField(

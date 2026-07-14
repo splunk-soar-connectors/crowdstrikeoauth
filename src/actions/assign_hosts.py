@@ -19,15 +19,13 @@ from ..app import Asset, app, get_client
 
 
 class AssignHostsParams(Params):
-    device_id: str = Param(
+    device_id: str | None = Param(
         description="Comma-separated list of device IDs",
-        required=False,
         primary=True,
         cef_types=["crowdstrike device id"],
     )
-    hostname: str = Param(
+    hostname: str | None = Param(
         description="Comma separated list of hostnames",
-        required=False,
         primary=True,
         cef_types=["host name"],
     )

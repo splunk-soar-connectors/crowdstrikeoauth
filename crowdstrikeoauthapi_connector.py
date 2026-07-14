@@ -4945,9 +4945,12 @@ class CrowdstrikeConnector(BaseConnector):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, "add_debug_data"):
             action_result.add_debug_data({"r_status_code": response.status_code})
-            if not self._stream_file_data:
-                action_result.add_debug_data({"r_text": response.text})
-            action_result.add_debug_data({"r_headers": response.headers})
+            if CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT in getattr(response, "url", ""):
+                action_result.add_debug_data({"r_text": "<token endpoint response redacted>"})
+            else:
+                if not self._stream_file_data:
+                    action_result.add_debug_data({"r_text": response.text})
+                action_result.add_debug_data({"r_headers": response.headers})
 
         # Reset_password returns empty body
         if not self._stream_file_data and not response.text and 200 <= response.status_code < 399:

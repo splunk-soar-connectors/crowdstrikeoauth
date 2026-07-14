@@ -139,7 +139,7 @@
             "description": "Run a query against CrowdStrike API",
             "type": "investigate",
             "identifier": "run_query",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "endpoint": {
                     "data_type": "string",

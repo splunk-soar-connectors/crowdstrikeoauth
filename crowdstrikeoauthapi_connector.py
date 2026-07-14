@@ -17,6 +17,7 @@
 import ipaddress
 import json
 import os
+import re
 import time
 import traceback
 import uuid
@@ -525,8 +526,7 @@ class CrowdstrikeConnector(BaseConnector):
         if not endpoint:
             return action_result.set_status(phantom.APP_ERROR, "Please provide endpoint path")
 
-        # Ensure using query endpoint
-        if "/queries/" not in endpoint.lower():
+        if not re.fullmatch(r"/[A-Za-z0-9_-]+/queries/[A-Za-z0-9_-]+/v\d+", endpoint):
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR)
 
         params = {"limit": param.get("limit", 50), "offset": param.get("offset", 0)}

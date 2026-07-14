@@ -523,7 +523,7 @@ No Output
 Run a query against CrowdStrike API
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 

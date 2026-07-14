@@ -2938,6 +2938,7 @@ class CrowdstrikeConnector(BaseConnector):
         # 5 second wait per request
         timeout_segment_length = 5
         timeout_segments = timeout / timeout_segment_length
+        deadline = time.monotonic() + timeout
 
         count = 0
         while count < int(timeout_segments):
@@ -2954,7 +2955,15 @@ class CrowdstrikeConnector(BaseConnector):
             if resources and len(resources):
                 # if complete, grab all sequences
                 if resources[0].get("complete", False):
+                    max_sequences = 10000
                     while True:
+                        if time.monotonic() >= deadline:
+                            return action_result.set_status(phantom.APP_ERROR, "Timed out while fetching command result sequences")
+                        if sequence_id >= max_sequences:
+                            return action_result.set_status(
+                                phantom.APP_ERROR,
+                                f"Command results exceeded the {max_sequences}-sequence limit",
+                            )
                         self.save_progress(f"sequence: {sequence_id}")
                         params = {
                             "cloud_request_id": cloud_request_id,

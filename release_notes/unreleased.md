@@ -11,3 +11,4 @@
 * Reported sandbox detonation poll timeouts as action failures while retaining follow-up data.
 * Protected detonation document passwords from action result parameter persistence.
 * Preserved existing IOA rule and rule-group enabled state when update actions omit the optional enabled parameter.
+* Bounded RTR command result sequence retrieval by the action timeout and a hard sequence limit.

@@ -4591,7 +4591,7 @@ class CrowdstrikeConnector(BaseConnector):
             )
 
         return action_result.set_status(
-            phantom.APP_SUCCESS,
+            phantom.APP_ERROR,
             f"Timed out while waiting for the result. To know the status of submitted \
             sample please run the check status action with {resource_id} resource id.",
         )

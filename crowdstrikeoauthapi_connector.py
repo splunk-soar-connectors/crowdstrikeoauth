@@ -308,6 +308,8 @@ class CrowdstrikeConnector(BaseConnector):
     def _save_results(self, results, param, is_incident=False):
         reused_containers = 0
         containers_processed = 0
+        failed_offsets = []
+        save_failures = 0
         artifact_type = "incident" if is_incident else "event"
 
         for i, result in enumerate(results):
@@ -315,16 +317,19 @@ class CrowdstrikeConnector(BaseConnector):
             # result is a dictionary of a single container and artifacts
             if "container" not in result:
                 self.debug_print(f"Skipping empty container # {i}")
+                save_failures += 1
                 continue
 
             if "artifacts" not in result:
                 # ignore containers without artifacts
                 self.debug_print(f"Skipping container # {i} without artifacts")
+                save_failures += 1
                 continue
 
             if len(result["artifacts"]) == 0:
                 # ignore containers without artifacts
                 self.debug_print(f"Skipping container # {i} with 0 artifacts")
+                save_failures += 1
                 continue
 
             config = self.get_config()
@@ -348,6 +353,8 @@ class CrowdstrikeConnector(BaseConnector):
 
                 if phantom.is_fail(ret_val):
                     self.debug_print("Error occurred while creating a new container")
+                    failed_offsets.extend(self._get_artifact_offsets(artifacts))
+                    save_failures += 1
                     continue
             else:
                 reused_containers += 1
@@ -368,13 +375,19 @@ class CrowdstrikeConnector(BaseConnector):
 
             if phantom.is_fail(ret_val):
                 self.debug_print(f"Error occurred while adding {len_artifacts} artifacts to container: {container_id}")
+                failed_offsets.extend(self._get_artifact_offsets(artifacts))
+                save_failures += 1
 
             containers_processed += 1
 
         if reused_containers and config.get("collate"):
             self.save_progress("Some containers were re-used due to collate set to True")
 
-        return containers_processed
+        return containers_processed, failed_offsets, save_failures
+
+    @staticmethod
+    def _get_artifact_offsets(artifacts):
+        return [artifact.get("source_data_identifier") for artifact in artifacts if isinstance(artifact.get("source_data_identifier"), int)]
 
     @staticmethod
     def validate_comma_seperated_values(values):
@@ -3395,7 +3408,9 @@ class CrowdstrikeConnector(BaseConnector):
                             return action_result.get_status()
                     elif max_crlf is None:
                         # Save events after refreshing the token
-                        self._save_events_on_poll(config, total_blank_lines_count, param)
+                        ret_val = self._save_events_on_poll(config, total_blank_lines_count, param, action_result)
+                        if phantom.is_fail(ret_val):
+                            return action_result.get_status()
 
                 if stream_data is None:
                     # Done with all the event data for now
@@ -3455,7 +3470,9 @@ class CrowdstrikeConnector(BaseConnector):
                     phantom.APP_ERROR, f"{CROWDSTRIKE_EVENTS_FETCH_ERROR}. Error response from server: {err_message}"
                 )
 
-        self._save_events_on_poll(config, total_blank_lines_count, param)
+        ret_val = self._save_events_on_poll(config, total_blank_lines_count, param, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if is_error_occurred:
             if restart_process:
@@ -3466,7 +3483,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _save_events_on_poll(self, config, total_blank_lines_count, param):
+    def _save_events_on_poll(self, config, total_blank_lines_count, param, action_result):
         # Check if to collate the data or not
         collate = config.get("collate", True)
 
@@ -3478,6 +3495,8 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress(CROWDSTRIKE_GOT_EVENTS_MESSAGE.format(len(self._events)))
 
         if self._events:
+            failed_offsets = []
+            save_failures = 0
             # Update messages to reference both event types
             self.send_progress("Parsing the fetched Detection Events...")
             results = events_parser.parse_events(self._events, self, collate)
@@ -3486,15 +3505,27 @@ class CrowdstrikeConnector(BaseConnector):
                 self.save_progress(
                     "Adding {} event artifact{}. Empty containers will be skipped.".format(len(results), "s" if len(results) > 1 else "")
                 )
-                self._save_results(results, param)
-                self.send_progress("Events have been stored")
+                _, failed_offsets, save_failures = self._save_results(results, param)
+                self.send_progress("Event save processing completed")
             if not self.is_poll_now():
                 last_event = self._events[-1]
                 last_offset_id = last_event["metadata"]["offset"]
-                self._state["last_offset_id"] = last_offset_id + 1
+                next_offset_id = last_offset_id + 1
+                if failed_offsets:
+                    next_offset_id = min(next_offset_id, min(failed_offsets))
+                if not save_failures or failed_offsets:
+                    self._state["last_offset_id"] = next_offset_id
                 self.save_state(self._state)
 
             self._events = []
+
+            if save_failures:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Failed to save {save_failures} detection result(s); the next poll will retry them",
+                )
+
+        return phantom.APP_SUCCESS
 
     def _poll_incidents(self, action_result, param, max_incidents):
         self.save_progress("Starting incident ingestion...")
@@ -3532,15 +3563,29 @@ class CrowdstrikeConnector(BaseConnector):
             incidents = response.get("resources", [])
 
             if incidents:
-                # Update timestamp for next poll if not poll_now
-                if not self.is_poll_now():
-                    latest_timestamp = max(incident.get("modified_timestamp", 0) for incident in incidents)
-                    self._state["last_incident_timestamp"] = latest_timestamp
-
-                # Process incidents through parser
+                incidents.sort(key=lambda incident: str(incident.get("modified_timestamp", "")))
                 self.save_progress(f"Processing {len(incidents)} incidents...")
-                incident_results = incidents_parser.process_incidents(incidents)
-                self._save_results(incident_results, param, True)
+                failed_incidents = 0
+                for incident in incidents:
+                    try:
+                        incident_results = incidents_parser.process_incidents([incident])
+                        if not incident_results:
+                            raise ValueError("Incident parser returned no result")
+                        _, _, save_failures = self._save_results(incident_results, param, True)
+                        failed_incidents += int(save_failures > 0)
+                    except Exception as e:
+                        failed_incidents += 1
+                        self.debug_print(f"Failed to ingest incident {incident.get('incident_id')}: {self._get_error_message_from_exception(e)}")
+
+                if failed_incidents:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Failed to ingest {failed_incidents} of {len(incidents)} incidents; the next poll will retry the batch",
+                    )
+
+                if not self.is_poll_now():
+                    latest_timestamp = max(incident.get("modified_timestamp", "") for incident in incidents)
+                    self._state["last_incident_timestamp"] = latest_timestamp
                 self.save_progress("Successfully processed incidents")
             else:
                 self.save_progress("No incidents found in response")

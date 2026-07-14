@@ -111,8 +111,8 @@ def process_incidents(incidents):
         container.update(_container_common)
 
         container["name"] = "{} on {} at {}".format(
-            incident.get("name", "Unnamed Incident"),
-            incident.get("hosts", [{}])[0].get("hostname", "Unknown Host"),
+            incident.get("name") or "Unnamed Incident",
+            (incident.get("hosts") or [{}])[0].get("hostname", "Unknown Host"),
             incident.get("start", "Unknown Time"),
         )
 

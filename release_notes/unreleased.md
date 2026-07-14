@@ -7,3 +7,4 @@
 * Encoded ingestion container lookups and limited container reuse to the current asset.
 * Reported the authoritative process total and whether list process results were truncated by the requested limit.
 * Bounded shared, custom-indicator, and IOA pagination loops and rejected non-advancing server cursors.
+* Preserved detection and incident polling checkpoints when fetched records fail to persist in SOAR.

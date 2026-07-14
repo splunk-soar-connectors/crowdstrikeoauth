@@ -4133,7 +4133,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **version** | required | Latest version of this Rule Group | numeric | |
 **name** | required | Name of the Rule Group | string | |
 **description** | required | Longer description for the Rule Group | string | |
-**enabled** | optional | Enable or disable the Rule Group | boolean | |
+**enabled** | optional | Enable or disable the Rule Group (omit to leave unchanged) | boolean | |
 **comment** | required | Comment for the audit log | string | |
 **assign_policy_id** | optional | Prevention Policy ID to assign the Rule Group to | string | `crowdstrike prevention policy id` |
 **remove_policy_id** | optional | Prevention Policy ID to remove the Rule Group from | string | `crowdstrike prevention policy id` |
@@ -4441,7 +4441,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **disposition_id** | required | The action that the rule should take when triggered (valid dispositions can be found in the "list ioa types" output) | numeric | |
 **field_values** | required | JSON list of parameters to pass to the new rule (valid fields can be found in the "list ioa types" output) | string | |
 **comment** | optional | Comment for the audit log (optional) | string | |
-**enabled** | optional | Enable this rule | boolean | |
+**enabled** | optional | Enable this rule (omit to leave unchanged) | boolean | |
 
 #### Action Output
 

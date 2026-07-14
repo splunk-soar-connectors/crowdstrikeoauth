@@ -10,3 +10,4 @@
 * Preserved detection and incident polling checkpoints when fetched records fail to persist in SOAR.
 * Reported sandbox detonation poll timeouts as action failures while retaining follow-up data.
 * Protected detonation document passwords from action result parameter persistence.
+* Preserved existing IOA rule and rule-group enabled state when update actions omit the optional enabled parameter.

@@ -3728,21 +3728,22 @@ class CrowdstrikeConnector(BaseConnector):
         except json.JSONDecodeError as e:
             return action_result.set_status(phantom.APP_ERROR, f"Failed to parse field_values: {e}")
 
+        rule_update = {
+            "instance_id": param["rule_id"],
+            "pattern_severity": param["severity"],
+            "name": param["name"],
+            "description": param["description"],
+            "disposition_id": param["disposition_id"],
+            "field_values": field_values,
+        }
+        if "enabled" in param:
+            rule_update["enabled"] = param["enabled"]
+
         update_params = {
             "rulegroup_id": param["rule_group_id"],
             "rulegroup_version": param["rule_group_version"],
             "instance_version": param["rule_version"],
-            "rule_updates": [
-                {
-                    "instance_id": param["rule_id"],
-                    "pattern_severity": param["severity"],
-                    "enabled": param.get("enabled", False),
-                    "name": param["name"],
-                    "description": param["description"],
-                    "disposition_id": param["disposition_id"],
-                    "field_values": field_values,
-                }
-            ],
+            "rule_updates": [rule_update],
         }
         update_comment = param.get("comment")
         if update_comment:
@@ -3790,9 +3791,10 @@ class CrowdstrikeConnector(BaseConnector):
             "rulegroup_version": param["version"],
             "name": param["name"],
             "description": param["description"],
-            "enabled": param.get("enabled", False),
             "comment": param["comment"],
         }
+        if "enabled" in param:
+            update_params["enabled"] = param["enabled"]
         ret_val, resp_json = self._make_rest_call_helper_oauth2(
             action_result,
             CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,

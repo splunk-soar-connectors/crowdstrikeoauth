@@ -20808,10 +20808,9 @@
                 },
                 "enabled": {
                     "data_type": "boolean",
-                    "description": "Enable or disable the Rule Group",
+                    "description": "Enable or disable the Rule Group (omit to leave unchanged)",
                     "required": false,
-                    "order": 4,
-                    "default": false
+                    "order": 4
                 },
                 "comment": {
                     "data_type": "string",
@@ -22310,9 +22309,8 @@
                 },
                 "enabled": {
                     "data_type": "boolean",
-                    "description": "Enable this rule",
+                    "description": "Enable this rule (omit to leave unchanged)",
                     "required": false,
-                    "default": false,
                     "order": 10
                 }
             },

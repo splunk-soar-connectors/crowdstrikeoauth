@@ -14,3 +14,4 @@
 * Bounded RTR command result sequence retrieval by the action timeout and a hard sequence limit.
 * Redacted OAuth token endpoint bodies and headers from connector debug data.
 * Verified resolved device identities exactly match requested hostnames or device IDs before device actions run.
+* Reported device, indicator upload, and mixed API response errors as action failures.

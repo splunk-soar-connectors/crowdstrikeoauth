@@ -1855,6 +1855,12 @@ class CrowdstrikeConnector(BaseConnector):
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
 
+                if response.get("errors"):
+                    error_msg = ", ".join(
+                        f"{error.get('code', 'Unknown')}: {error.get('message', 'Unknown error')}" for error in response["errors"]
+                    )
+                    return action_result.set_status(phantom.APP_ERROR, f"Device action failed: {error_msg}")
+
                 if not response.get("resources"):
                     return action_result.set_status(
                         phantom.APP_ERROR,
@@ -1899,6 +1905,12 @@ class CrowdstrikeConnector(BaseConnector):
 
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
+
+                if response.get("errors"):
+                    error_msg = ", ".join(
+                        f"{error.get('code', 'Unknown')}: {error.get('message', 'Unknown error')}" for error in response["errors"]
+                    )
+                    return action_result.set_status(phantom.APP_ERROR, f"Device action failed: {error_msg}")
 
                 del list_ids[: min(100, len(list_ids))]
 
@@ -3747,6 +3759,10 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
+        if response.get("errors"):
+            error_msg = ", ".join(f"{error.get('code', 'Unknown')}: {error.get('message', 'Unknown error')}" for error in response["errors"])
+            return action_result.set_status(phantom.APP_ERROR, f"Indicator upload failed: {error_msg}")
+
         for indicator_data in response.get("resources", []):
             action_result.add_data(indicator_data)
 
@@ -4774,8 +4790,8 @@ class CrowdstrikeConnector(BaseConnector):
                         else:
                             return RetVal(
                                 action_result.set_status(
-                                    phantom.APP_SUCCESS,
-                                    "Error from server. Error details: {}".format(error_msg.strip(", ")),
+                                    phantom.APP_ERROR,
+                                    "Partial failure reported by server. Error details: {}".format(error_msg.strip(", ")),
                                 ),
                                 resp_json,
                             )

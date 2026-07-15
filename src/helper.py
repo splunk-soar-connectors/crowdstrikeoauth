@@ -835,29 +835,19 @@ def get_subtenants(asset, cid: str | None = None) -> list:
 def migrate_legacy_ingest_state(asset) -> None:
     """Seed SDK ingest state from the pre-SDK connector's flat checkpoint keys.
 
-    The legacy BaseConnector app stored `last_offset_id` and `last_incident_timestamp`
-    as top-level keys in the asset state file. The SDK keeps ingestion checkpoints in a
-    separate encrypted partition, so upgrading in place would otherwise reset checkpoints
-    and re-ingest everything. Only the main tenant had checkpoints pre-SDK, so this only
-    migrates the non-subtenant keys, and only until the SDK partition has its own value.
+    The legacy BaseConnector app stored `last_offset_id` as a top-level key in the asset
+    state file. The SDK keeps ingestion checkpoints in a separate encrypted partition, so
+    upgrading in place would otherwise reset checkpoints and re-ingest everything. Only the
+    main tenant had checkpoints pre-SDK, so this only migrates the non-subtenant key, and
+    only until the SDK partition has its own value.
     """
-    needs_offset = "last_offset_id" not in asset.ingest_state
-    needs_timestamp = "last_incident_timestamp" not in asset.ingest_state
-    if not (needs_offset or needs_timestamp):
+    if "last_offset_id" in asset.ingest_state:
         return
 
     legacy_state = asset.ingest_state.backend.load_state() or {}
 
-    if (
-        needs_offset
-        and (legacy_offset_id := legacy_state.get("last_offset_id")) is not None
-    ):
+    if (legacy_offset_id := legacy_state.get("last_offset_id")) is not None:
         asset.ingest_state["last_offset_id"] = legacy_offset_id
-
-    if needs_timestamp and (
-        legacy_incident_timestamp := legacy_state.get("last_incident_timestamp")
-    ):
-        asset.ingest_state["last_incident_timestamp"] = legacy_incident_timestamp
 
 
 def validate_comma_separated_values(values: str) -> list:

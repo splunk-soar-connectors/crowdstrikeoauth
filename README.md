@@ -21,9 +21,6 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **app_id** | optional | string | App ID |
 **max_events** | optional | numeric | Maximum events to get for scheduled and interval polling |
 **max_events_poll_now** | optional | numeric | Maximum events to get while POLL NOW |
-**max_incidents** | optional | numeric | Maximum incidents to get for scheduled and interval polling |
-**max_incidents_poll_now** | optional | numeric | Maximum incidents to get while POLL NOW |
-**ingest_incidents** | optional | boolean | Should ingest incidents during polling |
 **collate** | optional | boolean | Merge containers for hostname and eventname |
 **max_crlf** | optional | numeric | Maximum allowed continuous blank lines |
 **detonate_timeout** | optional | numeric | Timeout for detonation result in minutes (Default: 15 minutes) |

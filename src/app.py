@@ -23,24 +23,19 @@ from soar_sdk.models.container import Container
 from soar_sdk.params import OnPollParams
 
 from . import parse_cs_events as events_parser
-from . import parse_cs_incidents as incidents_parser
 from .consts import (
     CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE,
     CROWDSTRIKE_EVENT_TYPES,
     CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT,
-    CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT,
     CROWDSTRIKE_GETTING_EVENTS_MESSAGE,
     CROWDSTRIKE_GOT_EVENTS_MESSAGE,
-    CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT,
     CROWDSTRIKE_NO_DATA_MESSAGE,
     CROWDSTRIKE_PULLED_EVENTS_MESSAGE,
     CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE,
     CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE,
     CROWDSTRIKE_REFRESH_TOKEN_ERROR,
     DEFAULT_EVENTS_COUNT,
-    DEFAULT_INCIDENTS_COUNT,
     DEFAULT_POLLNOW_EVENTS_COUNT,
-    DEFAULT_POLLNOW_INCIDENTS_COUNT,
 )
 from .helper import (
     CrowdStrikeClient,
@@ -84,21 +79,6 @@ class Asset(BaseAsset):
     max_events_poll_now: int | None = AssetField(
         description="Maximum events to get while POLL NOW",
         default=2000,
-        category=FieldCategory.INGEST,
-    )
-    max_incidents: int | None = AssetField(
-        description="Maximum incidents to get for scheduled and interval polling",
-        default=1000,
-        category=FieldCategory.INGEST,
-    )
-    max_incidents_poll_now: int | None = AssetField(
-        description="Maximum incidents to get while POLL NOW",
-        default=100,
-        category=FieldCategory.INGEST,
-    )
-    ingest_incidents: bool | None = AssetField(
-        description="Should ingest incidents during polling",
-        default=False,
         category=FieldCategory.INGEST,
     )
     collate: bool | None = AssetField(
@@ -164,16 +144,9 @@ def on_poll(
             asset.max_events_poll_now or DEFAULT_POLLNOW_EVENTS_COUNT,
             "max_events_poll_now",
         )
-        max_incidents = validate_integer(
-            asset.max_incidents_poll_now or DEFAULT_POLLNOW_INCIDENTS_COUNT,
-            "max_incidents_poll_now",
-        )
     else:
         max_events = validate_integer(
             asset.max_events or DEFAULT_EVENTS_COUNT, "max_events"
-        )
-        max_incidents = validate_integer(
-            asset.max_incidents or DEFAULT_INCIDENTS_COUNT, "max_incidents"
         )
 
     tenants = [None, *get_subtenants(asset)]
@@ -182,11 +155,6 @@ def on_poll(
         yield from _poll_detection_events(
             client, asset, is_poll_now, max_crlf, max_events, subtenant=tenant
         )
-
-        if asset.ingest_incidents:
-            yield from _poll_incidents(
-                client, asset, is_poll_now, max_incidents, subtenant=tenant
-            )
 
 
 def _poll_detection_events(
@@ -282,56 +250,6 @@ def _poll_detection_events(
         if not is_poll_now:
             last_offset_id = events[-1]["metadata"]["offset"]
             asset.ingest_state[offset_key] = last_offset_id + 1
-
-
-def _poll_incidents(
-    client: CrowdStrikeClient,
-    asset: Asset,
-    is_poll_now: bool,
-    max_incidents: int,
-    subtenant: str | None = None,
-) -> Iterator[Container | Artifact]:
-    timestamp_key = (
-        f"last_incident_timestamp_{subtenant}"
-        if subtenant
-        else "last_incident_timestamp"
-    )
-
-    logger.progress("Starting incident ingestion")
-    params = {"limit": max_incidents, "sort": "modified_timestamp.asc"}
-
-    if not is_poll_now:
-        last_ingestion_time = asset.ingest_state.get(timestamp_key, "")
-        params["filter"] = f"modified_timestamp:>'{last_ingestion_time}'"
-
-    incident_ids = client.paginator(
-        CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT, params, subtenant=subtenant
-    )
-    if not incident_ids:
-        logger.info("No incidents found")
-        return
-
-    response = client.make_rest_call(
-        CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT,
-        json_data={"ids": incident_ids},
-        method="post",
-        subtenant=subtenant,
-    )
-    incidents = response.get("resources", [])
-
-    if not incidents:
-        logger.info("No incidents found in response")
-        return
-
-    logger.progress(f"Processing {len(incidents)} incidents")
-    results = incidents_parser.process_incidents(incidents)
-    yield from _yield_results(results)
-
-    if not is_poll_now:
-        latest_timestamp = max(
-            incident.get("modified_timestamp", 0) for incident in incidents
-        )
-        asset.ingest_state[timestamp_key] = latest_timestamp
 
 
 def _yield_results(results: list) -> Iterator[Container | Artifact]:

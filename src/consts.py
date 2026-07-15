@@ -74,8 +74,6 @@ CROWDSTRIKE_SORT = "sort"
 DEFAULT_POLLNOW_EVENTS_COUNT = 2000
 DEFAULT_EVENTS_COUNT = 10000
 DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT = 50
-DEFAULT_POLLNOW_INCIDENTS_COUNT = 100
-DEFAULT_INCIDENTS_COUNT = 1000
 
 # Status messages for the app
 CROWDSTRIKE_SUCC_CONNECTIVITY_TEST = "Test connectivity passed"
@@ -216,12 +214,6 @@ CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH = "/indicators/queries/devices/v1"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH = "/indicators/queries/processes/v1"
 CROWDSTRIKE_GET_PROCESS_DETAIL_APIPATH = "/processes/entities/processes/v1"
 CROWDSTRIKE_RESOLVE_DETECTION_APIPATH = "/detects/entities/detects/v2"
-CROWDSTRIKE_LIST_INCIDENTS_ENDPOINT = "/incidents/queries/incidents/v1"
-CROWDSTRIKE_LIST_BEHAVIORS_ENDPOINT = "/incidents/queries/behaviors/v1"
-CROWDSTRIKE_GET_INCIDENT_DETAILS_ID_ENDPOINT = "/incidents/entities/incidents/GET/v1"
-CROWDSTRIKE_GET_INCIDENT_BEHAVIORS_ID_ENDPOINT = "/incidents/entities/behaviors/GET/v1"
-CROWDSTRIKE_LIST_CROWDSCORES_ENDPOINT = "/incidents/combined/crowdscores/v1"
-CROWDSTRIKE_UPDATE_INCIDENT_ENDPOINT = "/incidents/entities/incident-actions/v1"
 CROWDSTRIKE_LIST_USERS_UIDS_ENDPOINT = "/user-management/queries/users/v1"
 CROWDSTRIKE_GET_USER_INFO_ENDPOINT = "/user-management/entities/users/GET/v1"
 CROWDSTRIKE_GET_USER_ROLES_ENDPOINT = "/user-management/combined/user-roles/v1"

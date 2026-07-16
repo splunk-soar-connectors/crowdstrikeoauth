@@ -2442,7 +2442,7 @@
             "verbose": "This action supports filtering in order to retrieve a particular set of detections.",
             "type": "investigate",
             "identifier": "list_detections",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "limit": {
                     "data_type": "numeric",
@@ -3255,7 +3255,7 @@
             "description": "Get a list of epp alerts, replaces legacy Detects API",
             "type": "investigate",
             "identifier": "list_epp_alerts",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "limit": {
                     "data_type": "numeric",
@@ -6655,7 +6655,7 @@
             "verbose": "This action supports filtering in order to retrieve a particular set of alerts.",
             "type": "investigate",
             "identifier": "list_alerts",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "limit": {
                     "data_type": "numeric",
@@ -7000,7 +7000,7 @@
             "verbose": "This action supports filtering in order to retrieve a particular session.",
             "type": "investigate",
             "identifier": "list_sessions",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "limit": {
                     "data_type": "numeric",
@@ -7716,7 +7716,7 @@
             "description": "Retrieve results of an active responder command executed on a single host",
             "type": "investigate",
             "identifier": "get_command_details",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "cloud_request_id": {
                     "data_type": "string",
@@ -7875,7 +7875,7 @@
             "description": "Get a list of files for the specified RTR session",
             "type": "investigate",
             "identifier": "list_session_files",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "session_id": {
                     "data_type": "string",
@@ -9990,7 +9990,7 @@
             "verbose": "This action fetches incidents using pagination logic.",
             "type": "investigate",
             "identifier": "list_incidents",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "filter": {
                     "data_type": "string",
@@ -12567,7 +12567,7 @@
             "description": "Queries for custom indicators in your customer account",
             "type": "investigate",
             "identifier": "list_custom_indicators",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "indicator_value": {
                     "data_type": "string",
@@ -21300,7 +21300,7 @@
             "description": "List IOA Rule Groups",
             "type": "investigate",
             "identifier": "list_ioa_rule_groups",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "fql_query": {
                     "data_type": "string",

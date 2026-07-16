@@ -969,7 +969,7 @@ summary.total_objects_successful | numeric | | 1 |
 Get a list of detections \*The action uses legacy Detects API being deprecated. Please use the 'list epp alerts' action instead\*
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 This action supports filtering in order to retrieve a particular set of detections.
 
@@ -1099,7 +1099,7 @@ summary.total_objects_successful | numeric | | 1 |
 Get a list of epp alerts, replaces legacy Detects API
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 
@@ -1654,7 +1654,7 @@ action_result.parameter.comment | string | | |
 Get a list of alerts
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 This action supports filtering in order to retrieve a particular set of alerts.
 
@@ -1719,7 +1719,7 @@ action_result.parameter.include_hidden | numeric | | True |
 Lists Real Time Response sessions
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 This action supports filtering in order to retrieve a particular session.
 
@@ -1858,7 +1858,7 @@ summary.total_objects_successful | numeric | | 1 |
 Retrieve results of an active responder command executed on a single host
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 
@@ -1893,7 +1893,7 @@ summary.total_objects_successful | numeric | | 1 |
 Get a list of files for the specified RTR session
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 
@@ -2329,7 +2329,7 @@ summary.total_objects_successful | numeric | | 1 |
 Search for incidents by providing an FQL filter, sorting, and paging details
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 This action fetches incidents using pagination logic.
 
@@ -2832,7 +2832,7 @@ summary.total_objects_successful | numeric | | 1 |
 Queries for custom indicators in your customer account
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 
@@ -4235,7 +4235,7 @@ summary.total_objects_successful | numeric | | 1 |
 List IOA Rule Groups
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 

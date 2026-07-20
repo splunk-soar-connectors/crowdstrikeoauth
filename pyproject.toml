@@ -14,7 +14,7 @@ dependencies = [
     "pytz>=2023.3",
     "requests>=2.32.0",
     "requests-toolbelt==1.0.0",
-    "splunk-soar-sdk>=3.25.1",
+    "splunk-soar-sdk>=3.26.1",
 ]
 
 [tool.soar.app]

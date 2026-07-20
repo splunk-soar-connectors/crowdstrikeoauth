@@ -78,8 +78,8 @@ def _validate_filename_stem(filename: str) -> str:
 @app.action(
     name="download report",
     description="Download the report of a detonated file or URL",
-    action_type="investigate",
-    read_only=True,
+    action_type="generic",
+    read_only=False,
     render_as="table",
     summary_type=DownloadReportSummary,
 )

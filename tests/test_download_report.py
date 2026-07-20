@@ -15,7 +15,7 @@
 import pytest
 from soar_sdk.exceptions import ActionFailure
 
-from src.actions.download_report import _validate_filename_stem
+from src.actions.download_report import _validate_filename_stem, download_report
 
 
 @pytest.mark.parametrize(
@@ -38,3 +38,8 @@ def test_validate_filename_stem_rejects_path_components(filename: str) -> None:
 
 def test_validate_filename_stem_accepts_plain_filename() -> None:
     assert _validate_filename_stem("report-123") == "report-123"
+
+
+def test_download_report_is_not_read_only() -> None:
+    assert download_report.meta.type == "generic"
+    assert download_report.meta.read_only is False

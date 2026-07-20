@@ -16,6 +16,7 @@ from pathlib import Path
 
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
@@ -63,17 +64,29 @@ def _artifact_extension(content_type: str, content_disposition: str) -> str:
     return "gz"
 
 
+def _validate_filename_stem(filename: str) -> str:
+    if (
+        filename in {"", ".", ".."}
+        or "/" in filename
+        or "\\" in filename
+        or "\0" in filename
+    ):
+        raise ActionFailure("Filename must not contain path components")
+    return filename
+
+
 @app.action(
     name="download report",
     description="Download the report of a detonated file or URL",
-    action_type="investigate",
-    read_only=True,
+    action_type="generic",
+    read_only=False,
     render_as="table",
     summary_type=DownloadReportSummary,
 )
 def download_report(
     params: DownloadReportParams, soar: SOARClient, asset: Asset
 ) -> list[DownloadReportOutput]:
+    filename_stem = _validate_filename_stem(params.file_name or params.artifact_id)
     client = get_client(asset)
 
     response = client.stream_report_artifact(params.artifact_id)
@@ -86,7 +99,7 @@ def download_report(
         response.headers.get("Content-Type", ""),
         response.headers.get("Content-Disposition", ""),
     )
-    filename = f"{params.file_name or params.artifact_id}.{extension}"
+    filename = f"{filename_stem}.{extension}"
 
     vault_tmp_dir = Path(soar.vault.get_vault_tmp_dir())
     local_dir = vault_tmp_dir / str(uuid.uuid4())

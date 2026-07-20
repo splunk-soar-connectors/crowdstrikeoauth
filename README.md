@@ -587,8 +587,8 @@ summary.total_objects_successful | numeric | | 1 |
 
 Download the report of a detonated file or URL
 
-Type: **investigate** <br>
-Read only: **True**
+Type: **generic** <br>
+Read only: **False**
 
 #### Action Parameters
 

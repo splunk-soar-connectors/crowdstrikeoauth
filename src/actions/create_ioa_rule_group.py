@@ -34,6 +34,7 @@ class CreateIoaRuleGroupParams(Params):
     policy_id: str = Param(
         description="Comma-separated list of prevention policy IDs to attach",
         required=False,
+        allow_list=True,
         cef_types=["crowdstrike prevention policy id"],
     )
 

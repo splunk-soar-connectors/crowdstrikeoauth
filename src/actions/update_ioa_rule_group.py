@@ -41,11 +41,13 @@ class UpdateIoaRuleGroupParams(Params):
     assign_policy_id: str = Param(
         description="Comma-separated list of prevention policy IDs to attach",
         required=False,
+        allow_list=True,
         cef_types=["crowdstrike prevention policy id"],
     )
     remove_policy_id: str = Param(
         description="Comma-separated list of prevention policy IDs to remove",
         required=False,
+        allow_list=True,
         cef_types=["crowdstrike prevention policy id"],
     )
 

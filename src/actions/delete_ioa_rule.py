@@ -29,6 +29,7 @@ class DeleteIoaRuleParams(Params):
     rule_id: str = Param(
         description="Comma-separated list of rule IDs to delete",
         required=True,
+        allow_list=True,
         cef_types=["crowdstrike ioa rule id"],
     )
 

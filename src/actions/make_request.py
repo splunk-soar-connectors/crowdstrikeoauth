@@ -21,6 +21,7 @@ from soar_sdk.params import MakeRequestParams, Param
 
 from ..app import Asset, app
 from ..consts import CROWDSTRIKE_DEFAULT_TIMEOUT
+from ..helper import CrowdStrikeClient
 
 
 logger = getLogger()
@@ -61,8 +62,6 @@ def http_action(
             f"Invalid endpoint: {params.endpoint}. Do not include the base URL — "
             "it is derived from the asset configuration."
         )
-
-    from ..helper import CrowdStrikeClient
 
     client = CrowdStrikeClient(asset)
 

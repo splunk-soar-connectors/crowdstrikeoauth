@@ -24,6 +24,7 @@ class DeleteIoaRuleGroupParams(Params):
         description="Comma-separated list of rule group IDs to delete",
         required=True,
         primary=True,
+        allow_list=True,
         cef_types=["crowdstrike ioa rule group id"],
     )
 

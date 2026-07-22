@@ -27,7 +27,7 @@ class ListEppAlertsParams(Params):
     limit: int = Param(
         description="Maximum alerts to be fetched",
         required=False,
-        default=50,
+        default=100,
     )
     filter: str = Param(
         description="Filter expression used to limit the fetched alerts (FQL Syntax)",

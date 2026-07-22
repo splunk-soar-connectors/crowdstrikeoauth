@@ -92,8 +92,7 @@ def download_report(
     response = client.stream_report_artifact(params.artifact_id)
 
     if response.status_code != 200:
-        soar.set_message("No report artifact found for the supplied artifact id")
-        return []
+        raise ActionFailure("No report artifact found for the supplied artifact id")
 
     extension = _artifact_extension(
         response.headers.get("Content-Type", ""),

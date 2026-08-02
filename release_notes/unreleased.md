@@ -9,3 +9,4 @@
 * Reject device lookup metacharacters and verify resolved device identities before device actions.
 * Fail batch device and indicator operations when the API reports any item errors.
 * Escape dynamic values before embedding them in widget JavaScript string literals.
+* Validate generic query endpoints as canonical query paths before dispatch [PAPP-37947]

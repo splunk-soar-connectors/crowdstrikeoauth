@@ -11,12 +11,41 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+import re
+from urllib.parse import urlsplit
+
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
 from ..consts import CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR
+
+
+_QUERY_ENDPOINT_SEGMENT = re.compile(r"^[A-Za-z0-9._-]+$")
+
+
+def _validate_query_endpoint(endpoint: str) -> str:
+    parsed = urlsplit(endpoint)
+    segments = parsed.path.split("/")
+    valid_segments = (
+        len(segments) == 5
+        and segments[0] == ""
+        and segments[2].lower() == "queries"
+        and all(
+            segment not in {".", ".."} and _QUERY_ENDPOINT_SEGMENT.fullmatch(segment)
+            for segment in (segments[1], segments[3], segments[4])
+        )
+    )
+    if (
+        parsed.scheme
+        or parsed.netloc
+        or parsed.query
+        or parsed.fragment
+        or not valid_segments
+    ):
+        raise ValueError(CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR)
+    return endpoint
 
 
 class RunQueryParams(Params):
@@ -75,8 +104,7 @@ def run_query(
     if not endpoint:
         raise ValueError("Please provide endpoint path")
 
-    if "/queries/" not in endpoint.lower():
-        raise ValueError(CROWDSTRIKE_INVALID_QUERY_ENDPOINT_MESSAGE_ERROR)
+    endpoint = _validate_query_endpoint(endpoint)
 
     query_params: dict = {"limit": params.limit, "offset": params.offset}
     if params.filter:

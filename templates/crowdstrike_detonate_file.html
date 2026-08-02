@@ -110,7 +110,7 @@
                 <td>Vault ID</td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['vault id'], 'value': '{{ result.param.vault_id }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['vault id'], 'value': '{{ result.param.vault_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.vault_id }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -122,7 +122,7 @@
               <td>Environment Description</td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['crowdstrike environment'], 'value': '{{ result.param.environment }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['crowdstrike environment'], 'value': '{{ result.param.environment|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ result.param.environment }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -190,7 +190,7 @@
                         <td>
                           {% if item.id %}
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike resource id'], 'value': '{{ item.id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike resource id'], 'value': '{{ item.id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ item.id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -224,7 +224,7 @@
                         <td>
                           {% if item.ioc_report_broad_csv_artifact_id %}
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_broad_csv_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_broad_csv_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ item.ioc_report_broad_csv_artifact_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -236,7 +236,7 @@
                         <td>
                           {% if item.ioc_report_broad_json_artifact_id %}
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_broad_json_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_broad_json_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ item.ioc_report_broad_json_artifact_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -248,7 +248,7 @@
                         <td>
                           {% if item.ioc_report_broad_maec_artifact_id %}
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_broad_maec_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_broad_maec_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ item.ioc_report_broad_maec_artifact_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -260,7 +260,7 @@
                         <td>
                           {% if item.ioc_report_broad_stix_artifact_id %}
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_broad_stix_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_broad_stix_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ item.ioc_report_broad_stix_artifact_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -272,7 +272,7 @@
                         <td>
                           {% if item.ioc_report_strict_csv_artifact_id %}
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_strict_csv_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_strict_csv_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ item.ioc_report_strict_csv_artifact_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -284,7 +284,7 @@
                         <td>
                           {% if item.ioc_report_strict_json_artifact_id %}
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_strict_json_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_strict_json_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ item.ioc_report_strict_json_artifact_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -296,7 +296,7 @@
                         <td>
                           {% if item.ioc_report_strict_maec_artifact_id %}
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_strict_maec_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_strict_maec_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ item.ioc_report_strict_maec_artifact_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -308,7 +308,7 @@
                         <td>
                           {% if item.ioc_report_strict_stix_artifact_id %}
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_strict_stix_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                               onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ item.ioc_report_strict_stix_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                               {{ item.ioc_report_strict_stix_artifact_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -323,7 +323,7 @@
                               {% if analysis.pcap_report_artifact_id %}
                                 <li style="list-style-type: none;">
                                   <a href="javascript:;"
-                                     onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ analysis.pcap_report_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                                     onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ analysis.pcap_report_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                     {{ analysis.pcap_report_artifact_id }}
                                     &nbsp;
                                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -341,7 +341,7 @@
                               {% if analysis.memory_strings_artifact_id %}
                                 <li style="list-style-type: none;">
                                   <a href="javascript:;"
-                                     onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ analysis.memory_strings_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                                     onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ analysis.memory_strings_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                     {{ analysis.memory_strings_artifact_id }}
                                     &nbsp;
                                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -361,7 +361,7 @@
                                   {% if process.icon_artifact_id %}
                                     <li style="list-style-type: none;">
                                       <a href="javascript:;"
-                                         onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ process.icon_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                                         onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ process.icon_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                         {{ process.icon_artifact_id }}
                                         &nbsp;
                                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -382,7 +382,7 @@
                                 {% for screenshot_artifact_id in analysis.screenshots_artifact_ids %}
                                   <li style="list-style-type: none;">
                                     <a href="javascript:;"
-                                       onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ screenshot_artifact_id }}' }], 0, {{ container.id }}, null, false);">
+                                       onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ screenshot_artifact_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                                       {{ screenshot_artifact_id }}
                                       &nbsp;
                                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>

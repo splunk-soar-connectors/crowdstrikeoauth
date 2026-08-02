@@ -8,3 +8,4 @@
 * Report detonation polling timeouts as action failures while preserving the resource ID for follow-up.
 * Reject device lookup metacharacters and verify resolved device identities before device actions.
 * Fail batch device and indicator operations when the API reports any item errors.
+* Escape dynamic values before embedding them in widget JavaScript string literals.

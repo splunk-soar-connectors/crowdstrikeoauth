@@ -45,8 +45,8 @@ class UpdateIoaRuleParams(Params):
         description="JSON list of field values for the rule", required=True
     )
     comment: str = Param(description="Comment for the rule", required=False)
-    enabled: bool = Param(
-        description="Whether the rule is enabled", required=False, default=False
+    enabled: bool | None = Param(
+        description="Whether the rule is enabled", required=False
     )
 
 
@@ -153,7 +153,6 @@ def update_ioa_rule(
             {
                 "instance_id": params.rule_id,
                 "pattern_severity": params.severity,
-                "enabled": params.enabled,
                 "name": params.name,
                 "description": params.description,
                 "disposition_id": params.disposition_id,
@@ -161,6 +160,8 @@ def update_ioa_rule(
             }
         ],
     }
+    if params.enabled is not None:
+        update_params["rule_updates"][0]["enabled"] = params.enabled
     if params.comment:
         update_params["comment"] = params.comment
 

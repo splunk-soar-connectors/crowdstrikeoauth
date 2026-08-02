@@ -52,6 +52,8 @@ class ListProcessesOutput(PermissiveActionOutput):
 
 class ListProcessesSummary(ActionOutput):
     process_count: int
+    total_process_count: int
+    truncated: bool
 
 
 @app.view_handler(template="crowdstrike_process_list_view.html")
@@ -103,7 +105,13 @@ def list_processes(
     response = client.hunt_paginator(CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH, api_data)
 
     if not response:
-        soar.set_summary(ListProcessesSummary(process_count=0))
+        soar.set_summary(
+            ListProcessesSummary(
+                process_count=0,
+                total_process_count=client._last_hunt_total,
+                truncated=False,
+            )
+        )
         soar.set_message(
             "No resources found from the response for the list processes action"
         )
@@ -120,6 +128,14 @@ def list_processes(
         for process_id in response
     ]
 
-    soar.set_summary(ListProcessesSummary(process_count=len(response)))
-    soar.set_message(f"Process count: {len(response)}")
+    total = max(client._last_hunt_total, len(response))
+    truncated = len(response) < total
+    soar.set_summary(
+        ListProcessesSummary(
+            process_count=len(response),
+            total_process_count=total,
+            truncated=truncated,
+        )
+    )
+    soar.set_message(f"Process count: {len(response)} of {total}")
     return outputs

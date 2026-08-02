@@ -60,6 +60,9 @@ TOKEN_INVALID_MARKERS = (
     "access denied",
 )
 
+MAX_PAGINATION_PAGES = 1_000
+MAX_PAGINATION_RESULTS = 100_000
+
 
 class CrowdStrikeClient:
     """Multi-tenant OAuth2 client-credentials client for the CrowdStrike OAuth API.
@@ -76,6 +79,7 @@ class CrowdStrikeClient:
         self._client_secret = asset.client_secret
         self._stream_file_data = False
         self._required_detonation = False
+        self._last_hunt_total = 0
         self._tokens = self._load_tokens()
 
     # ------------------------------------------------------------------ #
@@ -429,8 +433,7 @@ class CrowdStrikeClient:
         param: dict | None = None,
         subtenant: str | None = None,
     ) -> list:
-        if param is None:
-            param = {}
+        param = dict(param or {})
         list_ids = []
 
         limit = None
@@ -438,16 +441,28 @@ class CrowdStrikeClient:
             limit = int(param.pop("limit"))
         offset = param.get("offset", 0)
 
+        page_count = 0
         while True:
+            page_count += 1
+            if page_count > MAX_PAGINATION_PAGES:
+                raise Exception("Pagination exceeded the maximum page count")
             param.update({"offset": offset})
             response = self.make_rest_call(endpoint, params=param, subtenant=subtenant)
 
             prev_offset = offset
-            offset = response.get("meta", {}).get("pagination", {}).get("offset")
-            if offset == prev_offset:
-                offset += len(response.get("resources", []))
+            pagination = response.get("meta", {}).get("pagination", {})
+            offset = pagination.get("offset")
+            total = pagination.get("total")
+            if not isinstance(offset, int) or offset < 0:
+                raise Exception("Invalid pagination offset returned by server")
+            if not isinstance(total, int) or total < 0:
+                raise Exception("Invalid pagination total returned by server")
 
-            total = response.get("meta", {}).get("pagination", {}).get("total")
+            resources = response.get("resources", [])
+            if not isinstance(resources, list):
+                raise Exception("Invalid paginated resources returned by server")
+            if offset == prev_offset:
+                offset += len(resources)
 
             if response.get("errors"):
                 error = response["errors"][0]
@@ -457,13 +472,13 @@ class CrowdStrikeClient:
                     )
                 )
 
-            if offset is None or total is None:
-                raise Exception(
-                    "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results"
-                )
+            if resources:
+                list_ids.extend(resources)
+            elif offset < total:
+                raise Exception("Pagination made no progress")
 
-            if response.get("resources"):
-                list_ids.extend(response["resources"])
+            if len(list_ids) > MAX_PAGINATION_RESULTS:
+                raise Exception("Pagination exceeded the maximum result count")
 
             if limit and len(list_ids) >= limit:
                 return list_ids[:limit]
@@ -474,6 +489,9 @@ class CrowdStrikeClient:
             if offset >= total:
                 return list_ids
 
+            if offset <= prev_offset:
+                raise Exception("Pagination made no progress")
+
     def hunt_paginator(
         self,
         endpoint: str,
@@ -481,8 +499,8 @@ class CrowdStrikeClient:
         search_subtenants: bool = False,
         subtenant: str | None = None,
     ) -> list:
+        params = dict(params)
         list_ids = []
-        offset = ""
         limit = None
         if params.get("limit"):
             limit = params.pop("limit")
@@ -497,8 +515,16 @@ class CrowdStrikeClient:
             if configured:
                 subtenants.extend(configured)
 
+        self._last_hunt_total = 0
         for sub in subtenants:
+            offset = ""
+            subtenant_result_start = len(list_ids)
+            page_count = 0
+            recorded_total = False
             while True:
+                page_count += 1
+                if page_count > MAX_PAGINATION_PAGES:
+                    raise Exception("Pagination exceeded the maximum page count")
                 params.update({"offset": offset, "limit": 100})
                 try:
                     response = self.make_rest_call(
@@ -509,7 +535,16 @@ class CrowdStrikeClient:
                         break
                     raise
 
-                offset = response.get("meta", {}).get("pagination", {}).get("offset")
+                pagination = response.get("meta", {}).get("pagination", {})
+                next_offset = pagination.get("offset")
+                resources = response.get("resources", [])
+                if not isinstance(resources, list):
+                    raise Exception("Invalid paginated resources returned by server")
+
+                total = pagination.get("total")
+                if not recorded_total and isinstance(total, int) and total >= 0:
+                    self._last_hunt_total += total
+                    recorded_total = True
 
                 if response.get("errors"):
                     error = response["errors"][0]
@@ -519,16 +554,25 @@ class CrowdStrikeClient:
                         )
                     )
 
-                if response.get("resources"):
-                    list_ids.extend(response["resources"])
+                if resources:
+                    list_ids.extend(resources)
+
+                if len(list_ids) > MAX_PAGINATION_RESULTS:
+                    raise Exception("Pagination exceeded the maximum result count")
 
                 if limit and len(list_ids) >= limit:
                     return list_ids[:limit]
 
-                if not offset and not response.get("meta", {}).get(
-                    "pagination", {}
-                ).get("next_page"):
+                has_next_page = bool(pagination.get("next_page"))
+                if not next_offset and not has_next_page:
                     break
+
+                if not resources or next_offset == offset:
+                    raise Exception("Pagination made no progress")
+                offset = next_offset
+
+            if not recorded_total:
+                self._last_hunt_total += len(list_ids) - subtenant_result_start
 
         return list_ids
 

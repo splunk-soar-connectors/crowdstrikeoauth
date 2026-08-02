@@ -5,3 +5,4 @@
 * Bound pagination and stop when an API page makes no progress.
 * Report when list-process results are truncated from the API's authoritative total.
 * Bound command-result polling by time, sequence count, and response size.
+* Report detonation polling timeouts as action failures while preserving the resource ID for follow-up.

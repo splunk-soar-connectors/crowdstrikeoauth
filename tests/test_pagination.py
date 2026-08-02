@@ -65,3 +65,14 @@ def test_hunt_paginator_records_authoritative_total() -> None:
         "second",
     ]
     assert client._last_hunt_total == 250
+
+
+def test_command_result_polling_rejects_repeated_sequence() -> None:
+    client = _client(
+        {"resources": [{"complete": True}]},
+        {"resources": [{"complete": True, "sequence_id": 1, "stdout": "a"}]},
+        {"resources": [{"complete": True, "sequence_id": 1, "stdout": "b"}]},
+    )
+
+    with pytest.raises(Exception, match="sequence made no progress"):
+        client.poll_command_results("request-id", timeout=60)

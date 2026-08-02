@@ -62,6 +62,7 @@ TOKEN_INVALID_MARKERS = (
 
 MAX_PAGINATION_PAGES = 1_000
 MAX_PAGINATION_RESULTS = 100_000
+MAX_COMMAND_RESULT_BYTES = 10 * 1024 * 1024
 
 
 class CrowdStrikeClient:
@@ -793,42 +794,68 @@ class CrowdStrikeClient:
     ) -> list:
         """Poll for RTR command results. Returns the list of polled response dicts."""
         timeout_segment_length = 5
-        timeout_segments = timeout / timeout_segment_length
-
+        deadline = time.monotonic() + timeout
         results: list = []
-        count = 0
-        while count < int(timeout_segments):
-            count += 1
+        while time.monotonic() < deadline:
             sequence_id = 0
             params = {"cloud_request_id": cloud_request_id, "sequence_id": sequence_id}
             resp_json = self.make_rest_call(endpoint, params=params)
 
             resources = resp_json.get("resources")
-            if resources and len(resources):
+            if resources:
                 if resources[0].get("complete", False):
-                    while True:
+                    result_bytes = 0
+                    previous_response_sequence = None
+                    for _page in range(MAX_PAGINATION_PAGES):
+                        if time.monotonic() >= deadline:
+                            raise Exception(
+                                "Timeout while fetching command result sequences"
+                            )
                         params = {
                             "cloud_request_id": cloud_request_id,
                             "sequence_id": sequence_id,
                         }
                         resp_json = self.make_rest_call(endpoint, params=params)
+                        errors = resp_json.get("errors", [])
+                        if errors:
+                            raise Exception(
+                                "Errors occurred while executing command: {}".format(
+                                    "\r\n".join(
+                                        str(error.get("message")) for error in errors
+                                    )
+                                )
+                            )
 
-                        if (
-                            resources[0].get("complete")
-                            and resources[0].get("stderr") is not None
-                            and resp_json.get("resources", [{}])[0].get("sequence_id")
-                        ):
+                        page_resources = resp_json.get("resources", [])
+                        if not page_resources:
+                            raise Exception(
+                                "Command result sequence returned no resources"
+                            )
+                        resource = page_resources[0]
+                        if resource.get("stderr"):
                             raise Exception(
                                 "Errors occurred while executing command {}".format(
-                                    "\r\n".join(resources[0].get("stderr"))
+                                    "\r\n".join(resource["stderr"])
                                 )
                             )
 
                         results.append(resp_json)
-                        if not resp_json.get("resources", [{}])[0].get("sequence_id"):
+                        result_bytes += len(json.dumps(resp_json, default=str))
+                        if result_bytes > MAX_COMMAND_RESULT_BYTES:
+                            raise Exception("Command results exceeded the maximum size")
+
+                        response_sequence = resource.get("sequence_id")
+                        if not response_sequence:
                             return results
 
+                        if response_sequence == previous_response_sequence:
+                            raise Exception("Command result sequence made no progress")
+                        previous_response_sequence = response_sequence
+
                         sequence_id += 1
+                    raise Exception(
+                        "Command results exceeded the maximum sequence count"
+                    )
             elif len(resp_json.get("errors", [])):
                 errors = [err.get("message") for err in resp_json.get("errors")]
                 raise Exception(
@@ -837,7 +864,7 @@ class CrowdStrikeClient:
                     )
                 )
 
-            time.sleep(timeout_segment_length)
+            time.sleep(min(timeout_segment_length, max(0, deadline - time.monotonic())))
 
         raise Exception(
             "Timeout while waiting for command execution. Please use cloud_request_id "

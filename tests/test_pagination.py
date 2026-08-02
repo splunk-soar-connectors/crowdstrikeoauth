@@ -76,3 +76,31 @@ def test_command_result_polling_rejects_repeated_sequence() -> None:
 
     with pytest.raises(Exception, match="sequence made no progress"):
         client.poll_command_results("request-id", timeout=60)
+
+
+def test_json_response_rejects_partial_success() -> None:
+    client = object.__new__(CrowdStrikeClient)
+    response = Mock(
+        status_code=202,
+        json=Mock(
+            return_value={
+                "resources": [{"id": "ok"}],
+                "errors": [{"code": 404, "message": "failed"}],
+            }
+        ),
+    )
+
+    with pytest.raises(Exception, match="404 - failed"):
+        client._process_json_response(response)
+
+
+@pytest.mark.parametrize("value", ["host*", "host'", "host+other", "host(test)"])
+def test_device_lookup_rejects_fql_metacharacters(value: str) -> None:
+    client = object.__new__(CrowdStrikeClient)
+    client.get_ids_with_subtenants = Mock()
+
+    invalid, resolved = client._set_error_flag_inputs([value], "hostname")
+
+    assert invalid is True
+    assert resolved == []
+    client.get_ids_with_subtenants.assert_not_called()

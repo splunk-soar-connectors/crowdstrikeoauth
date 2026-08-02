@@ -6,3 +6,5 @@
 * Report when list-process results are truncated from the API's authoritative total.
 * Bound command-result polling by time, sequence count, and response size.
 * Report detonation polling timeouts as action failures while preserving the resource ID for follow-up.
+* Reject device lookup metacharacters and verify resolved device identities before device actions.
+* Fail batch device and indicator operations when the API reports any item errors.

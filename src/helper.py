@@ -29,6 +29,7 @@ from .consts import (
     CROWDSTRIKE_DEFAULT_TIMEOUT,
     CROWDSTRIKE_DEVICE_ACTION_ENDPOINT,
     CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT,
+    CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT,
     CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT,
     CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT,
     CROWDSTRIKE_GROUP_DEVICE_ACTION_ENDPOINT,
@@ -389,29 +390,12 @@ class CrowdStrikeClient:
         except Exception as e:
             raise Exception(f"Unable to parse JSON response. Error: {e}") from e
 
-        resources = resp_json.get("resources")
         errors = resp_json.get("errors")
-        if "resources" in resp_json and "errors" in resp_json and errors:
-            if not resources:
-                error_msg = ", ".join(
-                    "{} - {}".format(err.get("code"), err.get("message"))
-                    for err in errors
-                )
-                raise Exception(f"Error from server. Error details: {error_msg}")
-            if (
-                resources
-                and isinstance(resources, list)
-                and resources[0].get("message")
-            ):
-                error_msg = ", ".join(
-                    "{} - {}".format(err.get("code"), err.get("message"))
-                    for err in errors
-                )
-                raise Exception(
-                    "Error from server. Error details: {}, {}".format(
-                        error_msg, resources[0]["message"]
-                    )
-                )
+        if errors:
+            error_msg = ", ".join(
+                "{} - {}".format(err.get("code"), err.get("message")) for err in errors
+            )
+            raise Exception(f"Error from server. Error details: {error_msg}")
 
         if 200 <= response.status_code < 399:
             return resp_json
@@ -621,6 +605,13 @@ class CrowdStrikeClient:
         Returns (flag, confirmed_ids). ``flag`` is True when some inputs could not
         be resolved (count mismatch), in which case ``confirmed_ids`` is empty.
         """
+        if key == "device_id":
+            valid_item = re.compile(r"^[A-Fa-f0-9]{32}$").fullmatch
+        else:
+            valid_item = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,252}$").fullmatch
+        if any(not valid_item(item) for item in list_items):
+            return True, []
+
         filter_str = "".join(f"{key}: '{item}', " for item in list_items)
         filter_str = filter_str[:-2]
 
@@ -630,9 +621,40 @@ class CrowdStrikeClient:
             subtenant=subtenant,
         )
 
-        if len(list_items) != len(check_items):
+        resolved_ids = list(check_items)
+        if len(list_items) != len(resolved_ids):
             return True, []
-        return False, list(check_items)
+
+        if key == "device_id":
+            if {item.casefold() for item in list_items} != {
+                item.casefold() for item in resolved_ids
+            }:
+                return True, []
+            return False, resolved_ids
+
+        id_tenant_map = (
+            check_items
+            if isinstance(check_items, dict)
+            else {device_id: subtenant for device_id in resolved_ids}
+        )
+        tenant_ids: dict = {}
+        for device_id, tenant in id_tenant_map.items():
+            tenant_ids.setdefault(tenant, []).append(device_id)
+
+        resolved_hostnames = set()
+        for tenant, device_ids in tenant_ids.items():
+            response = self.make_rest_call(
+                CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT,
+                json_data={"ids": device_ids},
+                subtenant=tenant,
+            )
+            resolved_hostnames.update(
+                str(device.get("hostname", "")).casefold()
+                for device in response.get("resources", [])
+            )
+        if {item.casefold() for item in list_items} != resolved_hostnames:
+            return True, []
+        return False, resolved_ids
 
     def check_device_params(self, param: dict, subtenant: str | None = None) -> list:
         """Validate and resolve device_id/hostname params into a device-ID list."""
@@ -753,16 +775,17 @@ class CrowdStrikeClient:
                     subtenant=subtenant,
                     method="post",
                 )
-                if not response.get("resources"):
+                resources = response.get("resources", [])
+                if len(resources) != len(batch):
                     raise ValueError(
-                        "No action could be performed on the provided devices"
+                        "The device action did not complete for every requested device"
                     )
-                results.extend(response.get("resources"))
+                results.extend(resources)
                 del list_ids[: min(100, len(list_ids))]
             return results
 
         if action_name in ("add-hosts", "remove-hosts"):
-            response = {}
+            results = []
             while list_ids:
                 batch = list_ids[: min(100, len(list_ids))]
                 data = {
@@ -777,11 +800,12 @@ class CrowdStrikeClient:
                     data=json.dumps(data),
                     method="post",
                 )
+                if not response.get("resources"):
+                    raise ValueError(
+                        "No action could be performed on the provided devices"
+                    )
+                results.extend(response["resources"])
                 del list_ids[: min(100, len(list_ids))]
-
-            if not response.get("resources"):
-                raise ValueError("No action could be performed on the provided devices")
-            results.extend(response.get("resources"))
             return results
 
         raise ValueError("Incorrect action name")

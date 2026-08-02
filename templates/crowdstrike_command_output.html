@@ -95,7 +95,7 @@
                           <td>{{ field.base_command }}</td>
                           <td>
                             <a href="javascript:;"
-                               onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ field.session_id }}' }], 0, {{ container }}, null, false);">{{ field.session_id }}
+                               onclick="context_menu(this, [{'contains': ['crowdstrike rtr session id'], 'value': '{{ field.session_id|escapejs }}' }], 0, {{ container }}, null, false);">{{ field.session_id }}
                               &nbsp;
                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                             </a>

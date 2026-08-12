@@ -1920,6 +1920,8 @@ action_result.data.\*.ioc | string | | |
 action_result.data.\*.ioc_type | string | | |
 action_result.data.\*.limit | numeric | | |
 action_result.summary.process_count | numeric | | |
+action_result.summary.total_process_count | numeric | | |
+action_result.summary.truncated | boolean | | True False |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

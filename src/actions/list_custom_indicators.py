@@ -230,7 +230,9 @@ def list_custom_indicators(
         api_data["filter"] = filter_query
 
     ioc_infos: list = []
-    while True:
+    previous_after = None
+    max_pages = (indicator_limit + 1_999) // 2_000 + 1
+    for _page in range(max_pages):
         response = client.make_rest_call(
             CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT, params=api_data
         )
@@ -243,17 +245,24 @@ def list_custom_indicators(
                 )
             )
 
-        if response.get("resources"):
-            ioc_infos.extend(response["resources"])
+        resources = response.get("resources", [])
+        if resources:
+            ioc_infos.extend(resources)
 
         after = response.get("meta", {}).get("pagination", {}).get("after")
         if after is None:
             break
 
+        if not resources or after == previous_after:
+            raise Exception("Pagination made no progress")
+
         if len(ioc_infos) >= indicator_limit:
             ioc_infos = ioc_infos[:indicator_limit]
             break
+        previous_after = after
         api_data["after"] = after
+    else:
+        raise Exception("Pagination exceeded the maximum page count")
 
     grouped: dict = {}
     for ioc_info in ioc_infos:

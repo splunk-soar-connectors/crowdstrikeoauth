@@ -12,6 +12,7 @@
 # and limitations under the License.
 
 from soar_sdk.abstract import SOARClient
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
@@ -210,7 +211,9 @@ def detonate_file(
         )
 
         poll_interval = validate_integer(asset.detonate_timeout, "detonate_timeout")
-        prev_resources, status = poll_for_detonation(client, resource_id, poll_interval)
+        _prev_resources, status = poll_for_detonation(
+            client, resource_id, poll_interval
+        )
 
         if status == "success":
             reports = fetch_reports(client, [resource_id], params.detail_report, None)
@@ -218,11 +221,10 @@ def detonate_file(
                 soar.set_summary(report_summary(reports))
             return _make_outputs(reports, params)
 
-        soar.set_message(
+        raise ActionFailure(
             f"Timed out while waiting for the result. To know the status of submitted "
             f"sample please run the check status action with {resource_id} resource id."
         )
-        return _make_outputs(prev_resources, params)
 
     if not resource_id_list:
         soar.set_message("No data found")

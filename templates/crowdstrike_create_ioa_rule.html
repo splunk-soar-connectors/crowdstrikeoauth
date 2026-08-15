@@ -148,21 +148,21 @@
                             <td>{{ resource.field_values }}</td>
                             <td>{{ resource.comment }}</td>
                           </tr>
-                        {% endfor %}
                       {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
-          <br>
-        {% endif %}
-      {% endfor %}
-      <!-- loop for each result end -->
-    </div>
-    <!-- Main Div -->
-    <script>
+        </div>
+        <br>
+      {% endif %}
+    {% endfor %}
+    <!-- loop for each result end -->
+  </div>
+  <!-- Main Div -->
+  <script>
     $.extend(true, $.fn.dataTable.defaults, {
         "searching": false,
         "bLengthChange": false,
@@ -180,5 +180,5 @@
     });
     $.fn.DataTable.ext.pager.numbers_length = 5;
     $('.datatable').DataTable();
-    </script>
-  {% endblock %}
+  </script>
+{% endblock %}

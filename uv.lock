@@ -261,7 +261,7 @@ requires-dist = [
     { name = "pytz", specifier = ">=2023.3" },
     { name = "requests", specifier = ">=2.32.0" },
     { name = "requests-toolbelt", specifier = "==1.0.0" },
-    { name = "splunk-soar-sdk", specifier = ">=4.0.0" },
+    { name = "splunk-soar-sdk", specifier = ">=4.1.1" },
 ]
 
 [package.metadata.requires-dev]
@@ -1050,7 +1050,7 @@ wheels = [
 
 [[package]]
 name = "splunk-soar-sdk"
-version = "4.0.0"
+version = "4.1.1"
 source = { registry = "https://pypi.python.org/simple" }
 dependencies = [
     { name = "authlib", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
@@ -1076,9 +1076,9 @@ dependencies = [
     { name = "tqdm", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
     { name = "typer", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ef/6a/4adf0c158f9115d2d2d519733bb85ae81af64a30003e97a2af0bedf556f3/splunk_soar_sdk-4.0.0.tar.gz", hash = "sha256:0ac59fa65465fd5538875d7a0d71cf09d5acfc95e24d3a3f9b82e721e0c95a7c", size = 764337, upload-time = "2026-08-15T00:13:02.768Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/90/ba/c847187945099f9995b2674f85813dbf4ed6b402d0648ad423adf617b62d/splunk_soar_sdk-4.1.1.tar.gz", hash = "sha256:01bb4fe7b56f1fead8a20d1e51ccb67e250a7eb6e5d6c89ae22e7f68252098b8", size = 765773, upload-time = "2026-08-21T21:49:59.41Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ce/bb/23f193f5e439e8a8ffdc760e7d8a51320d8072447a9eeb1650b897e6daa9/splunk_soar_sdk-4.0.0-py3-none-any.whl", hash = "sha256:00fa45dd902aeacf9e2cce2c940a415cd5169d38c3d313d4b733c88fa243d9f8", size = 223539, upload-time = "2026-08-15T00:13:01.156Z" },
+    { url = "https://files.pythonhosted.org/packages/95/89/3c13205daac227f659cd2678357a04643c899e990f8ed2d0d0bb095cd80e/splunk_soar_sdk-4.1.1-py3-none-any.whl", hash = "sha256:4bd8aee96031f459711aad824fcd601a284ec26b4a883a8c47cabd792a036ac5", size = 224221, upload-time = "2026-08-21T21:49:58.051Z" },
 ]
 
 [[package]]

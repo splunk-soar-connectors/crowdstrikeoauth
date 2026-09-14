@@ -115,7 +115,7 @@
                 </td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': [ 'crowdstrike device id' ], 'value': '{{ result.param.id }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': [ 'crowdstrike device id' ], 'value': '{{ result.param.id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.id }}
                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
@@ -127,7 +127,7 @@
                 </td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type }}' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type|escapejs }}' ], 'value': '{{ result.param.ioc|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.ioc }}
                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
@@ -143,9 +143,23 @@
               {% endif %}
               <tr>
                 <td>
-                  <b>Total Processes Found</b>
+                  <b>Processes Returned</b>
                 </td>
                 <td>{{ result.summary.process_count }}</td>
+              </tr>
+              {% if result.summary.total_process_count is not None %}
+                <tr>
+                  <td>
+                    <b>Provider Total</b>
+                  </td>
+                  <td>{{ result.summary.total_process_count }}</td>
+                </tr>
+              {% endif %}
+              <tr>
+                <td>
+                  <b>Results Truncated</b>
+                </td>
+                <td>{{ result.summary.truncated|yesno:"Yes,No" }}</td>
               </tr>
             {% endif %}
           </table>
@@ -168,7 +182,7 @@
                       <tr>
                         <td>
                           <a href="javascript:;"
-                             onclick="context_menu(this, [{'contains': [ 'falcon process id' ], 'value': '{{ curr_entry.falcon_process_id }}' }], 0, {{ container.id }}, null, false);">
+                             onclick="context_menu(this, [{'contains': [ 'falcon process id' ], 'value': '{{ curr_entry.falcon_process_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                             {{ curr_entry.falcon_process_id }}
                             &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                           </a>

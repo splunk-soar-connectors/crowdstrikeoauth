@@ -12,6 +12,7 @@
 # and limitations under the License.
 
 from soar_sdk.abstract import SOARClient
+from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
@@ -94,6 +95,7 @@ class DetonateUrlParams(Params):
     document_password: str = Param(
         description="Auto-filled password for Adobe or Office files",
         required=False,
+        sensitive=True,
     )
     command_line: str = Param(
         description="Command line script passed to the submitted file at runtime",
@@ -191,7 +193,9 @@ def detonate_url(
         )
 
         poll_interval = validate_integer(asset.detonate_timeout, "detonate_timeout")
-        prev_resources, status = poll_for_detonation(client, resource_id, poll_interval)
+        _prev_resources, status = poll_for_detonation(
+            client, resource_id, poll_interval
+        )
 
         if status == "success":
             reports = fetch_reports(client, [resource_id], params.detail_report, None)
@@ -199,11 +203,10 @@ def detonate_url(
                 soar.set_summary(report_summary(reports))
             return _make_outputs(reports, params)
 
-        soar.set_message(
+        raise ActionFailure(
             f"Timed out while waiting for the result. To know the status of submitted "
             f"sample please run the check status action with {resource_id} resource id."
         )
-        return _make_outputs(prev_resources, params)
 
     if not resource_id_list:
         soar.set_message("No data found")

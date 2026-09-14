@@ -864,7 +864,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **limit** | optional | Maximum reports to be fetched | numeric | |
 **offset** | optional | Starting index of overall result set | numeric | |
 **command_line** | optional | Command line script passed to the submitted file at runtime | string | |
-**document_password** | optional | Auto-filled password for Adobe or Office files | string | |
+**document_password** | optional | Auto-filled password for Adobe or Office files | password | |
 **submit_name** | optional | Name of the malware sample that is used for file type detection and analysis | string | |
 **user_tags** | optional | Comma-separated list of tags to categorize the submission | string | |
 **sort** | optional | Property to sort by | string | |
@@ -930,7 +930,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **environment** | required | Sandbox environment to use for analysis | string | `crowdstrike environment` |
 **limit** | optional | Maximum reports to be fetched | numeric | |
 **offset** | optional | Starting index of overall result set | numeric | |
-**document_password** | optional | Auto-filled password for Adobe or Office files | string | |
+**document_password** | optional | Auto-filled password for Adobe or Office files | password | |
 **command_line** | optional | Command line script passed to the submitted file at runtime | string | |
 **user_tags** | optional | Comma-separated list of tags to categorize the submission | string | |
 **sort** | optional | Property to sort by | string | |
@@ -1919,7 +1919,12 @@ action_result.data.\*.device_id | string | | |
 action_result.data.\*.ioc | string | | |
 action_result.data.\*.ioc_type | string | | |
 action_result.data.\*.limit | numeric | | |
+action_result.data.\*.summary_process_count | numeric | | |
+action_result.data.\*.summary_total_process_count | numeric | | |
+action_result.data.\*.summary_truncated | boolean | | True False |
 action_result.summary.process_count | numeric | | |
+action_result.summary.total_process_count | numeric | | |
+action_result.summary.truncated | boolean | | True False |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -2309,7 +2314,7 @@ summary.total_objects_successful | numeric | | 1 |
 Run a generic query against a CrowdStrike API query endpoint
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 

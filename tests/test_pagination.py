@@ -16,6 +16,11 @@ from unittest.mock import Mock
 
 import pytest
 
+from src.actions.list_processes import (
+    ListProcessesOutput,
+    _build_process_summary,
+    list_processes_view,
+)
 from src.helper import CrowdStrikeClient
 
 
@@ -23,6 +28,8 @@ def _client(*responses: dict) -> CrowdStrikeClient:
     client = object.__new__(CrowdStrikeClient)
     client._required_detonation = False
     client._last_hunt_total = 0
+    client._last_hunt_total_known = True
+    client._last_hunt_truncated = False
     client.make_rest_call = Mock(side_effect=responses)
     return client
 
@@ -65,6 +72,52 @@ def test_hunt_paginator_records_authoritative_total() -> None:
         "second",
     ]
     assert client._last_hunt_total == 250
+    assert client._last_hunt_total_known is True
+    assert client._last_hunt_truncated is True
+
+
+def test_hunt_paginator_marks_unknown_total_as_truncated_when_capped() -> None:
+    client = _client(
+        {
+            "meta": {"pagination": {"offset": "next", "next_page": "next"}},
+            "resources": ["first", "second"],
+        }
+    )
+
+    assert client.hunt_paginator("/queries/example/v1", {"limit": 1}) == ["first"]
+    assert client._last_hunt_total_known is False
+    assert client._last_hunt_truncated is True
+
+
+def test_process_summary_marks_positive_total_empty_page_as_truncated() -> None:
+    client = _client()
+    client._last_hunt_total = 12
+
+    summary = _build_process_summary(client, 0)
+
+    assert summary.total_process_count == 12
+    assert summary.truncated is True
+
+
+def test_process_view_preserves_total_and_truncation() -> None:
+    output = ListProcessesOutput(
+        falcon_process_id="process-id",
+        device_id="device-id",
+        ioc="example.test",
+        ioc_type="domain",
+        limit=1,
+        summary_process_count=1,
+        summary_total_process_count=12,
+        summary_truncated=True,
+    )
+
+    context = list_processes_view.__wrapped__([output])  # type: ignore[attr-defined]
+
+    assert context["results"][0]["summary"] == {
+        "process_count": 1,
+        "total_process_count": 12,
+        "truncated": True,
+    }
 
 
 def test_command_result_polling_rejects_repeated_sequence() -> None:

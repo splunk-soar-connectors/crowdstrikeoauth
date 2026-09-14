@@ -91,7 +91,7 @@ class RunQuerySummary(ActionOutput):
 @app.action(
     description="Run a generic query against a CrowdStrike API query endpoint",
     action_type="investigate",
-    read_only=True,
+    read_only=False,
     render_as="table",
     summary_type=RunQuerySummary,
 )

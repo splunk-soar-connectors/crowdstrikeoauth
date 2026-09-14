@@ -143,9 +143,23 @@
               {% endif %}
               <tr>
                 <td>
-                  <b>Total Processes Found</b>
+                  <b>Processes Returned</b>
                 </td>
                 <td>{{ result.summary.process_count }}</td>
+              </tr>
+              {% if result.summary.total_process_count is not None %}
+                <tr>
+                  <td>
+                    <b>Provider Total</b>
+                  </td>
+                  <td>{{ result.summary.total_process_count }}</td>
+                </tr>
+              {% endif %}
+              <tr>
+                <td>
+                  <b>Results Truncated</b>
+                </td>
+                <td>{{ result.summary.truncated|yesno:"Yes,No" }}</td>
               </tr>
             {% endif %}
           </table>

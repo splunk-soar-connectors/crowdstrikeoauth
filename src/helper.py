@@ -82,6 +82,8 @@ class CrowdStrikeClient:
         self._stream_file_data = False
         self._required_detonation = False
         self._last_hunt_total = 0
+        self._last_hunt_total_known = True
+        self._last_hunt_truncated = False
         self._tokens = self._load_tokens()
 
     # ------------------------------------------------------------------ #
@@ -501,9 +503,10 @@ class CrowdStrikeClient:
                 subtenants.extend(configured)
 
         self._last_hunt_total = 0
-        for sub in subtenants:
+        self._last_hunt_total_known = True
+        self._last_hunt_truncated = False
+        for subtenant_index, sub in enumerate(subtenants):
             offset = ""
-            subtenant_result_start = len(list_ids)
             page_count = 0
             recorded_total = False
             while True:
@@ -546,6 +549,18 @@ class CrowdStrikeClient:
                     raise Exception("Pagination exceeded the maximum result count")
 
                 if limit and len(list_ids) >= limit:
+                    if not recorded_total:
+                        self._last_hunt_total_known = False
+                    self._last_hunt_truncated = (
+                        len(list_ids) > limit
+                        or bool(next_offset)
+                        or bool(pagination.get("next_page"))
+                        or subtenant_index < len(subtenants) - 1
+                        or (
+                            self._last_hunt_total_known
+                            and self._last_hunt_total > limit
+                        )
+                    )
                     return list_ids[:limit]
 
                 has_next_page = bool(pagination.get("next_page"))
@@ -557,7 +572,10 @@ class CrowdStrikeClient:
                 offset = next_offset
 
             if not recorded_total:
-                self._last_hunt_total += len(list_ids) - subtenant_result_start
+                self._last_hunt_total_known = False
+
+        if self._last_hunt_total_known and self._last_hunt_total > len(list_ids):
+            self._last_hunt_truncated = True
 
         return list_ids
 

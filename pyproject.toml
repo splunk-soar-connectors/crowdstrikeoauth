@@ -14,7 +14,7 @@ dependencies = [
     "pytz>=2023.3",
     "requests>=2.32.0",
     "requests-toolbelt==1.0.0",
-    "splunk-soar-sdk>=4.1.2",
+    "splunk-soar-sdk>=4.4.2",
 ]
 
 [tool.soar.app]
@@ -119,7 +119,7 @@ indent = 2
 include = "H008,H009,H010,H014,H024,H026,H033,T028,T034"
 
 # Ignore troublesome rules that aren't auto-fixable or causing issues
-ignore = "D004,D018,H005,H006,H007,H011,H012,H013,H015,H016,H017,H019,H020,H021,H022,H023,H025,H029,H030,H031,H035,H036,H037,J004,J018,T001,T002,T003,T027,T032"
+ignore = "D004,D018,H005,H006,H007,H011,H012,H013,H015,H016,H017,H019,H020,H021,H022,H023,H025,H029,H030,H031,H035,H036,H037,H053,J004,J018,T001,T002,T003,T027,T032,T038,T041"
 
 # Markdown linting
 [tool.mdformat]

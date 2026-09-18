@@ -2,14 +2,14 @@ version = 1
 revision = 3
 requires-python = ">=3.13, <3.15"
 resolution-markers = [
-    "python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'linux'",
-    "python_full_version < '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin'",
-    "python_full_version < '3.14' and platform_machine == 'arm64' and sys_platform == 'darwin'",
     "python_full_version >= '3.14' and platform_machine == 'x86_64' and sys_platform == 'linux'",
     "python_full_version >= '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
     "python_full_version >= '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin'",
     "python_full_version >= '3.14' and platform_machine == 'arm64' and sys_platform == 'darwin'",
+    "python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'linux'",
+    "python_full_version < '3.14' and platform_machine == 'aarch64' and sys_platform == 'linux'",
+    "python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin'",
+    "python_full_version < '3.14' and platform_machine == 'arm64' and sys_platform == 'darwin'",
 ]
 supported-markers = [
     "python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'linux'",
@@ -234,7 +234,7 @@ wheels = [
 
 [[package]]
 name = "crowdstrikeoauthapi"
-version = "6.0.0"
+version = "6.0.1"
 source = { virtual = "." }
 dependencies = [
     { name = "beautifulsoup4", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
@@ -261,7 +261,7 @@ requires-dist = [
     { name = "pytz", specifier = ">=2023.3" },
     { name = "requests", specifier = ">=2.32.0" },
     { name = "requests-toolbelt", specifier = "==1.0.0" },
-    { name = "splunk-soar-sdk", specifier = ">=4.1.2" },
+    { name = "splunk-soar-sdk", specifier = ">=4.4.2" },
 ]
 
 [package.metadata.requires-dev]
@@ -1050,7 +1050,7 @@ wheels = [
 
 [[package]]
 name = "splunk-soar-sdk"
-version = "4.1.2"
+version = "5.0.1"
 source = { registry = "https://pypi.python.org/simple" }
 dependencies = [
     { name = "authlib", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
@@ -1076,9 +1076,9 @@ dependencies = [
     { name = "tqdm", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
     { name = "typer", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7c/05/7a667c605445278f221dd0d1aa429b491c97842d5c087af68df8b26ac5f3/splunk_soar_sdk-4.1.2.tar.gz", hash = "sha256:3eca2e908727035d1bfbaa9c1c1eb9585e93b3fe7b3ed40900d3b63fa018a342", size = 765856, upload-time = "2026-08-21T22:57:24.905Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6f/df/34ec2911975e3f1e757c385cde8357df89317166c59aac78c50d70ffa3b8/splunk_soar_sdk-5.0.1.tar.gz", hash = "sha256:b4c035040db91b115a02a4666d9cb0cea002542db10e8e79edc9dc3138ef7891", size = 980304, upload-time = "2026-09-18T19:17:34.776Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9c/c5/e0a6297bf1cbecfb36c4d4cd82b2010a4f9a0520846bfd500507046f4670/splunk_soar_sdk-4.1.2-py3-none-any.whl", hash = "sha256:ddff56d12640d8df0d4bbc0697f88f2cfb20a8a0ef3934a57e2cbed665212ce4", size = 224295, upload-time = "2026-08-21T22:57:23.755Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/66/7b4d136bf1248c0a1a14bee3d0a5f88bd38e7bbcca7442dee49c4aa15b46/splunk_soar_sdk-5.0.1-py3-none-any.whl", hash = "sha256:b374b02a50f1d7483822f3ac48b98549a7c177bf88fd3bb3c1e7fcbb0f089efa", size = 226312, upload-time = "2026-09-18T19:17:33.494Z" },
 ]
 
 [[package]]

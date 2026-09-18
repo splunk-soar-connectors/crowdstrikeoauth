@@ -12,7 +12,8 @@
 # and limitations under the License.
 
 import time
-from collections.abc import Iterator
+import types
+from collections.abc import Callable, Iterator
 
 from soar_sdk.abstract import SOARClient
 from soar_sdk.app import App
@@ -84,6 +85,11 @@ class Asset(BaseAsset):
     collate: bool | None = AssetField(
         description="Merge containers for hostname and eventname",
         default=True,
+        category=FieldCategory.INGEST,
+    )
+    preprocess_script: str | None = AssetField(
+        description="Script with a function to preprocess containers and artifacts",
+        is_python_script=True,
         category=FieldCategory.INGEST,
     )
     max_crlf: int | None = AssetField(
@@ -245,19 +251,40 @@ def _poll_detection_events(
 
     if events:
         results = events_parser.parse_events(events, asset.collate)
-        yield from _yield_results(results)
+        preprocess_container = _load_preprocess_container(asset.preprocess_script)
+        yield from _yield_results(results, preprocess_container)
 
         if not is_poll_now:
             last_offset_id = events[-1]["metadata"]["offset"]
             asset.ingest_state[offset_key] = last_offset_id + 1
 
 
-def _yield_results(results: list) -> Iterator[Container | Artifact]:
+def _load_preprocess_container(script: str | None) -> Callable[[dict], dict] | None:
+    if not script:
+        return None
+
+    script_module = types.ModuleType("preprocess_methods")
+    exec(script, script_module.__dict__)  # noqa: S102  # nosec B102: field requires SOAR Edit Code
+    return script_module.preprocess_container
+
+
+def _yield_results(
+    results: list,
+    preprocess_container: Callable[[dict], dict] | None = None,
+) -> Iterator[Container | Artifact]:
     for result in results:
         container = result.get("container")
         artifacts = result.get("artifacts")
         if not container or not artifacts:
             continue
+
+        if preprocess_container:
+            processed = preprocess_container({**container, "artifacts": artifacts})
+            artifacts = processed.pop("artifacts", [])
+            container = processed
+            if not container or not artifacts:
+                continue
+
         yield Container(**container)
         for artifact in artifacts:
             yield Artifact(**artifact)

@@ -4,7 +4,7 @@ Publisher: Splunk <br>
 Connector Version: 6.0.1 <br>
 Product Vendor: CrowdStrike <br>
 Product Name: CrowdStrike <br>
-Minimum Product Version: 8.6.0
+Minimum Product Version: 8.9.0
 
 This app integrates with CrowdStrike OAuth2 authentication standard to implement querying of endpoint security data
 
@@ -416,6 +416,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **max_events** | optional | numeric | Maximum events to get for scheduled and interval polling |
 **max_events_poll_now** | optional | numeric | Maximum events to get while POLL NOW |
 **collate** | optional | boolean | Merge containers for hostname and eventname |
+**preprocess_script** | optional | python_script | Script with a function to preprocess containers and artifacts |
 **max_crlf** | optional | numeric | Maximum allowed continuous blank lines |
 **detonate_timeout** | optional | numeric | Timeout for detonation result in minutes (Default: 15 minutes) |
 

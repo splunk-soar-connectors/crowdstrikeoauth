@@ -38,11 +38,18 @@ def make_params(enabled: str | None = None) -> UpdateIoaRuleParams:
 
 
 @pytest.mark.parametrize(
-    ("enabled", "expected"),
-    [(None, False), ("preserve", False), ("enable", True), ("disable", False)],
+    ("enabled", "current_state", "expected"),
+    [
+        (None, True, True),
+        (None, False, False),
+        ("preserve", True, True),
+        ("preserve", False, False),
+        ("enable", None, True),
+        ("disable", None, False),
+    ],
 )
 def test_update_ioa_rule_preserves_or_sets_enabled_state(
-    enabled: str | None, expected: bool
+    enabled: str | None, current_state: bool | None, expected: bool
 ) -> None:
     params = make_params(enabled)
     client = Mock()
@@ -60,7 +67,11 @@ def test_update_ioa_rule_preserves_or_sets_enabled_state(
         client.make_rest_call.side_effect = [
             {
                 "resources": [
-                    {"instance_id": "rule", "rulegroup_id": "group", "enabled": False}
+                    {
+                        "instance_id": "rule",
+                        "rulegroup_id": "group",
+                        "enabled": current_state,
+                    }
                 ]
             },
             update_response,

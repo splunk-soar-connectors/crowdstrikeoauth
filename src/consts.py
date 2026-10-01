@@ -291,6 +291,7 @@ CROWDSTRIKE_IOA_LIST_SEVERITIES_ENDPOINT = "/ioarules/queries/pattern-severities
 CROWDSTRIKE_IOA_LIST_TYPES_ENDPOINT = "/ioarules/queries/rule-types/v1"
 CROWDSTRIKE_IOA_GET_TYPE_ENDPOINT = "/ioarules/entities/rule-types/v1"
 CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT = "/ioarules/entities/rules/v1"
+CROWDSTRIKE_IOA_UPDATE_RULE_ENDPOINT = "/ioarules/entities/rules/v2"
 
 CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT = (
     "/policy/entities/prevention-actions/v1"

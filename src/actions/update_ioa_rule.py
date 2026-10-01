@@ -18,7 +18,7 @@ from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionO
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
-from ..consts import CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT
+from ..consts import CROWDSTRIKE_IOA_UPDATE_RULE_ENDPOINT
 
 
 class UpdateIoaRuleParams(Params):
@@ -166,7 +166,7 @@ def update_ioa_rule(
         update_params["comment"] = params.comment
 
     resp_json = client.make_rest_call(
-        CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,
+        CROWDSTRIKE_IOA_UPDATE_RULE_ENDPOINT,
         json_data=update_params,
         method="patch",
     )

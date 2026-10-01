@@ -393,13 +393,13 @@ class CrowdStrikeClient:
             raise Exception(f"Unable to parse JSON response. Error: {e}") from e
 
         errors = resp_json.get("errors")
-        if errors:
-            error_msg = ", ".join(
-                "{} - {}".format(err.get("code"), err.get("message")) for err in errors
-            )
-            raise Exception(f"Error from server. Error details: {error_msg}")
-
         if 200 <= response.status_code < 399:
+            if errors:
+                error_msg = ", ".join(
+                    "{} - {}".format(err.get("code"), err.get("message"))
+                    for err in errors
+                )
+                raise Exception(f"Error from server. Error details: {error_msg}")
             return resp_json
 
         msg = ""

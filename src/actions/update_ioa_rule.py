@@ -18,7 +18,7 @@ from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionO
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
-from ..consts import CROWDSTRIKE_IOA_UPDATE_RULE_ENDPOINT
+from ..consts import CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT
 
 
 class UpdateIoaRuleParams(Params):
@@ -160,13 +160,33 @@ def update_ioa_rule(
             }
         ],
     }
-    if params.enabled is not None:
-        update_params["rule_updates"][0]["enabled"] = params.enabled
+    enabled = params.enabled
+    if enabled is None:
+        current_rules = client.make_rest_call(
+            CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,
+            params={"ids": params.rule_id},
+            method="get",
+        )
+        rule = next(
+            (
+                rule
+                for rule in current_rules.get("resources", [])
+                if rule.get("instance_id") == params.rule_id
+                and rule.get("rulegroup_id") == params.rule_group_id
+            ),
+            None,
+        )
+        if rule is None or not isinstance(rule.get("enabled"), bool):
+            raise ValueError(
+                "CrowdStrike did not return the current rule enabled state"
+            )
+        enabled = rule["enabled"]
+    update_params["rule_updates"][0]["enabled"] = enabled
     if params.comment:
         update_params["comment"] = params.comment
 
     resp_json = client.make_rest_call(
-        CROWDSTRIKE_IOA_UPDATE_RULE_ENDPOINT,
+        CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,
         json_data=update_params,
         method="patch",
     )

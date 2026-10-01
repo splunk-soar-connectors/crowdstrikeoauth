@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 from unittest.mock import Mock
 
 import pytest
@@ -27,14 +28,21 @@ def test_non_success_json_error_keeps_status_and_server_message() -> None:
 
     with pytest.raises(
         Exception,
-        match="Error from server. Status Code: 409 Data from server:  file with given name already exists",
+        match=re.escape(
+            "Error from server. Status Code: 409 Data from server:  file with given name already exists"
+        ),
     ):
         CrowdStrikeClient._process_json_response(None, response)
 
 
 def test_success_status_with_error_payload_still_fails() -> None:
     response = Mock(status_code=200)
-    response.json.return_value = {"resources": [], "errors": [{"code": 42, "message": "bad data"}]}
+    response.json.return_value = {
+        "resources": [],
+        "errors": [{"code": 42, "message": "bad data"}],
+    }
 
-    with pytest.raises(Exception, match="Error from server. Error details: 42 - bad data"):
+    with pytest.raises(
+        Exception, match=re.escape("Error from server. Error details: 42 - bad data")
+    ):
         CrowdStrikeClient._process_json_response(None, response)

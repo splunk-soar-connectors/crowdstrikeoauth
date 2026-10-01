@@ -17,12 +17,11 @@ from unittest.mock import Mock, patch
 import pytest
 
 from src.actions.update_ioa_rule import UpdateIoaRuleParams, update_ioa_rule
-from src.consts import CROWDSTRIKE_IOA_UPDATE_RULE_ENDPOINT
+from src.consts import CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT
 
 
-@pytest.mark.parametrize("enabled", [None, False, True])
-def test_update_ioa_rule_preserves_or_sets_enabled_state(enabled: bool | None) -> None:
-    params = UpdateIoaRuleParams(
+def make_params(enabled: bool | None = None) -> UpdateIoaRuleParams:
+    return UpdateIoaRuleParams(
         rule_group_id="group",
         rule_group_version=2,
         rule_id="rule",
@@ -34,8 +33,13 @@ def test_update_ioa_rule_preserves_or_sets_enabled_state(enabled: bool | None) -
         field_values="[]",
         enabled=enabled,
     )
+
+
+@pytest.mark.parametrize("enabled", [None, False, True])
+def test_update_ioa_rule_preserves_or_sets_enabled_state(enabled: bool | None) -> None:
+    params = make_params(enabled)
     client = Mock()
-    client.make_rest_call.return_value = {
+    update_response = {
         "resources": [
             {
                 "id": "group",
@@ -45,15 +49,60 @@ def test_update_ioa_rule_preserves_or_sets_enabled_state(enabled: bool | None) -
             }
         ]
     }
+    if enabled is None:
+        client.make_rest_call.side_effect = [
+            {
+                "resources": [
+                    {"instance_id": "rule", "rulegroup_id": "group", "enabled": False}
+                ]
+            },
+            update_response,
+        ]
+    else:
+        client.make_rest_call.return_value = update_response
 
     with patch("src.actions.update_ioa_rule.get_client", return_value=client):
         update_ioa_rule.__wrapped__(params, Mock(), Mock())
 
     args, kwargs = client.make_rest_call.call_args
-    assert args == (CROWDSTRIKE_IOA_UPDATE_RULE_ENDPOINT,)
+    assert args == (CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,)
     assert kwargs["method"] == "patch"
     rule_update = kwargs["json_data"]["rule_updates"][0]
+    assert rule_update["enabled"] is (False if enabled is None else enabled)
     if enabled is None:
-        assert "enabled" not in rule_update
+        assert client.make_rest_call.call_count == 2
+        get_args, get_kwargs = client.make_rest_call.call_args_list[0]
+        assert get_args == (CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,)
+        assert get_kwargs == {"params": {"ids": "rule"}, "method": "get"}
     else:
-        assert rule_update["enabled"] is enabled
+        client.make_rest_call.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "current_rules",
+    [
+        {"resources": []},
+        {
+            "resources": [
+                {"instance_id": "other", "rulegroup_id": "group", "enabled": True}
+            ]
+        },
+        {
+            "resources": [
+                {"instance_id": "rule", "rulegroup_id": "other", "enabled": True}
+            ]
+        },
+        {"resources": [{"instance_id": "rule", "rulegroup_id": "group"}]},
+    ],
+)
+def test_update_ioa_rule_rejects_missing_enabled_state(current_rules: dict) -> None:
+    client = Mock()
+    client.make_rest_call.return_value = current_rules
+
+    with (
+        patch("src.actions.update_ioa_rule.get_client", return_value=client),
+        pytest.raises(ValueError, match="current rule enabled state"),
+    ):
+        update_ioa_rule.__wrapped__(make_params(), Mock(), Mock())
+
+    client.make_rest_call.assert_called_once()

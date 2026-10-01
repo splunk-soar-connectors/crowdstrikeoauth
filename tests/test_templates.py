@@ -12,19 +12,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import re
+from html import unescape
 from pathlib import Path
 
+from jinja2 import Environment, FileSystemLoader
 
-UNESCAPED_JS_TEMPLATE_VALUE = re.compile(r"'\{\{(?![^}]*\|escapejs)[^}]+\}\}'")
+
+INLINE_EXPRESSION = re.compile(r"\{\{\s*(.*?)\s*\}\}")
+ONCLICK_ATTRIBUTE = re.compile(r'onclick="([^"]*)"')
 
 
-def test_widget_javascript_string_values_are_escaped() -> None:
-    templates = Path("templates").glob("*.html")
+def test_widget_templates_compile_with_jinja() -> None:
+    environment = Environment(loader=FileSystemLoader("templates"), autoescape=True)
+    for template in Path("templates").glob("*.html"):
+        environment.get_template(template.name)
+
+
+def test_widget_javascript_values_are_safe_in_html_attributes() -> None:
     failures = []
-    for template in templates:
+    for template in Path("templates").glob("*.html"):
         for line_number, line in enumerate(template.read_text().splitlines(), 1):
-            if "onclick=" in line and UNESCAPED_JS_TEMPLATE_VALUE.search(line):
-                failures.append(f"{template}:{line_number}")
+            onclick = ONCLICK_ATTRIBUTE.search(line)
+            if onclick is None:
+                continue
+            for expression in INLINE_EXPRESSION.findall(onclick.group(1)):
+                if expression.strip() in {"container", "container.id"}:
+                    continue
+                if not expression.strip().endswith("|string|tojson|forceescape"):
+                    failures.append(f"{template}:{line_number}: {expression}")
 
     assert failures == []
+
+
+def test_widget_value_survives_json_and_html_attribute_escaping() -> None:
+    value = "quote' \" <script> & newline\n"
+    environment = Environment(autoescape=True)
+    rendered = environment.from_string(
+        "onclick=\"context_menu(this, [{'value': {{ value|string|tojson|forceescape }} }]);\""
+    ).render(value=value)
+
+    assert rendered.count('"') == 2
+    assert "&#34;" in rendered
+    assert "\\u003cscript\\u003e" in rendered
+    onclick = unescape(rendered[len('onclick="') : -1])
+    match = re.search(r"'value': (\"(?:\\.|[^\"])*\")", onclick)
+    assert match is not None
+    assert json.loads(match.group(1)) == value

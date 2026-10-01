@@ -23,12 +23,12 @@ def test_run_query_requires_approval() -> None:
     assert action.meta.read_only is False
 
 
-def test_document_passwords_generate_password_parameters() -> None:
+def test_document_passwords_generate_string_parameters() -> None:
     assert (
         DetonateFileParams._to_json_schema()["document_password"]["data_type"]
-        == "password"
+        == "string"
     )
     assert (
         DetonateUrlParams._to_json_schema()["document_password"]["data_type"]
-        == "password"
+        == "string"
     )

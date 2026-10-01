@@ -32,9 +32,11 @@ class UpdateIoaRuleGroupParams(Params):
     version: int = Param(description="Version of the rule group", required=True)
     name: str = Param(description="Name of the rule group", required=True)
     description: str = Param(description="Description of the rule group", required=True)
-    enabled: bool | None = Param(
-        description="Whether the rule group is enabled",
+    enabled: str = Param(
+        description="Choose whether to preserve, enable, or disable the rule group",
         required=False,
+        default="preserve",
+        value_list=["preserve", "enable", "disable"],
     )
     comment: str = Param(description="Comment for the update", required=True)
     assign_policy_id: str = Param(
@@ -111,8 +113,10 @@ def update_ioa_rule_group(
         "description": params.description,
         "comment": params.comment,
     }
-    if params.enabled is not None:
-        update_params["enabled"] = params.enabled
+    if params.enabled not in {"preserve", "enable", "disable"}:
+        raise ValueError("enabled must be preserve, enable, or disable")
+    if params.enabled != "preserve":
+        update_params["enabled"] = params.enabled == "enable"
     resp_json = client.make_rest_call(
         CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
         json_data=update_params,

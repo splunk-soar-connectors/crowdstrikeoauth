@@ -45,8 +45,11 @@ class UpdateIoaRuleParams(Params):
         description="JSON list of field values for the rule", required=True
     )
     comment: str = Param(description="Comment for the rule", required=False)
-    enabled: bool | None = Param(
-        description="Whether the rule is enabled", required=False
+    enabled: str = Param(
+        description="Choose whether to preserve, enable, or disable the rule",
+        required=False,
+        default="preserve",
+        value_list=["preserve", "enable", "disable"],
     )
 
 
@@ -160,8 +163,9 @@ def update_ioa_rule(
             }
         ],
     }
-    enabled = params.enabled
-    if enabled is None:
+    if params.enabled not in {"preserve", "enable", "disable"}:
+        raise ValueError("enabled must be preserve, enable, or disable")
+    if params.enabled == "preserve":
         current_rules = client.make_rest_call(
             CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,
             params={"ids": params.rule_id},
@@ -181,6 +185,8 @@ def update_ioa_rule(
                 "CrowdStrike did not return the current rule enabled state"
             )
         enabled = rule["enabled"]
+    else:
+        enabled = params.enabled == "enable"
     update_params["rule_updates"][0]["enabled"] = enabled
     if params.comment:
         update_params["comment"] = params.comment

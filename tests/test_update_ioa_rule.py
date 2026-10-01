@@ -20,8 +20,8 @@ from src.actions.update_ioa_rule import UpdateIoaRuleParams, update_ioa_rule
 from src.consts import CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT
 
 
-def make_params(enabled: bool | None = None) -> UpdateIoaRuleParams:
-    return UpdateIoaRuleParams(
+def make_params(enabled: str | None = None) -> UpdateIoaRuleParams:
+    values = dict(
         rule_group_id="group",
         rule_group_version=2,
         rule_id="rule",
@@ -31,12 +31,19 @@ def make_params(enabled: bool | None = None) -> UpdateIoaRuleParams:
         severity="high",
         disposition_id=10,
         field_values="[]",
-        enabled=enabled,
     )
+    if enabled is not None:
+        values["enabled"] = enabled
+    return UpdateIoaRuleParams(**values)
 
 
-@pytest.mark.parametrize("enabled", [None, False, True])
-def test_update_ioa_rule_preserves_or_sets_enabled_state(enabled: bool | None) -> None:
+@pytest.mark.parametrize(
+    ("enabled", "expected"),
+    [(None, False), ("preserve", False), ("enable", True), ("disable", False)],
+)
+def test_update_ioa_rule_preserves_or_sets_enabled_state(
+    enabled: str | None, expected: bool
+) -> None:
     params = make_params(enabled)
     client = Mock()
     update_response = {
@@ -49,7 +56,7 @@ def test_update_ioa_rule_preserves_or_sets_enabled_state(enabled: bool | None) -
             }
         ]
     }
-    if enabled is None:
+    if enabled is None or enabled == "preserve":
         client.make_rest_call.side_effect = [
             {
                 "resources": [
@@ -68,8 +75,8 @@ def test_update_ioa_rule_preserves_or_sets_enabled_state(enabled: bool | None) -
     assert args == (CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,)
     assert kwargs["method"] == "patch"
     rule_update = kwargs["json_data"]["rule_updates"][0]
-    assert rule_update["enabled"] is (False if enabled is None else enabled)
-    if enabled is None:
+    assert rule_update["enabled"] is expected
+    if enabled is None or enabled == "preserve":
         assert client.make_rest_call.call_count == 2
         get_args, get_kwargs = client.make_rest_call.call_args_list[0]
         assert get_args == (CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,)
@@ -106,3 +113,20 @@ def test_update_ioa_rule_rejects_missing_enabled_state(current_rules: dict) -> N
         update_ioa_rule.__wrapped__(make_params(), Mock(), Mock())
 
     client.make_rest_call.assert_called_once()
+
+
+def test_update_ioa_rule_exposes_choice_control() -> None:
+    schema = UpdateIoaRuleParams._to_json_schema()["enabled"]
+    assert schema["data_type"] == "string"
+    assert schema["default"] == "preserve"
+    assert schema["value_list"] == ["preserve", "enable", "disable"]
+
+
+def test_update_ioa_rule_rejects_invalid_choice() -> None:
+    client = Mock()
+    with (
+        patch("src.actions.update_ioa_rule.get_client", return_value=client),
+        pytest.raises(ValueError, match="enabled must be"),
+    ):
+        update_ioa_rule.__wrapped__(make_params("unexpected"), Mock(), Mock())
+    client.make_rest_call.assert_not_called()

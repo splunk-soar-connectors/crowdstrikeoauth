@@ -1,6 +1,6 @@
 **Unreleased**
 
-* Replace the IOA rule and rule-group update actions' `enabled` checkbox with a `preserve` (default), `enable`, or `disable` choice. This prevents an unchecked SOAR checkbox from silently disabling a rule or group. Existing playbooks passing a boolean `enabled` value must use the corresponding string choice. This breaking action contract requires a major release.
+* Replace the IOA rule and rule-group update actions' `enabled` checkbox with a `preserve` (default), `enable`, or `disable` choice. This prevents an unchecked SOAR checkbox from silently disabling a rule or group. Legacy Boolean inputs remain accepted as explicit enable or disable requests. The action parameter and output type change requires a major release.
 * Bound pagination and stop when an API page makes no progress.
 * Report when list-process results are truncated from the API's authoritative total.
 * Bound command-result polling by time, sequence count, and response size.

@@ -20,7 +20,7 @@ from src.actions.update_ioa_rule import UpdateIoaRuleParams, update_ioa_rule
 from src.consts import CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT
 
 
-def make_params(enabled: str | None = None) -> UpdateIoaRuleParams:
+def make_params(enabled: str | bool | None = None) -> UpdateIoaRuleParams:
     values = dict(
         rule_group_id="group",
         rule_group_version=2,
@@ -46,10 +46,14 @@ def make_params(enabled: str | None = None) -> UpdateIoaRuleParams:
         ("preserve", False, False),
         ("enable", None, True),
         ("disable", None, False),
+        (True, None, True),
+        (False, None, False),
+        ("True", None, True),
+        ("False", None, False),
     ],
 )
 def test_update_ioa_rule_preserves_or_sets_enabled_state(
-    enabled: str | None, current_state: bool | None, expected: bool
+    enabled: str | bool | None, current_state: bool | None, expected: bool
 ) -> None:
     params = make_params(enabled)
     client = Mock()

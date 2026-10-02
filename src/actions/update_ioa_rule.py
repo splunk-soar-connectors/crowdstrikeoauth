@@ -13,12 +13,14 @@
 
 import json
 
+from pydantic import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
 from ..consts import CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT
+from ._ioa_enabled import normalize_ioa_enabled
 
 
 class UpdateIoaRuleParams(Params):
@@ -51,6 +53,11 @@ class UpdateIoaRuleParams(Params):
         default="preserve",
         value_list=["preserve", "enable", "disable"],
     )
+
+    @field_validator("enabled", mode="before")
+    @classmethod
+    def normalize_enabled(cls, value: object) -> object:
+        return normalize_ioa_enabled(value)
 
 
 class UpdateIoaRuleFieldValueOption(PermissiveActionOutput):

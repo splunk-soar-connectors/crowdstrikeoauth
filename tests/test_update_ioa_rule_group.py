@@ -23,7 +23,7 @@ from src.actions.update_ioa_rule_group import (
 from src.consts import CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT
 
 
-def make_params(enabled: str | None = None) -> UpdateIoaRuleGroupParams:
+def make_params(enabled: str | bool | None = None) -> UpdateIoaRuleGroupParams:
     values = dict(
         id="group",
         version=2,
@@ -38,10 +38,19 @@ def make_params(enabled: str | None = None) -> UpdateIoaRuleGroupParams:
 
 @pytest.mark.parametrize(
     ("enabled", "expected"),
-    [(None, None), ("preserve", None), ("enable", True), ("disable", False)],
+    [
+        (None, None),
+        ("preserve", None),
+        ("enable", True),
+        ("disable", False),
+        (True, True),
+        (False, False),
+        ("True", True),
+        ("False", False),
+    ],
 )
 def test_update_ioa_rule_group_preserves_or_sets_enabled_state(
-    enabled: str | None, expected: bool | None
+    enabled: str | bool | None, expected: bool | None
 ) -> None:
     client = Mock()
     client.make_rest_call.return_value = {"resources": [{"id": "group"}]}

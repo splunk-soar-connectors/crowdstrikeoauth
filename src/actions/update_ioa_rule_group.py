@@ -11,6 +11,7 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+from pydantic import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
@@ -20,6 +21,7 @@ from ..consts import (
     CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
     CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
 )
+from ._ioa_enabled import normalize_ioa_enabled
 
 
 class UpdateIoaRuleGroupParams(Params):
@@ -38,6 +40,7 @@ class UpdateIoaRuleGroupParams(Params):
         default="preserve",
         value_list=["preserve", "enable", "disable"],
     )
+
     comment: str = Param(description="Comment for the update", required=True)
     assign_policy_id: str = Param(
         description="Comma-separated list of prevention policy IDs to attach",
@@ -51,6 +54,11 @@ class UpdateIoaRuleGroupParams(Params):
         allow_list=True,
         cef_types=["crowdstrike prevention policy id"],
     )
+
+    @field_validator("enabled", mode="before")
+    @classmethod
+    def normalize_enabled(cls, value: object) -> object:
+        return normalize_ioa_enabled(value)
 
 
 class UpdateIoaRuleGroupResource(PermissiveActionOutput):

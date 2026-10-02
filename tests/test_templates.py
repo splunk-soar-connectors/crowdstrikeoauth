@@ -17,7 +17,7 @@ import re
 from html import unescape
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import ChoiceLoader, DictLoader, Environment, FileSystemLoader
 
 
 INLINE_EXPRESSION = re.compile(r"\{\{\s*(.*?)\s*\}\}")
@@ -28,6 +28,37 @@ def test_widget_templates_compile_with_jinja() -> None:
     environment = Environment(loader=FileSystemLoader("templates"), autoescape=True)
     for template in Path("templates").glob("*.html"):
         environment.get_template(template.name)
+
+
+def test_widget_templates_extend_before_emitting_content() -> None:
+    for template in Path("templates").glob("*.html"):
+        assert (
+            template.read_text()
+            .lstrip()
+            .startswith("{% extends 'widgets/widget_template.html' %}")
+        ), f"{template} emits content before extending the SOAR widget"
+
+
+def test_device_scroll_renders_parent_before_license_comment() -> None:
+    environment = Environment(
+        loader=ChoiceLoader(
+            [
+                FileSystemLoader("templates"),
+                DictLoader(
+                    {
+                        "widgets/widget_template.html": (
+                            "<section>{% block widget_content %}{% endblock %}</section>"
+                        )
+                    }
+                ),
+            ]
+        ),
+        autoescape=True,
+    )
+    rendered = environment.get_template("crowdstrike_get_device_scroll.html").render(
+        results=[]
+    )
+    assert rendered.startswith("<section>")
 
 
 def test_widget_javascript_values_are_safe_in_html_attributes() -> None:

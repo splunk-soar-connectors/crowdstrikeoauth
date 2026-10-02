@@ -8,5 +8,6 @@
 * Reject device lookup metacharacters and verify resolved device identities before device actions.
 * Fail batch device and indicator operations when the API reports any item errors.
 * Escape dynamic values before embedding them in widget JavaScript string literals.
+* Render action widgets with Jinja inheritance first, before any HTML comments.
 * Validate generic query endpoints as canonical query paths before dispatch [PAPP-37947]
 * Require approval for generic query actions and report process-result truncation accurately.

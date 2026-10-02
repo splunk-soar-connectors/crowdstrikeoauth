@@ -1919,7 +1919,12 @@ action_result.data.\*.device_id | string | | |
 action_result.data.\*.ioc | string | | |
 action_result.data.\*.ioc_type | string | | |
 action_result.data.\*.limit | numeric | | |
+action_result.data.\*.summary_process_count | numeric | | |
+action_result.data.\*.summary_total_process_count | numeric | | |
+action_result.data.\*.summary_truncated | boolean | | True False |
 action_result.summary.process_count | numeric | | |
+action_result.summary.total_process_count | numeric | | |
+action_result.summary.truncated | boolean | | True False |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
@@ -2309,7 +2314,7 @@ summary.total_objects_successful | numeric | | 1 |
 Run a generic query against a CrowdStrike API query endpoint
 
 Type: **investigate** <br>
-Read only: **True**
+Read only: **False**
 
 #### Action Parameters
 
@@ -2528,7 +2533,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **disposition_id** | required | Disposition ID | numeric | |
 **field_values** | required | JSON list of field values for the rule | string | |
 **comment** | optional | Comment for the rule | string | |
-**enabled** | optional | Whether the rule is enabled | boolean | |
+**enabled** | optional | Choose whether to preserve, enable, or disable the rule | string | |
 
 #### Action Output
 
@@ -2546,7 +2551,7 @@ action_result.parameter.severity | string | | |
 action_result.parameter.disposition_id | numeric | | |
 action_result.parameter.field_values | string | | |
 action_result.parameter.comment | string | | |
-action_result.parameter.enabled | boolean | | |
+action_result.parameter.enabled | string | | |
 action_result.data.\*.resources.\*.id | string | `crowdstrike ioa rule group id` | |
 action_result.data.\*.resources.\*.name | string | | |
 action_result.data.\*.resources.\*.rules.\*.name | string | | |
@@ -2612,7 +2617,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **version** | required | Version of the rule group | numeric | |
 **name** | required | Name of the rule group | string | |
 **description** | required | Description of the rule group | string | |
-**enabled** | optional | Whether the rule group is enabled | boolean | |
+**enabled** | optional | Choose whether to preserve, enable, or disable the rule group | string | |
 **comment** | required | Comment for the update | string | |
 **assign_policy_id** | optional | Comma-separated list of prevention policy IDs to attach | string | `crowdstrike prevention policy id` |
 **remove_policy_id** | optional | Comma-separated list of prevention policy IDs to remove | string | `crowdstrike prevention policy id` |
@@ -2627,7 +2632,7 @@ action_result.parameter.id | string | `crowdstrike ioa rule group id` | |
 action_result.parameter.version | numeric | | |
 action_result.parameter.name | string | | |
 action_result.parameter.description | string | | |
-action_result.parameter.enabled | boolean | | |
+action_result.parameter.enabled | string | | |
 action_result.parameter.comment | string | | |
 action_result.parameter.assign_policy_id | string | `crowdstrike prevention policy id` | |
 action_result.parameter.remove_policy_id | string | `crowdstrike prevention policy id` | |

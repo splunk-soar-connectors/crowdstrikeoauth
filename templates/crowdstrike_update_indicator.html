@@ -1,20 +1,20 @@
-<!--
- Copyright (c) 2026 Splunk Inc.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
 {% extends 'widgets/widget_template.html' %}
 {% block widget_content %}
+  <!--
+   Copyright (c) 2026 Splunk Inc.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+  -->
   <style>
 a:hover {
   text-decoration:underline;
@@ -86,14 +86,14 @@ a:hover {
           <tr>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type }}' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': [ {{ result.param.ioc_type|string|tojson|forceescape }} ], 'value': {{ result.param.ioc|string|tojson|forceescape }} }], 0, {{ container.id }}, null, false);">
                 {{ result.param.ioc }}
                 &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
               </a>
             </td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': [ 'crowdstrike indicator action' ], 'value': '{{ result.param.action }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': [ 'crowdstrike indicator action' ], 'value': {{ result.param.action|string|tojson|forceescape }} }], 0, {{ container.id }}, null, false);">
                 {{ result.param.action }}
                 &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
               </a>

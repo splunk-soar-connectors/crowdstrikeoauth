@@ -29,6 +29,7 @@ from .consts import (
     CROWDSTRIKE_DEFAULT_TIMEOUT,
     CROWDSTRIKE_DEVICE_ACTION_ENDPOINT,
     CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT,
+    CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT,
     CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT,
     CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT,
     CROWDSTRIKE_GROUP_DEVICE_ACTION_ENDPOINT,
@@ -60,6 +61,12 @@ TOKEN_INVALID_MARKERS = (
     "access denied",
 )
 
+MAX_PAGINATION_PAGES = 1_000
+MAX_PAGINATION_RESULTS = 100_000
+MAX_PAGE_RESPONSE_BYTES = 10 * 1024 * 1024
+MAX_PAGINATION_BYTES = 50 * 1024 * 1024
+MAX_COMMAND_RESULT_BYTES = 10 * 1024 * 1024
+
 
 class CrowdStrikeClient:
     """Multi-tenant OAuth2 client-credentials client for the CrowdStrike OAuth API.
@@ -76,6 +83,9 @@ class CrowdStrikeClient:
         self._client_secret = asset.client_secret
         self._stream_file_data = False
         self._required_detonation = False
+        self._last_hunt_total = 0
+        self._last_hunt_total_known = True
+        self._last_hunt_truncated = False
         self._tokens = self._load_tokens()
 
     # ------------------------------------------------------------------ #
@@ -262,6 +272,7 @@ class CrowdStrikeClient:
         data=None,
         json_data=None,
         method: str = "get",
+        max_response_bytes: int | None = None,
     ):
         try:
             response = requests.request(
@@ -271,14 +282,31 @@ class CrowdStrikeClient:
                 data=data,
                 headers=headers,
                 params=params,
-                stream=self._stream_file_data,
+                stream=self._stream_file_data or max_response_bytes is not None,
                 timeout=CROWDSTRIKE_DEFAULT_TIMEOUT,
             )
         except Exception as e:
             raise ConnectionError(f"Error connecting to server. Details: {e}") from e
 
+        if max_response_bytes is not None:
+            self._read_bounded_response(response, max_response_bytes)
         is_download = CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT in url
         return self._process_response(response, is_download)
+
+    @staticmethod
+    def _read_bounded_response(response, max_response_bytes: int) -> None:
+        chunks = []
+        size = 0
+        try:
+            for chunk in response.iter_content(chunk_size=64 * 1024):
+                size += len(chunk)
+                if size > max_response_bytes:
+                    raise ValueError("Response exceeded the maximum size")
+                chunks.append(chunk)
+            response._content = b"".join(chunks)
+            response._content_consumed = True
+        finally:
+            response.close()
 
     def make_rest_call(
         self,
@@ -291,6 +319,7 @@ class CrowdStrikeClient:
         method: str = "get",
         upload_file: bool = False,
         append: bool = True,
+        max_response_bytes: int | None = None,
     ):
         url = f"{self._base_url}{endpoint}" if append else endpoint
         if headers is None:
@@ -313,7 +342,9 @@ class CrowdStrikeClient:
             headers["Content-Type"] = "application/json"
 
         try:
-            return self._make_rest_call(url, headers, params, data, json_data, method)
+            return self._make_rest_call(
+                url, headers, params, data, json_data, method, max_response_bytes
+            )
         except Exception as e:
             message = str(e)
             if not any(marker in message for marker in TOKEN_INVALID_MARKERS):
@@ -325,7 +356,9 @@ class CrowdStrikeClient:
         access_token = token.get("access_token")
         if access_token:
             headers["Authorization"] = f"Bearer {access_token}"
-        return self._make_rest_call(url, headers, params, data, json_data, method)
+        return self._make_rest_call(
+            url, headers, params, data, json_data, method, max_response_bytes
+        )
 
     # ------------------------------------------------------------------ #
     # Response processing
@@ -384,31 +417,14 @@ class CrowdStrikeClient:
         except Exception as e:
             raise Exception(f"Unable to parse JSON response. Error: {e}") from e
 
-        resources = resp_json.get("resources")
         errors = resp_json.get("errors")
-        if "resources" in resp_json and "errors" in resp_json and errors:
-            if not resources:
+        if 200 <= response.status_code < 399:
+            if errors:
                 error_msg = ", ".join(
                     "{} - {}".format(err.get("code"), err.get("message"))
                     for err in errors
                 )
                 raise Exception(f"Error from server. Error details: {error_msg}")
-            if (
-                resources
-                and isinstance(resources, list)
-                and resources[0].get("message")
-            ):
-                error_msg = ", ".join(
-                    "{} - {}".format(err.get("code"), err.get("message"))
-                    for err in errors
-                )
-                raise Exception(
-                    "Error from server. Error details: {}, {}".format(
-                        error_msg, resources[0]["message"]
-                    )
-                )
-
-        if 200 <= response.status_code < 399:
             return resp_json
 
         msg = ""
@@ -429,8 +445,7 @@ class CrowdStrikeClient:
         param: dict | None = None,
         subtenant: str | None = None,
     ) -> list:
-        if param is None:
-            param = {}
+        param = dict(param or {})
         list_ids = []
 
         limit = None
@@ -438,16 +453,34 @@ class CrowdStrikeClient:
             limit = int(param.pop("limit"))
         offset = param.get("offset", 0)
 
+        page_count = 0
+        retained_bytes = 0
         while True:
+            page_count += 1
+            if page_count > MAX_PAGINATION_PAGES:
+                raise Exception("Pagination exceeded the maximum page count")
             param.update({"offset": offset})
-            response = self.make_rest_call(endpoint, params=param, subtenant=subtenant)
+            response = self.make_rest_call(
+                endpoint,
+                params=param,
+                subtenant=subtenant,
+                max_response_bytes=MAX_PAGE_RESPONSE_BYTES,
+            )
 
             prev_offset = offset
-            offset = response.get("meta", {}).get("pagination", {}).get("offset")
-            if offset == prev_offset:
-                offset += len(response.get("resources", []))
+            pagination = response.get("meta", {}).get("pagination", {})
+            offset = pagination.get("offset")
+            total = pagination.get("total")
+            if not isinstance(offset, int) or offset < 0:
+                raise Exception("Invalid pagination offset returned by server")
+            if not isinstance(total, int) or total < 0:
+                raise Exception("Invalid pagination total returned by server")
 
-            total = response.get("meta", {}).get("pagination", {}).get("total")
+            resources = response.get("resources", [])
+            if not isinstance(resources, list):
+                raise Exception("Invalid paginated resources returned by server")
+            if offset == prev_offset:
+                offset += len(resources)
 
             if response.get("errors"):
                 error = response["errors"][0]
@@ -457,13 +490,16 @@ class CrowdStrikeClient:
                     )
                 )
 
-            if offset is None or total is None:
-                raise Exception(
-                    "Error occurred in fetching 'offset' and 'total' key-values while fetching paginated results"
-                )
-
-            if response.get("resources"):
-                list_ids.extend(response["resources"])
+            if resources:
+                page_bytes = len(json.dumps(resources, ensure_ascii=False).encode())
+                if retained_bytes + page_bytes > MAX_PAGINATION_BYTES:
+                    raise Exception("Pagination exceeded the maximum result size")
+                if len(list_ids) + len(resources) > MAX_PAGINATION_RESULTS:
+                    raise Exception("Pagination exceeded the maximum result count")
+                list_ids.extend(resources)
+                retained_bytes += page_bytes
+            elif offset < total:
+                raise Exception("Pagination made no progress")
 
             if limit and len(list_ids) >= limit:
                 return list_ids[:limit]
@@ -474,6 +510,9 @@ class CrowdStrikeClient:
             if offset >= total:
                 return list_ids
 
+            if offset <= prev_offset:
+                raise Exception("Pagination made no progress")
+
     def hunt_paginator(
         self,
         endpoint: str,
@@ -481,8 +520,9 @@ class CrowdStrikeClient:
         search_subtenants: bool = False,
         subtenant: str | None = None,
     ) -> list:
+        params = dict(params)
         list_ids = []
-        offset = ""
+        retained_bytes = 0
         limit = None
         if params.get("limit"):
             limit = params.pop("limit")
@@ -497,19 +537,40 @@ class CrowdStrikeClient:
             if configured:
                 subtenants.extend(configured)
 
-        for sub in subtenants:
+        self._last_hunt_total = 0
+        self._last_hunt_total_known = True
+        self._last_hunt_truncated = False
+        for subtenant_index, sub in enumerate(subtenants):
+            offset = ""
+            page_count = 0
+            recorded_total = False
             while True:
+                page_count += 1
+                if page_count > MAX_PAGINATION_PAGES:
+                    raise Exception("Pagination exceeded the maximum page count")
                 params.update({"offset": offset, "limit": 100})
                 try:
                     response = self.make_rest_call(
-                        endpoint, params=params, subtenant=sub
+                        endpoint,
+                        params=params,
+                        subtenant=sub,
+                        max_response_bytes=MAX_PAGE_RESPONSE_BYTES,
                     )
                 except Exception as e:
                     if "Error details: 404" in str(e):
                         break
                     raise
 
-                offset = response.get("meta", {}).get("pagination", {}).get("offset")
+                pagination = response.get("meta", {}).get("pagination", {})
+                next_offset = pagination.get("offset")
+                resources = response.get("resources", [])
+                if not isinstance(resources, list):
+                    raise Exception("Invalid paginated resources returned by server")
+
+                total = pagination.get("total")
+                if not recorded_total and isinstance(total, int) and total >= 0:
+                    self._last_hunt_total += total
+                    recorded_total = True
 
                 if response.get("errors"):
                     error = response["errors"][0]
@@ -519,16 +580,43 @@ class CrowdStrikeClient:
                         )
                     )
 
-                if response.get("resources"):
-                    list_ids.extend(response["resources"])
+                if resources:
+                    page_bytes = len(json.dumps(resources, ensure_ascii=False).encode())
+                    if retained_bytes + page_bytes > MAX_PAGINATION_BYTES:
+                        raise Exception("Pagination exceeded the maximum result size")
+                    if len(list_ids) + len(resources) > MAX_PAGINATION_RESULTS:
+                        raise Exception("Pagination exceeded the maximum result count")
+                    list_ids.extend(resources)
+                    retained_bytes += page_bytes
 
                 if limit and len(list_ids) >= limit:
+                    if not recorded_total:
+                        self._last_hunt_total_known = False
+                    self._last_hunt_truncated = (
+                        len(list_ids) > limit
+                        or bool(next_offset)
+                        or bool(pagination.get("next_page"))
+                        or subtenant_index < len(subtenants) - 1
+                        or (
+                            self._last_hunt_total_known
+                            and self._last_hunt_total > limit
+                        )
+                    )
                     return list_ids[:limit]
 
-                if not offset and not response.get("meta", {}).get(
-                    "pagination", {}
-                ).get("next_page"):
+                has_next_page = bool(pagination.get("next_page"))
+                if not next_offset and not has_next_page:
                     break
+
+                if not resources or next_offset == offset:
+                    raise Exception("Pagination made no progress")
+                offset = next_offset
+
+            if not recorded_total:
+                self._last_hunt_total_known = False
+
+        if self._last_hunt_total_known and self._last_hunt_total > len(list_ids):
+            self._last_hunt_truncated = True
 
         return list_ids
 
@@ -576,6 +664,13 @@ class CrowdStrikeClient:
         Returns (flag, confirmed_ids). ``flag`` is True when some inputs could not
         be resolved (count mismatch), in which case ``confirmed_ids`` is empty.
         """
+        if key == "device_id":
+            valid_item = re.compile(r"^[A-Fa-f0-9]{32}$").fullmatch
+        else:
+            valid_item = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,252}$").fullmatch
+        if any(not valid_item(item) for item in list_items):
+            return True, []
+
         filter_str = "".join(f"{key}: '{item}', " for item in list_items)
         filter_str = filter_str[:-2]
 
@@ -585,9 +680,40 @@ class CrowdStrikeClient:
             subtenant=subtenant,
         )
 
-        if len(list_items) != len(check_items):
+        resolved_ids = list(check_items)
+        if len(list_items) != len(resolved_ids):
             return True, []
-        return False, list(check_items)
+
+        if key == "device_id":
+            if {item.casefold() for item in list_items} != {
+                item.casefold() for item in resolved_ids
+            }:
+                return True, []
+            return False, resolved_ids
+
+        id_tenant_map = (
+            check_items
+            if isinstance(check_items, dict)
+            else {device_id: subtenant for device_id in resolved_ids}
+        )
+        tenant_ids: dict = {}
+        for device_id, tenant in id_tenant_map.items():
+            tenant_ids.setdefault(tenant, []).append(device_id)
+
+        resolved_hostnames = set()
+        for tenant, device_ids in tenant_ids.items():
+            response = self.make_rest_call(
+                CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT,
+                json_data={"ids": device_ids},
+                subtenant=tenant,
+            )
+            resolved_hostnames.update(
+                str(device.get("hostname", "")).casefold()
+                for device in response.get("resources", [])
+            )
+        if {item.casefold() for item in list_items} != resolved_hostnames:
+            return True, []
+        return False, resolved_ids
 
     def check_device_params(self, param: dict, subtenant: str | None = None) -> list:
         """Validate and resolve device_id/hostname params into a device-ID list."""
@@ -708,16 +834,17 @@ class CrowdStrikeClient:
                     subtenant=subtenant,
                     method="post",
                 )
-                if not response.get("resources"):
+                resources = response.get("resources", [])
+                if len(resources) != len(batch):
                     raise ValueError(
-                        "No action could be performed on the provided devices"
+                        "The device action did not complete for every requested device"
                     )
-                results.extend(response.get("resources"))
+                results.extend(resources)
                 del list_ids[: min(100, len(list_ids))]
             return results
 
         if action_name in ("add-hosts", "remove-hosts"):
-            response = {}
+            results = []
             while list_ids:
                 batch = list_ids[: min(100, len(list_ids))]
                 data = {
@@ -732,11 +859,12 @@ class CrowdStrikeClient:
                     data=json.dumps(data),
                     method="post",
                 )
+                if not response.get("resources"):
+                    raise ValueError(
+                        "No action could be performed on the provided devices"
+                    )
+                results.extend(response["resources"])
                 del list_ids[: min(100, len(list_ids))]
-
-            if not response.get("resources"):
-                raise ValueError("No action could be performed on the provided devices")
-            results.extend(response.get("resources"))
             return results
 
         raise ValueError("Incorrect action name")
@@ -749,42 +877,78 @@ class CrowdStrikeClient:
     ) -> list:
         """Poll for RTR command results. Returns the list of polled response dicts."""
         timeout_segment_length = 5
-        timeout_segments = timeout / timeout_segment_length
-
+        deadline = time.monotonic() + timeout
         results: list = []
-        count = 0
-        while count < int(timeout_segments):
-            count += 1
+        while time.monotonic() < deadline:
             sequence_id = 0
             params = {"cloud_request_id": cloud_request_id, "sequence_id": sequence_id}
-            resp_json = self.make_rest_call(endpoint, params=params)
+            resp_json = self.make_rest_call(
+                endpoint, params=params, max_response_bytes=MAX_COMMAND_RESULT_BYTES
+            )
 
             resources = resp_json.get("resources")
-            if resources and len(resources):
+            if resources:
                 if resources[0].get("complete", False):
-                    while True:
+                    result_bytes = 0
+                    previous_response_sequence = None
+                    for _page in range(MAX_PAGINATION_PAGES):
+                        if time.monotonic() >= deadline:
+                            raise Exception(
+                                "Timeout while fetching command result sequences"
+                            )
                         params = {
                             "cloud_request_id": cloud_request_id,
                             "sequence_id": sequence_id,
                         }
-                        resp_json = self.make_rest_call(endpoint, params=params)
-
-                        if (
-                            resources[0].get("complete")
-                            and resources[0].get("stderr") is not None
-                            and resp_json.get("resources", [{}])[0].get("sequence_id")
-                        ):
+                        remaining_bytes = MAX_COMMAND_RESULT_BYTES - result_bytes
+                        if remaining_bytes <= 0:
+                            raise Exception("Command results exceeded the maximum size")
+                        resp_json = self.make_rest_call(
+                            endpoint,
+                            params=params,
+                            max_response_bytes=remaining_bytes,
+                        )
+                        errors = resp_json.get("errors", [])
+                        if errors:
                             raise Exception(
-                                "Errors occurred while executing command {}".format(
-                                    "\r\n".join(resources[0].get("stderr"))
+                                "Errors occurred while executing command: {}".format(
+                                    "\r\n".join(
+                                        str(error.get("message")) for error in errors
+                                    )
                                 )
                             )
 
+                        page_resources = resp_json.get("resources", [])
+                        if not page_resources:
+                            raise Exception(
+                                "Command result sequence returned no resources"
+                            )
+                        resource = page_resources[0]
+                        if resource.get("stderr"):
+                            raise Exception(
+                                "Errors occurred while executing command {}".format(
+                                    "\r\n".join(resource["stderr"])
+                                )
+                            )
+
+                        page_bytes = len(json.dumps(resp_json, default=str).encode())
+                        if result_bytes + page_bytes > MAX_COMMAND_RESULT_BYTES:
+                            raise Exception("Command results exceeded the maximum size")
                         results.append(resp_json)
-                        if not resp_json.get("resources", [{}])[0].get("sequence_id"):
+                        result_bytes += page_bytes
+
+                        response_sequence = resource.get("sequence_id")
+                        if not response_sequence:
                             return results
 
+                        if response_sequence == previous_response_sequence:
+                            raise Exception("Command result sequence made no progress")
+                        previous_response_sequence = response_sequence
+
                         sequence_id += 1
+                    raise Exception(
+                        "Command results exceeded the maximum sequence count"
+                    )
             elif len(resp_json.get("errors", [])):
                 errors = [err.get("message") for err in resp_json.get("errors")]
                 raise Exception(
@@ -793,7 +957,7 @@ class CrowdStrikeClient:
                     )
                 )
 
-            time.sleep(timeout_segment_length)
+            time.sleep(min(timeout_segment_length, max(0, deadline - time.monotonic())))
 
         raise Exception(
             "Timeout while waiting for command execution. Please use cloud_request_id "

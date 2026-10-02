@@ -13,12 +13,14 @@
 
 import json
 
+from pydantic import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
 from ..consts import CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT
+from ._ioa_enabled import normalize_ioa_enabled
 
 
 class UpdateIoaRuleParams(Params):
@@ -45,9 +47,17 @@ class UpdateIoaRuleParams(Params):
         description="JSON list of field values for the rule", required=True
     )
     comment: str = Param(description="Comment for the rule", required=False)
-    enabled: bool = Param(
-        description="Whether the rule is enabled", required=False, default=False
+    enabled: str = Param(
+        description="Choose whether to preserve, enable, or disable the rule",
+        required=False,
+        default="preserve",
+        value_list=["preserve", "enable", "disable"],
     )
+
+    @field_validator("enabled", mode="before")
+    @classmethod
+    def normalize_enabled(cls, value: object) -> object:
+        return normalize_ioa_enabled(value)
 
 
 class UpdateIoaRuleFieldValueOption(PermissiveActionOutput):
@@ -153,7 +163,6 @@ def update_ioa_rule(
             {
                 "instance_id": params.rule_id,
                 "pattern_severity": params.severity,
-                "enabled": params.enabled,
                 "name": params.name,
                 "description": params.description,
                 "disposition_id": params.disposition_id,
@@ -161,6 +170,31 @@ def update_ioa_rule(
             }
         ],
     }
+    if params.enabled not in {"preserve", "enable", "disable"}:
+        raise ValueError("enabled must be preserve, enable, or disable")
+    if params.enabled == "preserve":
+        current_rules = client.make_rest_call(
+            CROWDSTRIKE_IOA_CREATE_RULE_ENDPOINT,
+            params={"ids": params.rule_id},
+            method="get",
+        )
+        rule = next(
+            (
+                rule
+                for rule in current_rules.get("resources", [])
+                if rule.get("instance_id") == params.rule_id
+                and rule.get("rulegroup_id") == params.rule_group_id
+            ),
+            None,
+        )
+        if rule is None or not isinstance(rule.get("enabled"), bool):
+            raise ValueError(
+                "CrowdStrike did not return the current rule enabled state"
+            )
+        enabled = rule["enabled"]
+    else:
+        enabled = params.enabled == "enable"
+    update_params["rule_updates"][0]["enabled"] = enabled
     if params.comment:
         update_params["comment"] = params.comment
 

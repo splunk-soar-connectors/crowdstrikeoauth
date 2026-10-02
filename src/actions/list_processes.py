@@ -48,16 +48,38 @@ class ListProcessesOutput(PermissiveActionOutput):
     ioc: str | None = None
     ioc_type: str | None = None
     limit: int | None = None
+    summary_process_count: int | None = None
+    summary_total_process_count: int | None = None
+    summary_truncated: bool | None = None
 
 
 class ListProcessesSummary(ActionOutput):
     process_count: int
+    total_process_count: int | None = None
+    truncated: bool
+
+
+def _build_process_summary(client, process_count: int) -> ListProcessesSummary:
+    total = (
+        client._last_hunt_total
+        if getattr(client, "_last_hunt_total_known", False)
+        else None
+    )
+    truncated = bool(getattr(client, "_last_hunt_truncated", False)) or (
+        total is not None and process_count < total
+    )
+    return ListProcessesSummary(
+        process_count=process_count,
+        total_process_count=total,
+        truncated=truncated,
+    )
 
 
 @app.view_handler(template="crowdstrike_process_list_view.html")
 def list_processes_view(outputs: list[ListProcessesOutput]) -> dict:
     data = [o.model_dump() for o in outputs]
     param = {}
+    summary = {"process_count": len(data)}
     if outputs:
         first = outputs[0]
         param = {
@@ -66,12 +88,21 @@ def list_processes_view(outputs: list[ListProcessesOutput]) -> dict:
             "ioc_type": first.ioc_type,
             "limit": first.limit,
         }
+        summary = {
+            "process_count": first.summary_process_count,
+            "total_process_count": first.summary_total_process_count,
+            "truncated": first.summary_truncated,
+        }
+        for row in data:
+            row.pop("summary_process_count", None)
+            row.pop("summary_total_process_count", None)
+            row.pop("summary_truncated", None)
     return {
         "results": [
             {
                 "data": data,
                 "param": param,
-                "summary": {"process_count": len(data)},
+                "summary": summary,
             }
         ]
     }
@@ -103,12 +134,13 @@ def list_processes(
     response = client.hunt_paginator(CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH, api_data)
 
     if not response:
-        soar.set_summary(ListProcessesSummary(process_count=0))
+        soar.set_summary(_build_process_summary(client, 0))
         soar.set_message(
             "No resources found from the response for the list processes action"
         )
         return []
 
+    summary = _build_process_summary(client, len(response))
     outputs = [
         ListProcessesOutput(
             falcon_process_id=process_id,
@@ -116,10 +148,22 @@ def list_processes(
             ioc=params.ioc,
             ioc_type=ioc_type,
             limit=limit,
+            summary_process_count=summary.process_count,
+            summary_total_process_count=summary.total_process_count,
+            summary_truncated=summary.truncated,
         )
         for process_id in response
     ]
 
-    soar.set_summary(ListProcessesSummary(process_count=len(response)))
-    soar.set_message(f"Process count: {len(response)}")
+    soar.set_summary(summary)
+    if summary.total_process_count is None:
+        soar.set_message(
+            f"Process count: {len(response)}; provider total unavailable; "
+            f"truncated: {summary.truncated}"
+        )
+    else:
+        soar.set_message(
+            f"Process count: {len(response)} of {summary.total_process_count}; "
+            f"truncated: {summary.truncated}"
+        )
     return outputs

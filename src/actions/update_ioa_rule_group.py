@@ -11,6 +11,7 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
+from pydantic import field_validator
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
@@ -20,6 +21,7 @@ from ..consts import (
     CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
     CROWDSTRIKE_UPDATE_PREVENTION_ACTIONS_ENDPOINT,
 )
+from ._ioa_enabled import normalize_ioa_enabled
 
 
 class UpdateIoaRuleGroupParams(Params):
@@ -32,11 +34,13 @@ class UpdateIoaRuleGroupParams(Params):
     version: int = Param(description="Version of the rule group", required=True)
     name: str = Param(description="Name of the rule group", required=True)
     description: str = Param(description="Description of the rule group", required=True)
-    enabled: bool = Param(
-        description="Whether the rule group is enabled",
+    enabled: str = Param(
+        description="Choose whether to preserve, enable, or disable the rule group",
         required=False,
-        default=False,
+        default="preserve",
+        value_list=["preserve", "enable", "disable"],
     )
+
     comment: str = Param(description="Comment for the update", required=True)
     assign_policy_id: str = Param(
         description="Comma-separated list of prevention policy IDs to attach",
@@ -50,6 +54,11 @@ class UpdateIoaRuleGroupParams(Params):
         allow_list=True,
         cef_types=["crowdstrike prevention policy id"],
     )
+
+    @field_validator("enabled", mode="before")
+    @classmethod
+    def normalize_enabled(cls, value: object) -> object:
+        return normalize_ioa_enabled(value)
 
 
 class UpdateIoaRuleGroupResource(PermissiveActionOutput):
@@ -110,9 +119,12 @@ def update_ioa_rule_group(
         "rulegroup_version": params.version,
         "name": params.name,
         "description": params.description,
-        "enabled": params.enabled,
         "comment": params.comment,
     }
+    if params.enabled not in {"preserve", "enable", "disable"}:
+        raise ValueError("enabled must be preserve, enable, or disable")
+    if params.enabled != "preserve":
+        update_params["enabled"] = params.enabled == "enable"
     resp_json = client.make_rest_call(
         CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT,
         json_data=update_params,

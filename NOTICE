@@ -116,7 +116,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 @@@@============================================================================
 
-Library: PyJWT - 2.13.0
+Library: PyJWT - 2.15.1
 Homepage: https://github.com/jpadilla/pyjwt
 License: MIT
 License Text:
@@ -384,7 +384,7 @@ SOFTWARE.
 
 @@@@============================================================================
 
-Library: anyio - 4.14.0
+Library: anyio - 4.14.2
 Homepage: https://anyio.readthedocs.io/en/stable/versionhistory.html
 License: MIT
 License Text:

@@ -233,9 +233,12 @@ CROWDSTRIKE_GET_ZERO_TRUST_ASSESSMENT_ENDPOINT = (
 CROWDSTRIKE_BASE_ENDPOINT = "/sensors/entities/datafeed/v2"
 CROWDSTRIKE_FALCONX_API_LIMIT = 5000
 CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
+    "macos catalina 10.15": 400,
+    "linux ubuntu 20.04, 64-bit": 310,
     "linux ubuntu 16.04, 64-bit": 300,
     "android (static analysis)": 200,
     "windows 10, 64-bit": 160,
+    "windows 11, 64-bit": 140,
     "windows 7, 64-bit": 110,
     "windows 7, 32-bit": 100,
 }

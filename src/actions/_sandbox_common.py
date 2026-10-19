@@ -14,6 +14,7 @@
 import time
 
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
+from soar_sdk.logging import getLogger
 
 from ..consts import (
     CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT,
@@ -24,6 +25,9 @@ from ..consts import (
     CROWDSTRIKE_UPLOAD_FILE_ENDPOINT,
 )
 from ..helper import CrowdStrikeClient, validate_integer
+
+
+logger = getLogger()
 
 
 ACTION_SCRIPT_LIST = [
@@ -301,6 +305,9 @@ def poll_for_detonation(
     counter = 0
     prev_resources: list = []
     while counter < poll_interval:
+        logger.progress(
+            f"Waiting for Falcon Sandbox report, poll {counter + 1}/{poll_interval}..."
+        )
         response = client.make_rest_call(
             CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT, params={"ids": resource_id}
         )

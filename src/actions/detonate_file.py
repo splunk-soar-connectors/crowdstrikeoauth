@@ -47,9 +47,12 @@ API_SORT_LIST = [
 ]
 
 ENVIRONMENT_LIST = [
+    "macOS Catalina 10.15",
+    "Linux Ubuntu 20.04, 64-bit",
     "Linux Ubuntu 16.04, 64-bit",
     "Android (static analysis)",
     "Windows 10, 64-bit",
+    "Windows 11, 64-bit",
     "Windows 7, 64-bit",
     "Windows 7, 32-bit",
 ]

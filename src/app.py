@@ -182,74 +182,148 @@ def _poll_detection_events(
         )
     )
 
-    app_id = asset.app_id or app.appid
-    feed = client.get_datafeed(app_id, subtenant=subtenant)
-
+    tenant = subtenant or "main"
+    stage = "feed discovery"
     events: list = []
-    counter = 0
-    total_blank_lines_count = 0
-    start_time = time.time()
-
-    response = client.stream_datafeed(feed["data_feed_url"], feed["token"], lower_id)
-    if response.status_code != 200:
-        try:
-            err_message = response.json()["errors"][0]["message"]
-        except Exception:
-            err_message = str(response.status_code)
-        raise Exception(
-            f"Error from server while opening datafeed stream: {err_message}"
+    skipped_records = 0
+    stop_reason = "stream exhausted"
+    try:
+        logger.info(f"Poll stage={stage}, tenant={tenant}, checkpoint={lower_id}")
+        feed = client.get_datafeed(
+            asset.app_id or str(app.app_meta_info["appid"]), subtenant=subtenant
         )
+        stage = "stream opening"
+        logger.info(f"Poll stage={stage}, tenant={tenant}")
+        response = client.stream_datafeed(
+            feed["data_feed_url"], feed["token"], lower_id
+        )
+        try:
+            if response.status_code != 200:
+                raise RuntimeError(
+                    f"Error opening CrowdStrike datafeed stream: HTTP {response.status_code}"
+                )
 
-    for stream_data in response.iter_lines(chunk_size=None):
-        if int(time.time() - start_time) > (feed["refresh_interval"] - 60):
-            try:
-                client.refresh_datafeed_session(feed["refresh_url"], subtenant)
-                start_time = time.time()
-            except Exception as e:
-                logger.debug(f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}: {e}")
-                break
-
-        if stream_data is None:
-            logger.debug(CROWDSTRIKE_NO_DATA_MESSAGE)
-            break
-
-        if not stream_data.strip():
-            counter += 1
-            total_blank_lines_count += 1
-            if max_crlf and counter > max_crlf:
-                logger.debug(CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter))
-                break
-            logger.debug(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
-            continue
-
-        ok, event = client.parse_stream_event(stream_data)
-        if not ok:
-            logger.debug(f"Failed to parse stream_data: {event}")
-            continue
-
-        if (
-            event
-            and event.get("metadata", {}).get("eventType") in CROWDSTRIKE_EVENT_TYPES
-        ):
-            events.append(event)
+            stage = "stream reading"
+            logger.info(f"Poll stage={stage}, tenant={tenant}")
             counter = 0
+            total_blank_lines_count = 0
+            start_time = time.time()
+            for stream_data in response.iter_lines(chunk_size=None):
+                if int(time.time() - start_time) > (feed["refresh_interval"] - 60):
+                    try:
+                        client.refresh_datafeed_session(feed["refresh_url"], subtenant)
+                        start_time = time.time()
+                    except Exception:
+                        if not events:
+                            raise
+                        stop_reason = "session refresh failed"
+                        logger.warning(
+                            f"{CROWDSTRIKE_REFRESH_TOKEN_ERROR}; tenant={tenant}, "
+                            f"processing {len(events)} valid events already received"
+                        )
+                        break
 
-        if max_events and len(events) >= max_events:
-            events = events[:max_events]
-            break
+                if stream_data is None:
+                    stop_reason = "no data"
+                    logger.debug(CROWDSTRIKE_NO_DATA_MESSAGE)
+                    break
+                if not stream_data.strip():
+                    counter += 1
+                    total_blank_lines_count += 1
+                    if max_crlf and counter > max_crlf:
+                        stop_reason = "blank-line limit"
+                        logger.debug(
+                            CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE.format(counter)
+                        )
+                        break
+                    logger.debug(CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE.format(counter))
+                    continue
 
-        logger.progress(CROWDSTRIKE_PULLED_EVENTS_MESSAGE.format(len(events)))
+                ok, event = client.parse_stream_event(stream_data)
+                if (
+                    not ok
+                    or not isinstance(event, dict)
+                    or not isinstance(event.get("metadata"), dict)
+                ):
+                    skipped_records += 1
+                    logger.warning(
+                        f"Skipping malformed CrowdStrike stream record; tenant={tenant}"
+                    )
+                    continue
+                metadata = event["metadata"]
+                event_type = metadata.get("eventType")
+                if event_type not in CROWDSTRIKE_EVENT_TYPES:
+                    continue
+                details = event.get("event")
+                offset = metadata.get("offset")
+                name_key = (
+                    "DetectName" if event_type == "DetectionSummaryEvent" else "Name"
+                )
+                if (
+                    not isinstance(details, dict)
+                    or type(offset) is not int
+                    or offset < 0
+                    or (
+                        asset.collate
+                        and (
+                            not isinstance(details.get(name_key), str)
+                            or not details[name_key].strip()
+                        )
+                    )
+                ):
+                    skipped_records += 1
+                    logger.warning(
+                        f"Skipping malformed CrowdStrike detection; tenant={tenant}"
+                    )
+                    continue
+                events.append(event)
+                counter = 0
+                if max_events and len(events) >= max_events:
+                    stop_reason = "event limit"
+                    break
+                logger.progress(CROWDSTRIKE_PULLED_EVENTS_MESSAGE.format(len(events)))
+            logger.debug(
+                CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE.format(total_blank_lines_count)
+            )
+        finally:
+            response.close()
 
-    logger.debug(CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE.format(total_blank_lines_count))
-    logger.info(CROWDSTRIKE_GOT_EVENTS_MESSAGE.format(len(events)))
+        logger.info(
+            f"Poll stream complete: tenant={tenant}, events={len(events)}, "
+            f"skipped={skipped_records}, stop_reason={stop_reason}"
+        )
+        logger.info(CROWDSTRIKE_GOT_EVENTS_MESSAGE.format(len(events)))
+        if skipped_records:
+            logger.warning(
+                f"Skipped {skipped_records} malformed records; tenant={tenant}. "
+                "Saving valid events may permanently skip malformed records before the next checkpoint."
+            )
+        if events:
+            stage = "event parsing"
+            logger.info(f"Poll stage={stage}, tenant={tenant}, events={len(events)}")
+            results = events_parser.parse_events(events, asset.collate)
+            if not results:
+                raise ValueError("CrowdStrike parser produced no ingestion results")
+            stage = "yielding results"
+            logger.info(f"Poll stage={stage}, tenant={tenant}")
+            yield from _yield_results(results)
 
-    if events:
-        results = events_parser.parse_events(events, asset.collate)
-        yield from _yield_results(results)
-
-        if not is_poll_now:
-            last_offset_id = events[-1]["metadata"]["offset"]
-            asset.ingest_state[offset_key] = last_offset_id + 1
+            if not is_poll_now:
+                stage = "checkpoint staging"
+                next_offset = max(
+                    lower_id, max(event["metadata"]["offset"] for event in events) + 1
+                )
+                asset.ingest_state[offset_key] = next_offset
+                logger.info(
+                    f"Checkpoint staged: tenant={tenant}, previous={lower_id}, next={next_offset}; "
+                    "commit pending SDK artifact saves"
+                )
+    except Exception:
+        logger.error(
+            f"Poll failed: stage={stage}, tenant={tenant}, events={len(events)}, "
+            f"skipped={skipped_records}, checkpoint_start={lower_id}"
+        )
+        raise
 
 
 def _yield_results(results: list) -> Iterator[Container | Artifact]:
@@ -257,7 +331,9 @@ def _yield_results(results: list) -> Iterator[Container | Artifact]:
         container = result.get("container")
         artifacts = result.get("artifacts")
         if not container or not artifacts:
-            continue
+            raise ValueError(
+                "CrowdStrike parser produced an incomplete ingestion result"
+            )
         yield Container(**container)
         for artifact in artifacts:
             yield Artifact(**artifact)

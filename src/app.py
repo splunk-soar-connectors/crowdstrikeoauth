@@ -256,8 +256,10 @@ def _poll_detection_events(
                     continue
                 details = event.get("event")
                 offset = metadata.get("offset")
-                name_key = (
-                    "DetectName" if event_type == "DetectionSummaryEvent" else "Name"
+                name_key, hostname_key = (
+                    ("DetectName", "ComputerName")
+                    if event_type == "DetectionSummaryEvent"
+                    else ("Name", "Hostname")
                 )
                 if (
                     not isinstance(details, dict)
@@ -268,6 +270,8 @@ def _poll_detection_events(
                         and (
                             not isinstance(details.get(name_key), str)
                             or not details[name_key].strip()
+                            or not isinstance(details.get(hostname_key), str)
+                            or not details[hostname_key].strip()
                         )
                     )
                 ):

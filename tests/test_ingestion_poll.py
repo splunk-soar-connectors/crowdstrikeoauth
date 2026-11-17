@@ -185,8 +185,78 @@ def test_malformed_records_allow_valid_events_to_commit(
 
 
 @pytest.mark.parametrize(
+    "event_type,hostname_key",
+    [
+        ("DetectionSummaryEvent", "ComputerName"),
+        ("EppDetectionSummaryEvent", "Hostname"),
+    ],
+)
+@pytest.mark.parametrize("collate", [False, True])
+def test_missing_hostname_does_not_block_ingestion(
+    poll,
+    client,
+    asset,
+    state_backend,
+    detection_event,
+    event_type,
+    hostname_key,
+    collate,
+):
+    asset.collate = collate
+    missing_hostname = detection_event(42, event_type, sub_events=False)
+    missing_hostname["event"].pop(hostname_key)
+    batches = iter(
+        [
+            [
+                detection_event(41, event_type, sub_events=False),
+                missing_hostname,
+                detection_event(43, event_type, sub_events=False),
+            ],
+            [detection_event(44, event_type, sub_events=False)],
+        ]
+    )
+    response, _, save = poll
+    response.iter_lines.side_effect = lambda **kwargs: iter(
+        json.dumps(event).encode() for event in next(batches)
+    )
+    before = copy.deepcopy(state_backend.stored)
+
+    assert run_poll() is True
+    assert asset.ingest_state["last_offset_id"] == 44
+    assert state_backend.stored != before
+    saved_ids = {
+        artifact["source_data_identifier"]
+        for call in save.call_args_list
+        for artifact in call.args[0]
+    }
+    assert saved_ids == ({"41", "43"} if collate else {"41", "42", "43"})
+
+    save.reset_mock()
+    assert run_poll() is True
+    assert client.stream_datafeed.call_args.args[2] == 44
+    assert asset.ingest_state["last_offset_id"] == 45
+    assert [
+        artifact["source_data_identifier"]
+        for call in save.call_args_list
+        for artifact in call.args[0]
+    ] == ["44"]
+    assert response.close.call_count == 2
+
+
+@pytest.mark.parametrize(
     "field,value",
-    [("offset", True), ("offset", -1), ("offset", "42"), ("event", []), ("name", " ")],
+    [
+        ("offset", True),
+        ("offset", -1),
+        ("offset", "42"),
+        ("event", []),
+        ("name", " "),
+        ("hostname", None),
+        ("hostname", ""),
+        ("hostname", " "),
+        ("hostname", 123),
+        ("hostname", []),
+    ],
 )
 def test_invalid_detection_structure_is_skipped(
     poll, asset, detection_event, field, value
@@ -196,6 +266,8 @@ def test_invalid_detection_structure_is_skipped(
         event["metadata"][field] = value
     elif field == "name":
         event["event"]["DetectName"] = value
+    elif field == "hostname":
+        event["event"]["ComputerName"] = value
     else:
         event[field] = value
     poll[0].iter_lines.side_effect = lambda **kwargs: iter([json.dumps(event).encode()])

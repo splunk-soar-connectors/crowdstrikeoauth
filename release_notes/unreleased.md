@@ -5,3 +5,4 @@
 * Validate OAuth token caches, token responses, and datafeed descriptors; retain the correct tenant during session refresh and report token persistence failures clearly (PAPP-37903).
 * Close streams reliably and identify ingestion stages, partial batches, and checkpoint staging in logs. Checkpoints commit through the SDK only after successful saves.
 * Save valid events received before a session-refresh failure and warn when malformed records are skipped. Committing a later valid offset can permanently skip earlier malformed records. Transport, parsing, and save failures preserve the previous checkpoint.
+* Skip detections with missing or invalid hostnames during collation so later valid events can be ingested.

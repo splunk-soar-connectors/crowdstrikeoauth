@@ -43,7 +43,6 @@ from .consts import (
     CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING,
     CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT,
     CROWDSTRIKE_OAUTH_TOKEN_STRING,
-    CROWDSTRIKE_RESOURCES_KEY_EMPTY_ERROR,
     CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR,
     CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE,
     CROWDSTRIKEOAUTH_EMPTY_RESPONSE_ERROR,
@@ -92,20 +91,39 @@ class CrowdStrikeClient:
     # Token state persistence
     # ------------------------------------------------------------------ #
     def _load_tokens(self) -> dict:
-        state = dict(self.asset.auth_state.get_all())
-        tokens = state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING, {}).get(
-            CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING
+        state = self.asset.auth_state.get_all()
+        if not isinstance(state, dict):
+            return {}
+        token_state = state.get(CROWDSTRIKE_OAUTH_TOKEN_STRING)
+        if not isinstance(token_state, dict):
+            return {}
+        tokens = token_state.get(CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING)
+        if not isinstance(tokens, dict):
+            return {}
+        return {
+            key: dict(value)
+            for key, value in tokens.items()
+            if isinstance(key, str) and self._valid_token(value)
+        }
+
+    @staticmethod
+    def _valid_token(value) -> bool:
+        return (
+            isinstance(value, dict)
+            and isinstance(value.get("access_token"), str)
+            and bool(value["access_token"].strip())
         )
-        if isinstance(tokens, dict):
-            return dict(tokens)
-        return {}
 
     def _save_tokens(self) -> None:
-        state = dict(self.asset.auth_state.get_all())
+        state = self.asset.auth_state.get_all()
+        state = dict(state) if isinstance(state, dict) else {}
         state[CROWDSTRIKE_OAUTH_TOKEN_STRING] = {
             CROWDSTRIKE_OAUTH_ACCESS_TOKEN_STRING: self._tokens
         }
         self.asset.auth_state.put_all(state)
+        # Native save_state can return False without the SDK raising an exception.
+        if self.asset.auth_state.get_all() != state:
+            raise RuntimeError("CrowdStrike OAuth token state was not persisted")
 
     @staticmethod
     def _token_key(member_cid: str | None) -> str:
@@ -130,24 +148,33 @@ class CrowdStrikeClient:
             resp_json = self._make_rest_call(
                 url, headers=headers, data=data, method="post"
             )
+            if not self._valid_token(resp_json):
+                raise ValueError("CrowdStrike token response has no valid access_token")
         except Exception:
             self._tokens.pop(token_key, None)
-            self._save_tokens()
+            try:
+                self._save_tokens()
+            except Exception:
+                logger.warning("Unable to persist invalid-token cache cleanup")
             raise
 
         self._tokens[token_key] = resp_json
-        self._save_tokens()
+        try:
+            self._save_tokens()
+        except Exception as e:
+            self._tokens.pop(token_key, None)
+            raise RuntimeError("Unable to persist CrowdStrike OAuth token") from e
 
-    def access_token(self, subtenant: str | None = None) -> str | None:
+    def access_token(self, subtenant: str | None = None) -> str:
         """Return the current OAuth access token for the given tenant, fetching one if needed."""
         if subtenant and subtenant == "main":
             subtenant = None
         token_key = self._token_key(subtenant)
         token = self._tokens.get(token_key, {})
-        if not token.get("access_token"):
+        if not self._valid_token(token):
             self._get_token(member_cid=subtenant)
             token = self._tokens[token_key]
-        return token.get("access_token")
+        return token["access_token"]
 
     # ------------------------------------------------------------------ #
     # Streaming data feed (on_poll)
@@ -162,26 +189,48 @@ class CrowdStrikeClient:
             CROWDSTRIKE_BASE_ENDPOINT, params=params, subtenant=subtenant
         )
 
-        if not resp.get("meta"):
-            raise Exception(CROWDSTRIKE_META_KEY_EMPTY_ERROR)
+        if not isinstance(resp, dict):
+            raise ValueError("CrowdStrike datafeed response must be an object")
+        if not isinstance(resp.get("meta"), dict) or not resp["meta"]:
+            raise ValueError(CROWDSTRIKE_META_KEY_EMPTY_ERROR)
 
         resources = resp.get("resources")
-        if not resources:
-            raise Exception(CROWDSTRIKE_RESOURCES_KEY_EMPTY_ERROR)
+        if not isinstance(resources, list) or not resources:
+            raise ValueError(
+                "CrowdStrike returned no valid datafeed resources. "
+                "Check Event Streams API access and retry."
+            )
+        if not isinstance(resources[0], dict):
+            raise ValueError("CrowdStrike datafeed resource must be an object")
 
         data_feed_url = resources[0].get("dataFeedURL")
-        if not data_feed_url:
-            raise Exception(CROWDSTRIKE_DATAFEED_EMPTY_ERROR)
+        if not isinstance(data_feed_url, str) or not data_feed_url.strip():
+            raise ValueError(CROWDSTRIKE_DATAFEED_EMPTY_ERROR)
 
         session_token = resources[0].get("sessionToken")
-        if not session_token:
-            raise Exception(CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR)
+        if (
+            not isinstance(session_token, dict)
+            or not isinstance(session_token.get("token"), str)
+            or not session_token["token"].strip()
+        ):
+            raise ValueError(CROWDSTRIKE_SESSION_TOKEN_NOT_FOUND_ERROR)
+
+        refresh_url = resources[0].get("refreshActiveSessionURL")
+        if not isinstance(refresh_url, str) or not refresh_url.strip():
+            raise ValueError(
+                "CrowdStrike refreshActiveSessionURL is missing or invalid"
+            )
+        refresh_interval = resources[0].get("refreshActiveSessionInterval", 1800)
+        if type(refresh_interval) is not int or refresh_interval <= 0:
+            raise ValueError(
+                "CrowdStrike refreshActiveSessionInterval must be a positive integer"
+            )
 
         return {
             "data_feed_url": data_feed_url,
             "token": session_token["token"],
-            "refresh_url": resources[0].get("refreshActiveSessionURL"),
-            "refresh_interval": resources[0].get("refreshActiveSessionInterval", 1800),
+            "refresh_url": refresh_url,
+            "refresh_interval": refresh_interval,
         }
 
     @staticmethod
@@ -205,14 +254,18 @@ class CrowdStrikeClient:
         self, refresh_url: str, subtenant: str | None = None
     ) -> None:
         """Refresh an active streaming session using the OAuth bearer token."""
-        access_token = self.access_token(subtenant)
         headers = {
-            "Authorization": f"Bearer {access_token}",
             "Connection": "Keep-Alive",
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
-        self.make_rest_call(refresh_url, headers=headers, method="post", append=False)
+        self.make_rest_call(
+            refresh_url,
+            headers=headers,
+            subtenant=subtenant,
+            method="post",
+            append=False,
+        )
 
     def stream_extracted_file(self, session_id: str, sha256: str):
         """Stream the RTR extracted-file-contents archive. Returns the raw streaming response."""
@@ -328,16 +381,9 @@ class CrowdStrikeClient:
         if subtenant and subtenant == "main":
             subtenant = None
 
-        token_key = self._token_key(subtenant)
-        token = self._tokens.get(token_key, {})
-
-        if upload_file or not token.get("access_token"):
+        if upload_file:
             self._get_token(member_cid=subtenant)
-            token = self._tokens[token_key]
-
-        access_token = token.get("access_token")
-        if access_token:
-            headers["Authorization"] = f"Bearer {access_token}"
+        headers["Authorization"] = f"Bearer {self.access_token(subtenant)}"
         if not headers.get("Content-Type"):
             headers["Content-Type"] = "application/json"
 
@@ -352,10 +398,7 @@ class CrowdStrikeClient:
 
         # Token rejected. Refresh and retry once.
         self._get_token(member_cid=subtenant)
-        token = self._tokens[token_key]
-        access_token = token.get("access_token")
-        if access_token:
-            headers["Authorization"] = f"Bearer {access_token}"
+        headers["Authorization"] = f"Bearer {self.access_token(subtenant)}"
         return self._make_rest_call(
             url, headers, params, data, json_data, method, max_response_bytes
         )

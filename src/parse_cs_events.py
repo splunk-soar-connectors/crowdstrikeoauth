@@ -37,13 +37,13 @@ _artifact_common = {
     "label": "event",
     "type": "network",
     "description": "Artifact added by Phantom",
-    "run_automation": False,
+    "run_automation": True,
 }
 
 _sub_artifact_common = {
     "label": "sub event",
     "description": "Artifact added by Phantom",
-    "run_automation": False,
+    "run_automation": True,
 }
 
 _severity_map = {
@@ -325,7 +325,10 @@ def _parse_sub_events(artifacts_list, input_dict, key_name, parent_artifact):
         cef["parentSdi"] = parent_sdi
         artifact["severity"] = parent_artifact["severity"]
         artifacts_list.append(artifact)
-        artifact["source_data_identifier"] = _create_dict_hash(artifact)
+        # Preserve identifiers generated with the previous automation default.
+        artifact["source_data_identifier"] = _create_dict_hash(
+            {**artifact, "run_automation": False}
+        )
         _set_cef_types(artifact, cef)
 
     return len(artifacts_list) - artifacts_len

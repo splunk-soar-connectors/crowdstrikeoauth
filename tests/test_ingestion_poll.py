@@ -517,3 +517,190 @@ def test_invalid_legacy_checkpoint_starts_at_zero(poll, asset, client, checkpoin
     asset.ingest_state["last_offset_id"] = checkpoint
     assert run_poll() is True
     assert client.stream_datafeed.call_args.args[-1] == 0
+
+
+@pytest.mark.parametrize(
+    "legacy,epp,idp,expected",
+    [
+        (None, None, None, ["DetectionSummaryEvent", "EppDetectionSummaryEvent"]),
+        (True, True, False, ["DetectionSummaryEvent", "EppDetectionSummaryEvent"]),
+        (False, True, True, ["EppDetectionSummaryEvent", "IdpDetectionSummaryEvent"]),
+        (False, False, True, ["IdpDetectionSummaryEvent"]),
+    ],
+)
+def test_checkboxes_select_stream_event_types(
+    poll, client, asset, legacy, epp, idp, expected
+):
+    asset.ingest_legacy_detections = legacy
+    asset.ingest_epp_detections = epp
+    asset.ingest_idp_detections = idp
+    assert run_poll() is True
+    assert client.stream_datafeed.call_args.kwargs["event_types"] == expected
+
+
+def test_unset_checkboxes_keep_existing_event_types(asset):
+    assert asset.ingest_legacy_detections is None
+    assert asset.ingest_epp_detections is None
+    assert asset.ingest_idp_detections is None
+    assert connector.get_enabled_event_types(asset) == [
+        "DetectionSummaryEvent",
+        "EppDetectionSummaryEvent",
+    ]
+
+
+def test_no_enabled_event_types_fails_poll(poll, asset, client):
+    asset.ingest_legacy_detections = False
+    asset.ingest_epp_detections = False
+    asset.ingest_idp_detections = False
+    assert run_poll() is False
+    client.stream_datafeed.assert_not_called()
+    assert asset.ingest_state["last_offset_id"] == 40
+    with pytest.raises(ValueError, match="No detection types are enabled"):
+        connector.get_enabled_event_types(asset)
+
+
+@pytest.mark.parametrize("collate", [False, True])
+def test_idp_detections_are_ingested_when_enabled(
+    poll, client, asset, detection_event, collate
+):
+    asset.collate = collate
+    asset.ingest_legacy_detections = False
+    asset.ingest_idp_detections = True
+    epp_missing_host = detection_event(42, "EppDetectionSummaryEvent", False)
+    epp_missing_host["event"].pop("Hostname")
+    lines = [
+        detection_event(41, "EppDetectionSummaryEvent", False),
+        epp_missing_host,
+        detection_event(43, "IdpDetectionSummaryEvent", False),
+        detection_event(45, "DetectionSummaryEvent", False),
+    ]
+    response, save_container, save = poll
+    response.iter_lines.side_effect = lambda **kwargs: iter(
+        json.dumps(event).encode() for event in lines
+    )
+
+    assert run_poll() is True
+    saved_ids = {
+        artifact["source_data_identifier"]
+        for call in save.call_args_list
+        for artifact in call.args[0]
+    }
+    assert saved_ids == ({"41", "43"} if collate else {"41", "42", "43"})
+    assert asset.ingest_state["last_offset_id"] == 44
+    expected_name = (
+        "Identity detection at 2021-01-01T00:00:43Z"
+        if collate
+        else "Identity detection on Unknown Host at 2021-01-01T00:00:43Z"
+    )
+    assert any(expected_name in str(call) for call in save_container.call_args_list)
+
+
+@pytest.mark.parametrize("collate", [False, True])
+def test_nameless_idp_detection_is_ingested_not_skipped(
+    poll, asset, detection_event, collate
+):
+    asset.collate = collate
+    asset.ingest_idp_detections = True
+    event = detection_event(43, "IdpDetectionSummaryEvent", False)
+    event["event"].pop("Name")
+    poll[0].iter_lines.side_effect = lambda **kwargs: iter([json.dumps(event).encode()])
+    assert run_poll() is True
+    assert asset.ingest_state["last_offset_id"] == 44
+    expected_name = (
+        "Unknown Detection at 2021-01-01T00:00:43Z"
+        if collate
+        else "Unknown Detection on Unknown Host at 2021-01-01T00:00:43Z"
+    )
+    assert any(expected_name in str(call) for call in poll[1].call_args_list)
+
+
+@pytest.mark.parametrize("collate", [False, True])
+def test_idp_container_and_artifact_fields(detection_event, collate):
+    event = detection_event(43, "IdpDetectionSummaryEvent", False)
+    event["event"].update(
+        {
+            "SourceEndpointHostName": "idp-host",
+            "SourceAccountDomain": "corp",
+            "SourceAccountName": "jdoe",
+            "SourceEndpointIpAddress": "10.0.0.5",
+        }
+    )
+    results = parser.parse_events([event], collate, ["IdpDetectionSummaryEvent"])
+    assert len(results) == 1
+    container = results[0]["container"]
+    assert container["name"] == "Identity detection on idp-host at 2021-01-01T00:00:43Z"
+    artifact = results[0]["artifacts"][0]
+    assert artifact["name"] == "Suspicious identity activity"
+    assert artifact["severity"] == "high"
+    assert artifact["cef"]["sourceHostName"] == "idp-host"
+    assert artifact["cef"]["sourceNtDomain"] == "corp"
+    assert artifact["cef"]["sourceUserName"] == "jdoe"
+    assert artifact["cef"]["sourceAddress"] == "10.0.0.5"
+    for raw in [
+        "sourceEndpointHostName",
+        "sourceAccountName",
+        "sourceEndpointIpAddress",
+    ]:
+        assert raw not in artifact["cef"]
+    assert parser.parse_events([event], collate) == []
+
+
+def test_unmapped_event_types_are_never_parsed(detection_event):
+    event = detection_event(43, "IdpDetectionSummaryEvent", False)
+    event["metadata"]["eventType"] = "AuthActivityAuditEvent"
+    assert parser.parse_events([event], False, ["AuthActivityAuditEvent"]) == []
+
+
+@pytest.mark.parametrize(
+    "details,expected",
+    [
+        ({"SeverityName": "Critical"}, "high"),
+        ({"SeverityName": "Informational"}, "low"),
+        ({"SeverityName": "bogus", "Severity": 90}, "high"),
+        ({"SeverityName": "bogus", "Severity": 60}, "high"),
+        ({"SeverityName": "bogus", "Severity": 59}, "medium"),
+        ({"SeverityName": "bogus", "Severity": 40}, "medium"),
+        ({"SeverityName": "bogus", "Severity": 39}, "low"),
+        ({"SeverityName": "bogus", "Severity": 0}, "low"),
+        ({"SeverityName": "bogus", "Severity": "90"}, "medium"),
+        ({"SeverityName": "bogus", "Severity": True}, "medium"),
+        ({"SeverityName": None}, "medium"),
+        ({}, "medium"),
+    ],
+)
+def test_idp_severity(detection_event, details, expected):
+    event = detection_event(43, "IdpDetectionSummaryEvent", False)
+    event["event"].pop("SeverityName")
+    event["event"].update(details)
+    results = parser.parse_events([event], False, ["IdpDetectionSummaryEvent"])
+    assert results[0]["container"]["severity"] == expected
+    assert results[0]["artifacts"][0]["severity"] == expected
+
+
+def test_collate_keeps_identity_and_endpoint_events_in_separate_containers(
+    detection_event,
+):
+    epp = detection_event(41, "EppDetectionSummaryEvent", False)
+    idp = detection_event(42, "IdpDetectionSummaryEvent", False)
+    idp["event"]["Name"] = epp["event"]["Name"]
+    idp["event"]["SourceEndpointHostName"] = epp["event"]["Hostname"]
+    types = ["EppDetectionSummaryEvent", "IdpDetectionSummaryEvent"]
+    results = parser.parse_events([epp, idp], True, types)
+    assert len(results) == 2
+    assert {len(r["artifacts"]) for r in results} == {1}
+
+
+def test_collate_still_merges_legacy_and_epp_events(detection_event):
+    legacy = detection_event(41, "DetectionSummaryEvent", False)
+    epp = detection_event(42, "EppDetectionSummaryEvent", False)
+    results = parser.parse_events([legacy, epp], True)
+    assert len(results) == 1
+    assert len(results[0]["artifacts"]) == 2
+
+
+def test_idp_numeric_severity_fallback(detection_event):
+    event = detection_event(43, "IdpDetectionSummaryEvent", False)
+    event["event"].pop("SeverityName")
+    event["event"]["Severity"] = 85
+    results = parser.parse_events([event], False, ["IdpDetectionSummaryEvent"])
+    assert results[0]["container"]["severity"] == "high"

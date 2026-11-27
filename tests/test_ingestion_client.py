@@ -265,3 +265,14 @@ def test_token_persistence_false_result_is_reported(
         client.make_rest_call("/test")
     request.assert_called_once()
     assert asset.auth_state.get_all() == {"unrelated": "preserved"}
+
+
+def test_stream_datafeed_uses_configured_event_types(monkeypatch):
+    request = Mock()
+    monkeypatch.setattr("src.helper.requests.request", request)
+    CrowdStrikeClient.stream_datafeed(
+        "https://feed.example.test/events?a=1", "session", 7, ["A", "B"]
+    )
+    url = request.call_args.args[1]
+    assert url == "https://feed.example.test/events?a=1&offset=7&eventType=A,B"
+    assert request.call_args.kwargs["headers"]["Authorization"] == "Token session"

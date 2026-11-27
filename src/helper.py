@@ -234,9 +234,11 @@ class CrowdStrikeClient:
         }
 
     @staticmethod
-    def stream_datafeed(data_feed_url: str, token: str, lower_id: int):
+    def stream_datafeed(
+        data_feed_url: str, token: str, lower_id: int, event_types: list[str]
+    ):
         """Open the streaming detection-event feed. Returns the raw streaming response."""
-        url = f"{data_feed_url}&offset={lower_id}&eventType=DetectionSummaryEvent,EppDetectionSummaryEvent"
+        url = f"{data_feed_url}&offset={lower_id}&eventType={','.join(event_types)}"
         headers = {
             "Authorization": f"Token {token}",
             "Connection": "Keep-Alive",

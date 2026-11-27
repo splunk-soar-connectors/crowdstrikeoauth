@@ -102,8 +102,9 @@ error.
     parameters [Maximum events to get while POLL NOW] (default 2000 if not specified) and
     [Maximum events to get while scheduled and interval polling] (default 10,000 if not
     specified). For ingestion, the events are fetched after filtering them based on the event
-    types - **DetectionSummaryEvent** and **EppDetectionSummaryEvent**. The app will exit from the polling cycle in the
-    below-mentioned 2 cases whichever is earlier.
+    types enabled by the [Ingest ... detections] asset configuration parameters (by default
+    **DetectionSummaryEvent** and **EppDetectionSummaryEvent**). The app will exit from the
+    polling cycle in the below-mentioned 2 cases whichever is earlier.
     - If the total events fetched equals the value provided in the \[Maximum
       events to get while POLL NOW\] (for manual polling) or \[Maximum events to get while
       scheduled and interval polling\] (for scheduled | interval polling) parameters
@@ -115,6 +116,22 @@ error.
     as specifying an interval in the configuration parameter \[Merge same containers within
     specified seconds\], all events which are of the same type and on the same host will be put
     into one container, as long as the time between those two events is less than the interval.
+  - The following asset configuration parameters select which detection types are ingested.
+    At least one must be enabled; otherwise test connectivity and polling fail.
+    - [Ingest legacy endpoint detections] - **DetectionSummaryEvent** (default: enabled)
+    - [Ingest endpoint detections] - **EppDetectionSummaryEvent** (default: enabled)
+    - [Ingest Identity Protection detections] - **IdpDetectionSummaryEvent** (default:
+      disabled). Identity Protection detections often have no host name; when merging
+      containers they are merged into containers named **\<name> at \<time>**, and events
+      without a name are ingested as **Unknown Detection** instead of being skipped.
+    - The API client needs read access to the Event Streams of the enabled products. Detection
+      types the tenant is not licensed for are not delivered by CrowdStrike and are not
+      reported as errors.
+    - All detection types share one stream offset per tenant. A newly enabled type is only
+      ingested from the current checkpoint forward; older events are not backfilled unless the
+      ingestion state is reset. Events that arrive while a type is disabled are not ingested after it is re-enabled; only new events are.
+    - Enabling additional detection types increases the stream volume, so the maximum events
+      limits are reached sooner.
   - The [Maximum allowed continuous blank lines] asset configuration parameter will be used to
     indicate the allowed number of continuous blank lines while fetching events. For example, if some events exist after 100 continuous blank lines and you've
     set the [Maximum allowed continues blank lines] parameter value to 500, it will keep on
@@ -128,14 +145,14 @@ error.
 - Manual Polling
   - During manual poll now, the app starts from the first event that it can query up to the
     value configured in the configuration parameter [Maximum events to get while POLL NOW] and
-    creates artifacts for all the fetched DetectionSummaryEvents. The last queried event's
+    creates artifacts for all the fetched events of the configured types. The last queried event's
     offset ID will not be remembered in Manual POLL NOW and it fetches everything every time
     from the beginning.
 - Scheduled | Interval Polling
   - During scheduled | interval polling, the app starts from the first event that it can query
     up to the value configured in the configuration parameter \[Maximum events to get while
     scheduled and interval polling\] and creates artifacts for all the fetched
-    DetectionSummaryEvents. Then, it remembers the last event's offset ID and stores it in the
+    events of the configured types. Then, it remembers the last event's offset ID and stores it in the
     state file against the key [last_offset_id]. In the next scheduled poll run, it will start
     from the stored offset ID in the state file and will fetch the maximum events as configured
     in the [Maximum events to get while scheduled and interval polling] parameter.
@@ -167,6 +184,15 @@ The **EppDetectionSummaryEvent** is parsed to extract the following values into 
 | cef.hash | SHA1String |
 | cef.hash | SHA256String |
 | cef.cs1 | cmdLine |
+
+The **IdpDetectionSummaryEvent** is parsed to extract the following values into an Artifact.
+
+| **Artifact Field** | **Event Field** |
+|--------------------|-----------------|
+| cef.sourceUserName | SourceAccountName |
+| cef.sourceHostName | SourceEndpointHostName |
+| cef.sourceNtDomain | SourceAccountDomain |
+| cef.sourceAddress | SourceEndpointIpAddress |
 
 The app also parses the following **sub-events** into their own artifacts.
 
@@ -415,6 +441,9 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **app_id** | optional | string | App ID |
 **max_events** | optional | numeric | Maximum events to get for scheduled and interval polling |
 **max_events_poll_now** | optional | numeric | Maximum events to get while POLL NOW |
+**ingest_legacy_detections** | optional | boolean | Ingest legacy endpoint detections (DetectionSummaryEvent) |
+**ingest_epp_detections** | optional | boolean | Ingest endpoint detections (EppDetectionSummaryEvent) |
+**ingest_idp_detections** | optional | boolean | Ingest Identity Protection detections (IdpDetectionSummaryEvent) |
 **collate** | optional | boolean | Merge containers for hostname and eventname |
 **max_crlf** | optional | numeric | Maximum allowed continuous blank lines |
 **detonate_timeout** | optional | numeric | Timeout for detonation result in minutes (Default: 15 minutes) |

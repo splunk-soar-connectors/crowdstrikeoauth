@@ -17,7 +17,11 @@ from datetime import datetime, UTC
 
 from bs4 import UnicodeDammit
 
-from .consts import CROWDSTRIKE_EVENT_TYPES
+from .consts import (
+    CROWDSTRIKE_EVENT_FIELD_MAP,
+    CROWDSTRIKE_EVENT_TYPES,
+    CROWDSTRIKE_UNKNOWN_DETECTION_NAME,
+)
 
 
 try:
@@ -96,15 +100,77 @@ def _set_cef_key(src_dict, src_key, dst_dict, dst_key, move=False):
     return True
 
 
-def _set_cef_key_list(event_details, cef, event_type):
-    if event_type == "DetectionSummaryEvent":
-        _set_cef_key(event_details, "ComputerName", cef, "sourceHostName", move=True)
-        _set_cef_key(event_details, "MachineDomain", cef, "sourceNtDomain", move=True)
-    else:
-        _set_cef_key(event_details, "Hostname", cef, "sourceHostName", move=True)
-        _set_cef_key(event_details, "LogonDomain", cef, "sourceNtDomain", move=True)
+def get_event_spec(event_type):
+    return CROWDSTRIKE_EVENT_FIELD_MAP[event_type]
 
-    _set_cef_key(event_details, "UserName", cef, "sourceUserName", move=True)
+
+def _event_type(event):
+    return event.get("metadata", {}).get("eventType", "")
+
+
+def _resolve_field(event_details, keys, default):
+    for key in keys:
+        value = event_details.get(key)
+        if isinstance(value, str) and value.strip():
+            return value
+    if len(keys) == 1:
+        return event_details.get(keys[0], default)
+    return default
+
+
+def get_event_name(event, default=None):
+    spec = get_event_spec(_event_type(event))
+    return _resolve_field(event["event"], spec["name"], default)
+
+
+def get_collate_name(event):
+    name = get_event_name(event)
+    if not name and not get_event_spec(_event_type(event))["name_required"]:
+        return CROWDSTRIKE_UNKNOWN_DETECTION_NAME
+    return name
+
+
+def get_event_host(event, default=""):
+    spec = get_event_spec(_event_type(event))
+    return _resolve_field(event["event"], spec["host"], default)
+
+
+def _score_to_severity(score):
+    if isinstance(score, bool) or not isinstance(score, int | float):
+        return "medium"
+    if score >= 60:
+        return "high"
+    return "medium" if score >= 40 else "low"
+
+
+def _get_event_severity(event_details, event_type):
+    mode = get_event_spec(event_type)["severity"]
+    if mode == "numeric":
+        return _severity_map.get(str(event_details.get("Severity", 3)), "medium")
+    severity_name = event_details.get("SeverityName", "")
+    severity = _severity_name_map.get(
+        severity_name.lower() if isinstance(severity_name, str) else ""
+    )
+    if severity:
+        return severity
+    if mode == "name_or_score":
+        return _score_to_severity(event_details.get("Severity"))
+    return "medium"
+
+
+def _move_first_cef_key(event_details, keys, cef, dst_key):
+    for key in keys:
+        if _set_cef_key(event_details, key, cef, dst_key, move=True):
+            return
+
+
+def _set_cef_key_list(event_details, cef, event_type):
+    spec = get_event_spec(event_type)
+    _move_first_cef_key(event_details, spec["host"], cef, "sourceHostName")
+    _move_first_cef_key(event_details, spec["domain"], cef, "sourceNtDomain")
+    _move_first_cef_key(event_details, spec["user"], cef, "sourceUserName")
+    _move_first_cef_key(event_details, spec["address"], cef, "sourceAddress")
+
     _set_cef_key(event_details, "FileName", cef, "fileName", move=True)
     _set_cef_key(event_details, "FilePath", cef, "filePath", move=True)
     _set_cef_key(event_details, "MD5String", cef, "fileHash")
@@ -132,43 +198,29 @@ def _set_cef_key_list(event_details, cef, event_type):
 def _collate_results(detection_events):
     results = []
 
-    detection_names = set()
-    for event in detection_events:
-        event_type = event.get("metadata", {}).get("eventType", "")
-        if event_type == "DetectionSummaryEvent":
-            name = event["event"].get("DetectName")
-        else:
-            name = event["event"].get("Name")
-        if name:
-            detection_names.add(name)
+    named_events = [
+        (
+            (
+                get_event_spec(_event_type(event))["collate_group"],
+                get_collate_name(event),
+            ),
+            event,
+        )
+        for event in detection_events
+    ]
+    detection_keys = dict.fromkeys(key for key, _ in named_events if key[1])
 
-    for detection_name in detection_names:
+    for group_key in detection_keys:
+        detection_name = group_key[1]
         per_detection_events = [
-            x
-            for x in detection_events
-            if (
-                x["event"].get("DetectName") == detection_name
-                or x["event"].get("Name") == detection_name
-            )
+            (get_event_host(x), x) for key, x in named_events if key == group_key
         ]
 
-        machine_names = set()
-        for event in per_detection_events:
-            event_type = event.get("metadata", {}).get("eventType", "")
-            if event_type == "DetectionSummaryEvent":
-                machine_name = event["event"].get("ComputerName", "")
-            else:
-                machine_name = event["event"].get("Hostname", "")
-            machine_names.add(machine_name)
+        machine_names = dict.fromkeys(host for host, _ in per_detection_events)
 
         for machine_name in machine_names:
             per_detection_machine_events = [
-                x
-                for x in per_detection_events
-                if (
-                    x["event"].get("ComputerName") == machine_name
-                    or x["event"].get("Hostname") == machine_name
-                )
+                x for host, x in per_detection_events if host == machine_name
             ]
 
             ingest_event = {}
@@ -346,15 +398,10 @@ def _create_artifacts_from_event(event):
     artifact.update(_artifact_common)
     artifact["source_data_identifier"] = str(event_metadata["offset"])
 
-    if event_type == "DetectionSummaryEvent":
-        artifact["name"] = event_details.get("DetectDescription", "Detection Artifact")
-        artifact["severity"] = _severity_map.get(
-            str(event_details.get("Severity", 3)), "medium"
-        )
-    else:
-        artifact["name"] = event_details.get("Description", "Detection Artifact")
-        severity_name = event_details.get("SeverityName", "").lower()
-        artifact["severity"] = _severity_name_map.get(severity_name, "medium")
+    artifact["name"] = _resolve_field(
+        event_details, get_event_spec(event_type)["description"], "Detection Artifact"
+    )
+    artifact["severity"] = _get_event_severity(event_details, event_type)
 
     _set_cef_key_list(event_details, cef, event_type)
 
@@ -388,11 +435,14 @@ def _get_str_from_epoch(epoch_milli):
     )
 
 
-def parse_events(events, collate):
+def parse_events(events, collate, event_types=None):
     results = []
 
+    allowed_types = set(event_types or CROWDSTRIKE_EVENT_TYPES).intersection(
+        CROWDSTRIKE_EVENT_FIELD_MAP
+    )
     detection_events = [
-        x for x in events if x["metadata"]["eventType"] in CROWDSTRIKE_EVENT_TYPES
+        x for x in events if x["metadata"]["eventType"] in allowed_types
     ]
 
     if not detection_events:
@@ -403,19 +453,9 @@ def parse_events(events, collate):
 
     for curr_event in detection_events:
         event_type = curr_event["metadata"]["eventType"]
-        event_details = curr_event["event"]
-
-        if event_type == "DetectionSummaryEvent":
-            detection_name = event_details.get("DetectName", "Unknown Detection")
-            container_severity = _severity_map.get(
-                str(event_details.get("Severity", 3)), "medium"
-            )
-            hostname = event_details.get("ComputerName", "Unknown Host")
-        else:
-            detection_name = event_details.get("Name", "Unknown Detection")
-            severity_name = event_details.get("SeverityName", "").lower()
-            container_severity = _severity_name_map.get(severity_name, "medium")
-            hostname = event_details.get("Hostname", "Unknown Host")
+        detection_name = get_event_name(curr_event, CROWDSTRIKE_UNKNOWN_DETECTION_NAME)
+        container_severity = _get_event_severity(curr_event["event"], event_type)
+        hostname = get_event_host(curr_event, "Unknown Host")
 
         creation_time = curr_event.get("metadata", {}).get("eventCreationTime", "")
 

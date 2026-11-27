@@ -25,11 +25,12 @@ from soar_sdk.params import OnPollParams
 from . import parse_cs_events as events_parser
 from .consts import (
     CROWDSTRIKE_BLANK_LINES_COUNT_MESSAGE,
-    CROWDSTRIKE_EVENT_TYPES,
+    CROWDSTRIKE_EVENT_FIELD_MAP,
     CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT,
     CROWDSTRIKE_GETTING_EVENTS_MESSAGE,
     CROWDSTRIKE_GOT_EVENTS_MESSAGE,
     CROWDSTRIKE_NO_DATA_MESSAGE,
+    CROWDSTRIKE_NO_EVENT_TYPES_ERROR,
     CROWDSTRIKE_PULLED_EVENTS_MESSAGE,
     CROWDSTRIKE_REACHED_CR_LF_COUNT_MESSAGE,
     CROWDSTRIKE_RECEIVED_CR_LF_MESSAGE,
@@ -81,6 +82,21 @@ class Asset(BaseAsset):
         default=2000,
         category=FieldCategory.INGEST,
     )
+    ingest_legacy_detections: bool | None = AssetField(
+        description="Ingest legacy endpoint detections (DetectionSummaryEvent)",
+        default=True,
+        category=FieldCategory.INGEST,
+    )
+    ingest_epp_detections: bool | None = AssetField(
+        description="Ingest endpoint detections (EppDetectionSummaryEvent)",
+        default=True,
+        category=FieldCategory.INGEST,
+    )
+    ingest_idp_detections: bool | None = AssetField(
+        description="Ingest Identity Protection detections (IdpDetectionSummaryEvent)",
+        default=False,
+        category=FieldCategory.INGEST,
+    )
     collate: bool | None = AssetField(
         description="Merge containers for hostname and eventname",
         default=True,
@@ -103,6 +119,18 @@ def get_client(asset: Asset) -> CrowdStrikeClient:
     return CrowdStrikeClient(asset)
 
 
+def get_enabled_event_types(asset: Asset) -> list[str]:
+    """Return the Event Stream event types enabled by the asset's ingest checkboxes."""
+    event_types = []
+    for event_type, spec in CROWDSTRIKE_EVENT_FIELD_MAP.items():
+        enabled = getattr(asset, spec["asset_field"])
+        if spec["enabled_by_default"] if enabled is None else enabled:
+            event_types.append(event_type)
+    if not event_types:
+        raise ValueError(CROWDSTRIKE_NO_EVENT_TYPES_ERROR)
+    return event_types
+
+
 app = App(
     name="CrowdStrike OAuth API",
     app_type="endpoint",
@@ -120,6 +148,7 @@ app = App(
 
 @app.test_connectivity()
 def test_connectivity(soar: SOARClient, asset: Asset) -> None:
+    get_enabled_event_types(asset)
     client = get_client(asset)
     logger.progress("Fetching devices")
     client.make_rest_call(CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT, params={"limit": 1})
@@ -149,11 +178,18 @@ def on_poll(
             asset.max_events or DEFAULT_EVENTS_COUNT, "max_events"
         )
 
+    event_types = get_enabled_event_types(asset)
     tenants = [None, *get_subtenants(asset)]
 
     for tenant in tenants:
         yield from _poll_detection_events(
-            client, asset, is_poll_now, max_crlf, max_events, subtenant=tenant
+            client,
+            asset,
+            is_poll_now,
+            max_crlf,
+            max_events,
+            event_types,
+            subtenant=tenant,
         )
 
 
@@ -163,8 +199,10 @@ def _poll_detection_events(
     is_poll_now: bool,
     max_crlf: int | None,
     max_events: int,
+    event_types: list[str],
     subtenant: str | None = None,
 ) -> Iterator[Container | Artifact]:
+    allowed_types = set(event_types)
     offset_key = f"last_offset_id_{subtenant}" if subtenant else "last_offset_id"
 
     lower_id = 0
@@ -195,7 +233,7 @@ def _poll_detection_events(
         stage = "stream opening"
         logger.info(f"Poll stage={stage}, tenant={tenant}")
         response = client.stream_datafeed(
-            feed["data_feed_url"], feed["token"], lower_id
+            feed["data_feed_url"], feed["token"], lower_id, event_types=event_types
         )
         try:
             if response.status_code != 200:
@@ -252,28 +290,15 @@ def _poll_detection_events(
                     continue
                 metadata = event["metadata"]
                 event_type = metadata.get("eventType")
-                if event_type not in CROWDSTRIKE_EVENT_TYPES:
+                if event_type not in allowed_types:
                     continue
                 details = event.get("event")
                 offset = metadata.get("offset")
-                name_key, hostname_key = (
-                    ("DetectName", "ComputerName")
-                    if event_type == "DetectionSummaryEvent"
-                    else ("Name", "Hostname")
-                )
                 if (
                     not isinstance(details, dict)
                     or type(offset) is not int
                     or offset < 0
-                    or (
-                        asset.collate
-                        and (
-                            not isinstance(details.get(name_key), str)
-                            or not details[name_key].strip()
-                            or not isinstance(details.get(hostname_key), str)
-                            or not details[hostname_key].strip()
-                        )
-                    )
+                    or (asset.collate and not _has_collate_fields(event))
                 ):
                     skipped_records += 1
                     logger.warning(
@@ -305,7 +330,7 @@ def _poll_detection_events(
         if events:
             stage = "event parsing"
             logger.info(f"Poll stage={stage}, tenant={tenant}, events={len(events)}")
-            results = events_parser.parse_events(events, asset.collate)
+            results = events_parser.parse_events(events, asset.collate, event_types)
             if not results:
                 raise ValueError("CrowdStrike parser produced no ingestion results")
             stage = "yielding results"
@@ -328,6 +353,21 @@ def _poll_detection_events(
             f"skipped={skipped_records}, checkpoint_start={lower_id}"
         )
         raise
+
+
+def _is_non_empty_str(value) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _has_collate_fields(event: dict) -> bool:
+    spec = events_parser.get_event_spec(event["metadata"].get("eventType"))
+    if spec["name_required"] and not _is_non_empty_str(
+        events_parser.get_event_name(event)
+    ):
+        return False
+    return not spec["host_required"] or _is_non_empty_str(
+        events_parser.get_event_host(event)
+    )
 
 
 def _yield_results(results: list) -> Iterator[Container | Artifact]:

@@ -75,21 +75,26 @@ def client(asset):
 @pytest.fixture
 def detection_event():
     def make(offset=42, event_type="DetectionSummaryEvent", sub_events=True):
-        details = (
-            {
+        if event_type == "DetectionSummaryEvent":
+            details = {
                 "DetectName": "Test detection",
                 "DetectDescription": "Suspicious process",
                 "ComputerName": "test-host",
                 "Severity": 3,
             }
-            if event_type == "DetectionSummaryEvent"
-            else {
+        elif event_type == "EppDetectionSummaryEvent":
+            details = {
                 "Name": "Test detection",
                 "Description": "Suspicious process",
                 "Hostname": "test-host",
                 "SeverityName": "medium",
             }
-        )
+        else:
+            details = {
+                "Name": "Identity detection",
+                "Description": "Suspicious identity activity",
+                "SeverityName": "high",
+            }
         if sub_events:
             details["FilesAccessed"] = [{"FileName": "evidence.txt"}]
         return {

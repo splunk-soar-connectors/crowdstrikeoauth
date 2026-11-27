@@ -282,7 +282,60 @@ CROWDSTRIKE_DETECTION_STATUSES = [
     "reopened",
 ]
 CROWDSTRIKE_EPP_ALERT_STATUSES = ["new", "in_progress", "closed", "reopened"]
-CROWDSTRIKE_EVENT_TYPES = ["DetectionSummaryEvent", "EppDetectionSummaryEvent"]
+CROWDSTRIKE_EVENT_FIELD_MAP = {
+    "DetectionSummaryEvent": {
+        "asset_field": "ingest_legacy_detections",
+        "collate_group": "endpoint",
+        "enabled_by_default": True,
+        "name": ["DetectName"],
+        "host": ["ComputerName"],
+        "domain": ["MachineDomain"],
+        "user": ["UserName"],
+        "address": [],
+        "description": ["DetectDescription"],
+        "name_required": True,
+        "host_required": True,
+        "severity": "numeric",
+    },
+    "EppDetectionSummaryEvent": {
+        "asset_field": "ingest_epp_detections",
+        "collate_group": "endpoint",
+        "enabled_by_default": True,
+        "name": ["Name"],
+        "host": ["Hostname"],
+        "domain": ["LogonDomain"],
+        "user": ["UserName"],
+        "address": [],
+        "description": ["Description"],
+        "name_required": True,
+        "host_required": True,
+        "severity": "name",
+    },
+    "IdpDetectionSummaryEvent": {
+        "asset_field": "ingest_idp_detections",
+        "collate_group": "identity",
+        "enabled_by_default": False,
+        "name": ["Name", "DisplayName"],
+        "host": ["SourceEndpointHostName", "Hostname"],
+        "domain": ["SourceAccountDomain", "LogonDomain"],
+        "user": ["SourceAccountName", "UserName"],
+        "address": ["SourceEndpointIpAddress"],
+        "description": ["Description"],
+        "name_required": False,
+        "host_required": False,
+        "severity": "name_or_score",
+    },
+}
+CROWDSTRIKE_EVENT_TYPES = [
+    event_type
+    for event_type, spec in CROWDSTRIKE_EVENT_FIELD_MAP.items()
+    if spec["enabled_by_default"]
+]
+CROWDSTRIKE_UNKNOWN_DETECTION_NAME = "Unknown Detection"
+CROWDSTRIKE_NO_EVENT_TYPES_ERROR = (
+    "No detection types are enabled for ingestion. "
+    "Enable at least one 'Ingest ... detections' asset configuration parameter"
+)
 
 CROWDSTRIKE_IOA_CREATE_RULE_GROUP_ENDPOINT = "/ioarules/entities/rule-groups/v1"
 CROWDSTRIKE_IOA_QUERY_RULE_GROUPS_ENDPOINT = "/ioarules/queries/rule-groups-full/v1"
